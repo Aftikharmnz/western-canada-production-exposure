@@ -1,5 +1,9 @@
-# Raw / heavy data — too large for GitHub (678 MB)
+# Monthly Petrinex files — exclude all except the 4 most recent months
 public/data/monthly/
+!public/data/monthly/petrinex_ab_2025-10-31.json
+!public/data/monthly/petrinex_ab_2025-11-30.json
+!public/data/monthly/petrinex_ab_2025-12-31.json
+!public/data/monthly/petrinex_ab_2026-01-31.json
 
 # Python cache
 __pycache__/
