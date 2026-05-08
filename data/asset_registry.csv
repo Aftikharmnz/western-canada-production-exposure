@@ -1,0 +1,65 @@
+production_system,company,asset_name,province,latitude,longitude,asset_kind,notes
+in_situ,Cenovus,Christina Lake,Alberta,55.775,-110.915,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Cenovus,Foster Creek,Alberta,55.170,-110.675,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Cenovus,Sunrise,Alberta,57.250,-111.420,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Cenovus,Narrows Lake,Alberta,56.460,-111.020,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Cenovus,Other Cenovus,Alberta,55.900,-111.050,in_situ_scheme,Company residual bucket, approximate.
+in_situ,CNRL,Brintnell,Alberta,55.870,-110.760,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,CNRL,Jackfish,Alberta,55.540,-110.710,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,CNRL,Kirby,Alberta,55.440,-110.720,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,CNRL,Primrose & Wolf Lake,Alberta,54.725,-110.160,in_situ_scheme,Approximate Cold Lake area centroid.
+in_situ,CNRL,CNRL Other,Alberta,55.650,-110.550,in_situ_scheme,Company residual bucket, approximate.
+in_situ,Suncor,Firebag,Alberta,57.225,-110.900,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Suncor,MacKay River,Alberta,57.050,-111.350,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
+in_situ,Imperial Oil,Cold Lake,Alberta,54.520,-110.170,in_situ_scheme,Approximate Cold Lake operations centroid.
+in_situ,Imperial Oil,Imperial Other,Alberta,54.650,-110.250,in_situ_scheme,Company residual bucket, approximate.
+in_situ,ConocoPhillips,Surmont,Alberta,56.235,-111.170,in_situ_scheme,Approximate scheme centroid.
+in_situ,MEG Energy,Christina Lake,Alberta,55.735,-110.930,in_situ_scheme,Approximate MEG Christina Lake centroid.
+in_situ,Strathcona,Lindbergh,Alberta,53.905,-110.370,in_situ_scheme,Approximate Lloydminster area centroid.
+in_situ,Strathcona,Orion,Alberta,55.300,-110.365,in_situ_scheme,Approximate Cold Lake area centroid.
+in_situ,Strathcona,Tucker,Alberta,55.505,-110.535,in_situ_scheme,Approximate scheme centroid.
+in_situ,Athabasca,Hangingstone,Alberta,56.530,-111.070,in_situ_scheme,Approximate scheme centroid.
+in_situ,Athabasca,Leismer,Alberta,55.300,-110.760,in_situ_scheme,Approximate scheme centroid.
+in_situ,CNOOC/Nexen,Long Lake,Alberta,56.380,-111.460,in_situ_scheme,Approximate scheme centroid.
+in_situ,Baytex,Cadotte,Alberta,56.365,-116.490,in_situ_scheme,Approximate Peace River area centroid.
+in_situ,Baytex,Seal/Peace River,Alberta,56.175,-117.340,in_situ_scheme,Approximate Peace River area centroid.
+in_situ,Baytex,Baytex Other,Alberta,56.230,-117.000,in_situ_scheme,Company residual bucket, approximate.
+in_situ,Connacher,Great Divide,Alberta,55.720,-110.240,in_situ_scheme,Approximate scheme centroid.
+in_situ,Greenfire,Hangingstone Demo,Alberta,56.505,-111.050,in_situ_scheme,Approximate Hangingstone area centroid.
+in_situ,Greenfire,Hangingstone Exp,Alberta,56.570,-111.100,in_situ_scheme,Approximate Hangingstone area centroid.
+in_situ,Headwater,Headwater (Assets),Alberta,56.050,-116.720,in_situ_scheme,Company residual bucket, approximate.
+in_situ,Harvest,BlackGold,Alberta,55.330,-110.625,in_situ_scheme,Approximate scheme centroid.
+in_situ,PetroChina,MacKay River (PC),Alberta,57.080,-111.520,in_situ_scheme,Approximate MacKay River area centroid.
+in_situ,Tamarack,Tamarack (Assets),Alberta,56.150,-116.600,in_situ_scheme,Company residual bucket, approximate.
+in_situ,Obsidian,Obsidian (Assets),Alberta,56.290,-116.900,in_situ_scheme,Company residual bucket, approximate.
+in_situ,,Other Producers Total,Alberta,55.850,-111.050,company_rollup,Workbook residual rollup.
+mined,CNRL,CNRL Horizon,Alberta,57.300,-111.670,mine,Approximate mine centroid.
+mined,CNRL,Muskeg River Mine,Alberta,57.335,-111.590,mine,Approximate Albian mine centroid.
+mined,CNRL,Jackpine Mine,Alberta,57.255,-111.505,mine,Approximate mine centroid.
+mined,Suncor,Fort Hills Mine,Alberta,57.295,-111.345,mine,Approximate mine centroid.
+mined,Imperial Oil,Kearl Mine,Alberta,57.220,-111.280,mine,Approximate mine centroid.
+mined,Suncor,Suncor OSG,Alberta,56.990,-111.450,mine,Approximate Millennium/Base operations centroid.
+mined,Syncrude JV,Syncrude Mildred Lake,Alberta,57.040,-111.560,mine,Approximate mine centroid.
+mined,Syncrude JV,Syncrude Aurora,Alberta,57.350,-111.480,mine,Approximate mine centroid.
+mined,CNRL,Shell Jackpine Mine,Alberta,57.250,-111.500,mine,Approximate mine centroid.
+provincial_light,Provincial aggregate,Alberta,Alberta,53.933,-116.576,province,Provincial aggregate marker.
+provincial_light,Provincial aggregate,Saskatchewan,Saskatchewan,52.940,-106.451,province,Provincial aggregate marker.
+provincial_light,Provincial aggregate,British Columbia,British Columbia,54.000,-125.000,province,Provincial aggregate marker.
+provincial_light,Provincial aggregate,Manitoba,Manitoba,53.761,-98.814,province,Provincial aggregate marker.
+provincial_light,Provincial aggregate,Northwest Territories,Northwest Territories,64.826,-124.846,province,Provincial aggregate marker.
+refinery_input,Provincial aggregate,Alberta,Alberta,53.933,-116.576,province_refinery,Provincial refinery input marker.
+refinery_input,Provincial aggregate,Saskatchewan,Saskatchewan,52.940,-106.451,province_refinery,Provincial refinery input marker.
+refinery_input,Provincial aggregate,British Columbia,British Columbia,54.000,-125.000,province_refinery,Provincial refinery input marker.
+conventional,Regional aggregate,Western Canada,Western Canada,55.400,-111.500,region,Regional aggregate marker.
+condensate,Regional aggregate,Western Canada Condensate,Western Canada,55.100,-112.200,region,Regional aggregate marker.
+heavy_conventional,Provincial aggregate,Alberta — Heavy crude oil,Alberta,55.20,-114.50,province,StatCan 25100063 AB heavy crude (offset NE from centroid).
+heavy_conventional,Provincial aggregate,Saskatchewan — Heavy crude oil,Saskatchewan,53.60,-105.20,province,StatCan 25100063 SK heavy crude (offset NE from centroid).
+heavy_conventional,Provincial aggregate,British Columbia — Heavy crude oil,British Columbia,55.50,-124.00,province,StatCan 25100063 BC heavy crude.
+heavy_conventional,Provincial aggregate,Manitoba — Heavy crude oil,Manitoba,54.80,-97.80,province,StatCan 25100063 MB heavy crude.
+conventional,Provincial aggregate,Alberta — Light & medium crude oil,Alberta,52.80,-114.50,province,StatCan 25100063 AB light+medium crude (offset SE from centroid).
+conventional,Provincial aggregate,Saskatchewan — Light & medium crude oil,Saskatchewan,51.80,-105.20,province,StatCan 25100063 SK light+medium crude.
+conventional,Provincial aggregate,British Columbia — Light & medium crude oil,British Columbia,53.20,-126.00,province,StatCan 25100063 BC light+medium crude.
+conventional,Provincial aggregate,Manitoba — Light & medium crude oil,Manitoba,52.70,-98.50,province,StatCan 25100063 MB light+medium crude.
+synthetic,Provincial aggregate,Alberta — Synthetic crude oil,Alberta,57.20,-111.80,province,StatCan 25100063 AB synthetic crude oil (near oil sands).
+condensate,Provincial aggregate,Alberta — Condensate Production,Alberta,55.80,-118.00,province,StatCan 25100063 AB condensate (Peace River area).
+condensate,Provincial aggregate,British Columbia — Condensate Production,British Columbia,55.30,-122.80,province,StatCan 25100063 BC condensate.

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Western Canada Production Exposure</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>Western Canada Production Exposure</h1>
+            <p id="freshness">Loading local production store...</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <label class="search-control">
+            <span>Search</span>
+            <input id="searchInput" type="search" placeholder="Asset, company, province, stream" />
+          </label>
+          <button id="selectModeBtn" class="select-mode-btn" type="button" title="Ctrl+drag to select assets">&#9638; Select</button>
+          <button id="formationToggle" class="formation-toggle-btn" type="button">AER Sites</button>
+          <button id="wildfireToggle" class="fire-toggle-btn" type="button">Fire Layer</button>
+          <button id="etlButton" class="primary-action" type="button">Run ETL</button>
+        </div>
+      </header>
+      <main class="workspace">
+        <aside class="filter-rail" aria-label="Production filters">
+          <section class="filter-section">
+            <h2>Date</h2>
+            <div class="date-readout">
+              <strong id="selectedDate">--</strong>
+              <span id="dateScenario">--</span>
+            </div>
+            <input id="dateSlider" class="range" type="range" min="0" max="0" value="0" />
+          </section>
+          <section class="filter-section">
+            <h2>Sources</h2>
+            <div id="sourceFilters" class="toggle-list"></div>
+          </section>
+          <section class="filter-section">
+            <h2>Streams</h2>
+            <div id="streamFilters" class="toggle-list"></div>
+          </section>
+          <section class="filter-section metrics">
+            <h2>Exposure</h2>
+            <div class="metric-row">
+              <span>Total shown</span>
+              <strong id="totalShown">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Mapped points</span>
+              <strong id="mappedCount">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Largest asset</span>
+              <strong id="largestPoint">--</strong>
+            </div>
+            <div class="metric-row fire-exposure-row" id="fireExposureRow" hidden>
+              <span>At fire risk</span>
+              <strong id="fireExposure">--</strong>
+            </div>
+            <div class="exp-subsection" id="provinceBreakdown"></div>
+            <div class="exp-subsection" id="systemBreakdown"></div>
+          </section>
+        </aside>
+        <section class="map-stage" aria-label="Production map">
+          <div id="map" class="map"></div>
+          <div id="mapFallback" class="map-fallback" hidden></div>
+          <div id="wildfireStatus" class="wildfire-status" hidden></div>
+          <div class="map-legend">
+            <span><i class="dot in-situ"></i>In-situ Bitumen</span>
+            <span><i class="dot mined"></i>Mined Bitumen</span>
+            <span><i class="dot synthetic"></i>Synthetic Crude</span>
+            <span><i class="dot heavy-conv"></i>Heavy Crude</span>
+            <span><i class="dot conventional"></i>Conventional</span>
+            <span><i class="dot condensate"></i>Condensate</span>
+            <span><i class="dot fire-zone"></i>Fire Hotspot (FWI)</span>
+            <span><i class="dot ab-fire-oc"></i>AB Fire – Out of Control</span>
+            <span><i class="dot ab-fire-bh"></i>AB Fire – Being Held</span>
+            <span><i class="dot ab-fire-uc"></i>AB Fire – Under Control</span>
+            <span><i class="dot ab-fire-carryover"></i>AB Fire – Carryover</span>
+            <span><i class="dot bc-fire-oc"></i>BC Fire – Out of Control</span>
+            <span><i class="dot bc-fire-bh"></i>BC Fire – Being Held</span>
+            <span><i class="dot bc-fire-uc"></i>BC Fire – Under Control</span>
+            <span><i class="dot bc-fire-fon"></i>BC Fire of Note</span>
+            <span><i class="dot formation-os"></i>In-situ Approval</span>
+            <span><i class="dot formation-tp"></i>Mineable Approval</span>
+            <span><i class="dot st102-facility"></i>ST102 Facility</span>
+          </div>
+          <div id="etlPanel" class="etl-panel" hidden>
+            <button id="closeEtl" type="button" aria-label="Close ETL panel">x</button>
+            <h2>Local refresh command</h2>
+            <p>Run this from the project folder after updating the workbook or refreshing raw sources.</p>
+            <code id="etlCommand"></code>
+            <p style="margin-top:12px;font-size:12px;">Add --download to also re-fetch AER, CER and StatCan raw files.</p>
+          </div>
+        </section>
+        <aside class="detail-panel" aria-label="Selected production detail">
+          <section>
+            <p class="panel-label">Selected Location</p>
+            <h2 id="detailTitle">Western Canada</h2>
+            <p id="detailSubtitle">Click a marker to inspect asset-level exposure.</p>
+          </section>
+          <section class="detail-kpis">
+            <div>
+              <span>Shown volume</span>
+              <strong id="detailVolume">--</strong>
+            </div>
+            <div>
+              <span>Source</span>
+              <strong id="detailSource">--</strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong id="detailStatus">--</strong>
+            </div>
+          </section>
+          <section id="fireRiskSection" class="fire-risk-section" hidden>
+            <div class="section-heading">
+              <h2>Wildfire Risk</h2>
+              <span id="fireRiskBadge" class="risk-badge">--</span>
+            </div>
+            <div class="metric-row">
+              <span>Nearest fire</span>
+              <strong id="fireDistDisplay">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>At-risk output</span>
+              <strong id="fireVolAtRisk">--</strong>
+            </div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Top Assets</h2>
+              <span id="topAssetsLabel">By production, current date</span>
+            </div>
+            <div id="topAssetsList" class="top-assets-list"></div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Stream Breakdown</h2>
+              <span id="sourceMixLabel">At selected date</span>
+            </div>
+            <div id="streamBreakdown" class="breakdown"></div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Source Mix</h2>
+              <span>All visible assets</span>
+            </div>
+            <div id="sourceBreakdown" class="breakdown"></div>
+          </section>
+        </aside>
+      </main>
+      <footer class="timeline">
+        <div class="timeline-head">
+          <span>Monthly production stack</span>
+          <strong id="timelineLabel">--</strong>
+        </div>
+        <div id="timelineBars" class="timeline-bars"></div>
+      </footer>
+    </div>
+    <script type="module" src="src/main.js?v=20260505-fire-hotspots-v2"></script>
+  </body>
+</html>

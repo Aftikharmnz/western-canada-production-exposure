@@ -1,0 +1,20 @@
+# Raw / heavy data — too large for GitHub (678 MB)
+public/data/monthly/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Local ETL inputs
+data/raw/
+data/processed/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Edge browser profile data (local only, not part of the app)
+.edge-debug*/
+.edge-profile*/
