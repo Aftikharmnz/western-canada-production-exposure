@@ -269,7 +269,9 @@ async function ensureDateRecords(date) {
   state.dateRecordLoading.add(date);
   state.dateRecordErrors.delete(date);
   try {
-    const path = file.startsWith("/") ? file : `/${file}`;
+    // Keep the path relative so it resolves correctly both locally and on
+    // GitHub Pages (where the app lives under a /repo-name/ subdirectory).
+    const path = file.startsWith("/") ? file.slice(1) : file;
     const response = await fetch(path);
     if (!response.ok) throw new Error(`Could not load ${path}`);
     state.dateRecordCache.set(date, await response.json());
