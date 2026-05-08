@@ -263,6 +263,44 @@ function recordsForDate(date = state.selectedDate) {
   ];
 }
 
+// Handles both file formats:
+//   Legacy : array of full record objects [{date, asset_id, source_id, stream, volume_kbbl_d, scenario}, ...]
+//   Compact: {date, source_id, stream, scenario, rows: [[asset_id, volume_kbbl_d], ...]}
+//            OR an array of such compact group objects (rare multi-source files)
+function expandMonthlyRecords(raw) {
+  if (Array.isArray(raw)) {
+    // Could be legacy full objects or array of compact groups
+    if (!raw.length) return [];
+    if ("rows" in raw[0]) {
+      // Array of compact group objects
+      return raw.flatMap(group =>
+        (group.rows || []).map(([asset_id, volume_kbbl_d]) => ({
+          date:           group.date,
+          asset_id,
+          source_id:      group.source_id,
+          stream:         group.stream,
+          volume_kbbl_d,
+          scenario:       group.scenario ?? "actual",
+        }))
+      );
+    }
+    // Legacy array of full record objects — return as-is
+    return raw;
+  }
+  // Single compact group object
+  if (raw && "rows" in raw) {
+    return (raw.rows || []).map(([asset_id, volume_kbbl_d]) => ({
+      date:           raw.date,
+      asset_id,
+      source_id:      raw.source_id,
+      stream:         raw.stream,
+      volume_kbbl_d,
+      scenario:       raw.scenario ?? "actual",
+    }));
+  }
+  return [];
+}
+
 async function ensureDateRecords(date) {
   const file = state.manifest?.monthly_record_files?.[date];
   if (!file || state.dateRecordCache.has(date) || state.dateRecordLoading.has(date)) return;
@@ -274,7 +312,8 @@ async function ensureDateRecords(date) {
     const path = file.startsWith("/") ? file.slice(1) : file;
     const response = await fetch(path);
     if (!response.ok) throw new Error(`Could not load ${path}`);
-    state.dateRecordCache.set(date, await response.json());
+    const raw = await response.json();
+    state.dateRecordCache.set(date, expandMonthlyRecords(raw));
   } catch (error) {
     state.dateRecordCache.set(date, []);
     state.dateRecordErrors.set(date, error.message || String(error));
