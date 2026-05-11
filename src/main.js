@@ -310,11 +310,11 @@ async function loadData() {
   [...new Set(sourceIds)].sort().forEach((s) => state.selectedSources.add(s));
 
   const initialRecords = recordsForDate(state.selectedDate);
-  PRIMARY_STREAMS.slice(0, 5).forEach((stream) => {
+  PRIMARY_STREAMS.forEach((stream) => {
     if (initialRecords.some((r) => r.stream === stream)) state.selectedStreams.add(stream);
   });
   if (!state.selectedStreams.size) {
-    [...new Set(initialRecords.map((r) => r.stream))].slice(0, 6).forEach((s) => state.selectedStreams.add(s));
+    [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
   }
 }
 
