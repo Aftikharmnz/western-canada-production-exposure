@@ -425,6 +425,29 @@ select {
   font-weight: 700;
 }
 
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.legend-item.muted {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.legend-item:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .dot {
   display: inline-block;
   width: 10px;
@@ -444,6 +467,10 @@ select {
 
 .dot.conventional {
   background: var(--green);
+}
+
+.dot.pentanes-plus {
+  background: #7c3aed;
 }
 
 .dot.refinery {
@@ -1144,7 +1171,8 @@ select {
 }
 
 /* Select-mode button */
-.select-mode-btn {
+.select-mode-btn,
+.distance-mode-btn {
   height: 36px;
   border: 1.5px solid var(--line-strong);
   border-radius: 6px;
@@ -1156,14 +1184,47 @@ select {
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.select-mode-btn:hover {
+.select-mode-btn:hover,
+.distance-mode-btn:hover {
   border-color: #2980b9;
   color: #2980b9;
 }
-.select-mode-btn.active {
+.select-mode-btn.active,
+.distance-mode-btn.active {
   background: #ebf5fb;
   border-color: #2980b9;
   color: #1a5f8a;
   font-weight: 760;
   cursor: crosshair;
+}
+
+.map.distance-mode-active {
+  cursor: crosshair;
+}
+
+.distance-status {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 80px);
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  z-index: 620;
+  color: #172326;
+  font-size: 12px;
+  font-weight: 760;
+  pointer-events: none;
+}
+
+.distance-tooltip {
+  border: 1px solid #0f172a;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(23, 35, 38, 0.18);
 }

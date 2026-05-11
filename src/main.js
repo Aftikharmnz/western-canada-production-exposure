@@ -555,7 +555,7 @@ function initDistanceTool() {
     els.distanceToggle.addEventListener("click", () => setDistanceMode(!state.distanceMode));
   }
   state.map.on("click", (event) => {
-    if (!state.distanceMode) return;
+    if (!state.distanceMode || state.rubberBandActive) return;
     handleDistanceClick(event.latlng);
   });
   updateDistanceToggleUI();
@@ -1803,6 +1803,9 @@ function initRubberBand() {
     mapEl.style.cursor = on ? "crosshair" : "";
   }
 
+  // Expose so distance tool can deactivate select mode
+  state.setSelectMode = setSelectMode;
+
   if (btn) {
     btn.addEventListener("click", () => setSelectMode(!selectMode));
   }
@@ -1839,7 +1842,6 @@ function initRubberBand() {
     active = true;
     state.rubberBandActive = true;
     state.map.dragging.disable();
-    state.map.off("click");   // prevent single-click asset select while dragging
   }, true);
 
   document.addEventListener("mousemove", (e) => {
@@ -1871,8 +1873,11 @@ function initRubberBand() {
 
     const { byAsset } = aggregateForDate();
     const hits = [];
-    for (const { asset } of byAsset.values()) {
+    for (const point of byAsset.values()) {
+      const { asset } = point;
       if (asset.latitude == null) continue;
+      // Respect legend hide/unhide — only select what's actually visible on the map
+      if (!legendVisible(pointLegendKey(point))) continue;
       // latLngToContainerPoint returns px relative to map container — same as our box coords
       const pt = state.map.latLngToContainerPoint([asset.latitude, asset.longitude]);
       if (pt.x >= bLeft && pt.x <= bRight && pt.y >= bTop && pt.y <= bBottom) {

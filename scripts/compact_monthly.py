@@ -41,6 +41,8 @@ def compact_file(path: Path) -> tuple[int, int]:
     # Already compact format — skip
     if isinstance(data, dict) and "rows" in data:
         return original_size, original_size
+    if isinstance(data, list) and data and isinstance(data[0], dict) and "rows" in data[0]:
+        return original_size, original_size
 
     if not isinstance(data, list) or not data:
         return original_size, original_size
