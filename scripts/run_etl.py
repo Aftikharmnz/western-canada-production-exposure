@@ -1355,6 +1355,8 @@ def append_petrinex_ab_conventional(
     target_wells: set[str] = set()
     total_rows = 0
     skipped_oil_sands = 0
+    # Pentanes plus (C5-SP PROC+FRAC) rows — collected in same pass to avoid re-reading zips
+    c5_raw_rows: list[dict[str, Any]] = []
     for path in volume_paths:
         period_match = re.search(r"Vol_(\d{4}-\d{2})-AB\.zip$", path.name)
         if not period_match:
@@ -1371,41 +1373,69 @@ def append_petrinex_ab_conventional(
         reader = open_nested_petrinex_csv(path)
         for row in reader:
             total_rows += 1
-            if row.get("ActivityID") != "PROD" or row.get("ProductID") != "OIL":
-                continue
-            if row.get("ReportingFacilityProvinceState") != "AB":
-                continue
-            if is_oil_sands_reporting_subtype(row.get("ReportingFacilitySubTypeDesc", "")):
-                skipped_oil_sands += 1
-                continue
-            volume_m3 = as_float(row.get("Volume"))
-            if volume_m3 is None or volume_m3 <= 0:
-                continue
-            facility_dls = format_dls(
-                row.get("FacilityLegalSubdivision"),
-                row.get("FacilitySection"),
-                row.get("FacilityTownship"),
-                row.get("FacilityRange"),
-                row.get("FacilityMeridian"),
-            )
-            if not facility_dls:
-                continue
-            well_id = clean_text(row.get("FromToID")) if row.get("FromToIDType") == "WI" else ""
-            if well_id.startswith("ABWI"):
-                target_wells.add(well_id)
-            raw_rows.append(
-                {
-                    "date": date_value,
-                    "period": period,
-                    "volume_m3": volume_m3,
-                    "well_id": well_id,
-                    "facility_dls": facility_dls,
-                    "facility_id": clean_text(row.get("ReportingFacilityID")),
-                    "facility_name": clean_text(row.get("ReportingFacilityName")),
-                    "facility_subtype": clean_text(row.get("ReportingFacilitySubTypeDesc")),
-                    "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
-                }
-            )
+            province = row.get("ReportingFacilityProvinceState")
+            activity = row.get("ActivityID")
+            product = row.get("ProductID")
+
+            # ── Conventional crude (OIL/PROD) ──────────────────────────────
+            if activity == "PROD" and product == "OIL" and province == "AB":
+                if is_oil_sands_reporting_subtype(row.get("ReportingFacilitySubTypeDesc", "")):
+                    skipped_oil_sands += 1
+                    continue
+                volume_m3 = as_float(row.get("Volume"))
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                facility_dls = format_dls(
+                    row.get("FacilityLegalSubdivision"),
+                    row.get("FacilitySection"),
+                    row.get("FacilityTownship"),
+                    row.get("FacilityRange"),
+                    row.get("FacilityMeridian"),
+                )
+                if not facility_dls:
+                    continue
+                well_id = clean_text(row.get("FromToID")) if row.get("FromToIDType") == "WI" else ""
+                if well_id.startswith("ABWI"):
+                    target_wells.add(well_id)
+                raw_rows.append(
+                    {
+                        "date": date_value,
+                        "period": period,
+                        "volume_m3": volume_m3,
+                        "well_id": well_id,
+                        "facility_dls": facility_dls,
+                        "facility_id": clean_text(row.get("ReportingFacilityID")),
+                        "facility_name": clean_text(row.get("ReportingFacilityName")),
+                        "facility_subtype": clean_text(row.get("ReportingFacilitySubTypeDesc")),
+                        "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    }
+                )
+
+            # ── Pentanes plus (C5-SP PROC or FRAC) ─────────────────────────
+            elif product == "C5-SP" and activity in {"PROC", "FRAC"} and province == "AB":
+                volume_m3 = as_float(row.get("Volume"))
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                facility_dls = format_dls(
+                    row.get("FacilityLegalSubdivision"),
+                    row.get("FacilitySection"),
+                    row.get("FacilityTownship"),
+                    row.get("FacilityRange"),
+                    row.get("FacilityMeridian"),
+                )
+                if not facility_dls:
+                    continue
+                c5_raw_rows.append(
+                    {
+                        "date": date_value,
+                        "period": period,
+                        "volume_m3": volume_m3,
+                        "facility_dls": facility_dls,
+                        "facility_id": clean_text(row.get("ReportingFacilityID")),
+                        "facility_name": clean_text(row.get("ReportingFacilityName")),
+                        "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    }
+                )
 
     if not raw_rows:
         log("  Petrinex AB conventional layer found no positive OIL/PROD rows after oil-sands exclusion.")
@@ -1495,6 +1525,84 @@ def append_petrinex_ab_conventional(
         "  Petrinex AB conventional: "
         f"{added:,} DLS/operator records from {len(raw_rows):,} OIL/PROD rows; "
         f"excluded {skipped_oil_sands:,} oil-sands rows."
+    )
+
+    # ── Pentanes plus processing ────────────────────────────────────────────
+    if not c5_raw_rows:
+        log("  Petrinex AB pentanes plus: no C5-SP PROC/FRAC rows found.")
+        return
+
+    c5_sites: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for item in c5_raw_rows:
+        key = (month_end(item["date"]).isoformat(), item["operator"], item["facility_dls"])
+        site = c5_sites.setdefault(
+            key,
+            {
+                "date": item["date"],
+                "operator": item["operator"],
+                "dls": item["facility_dls"],
+                "province": "Alberta",
+                "volume_m3": 0.0,
+                "facilities": set(),
+                "facility_names": set(),
+            },
+        )
+        site["volume_m3"] += item["volume_m3"]
+        if item["facility_id"]:
+            site["facilities"].add(item["facility_id"])
+        if item["facility_name"]:
+            site["facility_names"].add(item["facility_name"])
+
+    c5_items: list[dict[str, Any]] = []
+    for site in c5_sites.values():
+        date_value = site["date"]
+        days = calendar.monthrange(date_value.year, date_value.month)[1]
+        site["volume_bbl_d"] = site["volume_m3"] * M3_TO_BBL / days
+        c5_items.append(site)
+
+    c5_location_cache = resolve_dls_locations(c5_items, official_limit=250)
+    c5_added = 0
+    for site in c5_items:
+        cache_row = c5_location_cache.get((site["province"], site["dls"]))
+        if not cache_row:
+            continue
+        lat = as_float(cache_row.get("latitude"))
+        lon = as_float(cache_row.get("longitude"))
+        if lat is None or lon is None:
+            continue
+        facility_count = len(site["facilities"])
+        display = f"{site['dls']} - {site['operator']}"
+        note_bits = [
+            "Petrinex AB C5-SP PROC+FRAC rows aggregated by operator and DLS site.",
+            f"Location basis: reporting_facility_dls; coordinate method: {cache_row.get('method', '')}.",
+        ]
+        if facility_count:
+            note_bits.append(f"{facility_count} reporting facilit{'y' if facility_count == 1 else 'ies'}.")
+        asset_id = add_asset(
+            display_name=display,
+            source_id="petrinex_ab_pentanes_plus_vol",
+            production_system="pentanes_plus",
+            company=site["operator"],
+            province=site["province"],
+            asset_kind="dls_site",
+            latitude=lat,
+            longitude=lon,
+            notes=" ".join(note_bits),
+        )
+        add_record(
+            site["date"],
+            asset_id,
+            "Pentanes plus total",
+            site["volume_bbl_d"],
+            f"Petrinex AB Vol {month_period(site['date'])}",
+            site["dls"],
+            "petrinex_ab_pentanes_plus_vol",
+            scenario="actual",
+        )
+        c5_added += 1
+    log(
+        "  Petrinex AB pentanes plus: "
+        f"{c5_added:,} facility records from {len(c5_raw_rows):,} C5-SP PROC/FRAC rows."
     )
 
 

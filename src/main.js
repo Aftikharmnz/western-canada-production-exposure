@@ -18,6 +18,7 @@ const SYSTEM_META = {
   in_situ:           { label: "In-situ Bitumen",        color: "#008b8b", className: "in-situ" },
   mined:             { label: "Mined Bitumen",           color: "#d29b18", className: "mined" },
   conventional:      { label: "Conventional Crude",      color: "#4f8f45", className: "conventional" },
+  pentanes_plus:     { label: "Pentanes Plus",            color: "#7c3aed", className: "pentanes-plus" },
   heavy_conventional:{ label: "Heavy Crude (Conv.)",     color: "#c2720a", className: "heavy-conv" },
   synthetic:         { label: "Synthetic Crude Oil",     color: "#2980b9", className: "synthetic" },
   condensate:        { label: "Condensate",              color: "#6374a6", className: "condensate" },
@@ -34,6 +35,7 @@ const STREAM_COLORS = {
   "Mined bitumen gross":         "#d29b18",
   "Synthetic crude oil":         "#2980b9",
   "Conventional crude oil":      "#4f8f45",
+  "Pentanes plus total":         "#7c3aed",
   "Dilbit equivalent":           "#005f5f",
   "Ultra-Heavy":                 "#8b1a1a",
   "Ultra-H Dilbit":              "#c0392b",
@@ -63,6 +65,7 @@ const SOURCE_SHORT = {
   aer_st53:             "AER ST53",
   aer_st39:             "AER ST39",
   petrinex_ab_conventional_vol: "Petrinex AB",
+  petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -74,7 +77,20 @@ const PRIMARY_STREAMS = [
   "Mined bitumen gross",
   "Synthetic crude oil",
   "Conventional crude oil",
+  "Pentanes plus total",
 ];
+
+const STREAM_LEGEND_KEYS = {
+  "In-situ bitumen": "in-situ",
+  "Mined bitumen gross": "mined",
+  "Synthetic crude oil": "synthetic",
+  "Conventional crude oil": "conventional",
+  "Pentanes plus total": "pentanes-plus",
+  "Heavy crude oil": "heavy-conv",
+  "Condensate Production": "condensate",
+  "Condensate production": "condensate",
+  "Total Condensate Supply": "condensate",
+};
 
 // ============================================================
 // APPLICATION STATE
@@ -128,6 +144,12 @@ const state = {
   // Multi-asset rubber-band selection
   selectedAssets: [],
   rubberBandActive: false,
+  selectMode: false,
+  setSelectMode: null,
+  hiddenLegendKeys: new Set(),
+  distanceMode: false,
+  distancePoints: [],
+  distanceLayer: null,
   facilityLayer: null,
 };
 
@@ -170,6 +192,9 @@ const els = {
   wildfireToggle:   document.querySelector("#wildfireToggle"),
   wildfireStatus:   document.querySelector("#wildfireStatus"),
   formationToggle:  document.querySelector("#formationToggle"),
+  distanceToggle:   document.querySelector("#distanceToggle"),
+  distanceStatus:   document.querySelector("#distanceStatus"),
+  mapLegend:        document.querySelector("#mapLegend"),
   map:              document.querySelector("#map"),
   mapFallback:      document.querySelector("#mapFallback"),
 };
@@ -214,6 +239,41 @@ function systemMeta(system) {
 
 function streamColor(stream) {
   return STREAM_COLORS[stream] || "#60717a";
+}
+
+function legendVisible(key) {
+  return !key || !state.hiddenLegendKeys.has(key);
+}
+
+function pointLegendKey(point) {
+  const topStream = [...point.streams.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  return STREAM_LEGEND_KEYS[topStream] || systemMeta(point.asset.production_system).className;
+}
+
+function formationLegendKey(feature) {
+  const kind = feature?.properties?.kind;
+  if (kind === "in_situ_scheme") return "formation-os";
+  if (kind === "mineable_scheme" || kind === "oil_sands") return "formation-tp";
+  return "";
+}
+
+function albertaFireLegendKey(feature) {
+  const p = feature?.properties || {};
+  const year = Number((p.Fire_Name || "").match(/^(\d{4})_/)?.[1]);
+  if (Number.isFinite(year) && year < new Date().getFullYear()) return "ab-fire-carryover";
+  if (p.Stage_of_Control === "OC") return "ab-fire-oc";
+  if (p.Stage_of_Control === "BH") return "ab-fire-bh";
+  if (p.Stage_of_Control === "UC") return "ab-fire-uc";
+  return "ab-fire-uc";
+}
+
+function bcFireLegendKey(feature) {
+  const p = feature?.properties || {};
+  if (p.FIRE_OF_NOTE_IND === "Y") return "bc-fire-fon";
+  if (p.FIRE_STATUS === "Out of Control") return "bc-fire-oc";
+  if (p.FIRE_STATUS === "Being Held") return "bc-fire-bh";
+  if (p.FIRE_STATUS === "Under Control") return "bc-fire-uc";
+  return "bc-fire-uc";
 }
 
 // ============================================================
@@ -381,6 +441,7 @@ function initControls() {
   if (els.formationToggle) {
     els.formationToggle.addEventListener("click", toggleFormations);
   }
+  initLegendControls();
 }
 
 function toggleMarkup(group, value, label) {
@@ -414,6 +475,35 @@ function updateSetFromToggle(event, group, targetSet) {
   render();
 }
 
+function initLegendControls() {
+  if (!els.mapLegend) return;
+  els.mapLegend.addEventListener("click", (event) => {
+    const item = event.target.closest("[data-legend-key]");
+    if (!item) return;
+    const key = item.getAttribute("data-legend-key");
+    if (!key) return;
+    if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
+    else state.hiddenLegendKeys.add(key);
+    if (["formation-os", "formation-tp", "st102-facility"].includes(key)) {
+      if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
+      if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
+    }
+    updateLegendControls();
+    render();
+  });
+  updateLegendControls();
+}
+
+function updateLegendControls() {
+  if (!els.mapLegend) return;
+  els.mapLegend.querySelectorAll("[data-legend-key]").forEach((item) => {
+    const key = item.getAttribute("data-legend-key");
+    const visible = legendVisible(key);
+    item.classList.toggle("muted", !visible);
+    item.setAttribute("aria-pressed", visible ? "true" : "false");
+  });
+}
+
 // ============================================================
 // MAP INIT
 // ============================================================
@@ -439,6 +529,7 @@ function initMap() {
   state.markerLayer = L.layerGroup().addTo(state.map);
   drawPipelines();
   initRubberBand();
+  initDistanceTool();
 }
 
 function drawPipelines() {
@@ -453,6 +544,101 @@ function drawPipelines() {
       .bindTooltip(name)
       .addTo(state.map);
   });
+}
+
+function initDistanceTool() {
+  if (!state.map || !window.L) return;
+  state.distanceLayer = L.layerGroup().addTo(state.map);
+  if (els.distanceToggle) {
+    els.distanceToggle.addEventListener("click", () => setDistanceMode(!state.distanceMode));
+  }
+  state.map.on("click", (event) => {
+    if (!state.distanceMode) return;
+    handleDistanceClick(event.latlng);
+  });
+  updateDistanceToggleUI();
+}
+
+function setDistanceMode(on) {
+  state.distanceMode = Boolean(on);
+  if (state.distanceMode && typeof state.setSelectMode === "function") {
+    state.setSelectMode(false);
+  }
+  if (state.distanceMode) {
+    clearDistanceMeasurement();
+    updateDistanceStatus("Click first point");
+  } else {
+    clearDistanceMeasurement();
+  }
+  if (state.map) {
+    state.map.getContainer().classList.toggle("distance-mode-active", state.distanceMode);
+  }
+  updateDistanceToggleUI();
+}
+
+function updateDistanceToggleUI() {
+  if (!els.distanceToggle) return;
+  els.distanceToggle.textContent = state.distanceMode ? "Distance ON" : "Distance";
+  els.distanceToggle.classList.toggle("active", state.distanceMode);
+}
+
+function updateDistanceStatus(message) {
+  if (!els.distanceStatus) return;
+  els.distanceStatus.textContent = message || "";
+  els.distanceStatus.hidden = !message;
+}
+
+function clearDistanceMeasurement() {
+  state.distancePoints = [];
+  if (state.distanceLayer) state.distanceLayer.clearLayers();
+  updateDistanceStatus("");
+}
+
+function formatDistanceKm(km) {
+  if (!Number.isFinite(km)) return "--";
+  if (km < 10) return `${km.toFixed(2)} km`;
+  if (km < 100) return `${km.toFixed(1)} km`;
+  return `${Math.round(km).toLocaleString("en-CA")} km`;
+}
+
+function handleDistanceClick(latlng) {
+  if (!state.distanceMode || !state.distanceLayer || !latlng || !window.L) return;
+  if (state.distancePoints.length >= 2) {
+    clearDistanceMeasurement();
+  }
+  const point = L.latLng(latlng.lat, latlng.lng);
+  state.distancePoints.push(point);
+  L.circleMarker(point, {
+    radius: 5,
+    color: "#0f172a",
+    weight: 2,
+    fillColor: "#ffffff",
+    fillOpacity: 1,
+    interactive: false,
+  }).addTo(state.distanceLayer);
+
+  if (state.distancePoints.length === 1) {
+    updateDistanceStatus("Click second point");
+    return;
+  }
+
+  const [a, b] = state.distancePoints;
+  const km = haversineKm(a.lat, a.lng, b.lat, b.lng);
+  const label = formatDistanceKm(km);
+  L.polyline([a, b], {
+    color: "#0f172a",
+    weight: 2.5,
+    opacity: 0.95,
+    dashArray: "6 5",
+    interactive: false,
+  })
+    .bindTooltip(label, {
+      permanent: true,
+      direction: "center",
+      className: "distance-tooltip",
+    })
+    .addTo(state.distanceLayer);
+  updateDistanceStatus(`Distance: ${label}`);
 }
 
 // ============================================================
@@ -536,10 +722,11 @@ function renderMap() {
   const points = [...byAsset.values()].filter(
     ({ asset, kbbl: v }) => asset.latitude != null && asset.longitude != null && v > 0
   );
+  const visiblePoints = points.filter((point) => legendVisible(pointLegendKey(point)));
 
   if (state.map && state.markerLayer && window.L) {
     state.markerLayer.clearLayers();
-    points.forEach((point) => {
+    visiblePoints.forEach((point) => {
       const meta = systemMeta(point.asset.production_system);
       const color = meta.color;
       const isSelected = point.asset.asset_id === state.selectedAssetId;
@@ -566,14 +753,22 @@ function renderMap() {
       ];
       if (topStream) ttLines.push(`Top stream: ${escapeHtml(topStream[0])}`);
       marker.bindTooltip(ttLines.join("<br>"), { direction: "top", opacity: 0.96 });
-      marker.on("click", () => { state.selectedAssetId = point.asset.asset_id; render(); });
+      marker.on("click", (event) => {
+        if (state.distanceMode) {
+          if (event.originalEvent && window.L) L.DomEvent.stop(event.originalEvent);
+          handleDistanceClick(event.latlng);
+          return;
+        }
+        state.selectedAssetId = point.asset.asset_id;
+        render();
+      });
       marker.addTo(state.markerLayer);
     });
 
     renderFormationLayer();
     renderFireLayer();
   } else {
-    renderFallbackMap(points);
+    renderFallbackMap(visiblePoints);
   }
 }
 
@@ -799,8 +994,6 @@ function renderStreamBreakdown(assetId, streamMap) {
 
 function renderFireRisk(asset) {
   if (!els.fireRiskSection) return;
-  els.fireRiskSection.hidden = true;
-  return;
   if (!state.wildfireEnabled || asset.latitude == null) {
     els.fireRiskSection.hidden = true;
     return;
@@ -912,6 +1105,9 @@ function renderFormationLayer() {
   const source = state.schemeApprovals;
   if (source?.features?.length && !state.formationLayer) {
     state.formationLayer = L.geoJSON(source, {
+      filter(feature) {
+        return legendVisible(formationLegendKey(feature));
+      },
       style(feature) {
         return FORMATION_KIND_STYLE[feature.properties?.kind] || FORMATION_KIND_STYLE.in_situ_scheme;
       },
@@ -933,7 +1129,7 @@ function renderFormationLayer() {
   }
 
   const facilities = state.st102Facilities;
-  if (facilities?.features?.length && !state.facilityLayer) {
+  if (facilities?.features?.length && !state.facilityLayer && legendVisible("st102-facility")) {
     state.facilityLayer = L.geoJSON(facilities, {
       pointToLayer(_feature, latlng) {
         return L.circleMarker(latlng, {
@@ -1192,6 +1388,9 @@ function renderAlbertaFireLayer() {
   const currentYear = new Date().getFullYear();
 
   state.albertaFireLayer = L.geoJSON(state.albertaFires, {
+    filter(feature) {
+      return legendVisible(albertaFireLegendKey(feature));
+    },
     pointToLayer(feature, latlng) {
       const p = feature.properties || {};
       const stage = p.Stage_of_Control || "";
@@ -1287,6 +1486,9 @@ function renderBCFireLayer() {
   const currentYear = new Date().getFullYear();
 
   state.bcFireLayer = L.geoJSON(state.bcFires, {
+    filter(feature) {
+      return legendVisible(bcFireLegendKey(feature));
+    },
     pointToLayer(feature, latlng) {
       const p = feature.properties || {};
       const isFON = p.FIRE_OF_NOTE_IND === "Y";
@@ -1508,6 +1710,9 @@ function renderFireLayer() {
   const SEVERITY_COLOR = { extreme: "#b91c1c", high: "#ef4444", moderate: "#f97316", low: "#f6ad55", unknown: "#64748b" };
 
   state.fireLayer = L.geoJSON(state.wildfires, {
+    filter() {
+      return legendVisible("fire-zone");
+    },
     pointToLayer(feature, latlng) {
       const score = fireScore(feature);
       const sev = fireSeverity(score);
