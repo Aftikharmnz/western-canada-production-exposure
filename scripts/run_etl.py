@@ -51,7 +51,7 @@ PETRINEX_AB_VOL_DIR = PETRINEX_DIR / "ab" / "vol"
 PETRINEX_AB_INFRA_DIR = PETRINEX_DIR / "ab" / "infra"
 PETRINEX_BC_REF_DIR = PETRINEX_DIR / "bc" / "reference"
 M3_TO_BBL = 6.28981077
-ON_DEMAND_RECORD_SOURCES = {"petrinex_ab_conventional_vol"}
+ON_DEMAND_RECORD_SOURCES = {"petrinex_ab_conventional_vol", "petrinex_ab_pentanes_plus_vol", "petrinex_ab_condensate_vol"}
 PETRINEX_AB_EARLIEST_PUBLIC_PERIOD = "2022-01"
 
 DEFAULT_WORKBOOK = Path(
@@ -1357,6 +1357,8 @@ def append_petrinex_ab_conventional(
     skipped_oil_sands = 0
     # Pentanes plus (C5-SP PROC+FRAC) rows — collected in same pass to avoid re-reading zips
     c5_raw_rows: list[dict[str, Any]] = []
+    # Condensate (COND PROD, non-oil-sands) rows — collected in same pass
+    cond_raw_rows: list[dict[str, Any]] = []
     for path in volume_paths:
         period_match = re.search(r"Vol_(\d{4}-\d{2})-AB\.zip$", path.name)
         if not period_match:
@@ -1430,6 +1432,36 @@ def append_petrinex_ab_conventional(
                         "date": date_value,
                         "period": period,
                         "volume_m3": volume_m3,
+                        "facility_dls": facility_dls,
+                        "facility_id": clean_text(row.get("ReportingFacilityID")),
+                        "facility_name": clean_text(row.get("ReportingFacilityName")),
+                        "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    }
+                )
+
+            # ── Condensate (COND PROD, non-oil-sands) ───────────────────────
+            elif product == "COND" and activity == "PROD" and province == "AB":
+                if is_oil_sands_reporting_subtype(row.get("ReportingFacilitySubTypeDesc", "")):
+                    continue
+                volume_m3 = as_float(row.get("Volume"))
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                facility_dls = format_dls(
+                    row.get("FacilityLegalSubdivision"),
+                    row.get("FacilitySection"),
+                    row.get("FacilityTownship"),
+                    row.get("FacilityRange"),
+                    row.get("FacilityMeridian"),
+                )
+                if not facility_dls:
+                    continue
+                well_id = clean_text(row.get("FromToID")) if row.get("FromToIDType") == "WI" else ""
+                cond_raw_rows.append(
+                    {
+                        "date": date_value,
+                        "period": period,
+                        "volume_m3": volume_m3,
+                        "well_id": well_id,
                         "facility_dls": facility_dls,
                         "facility_id": clean_text(row.get("ReportingFacilityID")),
                         "facility_name": clean_text(row.get("ReportingFacilityName")),
@@ -1603,6 +1635,87 @@ def append_petrinex_ab_conventional(
     log(
         "  Petrinex AB pentanes plus: "
         f"{c5_added:,} facility records from {len(c5_raw_rows):,} C5-SP PROC/FRAC rows."
+    )
+
+    # ── Condensate processing ───────────────────────────────────────────────
+    if not cond_raw_rows:
+        log("  Petrinex AB condensate: no COND PROD rows found.")
+        return
+
+    cond_sites: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for item in cond_raw_rows:
+        link = well_links.get(item["well_id"], {}) if item.get("well_id") else {}
+        dls = link.get("dls") or item["facility_dls"]
+        key = (month_end(item["date"]).isoformat(), item["operator"], dls)
+        site = cond_sites.setdefault(
+            key,
+            {
+                "date": item["date"],
+                "operator": item["operator"],
+                "dls": dls,
+                "province": "Alberta",
+                "volume_m3": 0.0,
+                "facilities": set(),
+                "facility_names": set(),
+                "location_basis": "well_dls_current_link" if link else "reporting_facility_dls",
+            },
+        )
+        site["volume_m3"] += item["volume_m3"]
+        if item["facility_id"]:
+            site["facilities"].add(item["facility_id"])
+        if item["facility_name"]:
+            site["facility_names"].add(item["facility_name"])
+
+    cond_items: list[dict[str, Any]] = []
+    for site in cond_sites.values():
+        date_value = site["date"]
+        days = calendar.monthrange(date_value.year, date_value.month)[1]
+        site["volume_bbl_d"] = site["volume_m3"] * M3_TO_BBL / days
+        cond_items.append(site)
+
+    cond_location_cache = resolve_dls_locations(cond_items, official_limit=250)
+    cond_added = 0
+    for site in cond_items:
+        cache_row = cond_location_cache.get((site["province"], site["dls"]))
+        if not cache_row:
+            continue
+        lat = as_float(cache_row.get("latitude"))
+        lon = as_float(cache_row.get("longitude"))
+        if lat is None or lon is None:
+            continue
+        facility_count = len(site["facilities"])
+        display = f"{site['dls']} - {site['operator']}"
+        note_bits = [
+            "Petrinex AB COND PROD rows aggregated by operator and DLS site.",
+            f"Location basis: {site['location_basis']}; coordinate method: {cache_row.get('method', '')}.",
+        ]
+        if facility_count:
+            note_bits.append(f"{facility_count} reporting facilit{'y' if facility_count == 1 else 'ies'}.")
+        asset_id = add_asset(
+            display_name=display,
+            source_id="petrinex_ab_condensate_vol",
+            production_system="condensate",
+            company=site["operator"],
+            province=site["province"],
+            asset_kind="dls_site",
+            latitude=lat,
+            longitude=lon,
+            notes=" ".join(note_bits),
+        )
+        add_record(
+            site["date"],
+            asset_id,
+            "Condensate production",
+            site["volume_bbl_d"],
+            f"Petrinex AB Vol {month_period(site['date'])}",
+            site["dls"],
+            "petrinex_ab_condensate_vol",
+            scenario="actual",
+        )
+        cond_added += 1
+    log(
+        "  Petrinex AB condensate: "
+        f"{cond_added:,} facility records from {len(cond_raw_rows):,} COND PROD rows."
     )
 
 

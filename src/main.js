@@ -66,6 +66,7 @@ const SOURCE_SHORT = {
   aer_st39:             "AER ST39",
   petrinex_ab_conventional_vol: "Petrinex AB",
   petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
+  petrinex_ab_condensate_vol:    "Petrinex AB COND",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -78,6 +79,7 @@ const PRIMARY_STREAMS = [
   "Synthetic crude oil",
   "Conventional crude oil",
   "Pentanes plus total",
+  "Condensate production",
 ];
 
 const STREAM_LEGEND_KEYS = {
