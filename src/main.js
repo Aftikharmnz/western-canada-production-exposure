@@ -1967,7 +1967,7 @@ async function showSeasonalityPanel(assetIds) {
       </div>`;
     document.getElementById("map").appendChild(loadingPanel);
     try {
-      const resp = await fetch("public/data/asset_seasonality.json");
+      const resp = await fetch("public/data/asset_seasonality.json?v=20260511");
       state.seasonalityIndex = await resp.json();
     } catch(e) {
       console.warn("Could not load asset_seasonality.json:", e);
