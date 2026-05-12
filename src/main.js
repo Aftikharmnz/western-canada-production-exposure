@@ -2026,9 +2026,7 @@ function renderPipelineInstallLayer() {
     },
   }).addTo(state.map);
 
-  // Installations float above feeder lines but below production markers
-  state.pipelineInstallLayer.bringToFront();
-  if (state.markerLayer) state.markerLayer.bringToFront();
+  // Canvas layers render in add-order; no bringToFront() for canvas layers.
 }
 
 async function togglePipelines() {
