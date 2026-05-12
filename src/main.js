@@ -443,6 +443,10 @@ function initControls() {
   if (els.formationToggle) {
     els.formationToggle.addEventListener("click", toggleFormations);
   }
+  const pipelineToggleBtn = document.getElementById("pipelineToggle");
+  if (pipelineToggleBtn) {
+    pipelineToggleBtn.addEventListener("click", togglePipelines);
+  }
   initLegendControls();
 }
 
@@ -489,6 +493,9 @@ function initLegendControls() {
     if (["formation-os", "formation-tp", "st102-facility"].includes(key)) {
       if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
       if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
+    }
+    if (key.startsWith("pipe-") || key.startsWith("inst-")) {
+      refreshPipelineLayers();
     }
     updateLegendControls();
     render();
@@ -1811,6 +1818,277 @@ function renderFireLayer() {
   }).addTo(state.map);
 }
 
+// ============================================================
+// PIPELINE LAYER — AER Feeder Pipelines + Installations
+// 32 550 operating feeder segments + 5 502 pipeline installations
+// Data source: AER Pipeline Spatial Dataset (GCS NAD83 ≈ WGS84)
+// ============================================================
+
+const PIPELINE_SUBSTANCE_COLOR = {
+  'Oil-Well Effluent':    '#a16207',
+  'Crude Oil':            '#c2570a',
+  'HVP Products':         '#7c3aed',
+  'LVP Products':         '#0e7490',
+  'Condensate':           '#1d4ed8',
+  'Hydrocarbon Diluents': '#15803d',
+};
+
+const PIPELINE_SUBSTANCE_BADGE = {
+  'Oil-Well Effluent':    'oilwell',
+  'Crude Oil':            'crude',
+  'HVP Products':         'hvp',
+  'LVP Products':         'lvp',
+  'Condensate':           'condensate',
+  'Hydrocarbon Diluents': 'diluent',
+};
+
+const PIPELINE_LEGEND_KEY = {
+  'Oil-Well Effluent':    'pipe-oilwell',
+  'Crude Oil':            'pipe-crude',
+  'HVP Products':         'pipe-hvp',
+  'LVP Products':         'pipe-lvp',
+  'Condensate':           'pipe-condensate',
+  'Hydrocarbon Diluents': 'pipe-diluent',
+};
+
+const INSTALLATION_STYLE = {
+  'Pump Station':         { color: '#0c4a6e', fill: '#0ea5e9', radius: 7 },
+  'Compressor Station':   { color: '#431407', fill: '#fb923c', radius: 7 },
+  'Oil Terminal':         { color: '#713f12', fill: '#f59e0b', radius: 8 },
+  'Tank Farm':            { color: '#14532d', fill: '#22c55e', radius: 7 },
+  'Meter Station':        { color: '#312e81', fill: '#a78bfa', radius: 4 },
+  'Regulator Station':    { color: '#374151', fill: '#d1d5db', radius: 3 },
+  'Meter Regulator Stn.': { color: '#312e81', fill: '#c4b5fd', radius: 4 },
+  'Line Heater':          { color: '#4a044e', fill: '#e879f9', radius: 4 },
+};
+
+const INSTALLATION_LEGEND_KEY = {
+  'Pump Station':         'inst-pump',
+  'Compressor Station':   'inst-compressor',
+  'Oil Terminal':         'inst-terminal',
+  'Tank Farm':            'inst-terminal',
+  'Meter Station':        'inst-meter',
+  'Regulator Station':    'inst-meter',
+  'Meter Regulator Stn.': 'inst-meter',
+  'Line Heater':          'inst-meter',
+};
+
+// Extend app state for pipelines
+Object.assign(state, {
+  pipelineEnabled:      false,
+  pipelineData:         null,
+  pipelineInstallData:  null,
+  pipelineLoading:      false,
+  pipelineError:        null,
+  pipelineSegmentLayer: null,
+  pipelineInstallLayer: null,
+});
+
+function pipelineSubstanceWeight(diamMm) {
+  const d = parseFloat(diamMm) || 0;
+  if (d <= 0)   return 0.9;
+  if (d <= 60)  return 1.0;
+  if (d <= 114) return 1.6;
+  if (d <= 219) return 2.2;
+  return 3.0;
+}
+
+async function fetchPipelineData() {
+  if (state.pipelineData && state.pipelineInstallData) return true;
+  if (state.pipelineLoading) return false;
+
+  state.pipelineLoading = true;
+  state.pipelineError   = null;
+  updatePipelineToggleUI();
+  updatePipelineStatus('Loading AER pipeline data (30 MB, one-time)…');
+
+  try {
+    const [pipRes, instRes] = await Promise.all([
+      fetch('public/data/aer_feeder_pipelines.geojson'),
+      fetch('public/data/aer_pipeline_installations.geojson'),
+    ]);
+    if (!pipRes.ok)  throw new Error(`Pipeline segments: HTTP ${pipRes.status}`);
+    if (!instRes.ok) throw new Error(`Installations: HTTP ${instRes.status}`);
+    const [pipJson, instJson] = await Promise.all([pipRes.json(), instRes.json()]);
+    state.pipelineData        = pipJson;
+    state.pipelineInstallData = instJson;
+  } catch (err) {
+    state.pipelineError = err.message || String(err);
+    updatePipelineStatus(`Pipeline data unavailable: ${state.pipelineError}`);
+    state.pipelineLoading = false;
+    updatePipelineToggleUI();
+    return false;
+  }
+
+  state.pipelineLoading = false;
+  updatePipelineToggleUI();
+  updatePipelineStatus('');
+  return true;
+}
+
+function renderPipelineSegmentLayer() {
+  if (!state.map || !window.L) return;
+  if (state.pipelineSegmentLayer) {
+    state.map.removeLayer(state.pipelineSegmentLayer);
+    state.pipelineSegmentLayer = null;
+  }
+  if (!state.pipelineEnabled || !state.pipelineData) return;
+
+  const renderer = L.canvas({ padding: 0.5 });
+
+  state.pipelineSegmentLayer = L.geoJSON(state.pipelineData, {
+    renderer,
+    filter(feature) {
+      const sub = feature.properties?.substance || '';
+      const lk  = PIPELINE_LEGEND_KEY[sub];
+      return !lk || legendVisible(lk);
+    },
+    style(feature) {
+      const p   = feature.properties || {};
+      const sub = p.substance || '';
+      const col = PIPELINE_SUBSTANCE_COLOR[sub] || '#888888';
+      const w   = pipelineSubstanceWeight(p.diameter_mm);
+      return { color: col, weight: w, opacity: 0.72 };
+    },
+    onEachFeature(feature, layer) {
+      const p     = feature.properties || {};
+      const sub   = p.substance || 'Unknown';
+      const badge = PIPELINE_SUBSTANCE_BADGE[sub] || '';
+      const from  = [p.from_fac, p.from_loc].filter(Boolean).join(' @ ') || '—';
+      const to    = [p.to_fac,   p.to_loc  ].filter(Boolean).join(' @ ') || '—';
+      const diam  = p.diameter_mm ? `${p.diameter_mm} mm OD` : '—';
+      const maop  = p.maop_kpa ? `${Number(p.maop_kpa).toLocaleString('en-CA')} kPa MAOP` : '';
+      const len   = p.length_km ? `${p.length_km} km` : '';
+      const h2s   = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
+      const env   = p.environ || '';
+      const extras = [maop, len, h2s, env].filter(Boolean).join(' · ');
+
+      layer.bindTooltip(
+        `<div>` +
+        `<strong><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.company || '—')}</strong>` +
+        `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.field_ctr || '—')}</div>` +
+        `<div class="pt-sub" style="margin-top:4px">` +
+        `<b>From:</b> ${escapeHtml(from)}<br><b>To:</b> ${escapeHtml(to)}` +
+        `</div>` +
+        `<div class="pt-sub" style="margin-top:4px">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
+        `${p.material ? `<div class="pt-sub">${escapeHtml(p.material)}${p.joint ? ' · ' + escapeHtml(p.joint) : ''}</div>` : ''}` +
+        `</div>`,
+        { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+      );
+    },
+  }).addTo(state.map);
+
+  state.pipelineSegmentLayer.bringToBack();
+  if (state.formationLayer) state.formationLayer.bringToBack();
+}
+
+function renderPipelineInstallLayer() {
+  if (!state.map || !window.L) return;
+  if (state.pipelineInstallLayer) {
+    state.map.removeLayer(state.pipelineInstallLayer);
+    state.pipelineInstallLayer = null;
+  }
+  if (!state.pipelineEnabled || !state.pipelineInstallData) return;
+
+  const renderer = L.canvas({ padding: 0.5 });
+
+  state.pipelineInstallLayer = L.geoJSON(state.pipelineInstallData, {
+    renderer,
+    filter(feature) {
+      const t  = feature.properties?.type || '';
+      const st = feature.properties?.status || '';
+      if (['Abandoned', 'Removed', 'Discontinued'].includes(st)) return false;
+      const lk = INSTALLATION_LEGEND_KEY[t];
+      return !lk || legendVisible(lk);
+    },
+    pointToLayer(feature, latlng) {
+      const t     = feature.properties?.type || '';
+      const style = INSTALLATION_STYLE[t] || { color: '#374151', fill: '#94a3b8', radius: 4 };
+      return L.circleMarker(latlng, {
+        radius:      style.radius,
+        color:       style.color,
+        weight:      1.5,
+        fillColor:   style.fill,
+        fillOpacity: 0.88,
+        opacity:     0.9,
+      });
+    },
+    onEachFeature(feature, layer) {
+      const p    = feature.properties || {};
+      const type = p.type || 'Installation';
+      const pwr  = p.power_kw ? `${parseFloat(p.power_kw).toLocaleString('en-CA')} kW` : '';
+      const src  = p.prime_source || '';
+      const h2s  = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
+      const extras = [pwr && src ? `${pwr} (${src})` : (pwr || src), h2s].filter(Boolean).join(' · ');
+
+      layer.bindTooltip(
+        `<strong>${escapeHtml(type)}</strong>` +
+        `<div class="pt-sub">${escapeHtml(p.company || '—')}</div>` +
+        `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.location || '—')}</div>` +
+        `<div class="pt-sub">${escapeHtml(p.substance || '')}${p.field_ctr ? ' · ' + escapeHtml(p.field_ctr) : ''}</div>` +
+        (extras ? `<div class="pt-sub">${escapeHtml(extras)}</div>` : ''),
+        { sticky: true, opacity: 0.96, className: 'inst-tip' }
+      );
+    },
+  }).addTo(state.map);
+
+  // Installations float above feeder lines but below production markers
+  state.pipelineInstallLayer.bringToFront();
+  if (state.markerLayer) state.markerLayer.bringToFront();
+}
+
+async function togglePipelines() {
+  state.pipelineEnabled = !state.pipelineEnabled;
+
+  if (state.pipelineEnabled) {
+    updatePipelineToggleUI();
+    const ok = await fetchPipelineData();
+    if (!ok) { state.pipelineEnabled = false; updatePipelineToggleUI(); return; }
+    renderPipelineSegmentLayer();
+    renderPipelineInstallLayer();
+    document.getElementById('mapLegend')?.classList.add('pipeline-layer-active');
+    updateLegendControls();
+  } else {
+    if (state.pipelineSegmentLayer) { state.map.removeLayer(state.pipelineSegmentLayer); state.pipelineSegmentLayer = null; }
+    if (state.pipelineInstallLayer) { state.map.removeLayer(state.pipelineInstallLayer); state.pipelineInstallLayer = null; }
+    document.getElementById('mapLegend')?.classList.remove('pipeline-layer-active');
+    updatePipelineStatus('');
+    updateLegendControls();
+  }
+  updatePipelineToggleUI();
+}
+
+function updatePipelineToggleUI() {
+  const btn = document.getElementById('pipelineToggle');
+  if (!btn) return;
+  if (state.pipelineLoading) {
+    btn.textContent = 'Loading…';
+    btn.className   = 'pipeline-toggle-btn loading';
+  } else if (state.pipelineEnabled) {
+    btn.textContent = 'Pipelines ON';
+    btn.title       = `${(state.pipelineData?.features?.length ?? 0).toLocaleString('en-CA')} segments · ` +
+                      `${(state.pipelineInstallData?.features?.length ?? 0).toLocaleString('en-CA')} installations`;
+    btn.className   = 'pipeline-toggle-btn active';
+  } else {
+    btn.textContent = 'Pipelines';
+    btn.title       = 'AER feeder pipelines — crude, HVP/LVP, condensate, diluents, well effluent';
+    btn.className   = 'pipeline-toggle-btn';
+  }
+}
+
+function updatePipelineStatus(msg) {
+  const el = document.getElementById('pipelineStatus');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.hidden      = !msg;
+}
+
+function refreshPipelineLayers() {
+  if (!state.pipelineEnabled) return;
+  renderPipelineSegmentLayer();
+  renderPipelineInstallLayer();
+}
+
 async function boot() {
   try {
     await loadData();
@@ -1821,6 +2099,7 @@ async function boot() {
     state.wildfireEnabled = true;
     updateFireToggleUI();
     updateFormationToggleUI();
+    updatePipelineToggleUI();
     updateWildfireStatus("Fetching live wildfire data…");
     render();
     // Kick off both fire sources in parallel (non-blocking)
@@ -1941,9 +2220,7 @@ function initRubberBand() {
     for (const point of byAsset.values()) {
       const { asset } = point;
       if (asset.latitude == null) continue;
-      // Respect legend hide/unhide — only select what's actually visible on the map
       if (!legendVisible(pointLegendKey(point))) continue;
-      // latLngToContainerPoint returns px relative to map container — same as our box coords
       const pt = state.map.latLngToContainerPoint([asset.latitude, asset.longitude]);
       if (pt.x >= bLeft && pt.x <= bRight && pt.y >= bTop && pt.y <= bBottom) {
         hits.push(asset.asset_id);
@@ -1962,20 +2239,13 @@ function initRubberBand() {
 
 // ============================================================
 // SEASONALITY CHART PANEL
-// Shows 12-month production profile for selected assets with:
-//   - 5-year min/max envelope (light grey band)
-//   - 2 full past years (coloured lines)
-//   - Most recent partial year (dots only for known months)
 // ============================================================
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const SEA_COLORS   = { band: "#d1d5db", y0: "#2563eb", y1: "#16a34a", yCur: "#dc2626" };
 
 function computeSeasonality(assetIds) {
-  // Returns { ym: { year: { month(1-12): kbbl } }, years, currentYear, latestFull }
   const ym = {};
-
-  // --- AER / base records (already in memory, all dates) ---
   const allBase = state.baseRecords;
   for (const r of allBase) {
     if (!assetIds.includes(r.asset_id)) continue;
@@ -1984,8 +2254,6 @@ function computeSeasonality(assetIds) {
     if (!ym[year]) ym[year] = {};
     ym[year][month] = (ym[year][month] || 0) + r.volume_kbbl_d;
   }
-
-  // --- Petrinex / seasonality index (pre-aggregated compact lookup) ---
   if (state.seasonalityIndex) {
     for (const aid of assetIds) {
       const entry = state.seasonalityIndex[aid];
@@ -1998,28 +2266,22 @@ function computeSeasonality(assetIds) {
       }
     }
   }
-
   const years = Object.keys(ym).map(Number).sort();
   if (!years.length) return null;
-
   const currentYear = years[years.length - 1];
   let latestFull = null;
   for (let i = years.length - 1; i >= 0; i--) {
     if (Object.keys(ym[years[i]]).length === 12) { latestFull = years[i]; break; }
   }
-
   return { ym, years, currentYear, latestFull };
 }
 
 async function showSeasonalityPanel(assetIds) {
-  // Remove any existing panel
   const existing = document.getElementById("seasonalityPanel");
   if (existing) existing.remove();
 
-  // Lazy-load the Petrinex seasonality index (47 MB, loaded once)
   if (!state.seasonalityIndex && !state.seasonalityIndexLoading) {
     state.seasonalityIndexLoading = true;
-    // Show loading panel immediately
     const loadingPanel = document.createElement("div");
     loadingPanel.id = "seasonalityPanel";
     loadingPanel.innerHTML = `
@@ -2039,10 +2301,8 @@ async function showSeasonalityPanel(assetIds) {
       state.seasonalityIndex = {};
     }
     state.seasonalityIndexLoading = false;
-    // Remove loading panel and re-run
     loadingPanel.remove();
   } else if (state.seasonalityIndexLoading) {
-    // Already loading — retry after a moment
     setTimeout(() => showSeasonalityPanel(assetIds), 300);
     return;
   }
@@ -2050,14 +2310,12 @@ async function showSeasonalityPanel(assetIds) {
   const data = computeSeasonality(assetIds);
   const { byAsset } = aggregateForDate();
 
-  // Build title from selected asset names
   const names = assetIds.slice(0, 3).map(id => {
     const hit = byAsset.get(id);
     return hit ? hit.asset.display_name : id;
   });
   const titleStr = names.join(", ") + (assetIds.length > 3 ? ` +${assetIds.length - 3} more` : "");
 
-  // Create panel
   const panel = document.createElement("div");
   panel.id = "seasonalityPanel";
   panel.innerHTML = `
@@ -2098,12 +2356,10 @@ function drawSeasonalityChart(data, assetCount) {
 
   const { ym, years, currentYear, latestFull } = data;
 
-  // Pick years to show: envelope from up to 5 full years, 2 past full, current
   const fullYears = years.filter(y => y !== currentYear && Object.keys(ym[y] || {}).length === 12);
   const envYears  = fullYears.slice(-5);
-  const lineYears = fullYears.slice(-2);  // 2 most recent full years
+  const lineYears = fullYears.slice(-2);
 
-  // Build per-month envelope (min/max) across envYears
   const envMin = new Array(12).fill(Infinity);
   const envMax = new Array(12).fill(-Infinity);
   for (const y of envYears) {
@@ -2113,13 +2369,11 @@ function drawSeasonalityChart(data, assetCount) {
       if (v > envMax[m-1]) envMax[m-1] = v;
     }
   }
-  // Replace Infinity with 0 if no env data
   for (let i = 0; i < 12; i++) {
     if (envMin[i] === Infinity)  envMin[i] = 0;
     if (envMax[i] === -Infinity) envMax[i] = 0;
   }
 
-  // Global max for Y scale
   let globalMax = 0;
   for (const y of [...envYears, ...lineYears, currentYear]) {
     for (let m = 1; m <= 12; m++) {
@@ -2129,17 +2383,13 @@ function drawSeasonalityChart(data, assetCount) {
   }
   if (globalMax === 0) globalMax = 1;
 
-  const xPos = (m) => pad.left + ((m - 0.5) / 12) * cW;  // m = 1..12
+  const xPos = (m) => pad.left + ((m - 0.5) / 12) * cW;
   const yPos = (v) => pad.top + cH - (v / globalMax) * cH;
 
-  // Clear
   ctx.clearRect(0, 0, W, H);
-
-  // Background
   ctx.fillStyle = "#f9fafb";
   ctx.fillRect(0, 0, W, H);
 
-  // Draw Y gridlines
   ctx.strokeStyle = "#e5e7eb";
   ctx.lineWidth = 1;
   const ticks = 4;
@@ -2153,7 +2403,6 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.fillText(Math.round(v).toLocaleString(), pad.left - 5, y + 3);
   }
 
-  // Y axis label
   ctx.save();
   ctx.translate(12, pad.top + cH / 2);
   ctx.rotate(-Math.PI / 2);
@@ -2163,7 +2412,6 @@ function drawSeasonalityChart(data, assetCount) {
   ctx.fillText("kbbl/d", 0, 0);
   ctx.restore();
 
-  // X axis labels
   ctx.fillStyle = "#6b7280";
   ctx.font = "10px Inter, sans-serif";
   ctx.textAlign = "center";
@@ -2171,7 +2419,6 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.fillText(MONTH_LABELS[m-1], xPos(m), H - pad.bottom + 14);
   }
 
-  // Draw envelope band (5yr min-max)
   if (envYears.length > 0) {
     ctx.beginPath();
     for (let m = 1; m <= 12; m++) ctx.lineTo(xPos(m), yPos(envMax[m-1]));
@@ -2179,7 +2426,6 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.closePath();
     ctx.fillStyle = "rgba(156,163,175,0.28)";
     ctx.fill();
-    // Envelope outline
     ctx.beginPath();
     for (let m = 1; m <= 12; m++) {
       m === 1 ? ctx.moveTo(xPos(m), yPos(envMax[m-1])) : ctx.lineTo(xPos(m), yPos(envMax[m-1]));
@@ -2196,7 +2442,6 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.setLineDash([]);
   }
 
-  // Draw 2 full past years
   const lineColors = [SEA_COLORS.y0, SEA_COLORS.y1];
   lineYears.forEach((yr, i) => {
     ctx.beginPath();
@@ -2209,13 +2454,11 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.stroke();
   });
 
-  // Draw current (partial) year — dots only for known months
   const curMonths = Object.keys(ym[currentYear] || {}).map(Number);
   if (curMonths.length) {
     ctx.strokeStyle = SEA_COLORS.yCur;
     ctx.fillStyle = SEA_COLORS.yCur;
     ctx.lineWidth = 2;
-    // Connect known months with a line
     const sorted = curMonths.sort((a,b) => a-b);
     ctx.beginPath();
     sorted.forEach((m, i) => {
@@ -2223,7 +2466,6 @@ function drawSeasonalityChart(data, assetCount) {
       i === 0 ? ctx.moveTo(xPos(m), yPos(v)) : ctx.lineTo(xPos(m), yPos(v));
     });
     ctx.stroke();
-    // Dots on each known month
     sorted.forEach(m => {
       const v = ym[currentYear][m] ?? 0;
       ctx.beginPath();
@@ -2232,7 +2474,6 @@ function drawSeasonalityChart(data, assetCount) {
     });
   }
 
-  // Legend
   const legEl = document.getElementById("seaLegend");
   if (legEl) {
     const enStr = envYears.length ? `${envYears[0]}–${envYears[envYears.length-1]} range` : "";

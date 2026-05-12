@@ -1194,6 +1194,126 @@ select {
   flex-shrink: 0;
 }
 .sea-close:hover { color: var(--ink); }
+
+/* ─── PIPELINE TOGGLE BUTTON ─── */
+.pipeline-toggle-btn {
+  height: 36px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 0 14px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 680;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pipeline-toggle-btn:hover {
+  border-color: #92400e;
+  color: #78350f;
+}
+
+.pipeline-toggle-btn.active {
+  background: #fffbeb;
+  border-color: #d97706;
+  color: #78350f;
+  font-weight: 760;
+}
+
+.pipeline-toggle-btn.loading {
+  background: #fffbf0;
+  border-color: #d97706;
+  color: #92400e;
+  cursor: wait;
+}
+
+/* ─── PIPELINE STATUS BAR (over the map) ─── */
+.pipeline-status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 80px);
+  padding: 7px 14px;
+  background: rgba(255, 251, 235, 0.96);
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 580;
+  color: #78350f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  z-index: 900;
+}
+
+/* ─── PIPELINE LEGEND DOT COLOURS ─── */
+.dot.pipe-oilwell     { background: #a16207; }
+.dot.pipe-crude       { background: #c2570a; }
+.dot.pipe-hvp         { background: #7c3aed; }
+.dot.pipe-lvp         { background: #0e7490; }
+.dot.pipe-condensate  { background: #1d4ed8; }
+.dot.pipe-diluent     { background: #15803d; }
+.dot.inst-pump        { background: #0ea5e9; }
+.dot.inst-compressor  { background: #fb923c; }
+.dot.inst-terminal    { background: #f59e0b; }
+.dot.inst-meter       { background: #a78bfa; }
+
+/* ─── PIPELINE LEGEND ITEMS: hidden until pipeline layer is on ─── */
+.pipeline-legend-item {
+  display: none;
+}
+.pipeline-layer-active .pipeline-legend-item {
+  display: flex;
+}
+
+/* ─── PIPELINE TOOLTIP ─── */
+.pipeline-tip {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+  padding: 6px 10px;
+  color: var(--ink);
+  font-size: 12px;
+  pointer-events: none;
+  max-width: 260px;
+}
+.pipeline-tip .pt-sub {
+  color: var(--muted);
+  font-size: 11px;
+}
+.pipeline-tip .pt-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  margin-right: 4px;
+}
+.pt-badge.oilwell    { background: #a16207; }
+.pt-badge.crude      { background: #c2570a; }
+.pt-badge.hvp        { background: #7c3aed; }
+.pt-badge.lvp        { background: #0e7490; }
+.pt-badge.condensate { background: #1d4ed8; }
+.pt-badge.diluent    { background: #15803d; }
+
+/* ─── INSTALLATION TOOLTIP ─── */
+.inst-tip {
+  background: rgba(255,255,255,0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+  padding: 6px 10px;
+  color: var(--ink);
+  font-size: 12px;
+  pointer-events: none;
+  max-width: 240px;
+}
 #seasonalityCanvas {
   display: block;
   width: 100%;
