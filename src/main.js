@@ -2116,38 +2116,59 @@ function pipelineLegendCounts() {
   return counts;
 }
 
+// Returns (or creates) the pipeline legend panel element
+// Safe even if cached HTML doesn't have the element yet.
+function getPipelineLegendPanel() {
+  let panel = document.getElementById('pipelineLegend');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'pipelineLegend';
+    panel.style.cssText = [
+      'position:absolute',
+      'bottom:32px',
+      'right:10px',
+      'width:220px',
+      'max-height:480px',
+      'overflow-y:auto',
+      'background:#fff',
+      'border:1px solid #d1d5db',
+      'border-radius:8px',
+      'box-shadow:0 4px 16px rgba(0,0,0,0.18)',
+      'z-index:1100',
+      'font-size:12px',
+      'font-family:Inter,sans-serif',
+      'display:none',
+    ].join(';');
+    const mapStage = document.querySelector('.map-stage');
+    if (mapStage) mapStage.appendChild(panel);
+    else document.body.appendChild(panel);
+  }
+  return panel;
+}
+
 function buildPipelineLegendPanel() {
-  const panel = document.getElementById('pipelineLegend');
-  if (!panel) return;
+  const panel = getPipelineLegendPanel();
   const counts = pipelineLegendCounts();
 
-  let html = `
-    <div class="pl-panel-header">
-      <span class="pl-panel-title">⬡ Pipeline Layer</span>
-    </div>`;
+  let html = '<div style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:12px;color:#374151;">&#x2B21; Pipeline Layer</div>';
 
   for (const item of PIPELINE_LEGEND_ITEMS) {
     if (item.section) {
-      html += `<div class="pl-section-label">${escapeHtml(item.section)}</div>`;
+      html += `<div style="padding:6px 10px 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;">${escapeHtml(item.section)}</div>`;
       continue;
     }
     const count = counts[item.key] ?? 0;
     const countStr = count > 0 ? count.toLocaleString('en-CA') : '';
     const swatch = item.type === 'line'
-      ? `<span class="pl-swatch" style="background:${item.color}"></span>`
-      : `<span class="pl-dot" style="background:${item.color}"></span>`;
-    html += `
-      <button class="pl-item" data-pl-key="${item.key}" type="button">
-        ${swatch}
-        <span>${escapeHtml(item.label)}</span>
-        ${countStr ? `<span class="pl-count">${countStr}</span>` : ''}
-      </button>`;
+      ? `<span style="display:inline-block;width:20px;height:3px;border-radius:2px;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`
+      : `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`;
+    const isHidden = state.hiddenLegendKeys.has(item.key);
+    html += `<button data-pl-key="${item.key}" type="button" style="display:flex;align-items:center;gap:7px;width:100%;padding:4px 10px;border:none;background:transparent;cursor:pointer;text-align:left;opacity:${isHidden ? '0.35' : '1'};">${swatch}<span style="flex:1;color:#374151;">${escapeHtml(item.label)}</span>${countStr ? `<span style="color:#9ca3af;font-size:10px;">${countStr}</span>` : ''}</button>`;
   }
 
   panel.innerHTML = html;
 
-  // Wire up click handlers
-  panel.querySelectorAll('.pl-item[data-pl-key]').forEach(btn => {
+  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
     btn.addEventListener('click', () => {
       const key = btn.dataset.plKey;
       if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
@@ -2156,24 +2177,19 @@ function buildPipelineLegendPanel() {
       refreshPipelineLayers();
     });
   });
-
-  syncPipelineLegendPanel();
 }
 
 function syncPipelineLegendPanel() {
   const panel = document.getElementById('pipelineLegend');
   if (!panel) return;
-  panel.querySelectorAll('.pl-item[data-pl-key]').forEach(btn => {
-    const hidden = state.hiddenLegendKeys.has(btn.dataset.plKey);
-    btn.classList.toggle('muted', hidden);
-    btn.setAttribute('aria-pressed', hidden ? 'false' : 'true');
+  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
+    btn.style.opacity = state.hiddenLegendKeys.has(btn.dataset.plKey) ? '0.35' : '1';
   });
 }
 
 function showPipelineLegendPanel(visible) {
-  const panel = document.getElementById('pipelineLegend');
-  if (!panel) return;
-  panel.hidden = !visible;
+  const panel = getPipelineLegendPanel();
+  panel.style.display = visible ? 'block' : 'none';
 }
 
 function refreshPipelineLayers() {
