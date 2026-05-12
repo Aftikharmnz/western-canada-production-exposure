@@ -2123,26 +2123,30 @@ function getPipelineLegendPanel() {
   if (!panel) {
     panel = document.createElement('div');
     panel.id = 'pipelineLegend';
-    panel.style.cssText = [
-      'position:absolute',
-      'bottom:32px',
-      'right:10px',
-      'width:220px',
-      'max-height:480px',
-      'overflow-y:auto',
-      'background:#fff',
-      'border:1px solid #d1d5db',
-      'border-radius:8px',
-      'box-shadow:0 4px 16px rgba(0,0,0,0.18)',
-      'z-index:1100',
-      'font-size:12px',
-      'font-family:Inter,sans-serif',
-      'display:none',
-    ].join(';');
     const mapStage = document.querySelector('.map-stage');
     if (mapStage) mapStage.appendChild(panel);
     else document.body.appendChild(panel);
   }
+  // Always (re)apply inline styles — the CSS class has no rules.
+  // Preserve the current show/hide state while reapplying everything else.
+  const currentDisplay = panel.style.display;
+  panel.removeAttribute('hidden');
+  panel.style.cssText = [
+    'position:absolute',
+    'bottom:32px',
+    'right:10px',
+    'width:220px',
+    'max-height:480px',
+    'overflow-y:auto',
+    'background:#fff',
+    'border:1px solid #d1d5db',
+    'border-radius:8px',
+    'box-shadow:0 4px 16px rgba(0,0,0,0.18)',
+    'z-index:1100',
+    'font-size:12px',
+    'font-family:Inter,sans-serif',
+    'display:' + (currentDisplay || 'none'),
+  ].join(';');
   return panel;
 }
 
