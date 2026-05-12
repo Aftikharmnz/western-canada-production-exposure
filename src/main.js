@@ -603,44 +603,109 @@ function formatDistanceKm(km) {
   return `${Math.round(km).toLocaleString("en-CA")} km`;
 }
 
+// Returns intermediate lat/lng points along the great-circle arc between two coords.
+// Makes the polyline follow the true geodesic path rather than a straight Mercator line.
+function geodesicPoints(lat1, lon1, lat2, lon2, steps = 64) {
+  const d2r = Math.PI / 180;
+  const r2d = 180 / Math.PI;
+  const phi1 = lat1 * d2r, lam1 = lon1 * d2r;
+  const phi2 = lat2 * d2r, lam2 = lon2 * d2r;
+  const dphi = phi2 - phi1, dlam = lam2 - lam1;
+  const aa = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
+  const angDist = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+  if (angDist < 0.0001) return [[lat1, lon1], [lat2, lon2]];
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const ff = i / steps;
+    const A = Math.sin((1-ff)*angDist) / Math.sin(angDist);
+    const B = Math.sin(ff*angDist)    / Math.sin(angDist);
+    const x = A*Math.cos(phi1)*Math.cos(lam1) + B*Math.cos(phi2)*Math.cos(lam2);
+    const y = A*Math.cos(phi1)*Math.sin(lam1) + B*Math.cos(phi2)*Math.sin(lam2);
+    const z = A*Math.sin(phi1)               + B*Math.sin(phi2);
+    pts.push([Math.atan2(z, Math.sqrt(x*x+y*y))*r2d, Math.atan2(y, x)*r2d]);
+  }
+  return pts;
+}
+
+// Snaps a click to the nearest visible asset within SNAP_PX pixels.
+// Returns { latlng, label } or null if nothing close enough.
+function snapToNearestAsset(clickLatlng) {
+  const SNAP_PX = 20;
+  const { byAsset } = aggregateForDate();
+  let best = null, bestDist = Infinity;
+  for (const point of byAsset.values()) {
+    const { asset } = point;
+    if (asset.latitude == null || !legendVisible(pointLegendKey(point))) continue;
+    const pt    = state.map.latLngToContainerPoint([asset.latitude, asset.longitude]);
+    const click = state.map.latLngToContainerPoint(clickLatlng);
+    const px = Math.hypot(pt.x - click.x, pt.y - click.y);
+    if (px < SNAP_PX && px < bestDist) {
+      bestDist = px;
+      best = { latlng: L.latLng(asset.latitude, asset.longitude), label: asset.display_name };
+    }
+  }
+  return best;
+}
+
 function handleDistanceClick(latlng) {
   if (!state.distanceMode || !state.distanceLayer || !latlng || !window.L) return;
   if (state.distancePoints.length >= 2) {
     clearDistanceMeasurement();
   }
-  const point = L.latLng(latlng.lat, latlng.lng);
+
+  // Snap to nearest visible asset within 20 screen pixels for accuracy
+  const snapped = snapToNearestAsset(latlng);
+  const point   = snapped ? snapped.latlng : L.latLng(latlng.lat, latlng.lng);
+  point._label  = snapped ? snapped.label : null;
   state.distancePoints.push(point);
+
   L.circleMarker(point, {
-    radius: 5,
-    color: "#0f172a",
-    weight: 2,
-    fillColor: "#ffffff",
+    radius:      snapped ? 7 : 5,
+    color:       snapped ? "#2563eb" : "#0f172a",
+    weight:      2,
+    fillColor:   "#ffffff",
     fillOpacity: 1,
     interactive: false,
   }).addTo(state.distanceLayer);
 
+  if (snapped) {
+    L.tooltip({ permanent: true, direction: "top", className: "distance-snap-label", offset: [0, -10] })
+      .setContent(snapped.label)
+      .setLatLng(point)
+      .addTo(state.distanceLayer);
+  }
+
   if (state.distancePoints.length === 1) {
-    updateDistanceStatus("Click second point");
+    updateDistanceStatus(snapped ? `From: ${snapped.label} — click second point` : "Click second point");
     return;
   }
 
   const [a, b] = state.distancePoints;
-  const km = haversineKm(a.lat, a.lng, b.lat, b.lng);
+  const km    = haversineKm(a.lat, a.lng, b.lat, b.lng);
   const label = formatDistanceKm(km);
-  L.polyline([a, b], {
-    color: "#0f172a",
-    weight: 2.5,
-    opacity: 0.95,
+
+  // Draw geodesic arc so the line follows Earth's curvature, not Mercator distortion
+  const arcPts = geodesicPoints(a.lat, a.lng, b.lat, b.lng, 64);
+  L.polyline(arcPts, {
+    color:     "#0f172a",
+    weight:    2.5,
+    opacity:   0.95,
     dashArray: "6 5",
     interactive: false,
   })
     .bindTooltip(label, {
-      permanent: true,
-      direction: "center",
-      className: "distance-tooltip",
+      permanent:  true,
+      direction:  "center",
+      className:  "distance-tooltip",
     })
     .addTo(state.distanceLayer);
-  updateDistanceStatus(`Distance: ${label}`);
+
+  const aName = a._label, bName = b._label;
+  const statusMsg = (aName && bName)
+    ? `${aName} → ${bName}: ${label}`
+    : (aName || bName) ? `${aName || bName}: ${label}`
+    : `Distance: ${label}`;
+  updateDistanceStatus(statusMsg);
 }
 
 // ============================================================

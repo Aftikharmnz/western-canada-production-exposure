@@ -927,6 +927,64 @@ select {
   display: none;
 }
 
+/* ─── DISTANCE TOOL ─── */
+.distance-status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 80px);
+  padding: 7px 14px;
+  background: rgba(239, 246, 255, 0.97);
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  color: #1e3a5f;
+  z-index: 511;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaflet-tooltip.distance-tooltip {
+  background: #0f172a;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.leaflet-tooltip.distance-tooltip::before {
+  display: none;
+}
+
+.leaflet-tooltip.distance-snap-label {
+  background: rgba(37, 99, 235, 0.9);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.leaflet-tooltip.distance-snap-label::before {
+  display: none;
+}
+}
+
 /* ─── FIRE RISK SECTION (detail panel) ─── */
 .fire-risk-section {
   background: #fff8f0;
@@ -1228,3 +1286,55 @@ select {
   font-weight: 800;
   box-shadow: 0 2px 8px rgba(23, 35, 38, 0.18);
 }
+
+/* ─── DISTANCE TOOL ─── */
+.distance-status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 80px);
+  padding: 7px 14px;
+  background: rgba(239, 246, 255, 0.97);
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  color: #1e3a5f;
+  z-index: 511;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaflet-tooltip.distance-tooltip {
+  background: #0f172a;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.leaflet-tooltip.distance-tooltip::before { display: none; }
+
+.leaflet-tooltip.distance-snap-label {
+  background: rgba(37, 99, 235, 0.9);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  pointer-events: none;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.leaflet-tooltip.distance-snap-label::before { display: none; }
