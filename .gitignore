@@ -17,3 +17,5 @@ Thumbs.db
 # Edge browser profile data (local only, not part of the app)
 .edge-debug*/
 .edge-profile*/
+
+data/pipeline/

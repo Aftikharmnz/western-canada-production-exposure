@@ -1934,10 +1934,7 @@ function renderPipelineSegmentLayer() {
   }
   if (!state.pipelineEnabled || !state.pipelineData) return;
 
-  const renderer = L.canvas({ padding: 0.5 });
-
   state.pipelineSegmentLayer = L.geoJSON(state.pipelineData, {
-    renderer,
     filter(feature) {
       const sub = feature.properties?.substance || '';
       const lk  = PIPELINE_LEGEND_KEY[sub];
@@ -1990,10 +1987,7 @@ function renderPipelineInstallLayer() {
   }
   if (!state.pipelineEnabled || !state.pipelineInstallData) return;
 
-  const renderer = L.canvas({ padding: 0.5 });
-
   state.pipelineInstallLayer = L.geoJSON(state.pipelineInstallData, {
-    renderer,
     filter(feature) {
       const t  = feature.properties?.type || '';
       const st = feature.properties?.status || '';
@@ -2046,14 +2040,13 @@ async function togglePipelines() {
     if (!ok) { state.pipelineEnabled = false; updatePipelineToggleUI(); return; }
     renderPipelineSegmentLayer();
     renderPipelineInstallLayer();
-    document.getElementById('mapLegend')?.classList.add('pipeline-layer-active');
-    updateLegendControls();
+    buildPipelineLegendPanel();
+    showPipelineLegendPanel(true);
   } else {
     if (state.pipelineSegmentLayer) { state.map.removeLayer(state.pipelineSegmentLayer); state.pipelineSegmentLayer = null; }
     if (state.pipelineInstallLayer) { state.map.removeLayer(state.pipelineInstallLayer); state.pipelineInstallLayer = null; }
-    document.getElementById('mapLegend')?.classList.remove('pipeline-layer-active');
+    showPipelineLegendPanel(false);
     updatePipelineStatus('');
-    updateLegendControls();
   }
   updatePipelineToggleUI();
 }
@@ -2083,10 +2076,111 @@ function updatePipelineStatus(msg) {
   el.hidden      = !msg;
 }
 
+// ── Pipeline legend panel ─────────────────────────────────────
+// Built once after data loads; sync() just refreshes muted state.
+
+const PIPELINE_LEGEND_ITEMS = [
+  // Lines section
+  { section: 'Pipeline Lines' },
+  { key: 'pipe-oilwell',    label: 'Oil-Well Effluent',     color: '#a16207', type: 'line' },
+  { key: 'pipe-crude',      label: 'Crude Oil',              color: '#c2570a', type: 'line' },
+  { key: 'pipe-hvp',        label: 'HVP Products',           color: '#7c3aed', type: 'line' },
+  { key: 'pipe-lvp',        label: 'LVP Products',           color: '#0e7490', type: 'line' },
+  { key: 'pipe-condensate', label: 'Condensate',             color: '#1d4ed8', type: 'line' },
+  { key: 'pipe-diluent',    label: 'Hydrocarbon Diluents',   color: '#15803d', type: 'line' },
+  // Installations section
+  { section: 'Installations' },
+  { key: 'inst-pump',       label: 'Pump Stations',          color: '#0ea5e9', type: 'dot' },
+  { key: 'inst-compressor', label: 'Compressor Stations',    color: '#fb923c', type: 'dot' },
+  { key: 'inst-terminal',   label: 'Oil Terminals / Tank Farms', color: '#f59e0b', type: 'dot' },
+  { key: 'inst-meter',      label: 'Meter / Regulator Stns.', color: '#a78bfa', type: 'dot' },
+];
+
+// Count features per legend key from the loaded data
+function pipelineLegendCounts() {
+  const counts = {};
+  if (state.pipelineData) {
+    for (const feat of state.pipelineData.features) {
+      const lk = PIPELINE_LEGEND_KEY[feat.properties?.substance || ''];
+      if (lk) counts[lk] = (counts[lk] || 0) + 1;
+    }
+  }
+  if (state.pipelineInstallData) {
+    for (const feat of state.pipelineInstallData.features) {
+      const st = feat.properties?.status || '';
+      if (['Abandoned','Removed','Discontinued'].includes(st)) continue;
+      const lk = INSTALLATION_LEGEND_KEY[feat.properties?.type || ''];
+      if (lk) counts[lk] = (counts[lk] || 0) + 1;
+    }
+  }
+  return counts;
+}
+
+function buildPipelineLegendPanel() {
+  const panel = document.getElementById('pipelineLegend');
+  if (!panel) return;
+  const counts = pipelineLegendCounts();
+
+  let html = `
+    <div class="pl-panel-header">
+      <span class="pl-panel-title">⬡ Pipeline Layer</span>
+    </div>`;
+
+  for (const item of PIPELINE_LEGEND_ITEMS) {
+    if (item.section) {
+      html += `<div class="pl-section-label">${escapeHtml(item.section)}</div>`;
+      continue;
+    }
+    const count = counts[item.key] ?? 0;
+    const countStr = count > 0 ? count.toLocaleString('en-CA') : '';
+    const swatch = item.type === 'line'
+      ? `<span class="pl-swatch" style="background:${item.color}"></span>`
+      : `<span class="pl-dot" style="background:${item.color}"></span>`;
+    html += `
+      <button class="pl-item" data-pl-key="${item.key}" type="button">
+        ${swatch}
+        <span>${escapeHtml(item.label)}</span>
+        ${countStr ? `<span class="pl-count">${countStr}</span>` : ''}
+      </button>`;
+  }
+
+  panel.innerHTML = html;
+
+  // Wire up click handlers
+  panel.querySelectorAll('.pl-item[data-pl-key]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.plKey;
+      if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
+      else state.hiddenLegendKeys.add(key);
+      syncPipelineLegendPanel();
+      refreshPipelineLayers();
+    });
+  });
+
+  syncPipelineLegendPanel();
+}
+
+function syncPipelineLegendPanel() {
+  const panel = document.getElementById('pipelineLegend');
+  if (!panel) return;
+  panel.querySelectorAll('.pl-item[data-pl-key]').forEach(btn => {
+    const hidden = state.hiddenLegendKeys.has(btn.dataset.plKey);
+    btn.classList.toggle('muted', hidden);
+    btn.setAttribute('aria-pressed', hidden ? 'false' : 'true');
+  });
+}
+
+function showPipelineLegendPanel(visible) {
+  const panel = document.getElementById('pipelineLegend');
+  if (!panel) return;
+  panel.hidden = !visible;
+}
+
 function refreshPipelineLayers() {
   if (!state.pipelineEnabled) return;
   renderPipelineSegmentLayer();
   renderPipelineInstallLayer();
+  syncPipelineLegendPanel();
 }
 
 async function boot() {
@@ -2100,6 +2194,7 @@ async function boot() {
     updateFireToggleUI();
     updateFormationToggleUI();
     updatePipelineToggleUI();
+    showPipelineLegendPanel(false);
     updateWildfireStatus("Fetching live wildfire data…");
     render();
     // Kick off both fire sources in parallel (non-blocking)
