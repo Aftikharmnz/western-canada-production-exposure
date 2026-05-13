@@ -482,6 +482,14 @@ select {
   background: #7c3aed;
 }
 
+.dot.propane {
+  background: #e07b39;
+}
+
+.dot.butane {
+  background: #c9a227;
+}
+
 .dot.refinery {
   background: var(--rust);
 }

@@ -22,6 +22,8 @@ const SYSTEM_META = {
   heavy_conventional:{ label: "Heavy Crude (Conv.)",     color: "#c2720a", className: "heavy-conv" },
   synthetic:         { label: "Synthetic Crude Oil",     color: "#2980b9", className: "synthetic" },
   condensate:        { label: "Condensate",              color: "#6374a6", className: "condensate" },
+  propane:           { label: "Propane",                  color: "#e07b39", className: "propane" },
+  butane:            { label: "Butane",                   color: "#c9a227", className: "butane" },
   provincial_light:  { label: "Light Crude (Prov.)",     color: "#7bb53a", className: "conventional" },
   refinery_input:    { label: "Refinery Input",          color: "#9a5546", className: "refinery" },
 };
@@ -49,6 +51,8 @@ const STREAM_COLORS = {
   "Total Condensate Supply":     "#9b59b6",
   "Condensate Imports":          "#b39ddb",
   "Condensate production":       "#7d5fa5",
+  "Propane production":          "#e07b39",
+  "Butane production":           "#c9a227",
   "Total WC crude":              "#7f8c8d",
   "Total Oil Sands Dilbit + SCO":"#2c3e50",
   "Blend Ratio":                 "#95a5a6",
@@ -67,6 +71,8 @@ const SOURCE_SHORT = {
   petrinex_ab_conventional_vol: "Petrinex AB",
   petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
   petrinex_ab_condensate_vol:    "Petrinex AB COND",
+  petrinex_ab_propane_vol:       "Petrinex AB C3",
+  petrinex_ab_butane_vol:        "Petrinex AB C4",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -80,6 +86,8 @@ const PRIMARY_STREAMS = [
   "Conventional crude oil",
   "Pentanes plus total",
   "Condensate production",
+  "Propane production",
+  "Butane production",
 ];
 
 const STREAM_LEGEND_KEYS = {
@@ -92,6 +100,8 @@ const STREAM_LEGEND_KEYS = {
   "Condensate Production": "condensate",
   "Condensate production": "condensate",
   "Total Condensate Supply": "condensate",
+  "Propane production": "propane",
+  "Butane production":  "butane",
 };
 
 // ============================================================

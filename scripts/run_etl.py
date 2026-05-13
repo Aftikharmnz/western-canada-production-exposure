@@ -1359,6 +1359,10 @@ def append_petrinex_ab_conventional(
     c5_raw_rows: list[dict[str, Any]] = []
     # Condensate (COND PROD, non-oil-sands) rows — collected in same pass
     cond_raw_rows: list[dict[str, Any]] = []
+    # Propane (C3-MX + C3-SP, PROC) rows — collected in same pass
+    propane_raw_rows: list[dict[str, Any]] = []
+    # Butane  (C4-MX + C4-SP, PROC) rows — collected in same pass
+    butane_raw_rows: list[dict[str, Any]] = []
     for path in volume_paths:
         period_match = re.search(r"Vol_(\d{4}-\d{2})-AB\.zip$", path.name)
         if not period_match:
@@ -1462,6 +1466,58 @@ def append_petrinex_ab_conventional(
                         "period": period,
                         "volume_m3": volume_m3,
                         "well_id": well_id,
+                        "facility_dls": facility_dls,
+                        "facility_id": clean_text(row.get("ReportingFacilityID")),
+                        "facility_name": clean_text(row.get("ReportingFacilityName")),
+                        "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    }
+                )
+
+            # ── Propane (C3-MX + C3-SP, PROC) ──────────────────────────────
+            elif product in {"C3-MX", "C3-SP"} and activity == "PROC" and province == "AB":
+                volume_m3 = as_float(row.get("Volume"))
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                facility_dls = format_dls(
+                    row.get("FacilityLegalSubdivision"),
+                    row.get("FacilitySection"),
+                    row.get("FacilityTownship"),
+                    row.get("FacilityRange"),
+                    row.get("FacilityMeridian"),
+                )
+                if not facility_dls:
+                    continue
+                propane_raw_rows.append(
+                    {
+                        "date": date_value,
+                        "period": period,
+                        "volume_m3": volume_m3,
+                        "facility_dls": facility_dls,
+                        "facility_id": clean_text(row.get("ReportingFacilityID")),
+                        "facility_name": clean_text(row.get("ReportingFacilityName")),
+                        "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    }
+                )
+
+            # ── Butane (C4-MX + C4-SP, PROC) ────────────────────────────────
+            elif product in {"C4-MX", "C4-SP"} and activity == "PROC" and province == "AB":
+                volume_m3 = as_float(row.get("Volume"))
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                facility_dls = format_dls(
+                    row.get("FacilityLegalSubdivision"),
+                    row.get("FacilitySection"),
+                    row.get("FacilityTownship"),
+                    row.get("FacilityRange"),
+                    row.get("FacilityMeridian"),
+                )
+                if not facility_dls:
+                    continue
+                butane_raw_rows.append(
+                    {
+                        "date": date_value,
+                        "period": period,
+                        "volume_m3": volume_m3,
                         "facility_dls": facility_dls,
                         "facility_id": clean_text(row.get("ReportingFacilityID")),
                         "facility_name": clean_text(row.get("ReportingFacilityName")),
@@ -1717,6 +1773,160 @@ def append_petrinex_ab_conventional(
         "  Petrinex AB condensate: "
         f"{cond_added:,} facility records from {len(cond_raw_rows):,} COND PROD rows."
     )
+
+    # ── Propane processing ──────────────────────────────────────────────────
+    if not propane_raw_rows:
+        log("  Petrinex AB propane: no C3-MX/C3-SP PROC rows found.")
+    else:
+        propane_sites: dict[tuple[str, str, str], dict[str, Any]] = {}
+        for item in propane_raw_rows:
+            key = (month_end(item["date"]).isoformat(), item["operator"], item["facility_dls"])
+            site = propane_sites.setdefault(
+                key,
+                {
+                    "date": item["date"],
+                    "operator": item["operator"],
+                    "dls": item["facility_dls"],
+                    "province": "Alberta",
+                    "volume_m3": 0.0,
+                    "facilities": set(),
+                    "facility_names": set(),
+                },
+            )
+            site["volume_m3"] += item["volume_m3"]
+            if item["facility_id"]:
+                site["facilities"].add(item["facility_id"])
+            if item["facility_name"]:
+                site["facility_names"].add(item["facility_name"])
+
+        propane_items: list[dict[str, Any]] = []
+        for site in propane_sites.values():
+            date_value = site["date"]
+            days = calendar.monthrange(date_value.year, date_value.month)[1]
+            site["volume_bbl_d"] = site["volume_m3"] * M3_TO_BBL / days
+            propane_items.append(site)
+
+        propane_loc_cache = resolve_dls_locations(propane_items, official_limit=250)
+        propane_added = 0
+        for site in propane_items:
+            cache_row = propane_loc_cache.get((site["province"], site["dls"]))
+            if not cache_row:
+                continue
+            lat = as_float(cache_row.get("latitude"))
+            lon = as_float(cache_row.get("longitude"))
+            if lat is None or lon is None:
+                continue
+            facility_count = len(site["facilities"])
+            display = f"{site['dls']} - {site['operator']}"
+            note_bits = [
+                "Petrinex AB C3-MX+C3-SP PROC rows aggregated by operator and DLS site.",
+                f"Location basis: reporting_facility_dls; coordinate method: {cache_row.get('method', '')}.",
+            ]
+            if facility_count:
+                note_bits.append(f"{facility_count} reporting facilit{'y' if facility_count == 1 else 'ies'}.")
+            asset_id = add_asset(
+                display_name=display,
+                source_id="petrinex_ab_propane_vol",
+                production_system="propane",
+                company=site["operator"],
+                province=site["province"],
+                asset_kind="dls_site",
+                latitude=lat,
+                longitude=lon,
+                notes=" ".join(note_bits),
+            )
+            add_record(
+                site["date"],
+                asset_id,
+                "Propane production",
+                site["volume_bbl_d"],
+                f"Petrinex AB Vol {month_period(site['date'])}",
+                site["dls"],
+                "petrinex_ab_propane_vol",
+                scenario="actual",
+            )
+            propane_added += 1
+        log(
+            "  Petrinex AB propane: "
+            f"{propane_added:,} facility records from {len(propane_raw_rows):,} C3-MX/C3-SP PROC rows."
+        )
+
+    # ── Butane processing ───────────────────────────────────────────────────
+    if not butane_raw_rows:
+        log("  Petrinex AB butane: no C4-MX/C4-SP PROC rows found.")
+    else:
+        butane_sites: dict[tuple[str, str, str], dict[str, Any]] = {}
+        for item in butane_raw_rows:
+            key = (month_end(item["date"]).isoformat(), item["operator"], item["facility_dls"])
+            site = butane_sites.setdefault(
+                key,
+                {
+                    "date": item["date"],
+                    "operator": item["operator"],
+                    "dls": item["facility_dls"],
+                    "province": "Alberta",
+                    "volume_m3": 0.0,
+                    "facilities": set(),
+                    "facility_names": set(),
+                },
+            )
+            site["volume_m3"] += item["volume_m3"]
+            if item["facility_id"]:
+                site["facilities"].add(item["facility_id"])
+            if item["facility_name"]:
+                site["facility_names"].add(item["facility_name"])
+
+        butane_items: list[dict[str, Any]] = []
+        for site in butane_sites.values():
+            date_value = site["date"]
+            days = calendar.monthrange(date_value.year, date_value.month)[1]
+            site["volume_bbl_d"] = site["volume_m3"] * M3_TO_BBL / days
+            butane_items.append(site)
+
+        butane_loc_cache = resolve_dls_locations(butane_items, official_limit=250)
+        butane_added = 0
+        for site in butane_items:
+            cache_row = butane_loc_cache.get((site["province"], site["dls"]))
+            if not cache_row:
+                continue
+            lat = as_float(cache_row.get("latitude"))
+            lon = as_float(cache_row.get("longitude"))
+            if lat is None or lon is None:
+                continue
+            facility_count = len(site["facilities"])
+            display = f"{site['dls']} - {site['operator']}"
+            note_bits = [
+                "Petrinex AB C4-MX+C4-SP PROC rows aggregated by operator and DLS site.",
+                f"Location basis: reporting_facility_dls; coordinate method: {cache_row.get('method', '')}.",
+            ]
+            if facility_count:
+                note_bits.append(f"{facility_count} reporting facilit{'y' if facility_count == 1 else 'ies'}.")
+            asset_id = add_asset(
+                display_name=display,
+                source_id="petrinex_ab_butane_vol",
+                production_system="butane",
+                company=site["operator"],
+                province=site["province"],
+                asset_kind="dls_site",
+                latitude=lat,
+                longitude=lon,
+                notes=" ".join(note_bits),
+            )
+            add_record(
+                site["date"],
+                asset_id,
+                "Butane production",
+                site["volume_bbl_d"],
+                f"Petrinex AB Vol {month_period(site['date'])}",
+                site["dls"],
+                "petrinex_ab_butane_vol",
+                scenario="actual",
+            )
+            butane_added += 1
+        log(
+            "  Petrinex AB butane: "
+            f"{butane_added:,} facility records from {len(butane_raw_rows):,} C4-MX/C4-SP PROC rows."
+        )
 
 
 def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], list[dict[str, Any]], dict[str, Any]]:
