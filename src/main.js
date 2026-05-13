@@ -1130,19 +1130,23 @@ function renderTimeline() {
   const selectedIndex = rows.findIndex((r) => r.date === state.selectedDate);
   const windowStart = Math.max(0, selectedIndex - 30);
   const visible = rows.slice(windowStart, Math.min(rows.length, windowStart + 72));
-  els.timelineLabel.textContent = `${visible.length} monthly observations in view`;
-  els.timelineBars.innerHTML = visible.map((row) => {
-    const height = Math.max(3, (row.total / max) * 72);
-    const sel = row.date === state.selectedDate;
-    return `<button class="timeline-bar ${sel ? "selected" : ""}" style="height:${height}px" title="${dateLabel(row.date)} ${kbbl(row.total)}" data-date="${row.date}" aria-label="${dateLabel(row.date)} ${kbbl(row.total)}"></button>`;
-  }).join("");
-  els.timelineBars.querySelectorAll("button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.selectedDate = btn.dataset.date;
-      els.dateSlider.value = String(state.dates.indexOf(state.selectedDate));
-      render();
+  if (els.timelineLabel) {
+    els.timelineLabel.textContent = `${visible.length} monthly observations in view`;
+  }
+  if (els.timelineBars) {
+    els.timelineBars.innerHTML = visible.map((row) => {
+      const height = Math.max(3, (row.total / max) * 72);
+      const sel = row.date === state.selectedDate;
+      return `<button class="timeline-bar ${sel ? "selected" : ""}" style="height:${height}px" title="${dateLabel(row.date)} ${kbbl(row.total)}" data-date="${row.date}" aria-label="${dateLabel(row.date)} ${kbbl(row.total)}"></button>`;
+    }).join("");
+    els.timelineBars.querySelectorAll("button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedDate = btn.dataset.date;
+        els.dateSlider.value = String(state.dates.indexOf(state.selectedDate));
+        render();
+      });
     });
-  });
+  }
 }
 
 // ============================================================

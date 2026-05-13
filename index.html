@@ -79,6 +79,7 @@
           <div id="pipelineStatus" class="pipeline-status" hidden></div>
           <div id="distanceStatus" class="distance-status" hidden></div>
           <div id="mapLegend" class="map-legend" aria-label="Map legend filters">
+            <div class="map-legend-header">Legend</div>
             <button type="button" class="legend-item" data-legend-key="in-situ" aria-pressed="true"><i class="dot in-situ"></i><span>In-situ Bitumen</span></button>
             <button type="button" class="legend-item" data-legend-key="mined" aria-pressed="true"><i class="dot mined"></i><span>Mined Bitumen</span></button>
             <button type="button" class="legend-item" data-legend-key="synthetic" aria-pressed="true"><i class="dot synthetic"></i><span>Synthetic Crude</span></button>
@@ -165,13 +166,6 @@
           </section>
         </aside>
       </main>
-      <footer class="timeline">
-        <div class="timeline-head">
-          <span>Monthly production stack</span>
-          <strong id="timelineLabel">--</strong>
-        </div>
-        <div id="timelineBars" class="timeline-bars"></div>
-      </footer>
     </div>
     <script type="module" src="src/main.js?v=20260512-pipeline-legend"></script>
   </body>
