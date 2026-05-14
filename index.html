@@ -29,6 +29,7 @@
           <button id="pipelineToggle" class="pipeline-toggle-btn" type="button">Pipelines</button>
           <button id="wildfireToggle" class="fire-toggle-btn" type="button">Fire Layer</button>
           <button id="distanceToggle" class="distance-mode-btn" type="button">Distance</button>
+          <button id="docsBtn" class="docs-btn" type="button">&#9432; Docs</button>
           <button id="etlButton" class="primary-action" type="button">Run ETL</button>
         </div>
       </header>
@@ -87,8 +88,9 @@
             <button type="button" class="legend-item" data-legend-key="conventional" aria-pressed="true"><i class="dot conventional"></i><span>Conventional</span></button>
             <button type="button" class="legend-item" data-legend-key="pentanes-plus" aria-pressed="true"><i class="dot pentanes-plus"></i><span>Pentanes Plus</span></button>
             <button type="button" class="legend-item" data-legend-key="condensate" aria-pressed="true"><i class="dot condensate"></i><span>Condensate</span></button>
-            <button type="button" class="legend-item" data-legend-key="propane" aria-pressed="true"><i class="dot propane"></i><span>Propane</span></button>
-            <button type="button" class="legend-item" data-legend-key="butane" aria-pressed="true"><i class="dot butane"></i><span>Butane</span></button>
+            <button type="button" class="legend-item" data-legend-key="gas-plant" aria-pressed="true"><i class="dot gas-plant"></i><span>Gas Plant</span></button>
+            <button type="button" class="legend-item" data-legend-key="integrated-plant" aria-pressed="true"><i class="dot integrated-plant"></i><span>Integrated Plant</span></button>
+            <button type="button" class="legend-item" data-legend-key="spec-plant" aria-pressed="true"><i class="dot spec-plant"></i><span>Spec Plant</span></button>
             <button type="button" class="legend-item" data-legend-key="fire-zone" aria-pressed="true"><i class="dot fire-zone"></i><span>Fire Hotspot (FWI)</span></button>
             <button type="button" class="legend-item" data-legend-key="ab-fire-oc" aria-pressed="true"><i class="dot ab-fire-oc"></i><span>AB Fire - Out of Control</span></button>
             <button type="button" class="legend-item" data-legend-key="ab-fire-bh" aria-pressed="true"><i class="dot ab-fire-bh"></i><span>AB Fire - Being Held</span></button>
@@ -169,6 +171,260 @@
         </aside>
       </main>
     </div>
-    <script type="module" src="src/main.js?v=20260512-pipeline-legend"></script>
+    <!-- ===================== DOCUMENTATION PANEL ===================== -->
+    <div id="docsPanel" class="docs-panel" hidden>
+      <div class="docs-inner">
+        <div class="docs-header">
+          <h1>Western Canada Production Exposure — Documentation</h1>
+          <button id="closeDocs" class="docs-close" type="button" aria-label="Close documentation">&times;</button>
+        </div>
+        <nav class="docs-tabs" role="tablist">
+          <button class="docs-tab active" data-tab="systems" role="tab">Production Systems</button>
+          <button class="docs-tab" data-tab="volumes" role="tab">Volume &amp; Streams</button>
+          <button class="docs-tab" data-tab="wildfire" role="tab">Wildfire</button>
+          <button class="docs-tab" data-tab="approvals" role="tab">AER Approvals</button>
+          <button class="docs-tab" data-tab="pipelines" role="tab">Pipelines</button>
+          <button class="docs-tab" data-tab="sources" role="tab">Data Sources</button>
+        </nav>
+        <div class="docs-body">
+
+          <!-- ── PRODUCTION SYSTEMS ── -->
+          <section class="docs-section" id="tab-systems">
+            <h2>Production Systems &amp; Map Markers</h2>
+            <p>Each dot on the map represents a production facility or project. Dot colour indicates the <em>production system</em> — the type of hydrocarbon produced or the facility classification. Dot size scales with production volume at the selected date.</p>
+            <table class="docs-table">
+              <thead><tr><th>Colour</th><th>System</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><i class="doc-dot" style="background:#008b8b"></i></td><td>In-situ Bitumen</td><td>Bitumen extracted underground without mining, using thermal methods such as SAGD (Steam-Assisted Gravity Drainage) or CSS (Cyclic Steam Stimulation). Steam is injected to reduce viscosity; emulsified bitumen flows to a production well. Dominant method in the Athabasca oil sands.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#d29b18"></i></td><td>Mined Bitumen</td><td>Bitumen recovered by open-pit surface mining. Ore is excavated, mixed with hot water (Clark Hot Water Extraction), and the bitumen froth is upgraded or diluted for pipeline transport. Confined to deposits shallow enough for economic mining (generally &lt;75 m depth).</td></tr>
+                <tr><td><i class="doc-dot" style="background:#2980b9"></i></td><td>Synthetic Crude Oil (SCO)</td><td>Upgraded bitumen that has been processed in an upgrader (hydrocracking or coking) to produce a lighter, pipelineable crude that trades similarly to conventional light crude. Produced at integrated mining + upgrading facilities (e.g., Syncrude, Suncor Base Plant).</td></tr>
+                <tr><td><i class="doc-dot" style="background:#4f8f45"></i></td><td>Conventional Crude</td><td>Light and medium crude oil produced from conventional reservoirs in Alberta and BC — primarily from the Western Canada Sedimentary Basin. Generally 30–40° API gravity. Reported monthly by facility through Petrinex.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#c2720a"></i></td><td>Heavy Crude (Conv.)</td><td>Conventional heavy crude oil (typically &lt;22° API) from Alberta and Saskatchewan. Not bitumen — produced from conventional reservoirs but with higher viscosity and density than light crude.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#6374a6"></i></td><td>Condensate</td><td>Ultra-light hydrocarbon liquid (60–80° API) that condenses out of natural gas at surface conditions. Used heavily as a bitumen diluent (forming dilbit) for pipeline transport. Produced at gas wells and gas plants.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#7c3aed"></i></td><td>Pentanes Plus (C5+)</td><td>The heaviest NGL fraction — pentane and heavier hydrocarbons that are liquid at atmospheric conditions. Blended into diluent streams or sold as a light naphtha feedstock. Reported separately from condensate in Petrinex.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#e07b39"></i></td><td>Gas Plant</td><td>A gas processing plant that extracts NGLs (propane and butane) from raw natural gas. Produces <em>mix-grade</em> (MX) propane and butane only — no on-site fractionation to sales-grade product. See Volume &amp; Streams tab for details.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#7c3aed"></i></td><td>Integrated Plant</td><td>A gas processing plant with on-site fractionation capability. Reports both MX (raw extract) and SP (sales-grade) volumes. The facility extracts NGLs from gas and separates them into spec-grade products in the same complex.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#c9a227"></i></td><td>Spec Plant (Fractionator)</td><td>A standalone fractionation plant. Receives raw NGL mix from pipeline or truck and fractionates it into individual products: propane spec (C3-SP) and butane spec (C4-SP). Reports SP activity only — no raw gas processing.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- ── VOLUME & STREAMS ── -->
+          <section class="docs-section" id="tab-volumes" hidden>
+            <h2>Volume Terminology &amp; NGL Streams</h2>
+
+            <h3>Units</h3>
+            <p>All volumes are shown in <strong>bbl/d</strong> — barrels per day (one barrel = 158.99 litres). Monthly raw data from Petrinex and AER is reported in cubic metres (m³); the ETL converts to bbl/d using 6.2898 bbl per m³ and divides by days in the production month.</p>
+
+            <h3>Activity Codes (Petrinex)</h3>
+            <p>Petrinex tracks what happens to a product at a facility using activity codes. The two most relevant for NGL volumes are:</p>
+            <table class="docs-table">
+              <thead><tr><th>Code</th><th>Name</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PROD</strong></td><td>Production</td><td>Raw production at the wellhead. Used for oil and gas production volumes.</td></tr>
+                <tr><td><strong>PROC</strong></td><td>Processing</td><td>Volume of NGL extracted from raw natural gas at a gas processing plant. This is the primary activity used for propane and butane volumes on this map — it captures the volume produced at the gas plant.</td></tr>
+                <tr><td><strong>FRAC</strong></td><td>Fractionation</td><td>Volume of NGL separated into individual product streams at a fractionation plant. Used by standalone fractionators and integrated plants for their spec-grade output.</td></tr>
+                <tr><td><strong>DISP</strong></td><td>Disposition</td><td>Sales or transfer volumes. Used for tracking downstream movement, not production.</td></tr>
+              </tbody>
+            </table>
+            <p class="docs-note">⚠️ This map uses <strong>PROC only</strong> for NGL volumes. This avoids double-counting: propane and butane extracted at a gas plant (PROC) may be shipped to a fractionator and re-reported as FRAC. Counting both would inflate totals.</p>
+
+            <h3>Mix vs. Spec (MX vs. SP)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Grade</th><th>Code</th><th>What it is</th><th>Where it comes from</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Mix</strong></td><td>MX</td><td>Raw, unfractionated product extracted from natural gas at a gas processing plant. Contains impurities and may be mixed with other NGL components. Not yet at sales / pipeline specification.</td><td>Gas plants (orange dots) and integrated plants (purple dots) — PROC activity</td></tr>
+                <tr><td><strong>Spec</strong></td><td>SP</td><td>Sales-grade product meeting pipeline or end-user specifications. Produced after fractionation — the process of separating the mixed NGL stream by boiling point into individual components.</td><td>Spec plants (gold dots) and integrated plants (purple dots) — FRAC activity</td></tr>
+              </tbody>
+            </table>
+            <p>In plain language: raw gas comes out of the ground mixed with propane, butane, and heavier liquids. A gas plant separates these liquids from the gas stream (PROC), producing <em>propane mix</em> and <em>butane mix</em>. A fractionator then takes that mix and distills it into pure propane spec and butane spec for sale.</p>
+
+            <h3>NGL Stream Breakdown</h3>
+            <table class="docs-table">
+              <thead><tr><th>Stream</th><th>Product ID</th><th>Carbon</th><th>Grade</th><th>Source facility</th></tr></thead>
+              <tbody>
+                <tr><td>Propane mix</td><td>C3-MX</td><td>3 carbons (C3)</td><td>Mix</td><td>Gas plants, integrated plants</td></tr>
+                <tr><td>Propane spec</td><td>C3-SP</td><td>3 carbons (C3)</td><td>Spec</td><td>Spec plants, integrated plants</td></tr>
+                <tr><td>Butane mix</td><td>C4-MX</td><td>4 carbons (C4)</td><td>Mix</td><td>Gas plants, integrated plants</td></tr>
+                <tr><td>Butane spec</td><td>C4-SP</td><td>4 carbons (C4)</td><td>Spec</td><td>Spec plants, integrated plants</td></tr>
+              </tbody>
+            </table>
+            <p>Facility type is determined <em>consistently across all reporting months</em>: if a facility ever reports both MX and SP, it is classified as an integrated plant for all months. This prevents month-to-month colour changes for the same facility.</p>
+          </section>
+
+          <!-- ── WILDFIRE ── -->
+          <section class="docs-section" id="tab-wildfire" hidden>
+            <h2>Wildfire Layer</h2>
+
+            <h3>Fire Weather Index (FWI)</h3>
+            <p>The <strong>Fire Weather Index</strong> is a numeric rating of fire intensity potential developed by the Canadian Forest Service. It combines six sub-indices based on temperature, relative humidity, wind speed, and cumulative rainfall. FWI ranges from 0 to over 100; higher values indicate greater fire danger.</p>
+            <table class="docs-table">
+              <thead><tr><th>FWI Range</th><th>Rating</th></tr></thead>
+              <tbody>
+                <tr><td>0 – 8</td><td>Low</td></tr>
+                <tr><td>9 – 17</td><td>Moderate</td></tr>
+                <tr><td>18 – 29</td><td>High</td></tr>
+                <tr><td>30 – 47</td><td>Very High</td></tr>
+                <tr><td>48+</td><td>Extreme</td></tr>
+              </tbody>
+            </table>
+            <p>Fire hotspots on this map (red halos) are drawn when FWI exceeds the hotspot threshold in the CWFIS feed. The "At fire risk" exposure metric counts production volume within a buffer distance of active hotspots.</p>
+
+            <h3>Alberta Fire Status Codes (ABFP)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td>Out of Control</td><td><i class="doc-dot" style="background:#e53e3e"></i></td><td>The fire is spreading beyond defined control lines and available suppression resources are insufficient to contain the perimeter. Highest risk designation.</td></tr>
+                <tr><td>Being Held</td><td><i class="doc-dot" style="background:#f6ad55"></i></td><td>The fire is not currently expected to spread beyond its defined perimeter given available resources and weather conditions. Suppression is active and managing the boundary.</td></tr>
+                <tr><td>Under Control</td><td><i class="doc-dot" style="background:#68d391"></i></td><td>The fire perimeter is fully contained. The fire is no longer spreading; mop-up operations may continue to extinguish residual burning material.</td></tr>
+                <tr><td>Carryover</td><td><i class="doc-dot" style="background:#a0aec0"></i></td><td>A fire from a previous fire season that was not fully extinguished (smouldering underground) and has re-ignited or is still being monitored. Common in peatlands.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>BC Fire Designations (BCWS)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td>Out of Control</td><td>Same definition as AB — fire perimeter is expanding beyond control lines.</td></tr>
+                <tr><td>Being Held</td><td>Same as AB — fire is contained within current perimeter under active suppression.</td></tr>
+                <tr><td>Under Control</td><td>Same as AB — fire is fully contained.</td></tr>
+                <tr><td>Fire of Note</td><td>BC Wildfire Service designation for a fire that is large, visible, or threatening enough to warrant heightened public communication, regardless of its containment status. A Fire of Note may be any status level.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- ── AER APPROVALS ── -->
+          <section class="docs-section" id="tab-approvals" hidden>
+            <h2>AER Scheme Approvals</h2>
+            <p>The AER Sites layer shows oil sands scheme approvals issued by the Alberta Energy Regulator (AER) under the <em>Oil Sands Conservation Act</em>. Each polygon represents an approved project area, not necessarily the current active extraction footprint.</p>
+
+            <h3>In-situ Approval (teal polygon)</h3>
+            <p>Approval for a <strong>thermal in-situ</strong> oil sands recovery scheme. The operator has regulatory approval to extract bitumen using subsurface thermal methods within the designated area. Common methods include:</p>
+            <ul class="docs-list">
+              <li><strong>SAGD</strong> (Steam-Assisted Gravity Drainage): horizontal well pairs — steam injected in upper well, bitumen drains to lower producer well.</li>
+              <li><strong>CSS</strong> (Cyclic Steam Stimulation): single well alternates between steam injection, soak, and production phases.</li>
+              <li><strong>THAI / VAPEX</strong>: experimental combustion and vapour-based methods.</li>
+            </ul>
+
+            <h3>Mineable Approval (amber polygon)</h3>
+            <p>Approval for an <strong>open-pit surface mining</strong> oil sands scheme. The operator has AER approval to mine bitumen-bearing ore from the surface. Generally applies to deposits less than ~75 metres deep where in-situ methods are uneconomic. Mining produces large volumes of tailings that must be managed on-site.</p>
+
+            <h3>ST102 Facilities</h3>
+            <p>AER ST102 is the <em>Oil Sands Facility Data Report</em>, which lists all approved oil sands facilities with their approved capacities. ST102 facility markers show the registered location of active or approved oil sands facilities — useful for cross-referencing production volumes against regulatory approvals.</p>
+
+            <p class="docs-note">ℹ️ Scheme boundaries are regulatory approval polygons sourced from the AER open data portal. They may not exactly match the current operational footprint or the extent shown on satellite imagery.</p>
+          </section>
+
+          <!-- ── PIPELINES ── -->
+          <section class="docs-section" id="tab-pipelines" hidden>
+            <h2>Pipeline Layer</h2>
+            <p>The pipeline layer shows federally regulated interprovincial pipelines from the <strong>Canada Energy Regulator (CER)</strong> facility and pipeline registry. These are pipelines that cross provincial or international borders and are therefore under federal jurisdiction (NEB/CER Act).</p>
+
+            <h3>What is shown</h3>
+            <p>Line segments represent approved pipeline routes. Each segment is attributed with the operator, commodity type, and (where available) nominal capacity. Not all provincial or gathering pipelines are included — this data covers CER-regulated facilities only.</p>
+
+            <h3>Commodity types</h3>
+            <table class="docs-table">
+              <thead><tr><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>Crude Oil</td><td>Conventional crude, bitumen blend (dilbit/synbit), and synthetic crude pipelines. Includes the Enbridge Mainline, Trans Mountain, Keystone, and Express systems.</td></tr>
+                <tr><td>Natural Gas</td><td>Transmission pipelines carrying natural gas for domestic consumption or export. Includes NGTL (TC Energy), Alliance, and Westcoast systems.</td></tr>
+                <tr><td>NGL / Products</td><td>Pipelines carrying natural gas liquids (ethane, propane, butane, condensate) or refined petroleum products.</td></tr>
+                <tr><td>Multi-product</td><td>Pipelines approved to carry more than one commodity class.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>What is not shown</h3>
+            <p>Provincially regulated pipelines, gathering lines, and field infrastructure are <em>not</em> included. For Alberta intra-provincial pipeline data, refer to the AER pipeline database (Line Pipe Safety program). The pipeline layer is best used as reference context for understanding transport connectivity, not for detailed infrastructure analysis.</p>
+          </section>
+
+          <!-- ── DATA SOURCES ── -->
+          <section class="docs-section" id="tab-sources" hidden>
+            <h2>Data Sources</h2>
+            <p>All data is processed locally via the ETL pipeline (<code>python scripts/run_etl.py</code>) and stored in a SQLite database. The frontend reads pre-built JSON files from <code>public/data/</code>.</p>
+
+            <table class="docs-table">
+              <thead><tr><th>Source</th><th>Dataset</th><th>Coverage</th><th>Streams</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>AER ST53</strong></td>
+                  <td>Alberta Energy Regulator Statistical Table 53 — Oil Sands Production</td>
+                  <td>Monthly, Alberta oil sands projects</td>
+                  <td>In-situ bitumen, Mined bitumen, Synthetic crude oil</td>
+                </tr>
+                <tr>
+                  <td><strong>AER ST39</strong></td>
+                  <td>AER Statistical Table 39 — Crude Oil and Equivalent</td>
+                  <td>Monthly, Alberta conventional facilities</td>
+                  <td>Conventional crude, Heavy crude, Condensate, Pentanes plus (AER facilities)</td>
+                </tr>
+                <tr>
+                  <td><strong>Petrinex AB</strong></td>
+                  <td>Petrinex Alberta monthly volumetric submissions (PROD/PROC activity)</td>
+                  <td>Monthly, Alberta upstream facilities</td>
+                  <td>Conventional crude, Pentanes plus, Condensate, Propane mix/spec, Butane mix/spec</td>
+                </tr>
+                <tr>
+                  <td><strong>Petrinex BC</strong></td>
+                  <td>Petrinex BC facility reference data (formation codes, activity codes)</td>
+                  <td>Reference tables, BC facilities</td>
+                  <td>Used for facility lookup and stream classification only</td>
+                </tr>
+                <tr>
+                  <td><strong>Statistics Canada</strong></td>
+                  <td>Table 25-10-0063-01 — Crude oil and equivalent production, by type</td>
+                  <td>Monthly, national and provincial totals</td>
+                  <td>National context: Total WC crude, Oil sands totals, dilbit, SCO</td>
+                </tr>
+                <tr>
+                  <td><strong>CWFIS (NRCan)</strong></td>
+                  <td>Canadian Wildland Fire Information System — active fire hotspots</td>
+                  <td>Near-real-time, Canada-wide satellite detections</td>
+                  <td>Fire hotspot positions (FWI-based)</td>
+                </tr>
+                <tr>
+                  <td><strong>ABFP</strong></td>
+                  <td>Alberta Wildfire open data — provincial active fire perimeters</td>
+                  <td>Current fire season, Alberta</td>
+                  <td>Fire polygons with OC / BH / UC / Carryover status</td>
+                </tr>
+                <tr>
+                  <td><strong>BC Wildfire Service</strong></td>
+                  <td>BCWS open data — BC provincial active fire perimeters</td>
+                  <td>Current fire season, British Columbia</td>
+                  <td>Fire polygons with status + Fires of Note designation</td>
+                </tr>
+                <tr>
+                  <td><strong>CER</strong></td>
+                  <td>Canada Energy Regulator — pipeline and facility registry</td>
+                  <td>Federally regulated pipelines, Canada-wide</td>
+                  <td>Pipeline routes by commodity type</td>
+                </tr>
+                <tr>
+                  <td><strong>AER Scheme Approvals</strong></td>
+                  <td>AER oil sands scheme approval polygons (in-situ and mineable)</td>
+                  <td>All approved schemes, Alberta</td>
+                  <td>Approval polygons: in-situ (teal), mineable (amber)</td>
+                </tr>
+                <tr>
+                  <td><strong>AER ST102</strong></td>
+                  <td>Oil Sands Facility Data Report — approved facility locations and capacities</td>
+                  <td>All approved oil sands facilities, Alberta</td>
+                  <td>Facility points for cross-reference</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>ETL Refresh</h3>
+            <p>Click <strong>Run ETL</strong> in the top bar to see the refresh command. Run <code>python scripts/run_etl.py</code> from the project root to rebuild the database from any locally cached raw files. Add <code>--download</code> to also re-fetch the latest AER, Petrinex, and StatCan source files from their public endpoints before processing.</p>
+            <p class="docs-note">ℹ️ Wildfire data (CWFIS, ABFP, BCWS) is fetched live in the browser when you click the Fire Layer button — it does not go through the ETL.</p>
+          </section>
+
+        </div><!-- .docs-body -->
+      </div><!-- .docs-inner -->
+    </div><!-- #docsPanel -->
+    <!-- ============================================================ -->
+
+    <script type="module" src="src/main.js?v=20260514-perf"></script>
   </body>
 </html>

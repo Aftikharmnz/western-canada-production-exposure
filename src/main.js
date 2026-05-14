@@ -22,8 +22,9 @@ const SYSTEM_META = {
   heavy_conventional:{ label: "Heavy Crude (Conv.)",     color: "#c2720a", className: "heavy-conv" },
   synthetic:         { label: "Synthetic Crude Oil",     color: "#2980b9", className: "synthetic" },
   condensate:        { label: "Condensate",              color: "#6374a6", className: "condensate" },
-  propane:           { label: "Propane",                  color: "#e07b39", className: "propane" },
-  butane:            { label: "Butane",                   color: "#c9a227", className: "butane" },
+  gas_plant:         { label: "Gas Plant (NGL extraction)",  color: "#e07b39", className: "gas-plant",         useSystemColor: true },
+  integrated_plant:  { label: "Integrated Plant (NGL+frac)", color: "#7c3aed", className: "integrated-plant",  useSystemColor: true },
+  spec_plant:        { label: "Spec Plant (fractionation)",  color: "#c9a227", className: "spec-plant",        useSystemColor: true },
   provincial_light:  { label: "Light Crude (Prov.)",     color: "#7bb53a", className: "conventional" },
   refinery_input:    { label: "Refinery Input",          color: "#9a5546", className: "refinery" },
 };
@@ -51,14 +52,27 @@ const STREAM_COLORS = {
   "Total Condensate Supply":     "#9b59b6",
   "Condensate Imports":          "#b39ddb",
   "Condensate production":       "#7d5fa5",
-  "Propane production":          "#e07b39",
-  "Butane production":           "#c9a227",
+  "Propane mix":                 "#e07b39",
+  "Propane spec":                "#f4a261",
+  "Butane mix":                  "#c9a227",
+  "Butane spec":                 "#e9c46a",
   "Total WC crude":              "#7f8c8d",
   "Total Oil Sands Dilbit + SCO":"#2c3e50",
   "Blend Ratio":                 "#95a5a6",
   "Medium":                      "#e08c3a",
   "Heavy":                       "#c2720a",
   "Light":                       "#8bc34a",
+};
+
+// ============================================================
+// STREAM DESCRIPTIONS  (shown as tooltip on stream toggles)
+// ============================================================
+
+const STREAM_DESCRIPTIONS = {
+  "Propane mix":  "C3-MX · Raw propane mix extracted at gas processing plants — not yet fractionated to sales grade",
+  "Propane spec": "C3-SP · Sales-grade propane produced at fractionation or integrated gas plants",
+  "Butane mix":   "C4-MX · Raw butane mix extracted at gas processing plants — not yet fractionated to sales grade",
+  "Butane spec":  "C4-SP · Sales-grade butane produced at fractionation or integrated gas plants",
 };
 
 // ============================================================
@@ -71,8 +85,7 @@ const SOURCE_SHORT = {
   petrinex_ab_conventional_vol: "Petrinex AB",
   petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
   petrinex_ab_condensate_vol:    "Petrinex AB COND",
-  petrinex_ab_propane_vol:       "Petrinex AB C3",
-  petrinex_ab_butane_vol:        "Petrinex AB C4",
+  petrinex_ab_ngl_vol:           "Petrinex AB NGL",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -86,8 +99,10 @@ const PRIMARY_STREAMS = [
   "Conventional crude oil",
   "Pentanes plus total",
   "Condensate production",
-  "Propane production",
-  "Butane production",
+  "Propane mix",
+  "Propane spec",
+  "Butane mix",
+  "Butane spec",
 ];
 
 const STREAM_LEGEND_KEYS = {
@@ -100,8 +115,9 @@ const STREAM_LEGEND_KEYS = {
   "Condensate Production": "condensate",
   "Condensate production": "condensate",
   "Total Condensate Supply": "condensate",
-  "Propane production": "propane",
-  "Butane production":  "butane",
+  // Propane mix / spec / Butane mix / spec intentionally omitted —
+  // pointLegendKey falls back to production_system className (gas-plant /
+  // integrated-plant / spec-plant) which is set per facility in the ETL.
 };
 
 // ============================================================
@@ -115,6 +131,8 @@ const state = {
   records: [],
   baseRecords: [],
   dateRecordCache: new Map(),
+  baseRecordsByDate: new Map(),   // pre-indexed for O(1) date lookup
+  timelineCache: null,            // cached bar totals; null = dirty
   dateRecordLoading: new Set(),
   dateRecordErrors: new Map(),
   geojson: null,
@@ -201,6 +219,9 @@ const els = {
   etlPanel:         document.querySelector("#etlPanel"),
   closeEtl:         document.querySelector("#closeEtl"),
   etlCommand:       document.querySelector("#etlCommand"),
+  docsBtn:          document.querySelector("#docsBtn"),
+  docsPanel:        document.querySelector("#docsPanel"),
+  closeDocs:        document.querySelector("#closeDocs"),
   wildfireToggle:   document.querySelector("#wildfireToggle"),
   wildfireStatus:   document.querySelector("#wildfireStatus"),
   formationToggle:  document.querySelector("#formationToggle"),
@@ -306,6 +327,14 @@ async function loadData() {
   state.assetById = new Map(assets.map((a) => [a.asset_id, a]));
   state.baseRecords = records;
   state.records = records;
+  // Build O(1) date index so recordsForDate never scans the full array
+  const _byDate = new Map();
+  for (const r of records) {
+    let bucket = _byDate.get(r.date);
+    if (!bucket) { bucket = []; _byDate.set(r.date, bucket); }
+    bucket.push(r);
+  }
+  state.baseRecordsByDate = _byDate;
   state.geojson = null;
   state.schemeApprovals = schemeApprovals;
   state.st102Facilities = st102Facilities;
@@ -329,10 +358,10 @@ async function loadData() {
 }
 
 function recordsForDate(date = state.selectedDate) {
-  return [
-    ...state.baseRecords.filter((record) => record.date === date),
-    ...(state.dateRecordCache.get(date) || []),
-  ];
+  // O(1) indexed lookup — no full-array scan
+  const base = state.baseRecordsByDate.get(date) || [];
+  const onDemand = state.dateRecordCache.get(date) || [];
+  return onDemand.length ? [...base, ...onDemand] : base;
 }
 
 // Handles both file formats:
@@ -400,6 +429,8 @@ function requestDateRecords(date) {
   ensureDateRecords(date).then(() => {
     if (state.selectedDate === date) {
       state.records = recordsForDate(date);
+      // New on-demand records loaded — invalidate timeline total for this date
+      if (state.timelineCache) state.timelineCache.delete(date);
       render();
     }
   });
@@ -417,7 +448,7 @@ function initControls() {
   els.dateSlider.addEventListener("input", () => {
     state.selectedDate = state.dates[Number(els.dateSlider.value)];
     requestDateRecords(state.selectedDate);
-    render();
+    scheduleRender(); // debounce rapid slider drags
   });
 
   const sourceIds = [...new Set(state.records.map((r) => r.source_id))].sort();
@@ -440,12 +471,38 @@ function initControls() {
 
   els.searchInput.addEventListener("input", () => {
     state.search = els.searchInput.value.trim().toLowerCase();
-    render();
+    state.timelineCache = null;
+    scheduleRender();
   });
 
   els.etlCommand.textContent = "python scripts/run_etl.py --download";
   els.etlButton.addEventListener("click", () => { els.etlPanel.hidden = false; });
   els.closeEtl.addEventListener("click", () => { els.etlPanel.hidden = true; });
+
+  // ── Docs panel ──
+  if (els.docsBtn && els.docsPanel) {
+    els.docsBtn.addEventListener("click", () => {
+      els.docsPanel.hidden = false;
+      els.docsBtn.classList.add("active");
+    });
+    els.closeDocs.addEventListener("click", () => {
+      els.docsPanel.hidden = true;
+      els.docsBtn.classList.remove("active");
+    });
+    els.docsPanel.addEventListener("keydown", e => {
+      if (e.key === "Escape") { els.docsPanel.hidden = true; els.docsBtn.classList.remove("active"); }
+    });
+    // Tab switching
+    els.docsPanel.querySelectorAll(".docs-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        els.docsPanel.querySelectorAll(".docs-tab").forEach(t => t.classList.remove("active"));
+        els.docsPanel.querySelectorAll(".docs-section").forEach(s => { s.hidden = true; });
+        tab.classList.add("active");
+        const sec = els.docsPanel.querySelector(`#tab-${tab.dataset.tab}`);
+        if (sec) sec.hidden = false;
+      });
+    });
+  }
 
   if (els.wildfireToggle) {
     els.wildfireToggle.addEventListener("click", toggleWildfires);
@@ -472,8 +529,9 @@ function toggleMarkup(group, value, label) {
 function toggleMarkupStream(stream) {
   const checked = state.selectedStreams.has(stream);
   const color = streamColor(stream);
+  const desc = STREAM_DESCRIPTIONS[stream] || stream;
   return `
-    <label class="toggle-item" title="${escapeHtml(stream)}">
+    <label class="toggle-item" title="${escapeHtml(desc)}">
       <input type="checkbox" data-group="stream" value="${escapeHtml(stream)}" ${checked ? "checked" : ""} />
       <span class="stream-swatch-label">
         <i class="stream-swatch" style="background:${color}"></i>
@@ -488,7 +546,8 @@ function updateSetFromToggle(event, group, targetSet) {
   if (input.checked) targetSet.add(input.value);
   else targetSet.delete(input.value);
   state.selectedAssetId = null;
-  render();
+  state.timelineCache = null; // filters changed — invalidate bar chart cache
+  scheduleRender();
 }
 
 function initLegendControls() {
@@ -507,8 +566,9 @@ function initLegendControls() {
     if (key.startsWith("pipe-") || key.startsWith("inst-")) {
       refreshPipelineLayers();
     }
+    state.timelineCache = null; // visible streams changed — invalidate bar chart cache
     updateLegendControls();
-    render();
+    scheduleRender();
   });
   updateLegendControls();
 }
@@ -779,6 +839,15 @@ function aggregateForDate(date = state.selectedDate) {
 // MAIN RENDER ORCHESTRATOR
 // ============================================================
 
+// rAF-based debounce: multiple synchronous calls in the same frame
+// collapse into one render at the next animation frame.
+let _renderPending = false;
+function scheduleRender() {
+  if (_renderPending) return;
+  _renderPending = true;
+  requestAnimationFrame(() => { _renderPending = false; render(); });
+}
+
 function render() {
   requestDateRecords(state.selectedDate);
   els.selectedDate.textContent = dateLabel(state.selectedDate);
@@ -791,9 +860,11 @@ function render() {
     els.dateScenario.textContent =
       actualCutoff && state.selectedDate > actualCutoff ? "forecast/model" : "actual/source";
   }
-  renderMap();
-  renderMetrics();
-  renderDetails();
+  // Compute once and pass to all sub-renders — avoids 3× redundant aggregation
+  const aggregated = aggregateForDate();
+  renderMap(aggregated);
+  renderMetrics(aggregated);
+  renderDetails(aggregated);
   renderTimeline();
 }
 
@@ -801,8 +872,8 @@ function render() {
 // MAP RENDER
 // ============================================================
 
-function renderMap() {
-  const { byAsset } = aggregateForDate();
+function renderMap(aggregated) {
+  const { byAsset } = aggregated || aggregateForDate();
   const points = [...byAsset.values()].filter(
     ({ asset, kbbl: v }) => asset.latitude != null && asset.longitude != null && v > 0
   );
@@ -816,7 +887,7 @@ function renderMap() {
       const isSelected = point.asset.asset_id === state.selectedAssetId;
       const radius = Math.max(5, Math.min(34, Math.sqrt(point.kbbl) * 1.9));
       const topStream = [...point.streams.entries()].sort((a, b) => b[1] - a[1])[0];
-      const markerColor = topStream ? streamColor(topStream[0]) : color;
+      const markerColor = (meta.useSystemColor || !topStream) ? color : streamColor(topStream[0]);
 
       const marker = L.circleMarker(
         [point.asset.latitude, point.asset.longitude],
@@ -829,13 +900,17 @@ function renderMap() {
           weight: isSelected ? 3 : 1.4,
         }
       );
+      const sortedStreams = [...point.streams.entries()].sort((a, b) => b[1] - a[1]);
       const ttLines = [
         `<strong>${escapeHtml(point.asset.display_name)}</strong>`,
         escapeHtml(point.asset.company || point.asset.province),
         kbbl(point.kbbl),
         `<em>${escapeHtml(meta.label)}</em>`,
       ];
-      if (topStream) ttLines.push(`Top stream: ${escapeHtml(topStream[0])}`);
+      sortedStreams.forEach(([stream, vol]) => {
+        const swatch = `<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${streamColor(stream)};margin-right:4px;"></i>`;
+        ttLines.push(`${swatch}${escapeHtml(stream)}: ${kbbl(vol)}`);
+      });
       marker.bindTooltip(ttLines.join("<br>"), { direction: "top", opacity: 0.96 });
       marker.on("click", (event) => {
         if (state.distanceMode) {
@@ -887,8 +962,8 @@ function renderFallbackMap(points) {
 // METRICS PANEL
 // ============================================================
 
-function renderMetrics() {
-  const { byAsset, sourceTotals } = aggregateForDate();
+function renderMetrics(aggregated) {
+  const { byAsset, sourceTotals } = aggregated || aggregateForDate();
   const points = [...byAsset.values()].filter(
     ({ asset, kbbl: v }) => !asset.is_rollup && asset.latitude != null && v > 0
   );
@@ -967,8 +1042,8 @@ function renderMetrics() {
 // DETAIL PANEL
 // ============================================================
 
-function renderDetails() {
-  const { byAsset } = aggregateForDate();
+function renderDetails(aggregated) {
+  const { byAsset } = aggregated || aggregateForDate();
   let selected = state.selectedAssetId ? byAsset.get(state.selectedAssetId) : null;
   if (!selected) selected = [...byAsset.values()].sort((a, b) => b.kbbl - a.kbbl)[0] || null;
 
@@ -978,7 +1053,7 @@ function renderDetails() {
     els.detailVolume.textContent = "--";
     els.detailSource.textContent = "--";
     els.detailStatus.textContent = "--";
-    renderTopAssets();
+    renderTopAssets(aggregated);
     if (els.streamBreakdown) els.streamBreakdown.innerHTML = "";
     if (els.fireRiskSection) els.fireRiskSection.hidden = true;
     return;
@@ -995,7 +1070,7 @@ function renderDetails() {
   els.detailSource.textContent = [...selected.sources].map((s) => SOURCE_SHORT[s] || s).join(", ");
   els.detailStatus.textContent = [...selected.scenarios].join(", ");
 
-  renderTopAssets();
+  renderTopAssets(aggregated);
   renderStreamBreakdown(asset.asset_id, selected.streams);
   renderFireRisk(asset);
 }
@@ -1004,12 +1079,12 @@ function renderDetails() {
 // TOP ASSETS TABLE  (replaces sparkline)
 // ============================================================
 
-function renderTopAssets() {
+function renderTopAssets(aggregated) {
   const el = document.getElementById("topAssetsList");
   const labelEl = document.getElementById("topAssetsLabel");
   if (!el) return;
 
-  const { byAsset } = aggregateForDate();
+  const { byAsset } = aggregated || aggregateForDate();
   // Rank all mapped assets by volume descending
   const ranked = [...byAsset.values()]
     .filter(({ asset, kbbl: v }) => asset.latitude != null && v > 0)
@@ -1124,18 +1199,26 @@ function renderFireRisk(asset) {
 // ============================================================
 
 function renderTimeline() {
-  const rows = state.dates.map((date) => {
-    let total;
-    const hasOnDemandFile = Boolean(state.manifest?.monthly_record_files?.[date]);
-    if (hasOnDemandFile && !state.dateRecordCache.has(date)) {
-      total = state.manifest?.date_totals_kbbl_d?.[date];
+  // Build timeline totals once per filter-state; reuse on subsequent renders.
+  // state.timelineCache is set to null whenever filters change.
+  if (!state.timelineCache) {
+    const cache = new Map();
+    for (const date of state.dates) {
+      let total;
+      const hasOnDemandFile = Boolean(state.manifest?.monthly_record_files?.[date]);
+      // For unloaded on-demand files, prefer the pre-computed manifest total (fast)
+      if (hasOnDemandFile && !state.dateRecordCache.has(date)) {
+        total = state.manifest?.date_totals_kbbl_d?.[date];
+      }
+      if (!Number.isFinite(total)) {
+        const { byAsset } = aggregateForDate(date);
+        total = [...byAsset.values()].reduce((s, p) => s + p.kbbl, 0);
+      }
+      cache.set(date, total || 0);
     }
-    if (!Number.isFinite(total)) {
-      const { byAsset } = aggregateForDate(date);
-      total = [...byAsset.values()].reduce((s, p) => s + p.kbbl, 0);
-    }
-    return { date, total };
-  });
+    state.timelineCache = cache;
+  }
+  const rows = state.dates.map((date) => ({ date, total: state.timelineCache.get(date) || 0 }));
   const max = Math.max(...rows.map((r) => r.total), 1);
   const selectedIndex = rows.findIndex((r) => r.date === state.selectedDate);
   const windowStart = Math.max(0, selectedIndex - 30);
