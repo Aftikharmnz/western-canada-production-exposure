@@ -292,11 +292,11 @@ function formationLegendKey(feature) {
 
 function albertaFireLegendKey(feature) {
   const p = feature?.properties || {};
-  const year = Number((p.Fire_Name || "").match(/^(\d{4})_/)?.[1]);
-  if (Number.isFinite(year) && year < new Date().getFullYear()) return "ab-fire-carryover";
-  if (p.Stage_of_Control === "OC") return "ab-fire-oc";
-  if (p.Stage_of_Control === "BH") return "ab-fire-bh";
-  if (p.Stage_of_Control === "UC") return "ab-fire-uc";
+  if (p.FIRE_TYPE === "Mutual Aid") return "ab-fire-ma";
+  if (p.CO_FLAG === "Y") return "ab-fire-carryover";
+  if (p.FIRE_STATUS === "Out of Control") return "ab-fire-oc";
+  if (p.FIRE_STATUS === "Being Held") return "ab-fire-bh";
+  if (p.FIRE_STATUS === "Under Control") return "ab-fire-uc";
   return "ab-fire-uc";
 }
 
@@ -1367,10 +1367,6 @@ const CWFIS_URL =
   "&CQL_FILTER=lat%3E49%20AND%20lat%3C72%20AND%20lon%3E-141%20AND%20lon%3C-94" +
   "&maxFeatures=2000";
 
-// Alberta provincial active wildfire locations — ArcGIS public FeatureServer.
-// Returns point features with Agency, Fire_Name, Latitude, Longitude,
-// Hectares__Ha_, Stage_of_Control, and Start_Date.
-// Filter: Agency = 'Alberta'  (catches AB fires; server also holds BC/other agencies)
 // BC Wildfire Service — BCWS_ActiveFires_PublicView, all fires except status 'Out'.
 // Status values: 'Out of Control', 'Being Held', 'Under Control', 'Fire of Note', 'New'.
 // Geometry is proper WGS84 — no coordinate normalization needed.
@@ -1381,14 +1377,24 @@ const BC_FIRES_URL =
   "&returnGeometry=true" +
   "&f=geojson";
 
-// Full Alberta active fire inventory — wjcPoefzjpzCgffS 'activefires' layer.
-// This is the comprehensive source used by the Alberta Wildfire Status Dashboard.
-// Returns 20+ fires including all carryover fires; Agency uses uppercase 'AB'.
-// Fire_Name format: "YYYY_AB_FireCode-YYYY" e.g. "2025_AB_SWF-085-2025"
+// Official Alberta Wildfire active fire inventory — Alberta Government ArcGIS (Eb8P5h4CJk8utIBz).
+// This is the authoritative source powering the Alberta Wildfire Status Dashboard experience.
+// Fields: LABEL (e.g. "LWF-041-2026"), FIRE_STATUS (full English strings), AREA_ESTIMATE (ha),
+//   RESP_AREA (forest area name), GENERAL_CAUSE, RESPONSE_TYPE, CO_FLAG ("Y" = carryover fire).
 const ALBERTA_FIRES_URL =
-  "https://services.arcgis.com/wjcPoefzjpzCgffS/ArcGIS/rest/services/activefires/FeatureServer/0/query" +
-  "?where=Agency%3D%27AB%27" +
-  "&outFields=Agency%2CFire_Name%2CLatitude%2CLongitude%2CHectares__Ha_%2CStage_of_Control%2CStart_Date" +
+  "https://services.arcgis.com/Eb8P5h4CJk8utIBz/arcgis/rest/services/Active_Wildfires_(PROD)/FeatureServer/0/query" +
+  "?where=1%3D1" +
+  "&outFields=LABEL%2CFIRE_NUMBER%2CLATITUDE%2CLONGITUDE%2CFIRE_YEAR%2CFIRE_TYPE%2CFIRE_STATUS%2CFIRE_STATUS_DATE%2CAREA_ESTIMATE%2CSIZE_CLASS%2CRESP_AREA%2CGENERAL_CAUSE%2CRESPONSE_TYPE%2CASSESSMENT_ASSISTANCE_DATE%2CCO_FLAG" +
+  "&returnGeometry=true" +
+  "&f=geojson";
+
+// Mutual Aid fires — provincial assistance to municipal/county fires (RCU, CCU, WCU, etc.).
+// Same schema as Active_Wildfires_(PROD). Status "Assistance Started" = actively assisted;
+// "Assistance Ended" = province has stood down (excluded from map).
+const ALBERTA_MUTUAL_AID_URL =
+  "https://services.arcgis.com/Eb8P5h4CJk8utIBz/arcgis/rest/services/Active_Mutual_Aid_Wildfires/FeatureServer/0/query" +
+  "?where=FIRE_STATUS%20%3C%3E%20%27Assistance%20Ended%27" +
+  "&outFields=LABEL%2CFIRE_NUMBER%2CLATITUDE%2CLONGITUDE%2CFIRE_YEAR%2CFIRE_TYPE%2CFIRE_STATUS%2CFIRE_STATUS_DATE%2CAREA_ESTIMATE%2CSIZE_CLASS%2CRESP_AREA%2CGENERAL_CAUSE%2CRESPONSE_TYPE%2CASSESSMENT_ASSISTANCE_DATE%2CCO_FLAG" +
   "&returnGeometry=true" +
   "&f=geojson";
 
@@ -1492,17 +1498,19 @@ async function fetchWildfires() {
 }
 
 // ============================================================
-// ALBERTA PROVINCIAL ACTIVE WILDFIRES  — ArcGIS FeatureServer
+// ALBERTA PROVINCIAL ACTIVE WILDFIRES  — Official Alberta Government ArcGIS
 // Loaded automatically on boot and refreshed alongside CWFIS.
-// Stage_of_Control short codes used by this layer:
-//   "OC" = Out of Control, "BH" = Being Held, "UC" = Under Control
+// FIRE_STATUS uses full English strings (same convention as BC):
+//   "Out of Control", "Being Held", "Under Control"
+// CO_FLAG = "Y" means carry-over fire from a prior season.
 // ============================================================
 
 const ALBERTA_STAGE_STYLE = {
-  "OC": { color: "#7f1d1d", fill: "#ef4444", weight: 2.5, opacity: 0.95, label: "Out of Control" },
-  "BH": { color: "#7c2d12", fill: "#f97316", weight: 2,   opacity: 0.90, label: "Being Held"     },
-  "UC": { color: "#78350f", fill: "#fbbf24", weight: 2,   opacity: 0.85, label: "Under Control"  },
-  default: { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown" },
+  "Out of Control":      { color: "#7f1d1d", fill: "#ef4444", weight: 2.5, opacity: 0.95, label: "Out of Control"     },
+  "Being Held":          { color: "#7c2d12", fill: "#f97316", weight: 2,   opacity: 0.90, label: "Being Held"         },
+  "Under Control":       { color: "#78350f", fill: "#fbbf24", weight: 2,   opacity: 0.85, label: "Under Control"      },
+  "Assistance Started":  { color: "#4c1d95", fill: "#7c3aed", weight: 2,   opacity: 0.90, label: "Mutual Aid — Active" },
+  default:               { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown"            },
 };
 
 // BC uses full English status strings; Fire of Note gets a distinct purple marker.
@@ -1520,22 +1528,30 @@ async function fetchAlbertaFires() {
   state.albertaFireLoading = true;
   state.albertaFireError = null;
   try {
-    const response = await fetch(ALBERTA_FIRES_URL, { mode: "cors" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const raw = await response.json();
+    // Fetch provincial fires and mutual aid fires in parallel
+    const [provResp, maResp] = await Promise.all([
+      fetch(ALBERTA_FIRES_URL,       { mode: "cors" }),
+      fetch(ALBERTA_MUTUAL_AID_URL,  { mode: "cors" }),
+    ]);
+    if (!provResp.ok) throw new Error(`HTTP ${provResp.status} (provincial)`);
+    if (!maResp.ok)   throw new Error(`HTTP ${maResp.status} (mutual aid)`);
 
-    // Normalize: prefer the explicit Latitude/Longitude props over geometry
+    const [provRaw, maRaw] = await Promise.all([provResp.json(), maResp.json()]);
+
+    // Normalize: use explicit LATITUDE/LONGITUDE props over geometry
     // (geometry may be in a projected CRS on some ArcGIS exports).
-    const features = (raw.features || []).map(f => {
+    const normalize = f => {
       const p = f.properties || {};
-      const lat = Number(p.Latitude  ?? p.latitude);
-      const lon = Number(p.Longitude ?? p.longitude);
+      const lat = Number(p.LATITUDE);
+      const lon = Number(p.LONGITUDE);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-      return {
-        ...f,
-        geometry: { type: "Point", coordinates: [lon, lat] },
-      };
-    }).filter(Boolean);
+      return { ...f, geometry: { type: "Point", coordinates: [lon, lat] } };
+    };
+
+    const features = [
+      ...(provRaw.features || []).map(normalize),
+      ...(maRaw.features   || []).map(normalize),
+    ].filter(Boolean);
 
     state.albertaFires = { type: "FeatureCollection", features };
   } catch (err) {
@@ -1564,15 +1580,14 @@ function renderAlbertaFireLayer() {
     },
     pointToLayer(feature, latlng) {
       const p = feature.properties || {};
-      const stage = p.Stage_of_Control || "";
-      const style = ALBERTA_STAGE_STYLE[stage] || ALBERTA_STAGE_STYLE.default;
-      const ha = Number(p.Hectares__Ha_);
+      const status = p.FIRE_STATUS || "";
+      const style = ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default;
+      const ha = Number(p.AREA_ESTIMATE);
       const r = Number.isFinite(ha) && ha > 0
         ? Math.min(22, 8 + Math.log10(ha + 1) * 4)
         : 8;
-      // Name format is "YYYY_AB_FireCode" — year prefix tells us if it's a carryover
-      const nameYear = Number((p.Fire_Name || "").match(/^(\d{4})_/)?.[1]);
-      const isCarryover = Number.isFinite(nameYear) && nameYear < currentYear;
+      // CO_FLAG = "Y" is the authoritative carryover indicator from the official service
+      const isCarryover = p.CO_FLAG === "Y";
       return L.circleMarker(latlng, {
         radius: r,
         color: style.color,
@@ -1585,27 +1600,34 @@ function renderAlbertaFireLayer() {
     },
     onEachFeature(feature, layer) {
       const p = feature.properties || {};
-      // Strip the "YYYY_AB_" prefix for display — show just the fire code e.g. "SWF-085-2025"
-      const rawName = p.Fire_Name || "Unnamed Alberta fire";
-      const displayName = rawName.replace(/^\d{4}_[A-Z]{2}_/, "");
-      const ha = Number(p.Hectares__Ha_);
+      const label = p.LABEL || "Unnamed Alberta fire";
+      const ha = Number(p.AREA_ESTIMATE);
       const haStr = Number.isFinite(ha) && ha > 0 ? `${ha.toLocaleString("en-CA")} ha` : "size unknown";
-      const startMs = Number(p.Start_Date);
+      const sizeClass = p.SIZE_CLASS ? ` (Class ${escapeHtml(p.SIZE_CLASS)})` : "";
+      const startMs = Number(p.ASSESSMENT_ASSISTANCE_DATE);
       const startDate = Number.isFinite(startMs) && startMs > 0 ? new Date(startMs) : null;
       const startStr = startDate ? startDate.toLocaleDateString("en-CA") : "—";
-      const startYear = startDate ? startDate.getFullYear() : null;
-      const nameYear = Number(rawName.match(/^(\d{4})_/)?.[1]);
-      const isCarryover = Number.isFinite(nameYear) && nameYear < currentYear;
-      const stageCode = p.Stage_of_Control || "";
-      const stageStyle = ALBERTA_STAGE_STYLE[stageCode] || ALBERTA_STAGE_STYLE.default;
+      const fireYear = Number(p.FIRE_YEAR) || currentYear;
+      const isCarryover = p.CO_FLAG === "Y";
+      const status = p.FIRE_STATUS || "";
+      const stageStyle = ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default;
       const carryoverNote = isCarryover
-        ? `<span style="color:#b45309">⚠️ Carryover — burning since ${nameYear}</span><br>`
-        : `<span style="color:#166534">🔥 New fire (${startYear ?? currentYear})</span><br>`;
+        ? `<span style="color:#b45309">⚠️ Carryover — fire from ${fireYear}</span><br>`
+        : `<span style="color:#166534">🔥 New fire (${fireYear})</span><br>`;
+      const isMutualAid = p.FIRE_TYPE === "Mutual Aid";
+      const maBadge   = isMutualAid ? `<span style="color:#7c3aed;font-weight:700">🤝 Mutual Aid Fire</span><br>` : "";
+      const respArea  = p.RESP_AREA      ? `📍 ${escapeHtml(p.RESP_AREA)}<br>`            : "";
+      const cause     = p.GENERAL_CAUSE  ? `Cause: ${escapeHtml(p.GENERAL_CAUSE)}<br>`    : "";
+      const respType  = p.RESPONSE_TYPE  ? `Response: ${escapeHtml(p.RESPONSE_TYPE)}<br>` : "";
       layer.bindTooltip(
-        `<strong>${escapeHtml(displayName)}</strong><br>` +
+        `<strong>${escapeHtml(label)}</strong><br>` +
+        maBadge +
         carryoverNote +
+        respArea +
         `Status: ${escapeHtml(stageStyle.label)}<br>` +
-        `Size: ${haStr}<br>` +
+        `Size: ${haStr}${sizeClass}<br>` +
+        cause +
+        respType +
         `Started: ${startStr}<br>` +
         `<em>Alberta Wildfire (official)</em>`,
         { opacity: 0.96, className: "alberta-fire-tip" }
@@ -1741,15 +1763,22 @@ function buildFireStatusMsg() {
     parts.push(`${cwfisCount} NRCan hotspot${cwfisCount !== 1 ? "s" : ""}${sev ? ` (${sev})` : ""}`);
   }
 
-  // Alberta official fires
-  const abCount = state.albertaFires?.features?.length ?? 0;
-  if (state.albertaFireError && !abCount) {
+  // Alberta official fires (provincial + mutual aid combined)
+  const abFeatures   = state.albertaFires?.features ?? [];
+  const abCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE !== "Mutual Aid").length;
+  const maCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Mutual Aid").length;
+  if (state.albertaFireError && !abFeatures.length) {
     parts.push(`AB: ${state.albertaFireError}`);
-  } else if (abCount > 0) {
-    const ooc = state.albertaFires.features.filter(f => f.properties?.Stage_of_Control === "OC").length;
-    const bh  = state.albertaFires.features.filter(f => f.properties?.Stage_of_Control === "BH").length;
-    const stageSummary = [ooc > 0 ? `${ooc} OC` : "", bh > 0 ? `${bh} BH` : ""].filter(Boolean).join(", ");
-    parts.push(`${abCount} AB fire${abCount !== 1 ? "s" : ""}${stageSummary ? ` (${stageSummary})` : ""}`);
+  } else if (abFeatures.length > 0) {
+    const ooc = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Out of Control").length;
+    const bh  = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Being Held").length;
+    const stageSummary = [
+      ooc  > 0 ? `${ooc} OC`    : "",
+      bh   > 0 ? `${bh} BH`     : "",
+      maCount > 0 ? `${maCount} MA` : "",
+    ].filter(Boolean).join(", ");
+    const total = abCount + maCount;
+    parts.push(`${total} AB fire${total !== 1 ? "s" : ""}${stageSummary ? ` (${stageSummary})` : ""}`);
   }
 
   // BC official fires
