@@ -60,7 +60,7 @@ def compact_file(path: Path) -> tuple[int, int]:
         if vol is not None and vol > 0.0:
             groups[key].append([record["asset_id"], round(float(vol), 6)])
 
-    date_val = data[0].get("date", path.stem.replace("petrinex_ab_", ""))
+    date_val = data[0].get("date", path.stem.replace("petrinex_ab_", "").replace("on_demand_", ""))
 
     if len(groups) == 1:
         # Common case: single source/stream/scenario — flat compact object

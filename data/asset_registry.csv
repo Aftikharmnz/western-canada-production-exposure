@@ -1,65 +1,74 @@
 production_system,company,asset_name,province,latitude,longitude,asset_kind,notes
-in_situ,Cenovus,Christina Lake,Alberta,55.775,-110.915,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Cenovus,Foster Creek,Alberta,55.170,-110.675,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Cenovus,Sunrise,Alberta,57.250,-111.420,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Cenovus,Narrows Lake,Alberta,56.460,-111.020,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Cenovus,Other Cenovus,Alberta,55.900,-111.050,in_situ_scheme,Company residual bucket, approximate.
-in_situ,CNRL,Brintnell,Alberta,55.870,-110.760,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,CNRL,Jackfish,Alberta,55.540,-110.710,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,CNRL,Kirby,Alberta,55.440,-110.720,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,CNRL,Primrose & Wolf Lake,Alberta,54.725,-110.160,in_situ_scheme,Approximate Cold Lake area centroid.
-in_situ,CNRL,CNRL Other,Alberta,55.650,-110.550,in_situ_scheme,Company residual bucket, approximate.
-in_situ,Suncor,Firebag,Alberta,57.225,-110.900,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Suncor,MacKay River,Alberta,57.050,-111.350,in_situ_scheme,Approximate scheme centroid; refine with AER spatial data.
-in_situ,Imperial Oil,Cold Lake,Alberta,54.520,-110.170,in_situ_scheme,Approximate Cold Lake operations centroid.
-in_situ,Imperial Oil,Imperial Other,Alberta,54.650,-110.250,in_situ_scheme,Company residual bucket, approximate.
-in_situ,ConocoPhillips,Surmont,Alberta,56.235,-111.170,in_situ_scheme,Approximate scheme centroid.
-in_situ,MEG Energy,Christina Lake,Alberta,55.735,-110.930,in_situ_scheme,Approximate MEG Christina Lake centroid.
-in_situ,Strathcona,Lindbergh,Alberta,53.905,-110.370,in_situ_scheme,Approximate Lloydminster area centroid.
-in_situ,Strathcona,Orion,Alberta,55.300,-110.365,in_situ_scheme,Approximate Cold Lake area centroid.
-in_situ,Strathcona,Tucker,Alberta,55.505,-110.535,in_situ_scheme,Approximate scheme centroid.
-in_situ,Athabasca,Hangingstone,Alberta,56.530,-111.070,in_situ_scheme,Approximate scheme centroid.
-in_situ,Athabasca,Leismer,Alberta,55.300,-110.760,in_situ_scheme,Approximate scheme centroid.
-in_situ,CNOOC/Nexen,Long Lake,Alberta,56.380,-111.460,in_situ_scheme,Approximate scheme centroid.
-in_situ,Baytex,Cadotte,Alberta,56.365,-116.490,in_situ_scheme,Approximate Peace River area centroid.
-in_situ,Baytex,Seal/Peace River,Alberta,56.175,-117.340,in_situ_scheme,Approximate Peace River area centroid.
-in_situ,Baytex,Baytex Other,Alberta,56.230,-117.000,in_situ_scheme,Company residual bucket, approximate.
-in_situ,Connacher,Great Divide,Alberta,55.720,-110.240,in_situ_scheme,Approximate scheme centroid.
-in_situ,Greenfire,Hangingstone Demo,Alberta,56.505,-111.050,in_situ_scheme,Approximate Hangingstone area centroid.
-in_situ,Greenfire,Hangingstone Exp,Alberta,56.570,-111.100,in_situ_scheme,Approximate Hangingstone area centroid.
-in_situ,Headwater,Headwater (Assets),Alberta,56.050,-116.720,in_situ_scheme,Company residual bucket, approximate.
-in_situ,Harvest,BlackGold,Alberta,55.330,-110.625,in_situ_scheme,Approximate scheme centroid.
-in_situ,PetroChina,MacKay River (PC),Alberta,57.080,-111.520,in_situ_scheme,Approximate MacKay River area centroid.
-in_situ,Tamarack,Tamarack (Assets),Alberta,56.150,-116.600,in_situ_scheme,Company residual bucket, approximate.
-in_situ,Obsidian,Obsidian (Assets),Alberta,56.290,-116.900,in_situ_scheme,Company residual bucket, approximate.
-in_situ,,Other Producers Total,Alberta,55.850,-111.050,company_rollup,Workbook residual rollup.
-mined,CNRL,CNRL Horizon,Alberta,57.300,-111.670,mine,Approximate mine centroid.
-mined,CNRL,Muskeg River Mine,Alberta,57.335,-111.590,mine,Approximate Albian mine centroid.
-mined,CNRL,Jackpine Mine,Alberta,57.255,-111.505,mine,Approximate mine centroid.
-mined,Suncor,Fort Hills Mine,Alberta,57.295,-111.345,mine,Approximate mine centroid.
-mined,Imperial Oil,Kearl Mine,Alberta,57.220,-111.280,mine,Approximate mine centroid.
-mined,Suncor,Suncor OSG,Alberta,56.990,-111.450,mine,Approximate Millennium/Base operations centroid.
-mined,Syncrude JV,Syncrude Mildred Lake,Alberta,57.040,-111.560,mine,Approximate mine centroid.
-mined,Syncrude JV,Syncrude Aurora,Alberta,57.350,-111.480,mine,Approximate mine centroid.
-mined,CNRL,Shell Jackpine Mine,Alberta,57.250,-111.500,mine,Approximate mine centroid.
-provincial_light,Provincial aggregate,Alberta,Alberta,53.933,-116.576,province,Provincial aggregate marker.
-provincial_light,Provincial aggregate,Saskatchewan,Saskatchewan,52.940,-106.451,province,Provincial aggregate marker.
-provincial_light,Provincial aggregate,British Columbia,British Columbia,54.000,-125.000,province,Provincial aggregate marker.
-provincial_light,Provincial aggregate,Manitoba,Manitoba,53.761,-98.814,province,Provincial aggregate marker.
-provincial_light,Provincial aggregate,Northwest Territories,Northwest Territories,64.826,-124.846,province,Provincial aggregate marker.
-refinery_input,Provincial aggregate,Alberta,Alberta,53.933,-116.576,province_refinery,Provincial refinery input marker.
-refinery_input,Provincial aggregate,Saskatchewan,Saskatchewan,52.940,-106.451,province_refinery,Provincial refinery input marker.
-refinery_input,Provincial aggregate,British Columbia,British Columbia,54.000,-125.000,province_refinery,Provincial refinery input marker.
-conventional,Regional aggregate,Western Canada,Western Canada,55.400,-111.500,region,Regional aggregate marker.
-condensate,Regional aggregate,Western Canada Condensate,Western Canada,55.100,-112.200,region,Regional aggregate marker.
-heavy_conventional,Provincial aggregate,Alberta — Heavy crude oil,Alberta,55.20,-114.50,province,StatCan 25100063 AB heavy crude (offset NE from centroid).
-heavy_conventional,Provincial aggregate,Saskatchewan — Heavy crude oil,Saskatchewan,53.60,-105.20,province,StatCan 25100063 SK heavy crude (offset NE from centroid).
-heavy_conventional,Provincial aggregate,British Columbia — Heavy crude oil,British Columbia,55.50,-124.00,province,StatCan 25100063 BC heavy crude.
-heavy_conventional,Provincial aggregate,Manitoba — Heavy crude oil,Manitoba,54.80,-97.80,province,StatCan 25100063 MB heavy crude.
-conventional,Provincial aggregate,Alberta — Light & medium crude oil,Alberta,52.80,-114.50,province,StatCan 25100063 AB light+medium crude (offset SE from centroid).
-conventional,Provincial aggregate,Saskatchewan — Light & medium crude oil,Saskatchewan,51.80,-105.20,province,StatCan 25100063 SK light+medium crude.
-conventional,Provincial aggregate,British Columbia — Light & medium crude oil,British Columbia,53.20,-126.00,province,StatCan 25100063 BC light+medium crude.
-conventional,Provincial aggregate,Manitoba — Light & medium crude oil,Manitoba,52.70,-98.50,province,StatCan 25100063 MB light+medium crude.
-synthetic,Provincial aggregate,Alberta — Synthetic crude oil,Alberta,57.20,-111.80,province,StatCan 25100063 AB synthetic crude oil (near oil sands).
-condensate,Provincial aggregate,Alberta — Condensate Production,Alberta,55.80,-118.00,province,StatCan 25100063 AB condensate (Peace River area).
-condensate,Provincial aggregate,British Columbia — Condensate Production,British Columbia,55.30,-122.80,province,StatCan 25100063 BC condensate.
+in_situ,Cenovus,Christina Lake,Alberta,55.556,-110.8159,in_situ_scheme,AER spatial centroid; Cenovus Christina Lake SAGD (8591LLLL).
+in_situ,Cenovus,Christina Lake North,Alberta,55.83,-110.75,in_situ_scheme,Cenovus Christina Lake North SAGD (10773ZZZ); north of main CL scheme.
+in_situ,Cenovus,Foster Creek,Alberta,55.0804,-110.6417,in_situ_scheme,AER spatial centroid; Cenovus Foster Creek SAGD (8623SSSSS).
+in_situ,Cenovus,Sunrise,Alberta,57.2216,-111.0321,in_situ_scheme,AER spatial centroid; Cenovus Sunrise SAGD (10419JJJ).
+in_situ,Cenovus,Tucker,Alberta,54.56,-110.56,in_situ_scheme,Cenovus Tucker SAGD; Cold Lake area.
+in_situ,Cenovus,Tucker Lake,Alberta,54.61,-110.52,in_situ_scheme,Cenovus Tucker Lake; Cold Lake area.
+in_situ,Cenovus,Narrows Lake,Alberta,55.6514,-110.9197,in_situ_scheme,AER spatial centroid; Cenovus Narrows Lake SAGD (11798N).
+in_situ,Cenovus,Cold Lake (Primary),Alberta,54.52,-110.25,in_situ_scheme,Cenovus Cold Lake Primary; Cold Lake area.
+in_situ,Cenovus,Athabasca (Primary),Alberta,55.68,-110.95,in_situ_scheme,Cenovus Athabasca Primary; Athabasca area.
+in_situ,Cenovus,EnCAID,Alberta,55.25,-110.88,in_situ_scheme,Cenovus EnCAID enhanced recovery (10440L); Athabasca.
+in_situ,Cenovus,Other Cenovus,Alberta,55.9,-111.05,in_situ_scheme,"Company residual bucket, approximate."
+in_situ,CNRL,Jackfish,Alberta,55.5289,-110.9253,in_situ_scheme,AER spatial centroid; CNRL Jackfish SAGD (10097AAAA).
+in_situ,CNRL,Primrose and Wolf Lake,Alberta,54.7931,-110.61,in_situ_scheme,AER spatial centroid; CNRL Primrose and Wolf Lake CSS.
+in_situ,CNRL,Cold Lake (Primary),Alberta,54.85,-110.52,in_situ_scheme,CNRL Cold Lake Primary; Cold Lake area.
+in_situ,CNRL,Kirby,Alberta,55.3837,-111.0782,in_situ_scheme,AER spatial centroid; CNRL Kirby SAGD (11475QQQ).
+in_situ,CNRL,Brintnell Polymer Flood,Alberta,55.951,-113.306,in_situ_scheme,CNRL Brintnell Polymer Flood; Athabasca.
+in_situ,CNRL,Brintnell,Alberta,55.9505,-113.3061,in_situ_scheme,AER spatial centroid; CNRL Brintnell primary.
+in_situ,CNRL,Pelican Lake Polymer Flood,Alberta,55.882,-113.948,in_situ_scheme,CNRL Pelican Lake Polymer Flood; Athabasca.
+in_situ,CNRL,Athabasca (Primary),Alberta,55.75,-110.82,in_situ_scheme,CNRL Athabasca Primary; Athabasca area.
+in_situ,CNRL,Peace River (N) (Primary),Alberta,56.28,-117.08,in_situ_scheme,CNRL Peace River N Primary; Peace River area.
+in_situ,CNRL,Peace River,Alberta,56.2,-116.98,in_situ_scheme,CNRL Peace River CSS (8143GG); Peace River area.
+in_situ,CNRL,Athabasca (EOR),Alberta,55.58,-110.78,in_situ_scheme,CNRL Athabasca EOR; Athabasca area.
+in_situ,CNRL,Pike,Alberta,55.44,-110.85,in_situ_scheme,CNRL Pike SAGD (12301F); Athabasca.
+in_situ,CNRL,Downhole Electric Heater Project,Alberta,55.75,-110.88,in_situ_scheme,CNRL Downhole Electric Heater Project; Athabasca.
+in_situ,CNRL,Cold Lake (EOR),Alberta,54.82,-110.48,in_situ_scheme,CNRL Cold Lake EOR; Cold Lake area.
+in_situ,Suncor,Firebag,Alberta,57.2308,-110.8666,in_situ_scheme,AER spatial centroid; Suncor Firebag SAGD (8870JJJJJ).
+in_situ,Suncor,MacKay River,Alberta,57.0445,-111.9035,in_situ_scheme,AER spatial centroid; Suncor MacKay River SAGD.
+in_situ,Suncor,Mackay River,Alberta,57.0445,-111.9035,in_situ_scheme,AER spatial centroid; Suncor MacKay River SAGD (spelling variant).
+in_situ,Suncor,Lewis,Alberta,57.08,-111.1,in_situ_scheme,Suncor Lewis SAGD (13002); Athabasca.
+in_situ,Imperial Oil,Cold Lake,Alberta,54.6619,-110.4221,in_situ_scheme,AER spatial centroid; Imperial Oil Cold Lake CSS.
+in_situ,Imperial Oil,CSP Pilot,Alberta,54.65,-110.4,in_situ_scheme,Imperial Oil CSP Pilot; Cold Lake area.
+in_situ,Imperial Oil,Enhanced Late-Life Process,Alberta,54.63,-110.42,in_situ_scheme,Imperial Oil Enhanced Late-Life Process; Cold Lake area.
+in_situ,ConocoPhillips,Surmont,Alberta,56.1294,-110.9177,in_situ_scheme,AER spatial centroid; ConocoPhillips Surmont SAGD.
+in_situ,MEG Energy,Christina Lake,Alberta,55.6779,-110.7372,in_situ_scheme,AER spatial centroid; MEG Energy Christina Lake SAGD.
+in_situ,MEG Energy,Christina Lake (MEG),Alberta,55.678,-110.737,in_situ_scheme,MEG Energy Christina Lake SAGD (variant label).
+in_situ,Strathcona,Orion,Alberta,54.534,-110.3941,in_situ_scheme,AER spatial centroid; Strathcona Orion SAGD; Cold Lake.
+in_situ,Strathcona,Lindbergh,Alberta,54.0558,-110.5836,in_situ_scheme,AER spatial centroid; Strathcona Lindbergh SAGD; Cold Lake.
+in_situ,Strathcona,Tucker,Alberta,54.5639,-110.5626,in_situ_scheme,AER spatial centroid; Strathcona Tucker SAGD; Cold Lake.
+in_situ,Athabasca,Leismer,Alberta,55.797,-111.4736,in_situ_scheme,AER spatial centroid; Athabasca Oil Sands Leismer SAGD.
+in_situ,Athabasca,Hangingstone,Alberta,56.4847,-111.4348,in_situ_scheme,AER spatial centroid; Athabasca Oil Sands Hangingstone SAGD.
+in_situ,CNOOC/Nexen,Long Lake,Alberta,56.3625,-110.9607,in_situ_scheme,AER spatial centroid; CNOOC/Nexen Long Lake SAGD.
+in_situ,Baytex,Peace River (N) (Primary),Alberta,56.34,-117.18,in_situ_scheme,Baytex Peace River N Primary; Peace River area.
+in_situ,Baytex,Cold Lake (Primary),Alberta,54.72,-110.38,in_situ_scheme,Baytex Cold Lake Primary; Cold Lake area.
+in_situ,Baytex,Seal Polymer,Alberta,56.0339,-116.8735,in_situ_scheme,AER spatial centroid; Baytex Seal Polymer Flood; Peace River.
+in_situ,Baytex,Peace River (S) (Primary),Alberta,55.65,-117.38,in_situ_scheme,Baytex Peace River S Primary; Peace River area.
+in_situ,Baytex,Peace River (S) (EOR),Alberta,55.62,-117.4,in_situ_scheme,Baytex Peace River S EOR; Peace River area.
+in_situ,Baytex,Peace River (N) (EOR),Alberta,56.28,-117.25,in_situ_scheme,Baytex Peace River N EOR; Peace River area.
+in_situ,Baytex,Cadotte HCSS,Alberta,56.3616,-116.6414,in_situ_scheme,AER spatial centroid; Baytex Cadotte HCSS; Peace River.
+in_situ,Baytex,Gemini,Alberta,54.48,-110.58,in_situ_scheme,Baytex Gemini; Cold Lake area.
+in_situ,Connacher,Great Divide,Alberta,56.1231,-111.7499,in_situ_scheme,AER spatial centroid; Connacher Great Divide SAGD.
+in_situ,Greenfire,Hangingstone Expansion,Alberta,56.2842,-111.6687,in_situ_scheme,AER spatial centroid; Greenfire Hangingstone Expansion SAGD.
+in_situ,Greenfire,Hangingstone Demonstration,Alberta,56.3227,-111.6586,in_situ_scheme,AER spatial centroid; Greenfire Hangingstone Demonstration SAGD.
+in_situ,Headwater,Athabasca (EOR),Alberta,55.82,-110.32,in_situ_scheme,Headwater Athabasca EOR; Athabasca area.
+in_situ,Headwater,Athabasca (Primary),Alberta,55.75,-110.4,in_situ_scheme,Headwater Athabasca Primary; Athabasca area.
+in_situ,Headwater,Peace River (N) (Primary),Alberta,56.32,-116.65,in_situ_scheme,Headwater Peace River N Primary; Peace River area.
+in_situ,Headwater,Cold Lake (Primary),Alberta,54.52,-110.28,in_situ_scheme,Headwater Cold Lake Primary; Cold Lake area.
+in_situ,Harvest,BlackGold,Alberta,55.5758,-110.9768,in_situ_scheme,AER spatial centroid; Harvest BlackGold SAGD.
+in_situ,Harvest,Cold Lake (Primary),Alberta,54.68,-110.35,in_situ_scheme,Harvest Cold Lake Primary; Cold Lake area.
+in_situ,PetroChina,MacKay River,Alberta,56.8291,-112.1825,in_situ_scheme,AER spatial centroid; PetroChina MacKay River SAGD.
+in_situ,Tamarack,Athabasca (Primary),Alberta,55.82,-110.75,in_situ_scheme,Tamarack Athabasca Primary; Athabasca area.
+in_situ,Tamarack,Athabasca (EOR),Alberta,55.88,-110.78,in_situ_scheme,Tamarack Athabasca EOR; Athabasca area.
+in_situ,Tamarack,Peace River (N) (Primary),Alberta,56.32,-116.72,in_situ_scheme,Tamarack Peace River N Primary; Peace River area.
+in_situ,Obsidian,Peace River (N) (Primary),Alberta,56.42,-116.85,in_situ_scheme,Obsidian Peace River N Primary; Peace River area.
+in_situ,Obsidian,Peace River (N) (EOR),Alberta,56.38,-116.88,in_situ_scheme,Obsidian Peace River N EOR; Peace River area.
+mined,CNRL 100%,CNRL Horizon,Alberta,57.350324,-111.812999,mine,AER spatial centroid; CNRL Horizon Mine.
+mined,CNRL 100%,Muskeg River Mine,Alberta,57.237539,-111.522144,mine,AER spatial centroid; CNRL/Shell Muskeg River Mine.
+mined,CNRL 100%,Jackpine Mine,Alberta,57.34056,-111.301592,mine,AER spatial centroid; CNRL Jackpine Mine.
+mined,Suncor 100%,Fort Hills Mine,Alberta,57.424571,-111.523099,mine,AER spatial centroid; Suncor Fort Hills Mine.
+mined,Imperial Oil 71% ExxonMobil Canada 29%,Kearl Mine,Alberta,57.356652,-111.099505,mine,AER spatial centroid; Imperial Oil Kearl Mine.
+mined,Suncor 100%,Suncor OSG,Alberta,56.948281,-111.364047,mine,AER spatial centroid; Suncor Oil Sands Group base plant.
+mined,Syncrude JV,Syncrude Mildred Lake,Alberta,57.056387,-111.710922,mine,AER spatial centroid; Syncrude Mildred Lake Mine.
+mined,Syncrude JV,Syncrude Aurora,Alberta,57.276312,-111.358626,mine,AER spatial centroid; Syncrude Aurora Mine.
+mined,CNRL 100% (acq. Shell 2017),Shell Jackpine Mine,Alberta,57.34056,-111.301592,mine,AER spatial centroid; Shell/CNRL Jackpine Mine.

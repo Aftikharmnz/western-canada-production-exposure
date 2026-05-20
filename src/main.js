@@ -8,6 +8,7 @@ const DATA_PATHS = {
   production: "public/data/monthly_production.json",
   schemeApprovals: "public/data/aer_scheme_approvals.geojson",
   st102Facilities: "public/data/aer_st102_oil_sands_facilities.geojson",
+  assetGeometries: "public/data/asset_geometries.geojson",
 };
 
 // ============================================================
@@ -86,6 +87,7 @@ const SOURCE_SHORT = {
   petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
   petrinex_ab_condensate_vol:    "Petrinex AB COND",
   petrinex_ab_ngl_vol:           "Petrinex AB NGL",
+  bcer_well_production:          "BCER wells",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -120,6 +122,18 @@ const STREAM_LEGEND_KEYS = {
   // integrated-plant / spec-plant) which is set per facility in the ETL.
 };
 
+const LOCATION_CONFIDENCE_META = {
+  exact:     { label: "Exact point",       short: "Exact",     className: "quality-exact" },
+  high:      { label: "Project polygon",   short: "Polygon",   className: "quality-high" },
+  medium:    { label: "Official centroid", short: "Centroid",  className: "quality-medium" },
+  low:       { label: "Approximate",       short: "Approx.",   className: "quality-low" },
+  aggregate: { label: "Aggregate",         short: "Aggregate", className: "quality-aggregate" },
+  unmapped:  { label: "Unmapped",          short: "Unmapped",  className: "quality-unmapped" },
+  unknown:   { label: "Unknown",           short: "Unknown",   className: "quality-unknown" },
+};
+
+const DEFAULT_LOCATION_CONFIDENCE = ["exact", "high", "medium", "low", "aggregate", "unmapped", "unknown"];
+
 // ============================================================
 // APPLICATION STATE
 // ============================================================
@@ -138,11 +152,13 @@ const state = {
   geojson: null,
   schemeApprovals: null,
   st102Facilities: null,
+  assetGeometries: null,
   dates: [],
   selectedDate: null,
   selectedAssetId: null,
   selectedSources: new Set(),
   selectedStreams: new Set(),
+  selectedLocationConfidence: new Set(DEFAULT_LOCATION_CONFIDENCE),
   company: "All",
   search: "",
   map: null,
@@ -168,6 +184,7 @@ const state = {
   // Formation overlay state
   formationEnabled: false,
   formationLayer: null,
+  assetFootprintLayer: null,
   // Seasonality index (lazy-loaded from asset_seasonality.json)
   seasonalityIndex: null,
   seasonalityIndexLoading: false,
@@ -194,9 +211,11 @@ const els = {
   dateScenario:     document.querySelector("#dateScenario"),
   sourceFilters:    document.querySelector("#sourceFilters"),
   streamFilters:    document.querySelector("#streamFilters"),
+  locationQualityFilters: document.querySelector("#locationQualityFilters"),
   searchInput:      document.querySelector("#searchInput"),
   totalShown:       document.querySelector("#totalShown"),
   mappedCount:      document.querySelector("#mappedCount"),
+  unmappedVolume:   document.querySelector("#unmappedVolume"),
   largestPoint:     document.querySelector("#largestPoint"),
   fireExposureRow:  document.querySelector("#fireExposureRow"),
   fireExposure:     document.querySelector("#fireExposure"),
@@ -205,6 +224,7 @@ const els = {
   detailVolume:     document.querySelector("#detailVolume"),
   detailSource:     document.querySelector("#detailSource"),
   detailStatus:     document.querySelector("#detailStatus"),
+  detailLocationQuality: document.querySelector("#detailLocationQuality"),
   topAssetsList:    document.querySelector("#topAssetsList"),
   topAssetsLabel:   document.querySelector("#topAssetsLabel"),
   sourceBreakdown:  document.querySelector("#sourceBreakdown"),
@@ -310,12 +330,28 @@ function bcFireLegendKey(feature) {
   return "bc-fire-uc";
 }
 
+function locationConfidenceKey(asset) {
+  const key = asset?.location_confidence || "unknown";
+  return LOCATION_CONFIDENCE_META[key] ? key : "unknown";
+}
+
+function locationConfidenceMeta(assetOrKey) {
+  const key = typeof assetOrKey === "string" ? assetOrKey : locationConfidenceKey(assetOrKey);
+  return LOCATION_CONFIDENCE_META[key] || LOCATION_CONFIDENCE_META.unknown;
+}
+
+function locationQualityText(asset) {
+  const meta = locationConfidenceMeta(asset);
+  const method = asset?.coordinate_method ? ` · ${asset.coordinate_method.replaceAll("_", " ")}` : "";
+  return `${meta.short}${method}`;
+}
+
 // ============================================================
 // DATA LOADING
 // ============================================================
 
 async function loadData() {
-  const [manifest, assets, records, schemeApprovals, st102Facilities] = await Promise.all(
+  const [manifest, assets, records, schemeApprovals, st102Facilities, assetGeometries] = await Promise.all(
     Object.values(DATA_PATHS).map((path) =>
       fetch(path).then((r) => {
         if (!r.ok) throw new Error(`Could not load ${path}`);
@@ -339,8 +375,9 @@ async function loadData() {
   state.geojson = null;
   state.schemeApprovals = schemeApprovals;
   state.st102Facilities = st102Facilities;
+  state.assetGeometries = assetGeometries;
   state.dates = manifest.periods || [...new Set(records.map((r) => r.date))].sort();
-  state.selectedDate = manifest.latest_actual_date || state.dates.at(-1);
+  state.selectedDate = manifest.default_date || manifest.latest_actual_date || state.dates.at(-1);
   if (!state.dates.includes(state.selectedDate)) state.selectedDate = state.dates.at(-1);
   await ensureDateRecords(state.selectedDate);
   state.records = recordsForDate(state.selectedDate);
@@ -468,6 +505,16 @@ function initControls() {
     .join("");
   els.streamFilters.addEventListener("change", (e) => updateSetFromToggle(e, "stream", state.selectedStreams));
 
+  if (els.locationQualityFilters) {
+    els.locationQualityFilters.innerHTML = DEFAULT_LOCATION_CONFIDENCE
+      .map((key) => toggleMarkupLocationQuality(key))
+      .join("");
+    els.locationQualityFilters.addEventListener(
+      "change",
+      (e) => updateSetFromToggle(e, "confidence", state.selectedLocationConfidence)
+    );
+  }
+
   // company select removed
 
   els.searchInput.addEventListener("input", () => {
@@ -541,6 +588,16 @@ function toggleMarkupStream(stream) {
     </label>`;
 }
 
+function toggleMarkupLocationQuality(key) {
+  const meta = locationConfidenceMeta(key);
+  const checked = state.selectedLocationConfidence.has(key);
+  return `
+    <label class="toggle-item location-quality-item" title="${escapeHtml(meta.label)}">
+      <input type="checkbox" data-group="confidence" value="${escapeHtml(key)}" ${checked ? "checked" : ""} />
+      <span><i class="quality-dot ${meta.className}"></i>${escapeHtml(meta.label)}</span>
+    </label>`;
+}
+
 function updateSetFromToggle(event, group, targetSet) {
   const input = event.target.closest(`input[data-group="${group}"]`);
   if (!input) return;
@@ -560,9 +617,10 @@ function initLegendControls() {
     if (!key) return;
     if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
     else state.hiddenLegendKeys.add(key);
-    if (["formation-os", "formation-tp", "st102-facility"].includes(key)) {
+    if (["formation-os", "formation-tp", "asset-footprint", "st102-facility"].includes(key)) {
       if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
       if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
+      if (state.assetFootprintLayer) { state.map.removeLayer(state.assetFootprintLayer); state.assetFootprintLayer = null; }
     }
     if (key.startsWith("pipe-") || key.startsWith("inst-")) {
       refreshPipelineLayers();
@@ -798,6 +856,7 @@ function filteredRecords(date = state.selectedDate) {
     if (!Number.isFinite(record.volume_kbbl_d) || record.volume_kbbl_d <= 0) return false;
     const asset = state.assetById.get(record.asset_id);
     if (!asset) return false;
+    if (!state.selectedLocationConfidence.has(locationConfidenceKey(asset))) return false;
     // company filter removed — exposure panel now shows breakdown instead
     if (state.search) {
       const hay = `${asset.display_name} ${asset.company} ${asset.province} ${record.stream}`.toLowerCase();
@@ -907,6 +966,7 @@ function renderMap(aggregated) {
         escapeHtml(point.asset.company || point.asset.province),
         kbbl(point.kbbl),
         `<em>${escapeHtml(meta.label)}</em>`,
+        `Location: ${escapeHtml(locationQualityText(point.asset))}`,
       ];
       sortedStreams.forEach(([stream, vol]) => {
         const swatch = `<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${streamColor(stream)};margin-right:4px;"></i>`;
@@ -965,19 +1025,23 @@ function renderFallbackMap(points) {
 
 function renderMetrics(aggregated) {
   const { byAsset, sourceTotals } = aggregated || aggregateForDate();
-  const points = [...byAsset.values()].filter(
-    ({ asset, kbbl: v }) => !asset.is_rollup && asset.latitude != null && v > 0
-  );
+  const exposureAssets = [...byAsset.values()].filter(({ asset, kbbl: v }) => !asset.is_rollup && v > 0);
+  const points = exposureAssets.filter(({ asset }) => asset.latitude != null && asset.longitude != null);
   const total = points.reduce((s, p) => s + p.kbbl, 0);
+  const unmappedTotal = exposureAssets
+    .filter(({ asset }) => asset.latitude == null || asset.longitude == null)
+    .reduce((s, p) => s + p.kbbl, 0);
+  const allTotal = total + unmappedTotal;
   const largest = points.reduce((best, p) => (!best || p.kbbl > best.kbbl ? p : best), null);
   els.totalShown.textContent = kbbl(total);
   els.mappedCount.textContent = formatNumber(points.length);
+  if (els.unmappedVolume) els.unmappedVolume.textContent = kbbl(unmappedTotal);
   els.largestPoint.textContent = largest ? kbbl(largest.kbbl) : "--";
 
   // Source breakdown (sidebar)
   const totalBySource = [...sourceTotals.entries()].sort((a, b) => b[1] - a[1]);
   els.sourceBreakdown.innerHTML = totalBySource.slice(0, 6).map(([src, val]) => {
-    const pct = total > 0 ? Math.min(100, (val / total) * 100) : 0;
+    const pct = allTotal > 0 ? Math.min(100, (val / allTotal) * 100) : 0;
     return `<div class="breakdown-row">
       <span>${escapeHtml(SOURCE_SHORT[src] || src)}</span>
       <strong>${kbbl(val)}</strong>
@@ -990,7 +1054,7 @@ function renderMetrics(aggregated) {
   if (provEl) {
     const byProv = {};
     for (const { asset, kbbl: v } of byAsset.values()) {
-      if (!asset.is_rollup && asset.latitude != null && v > 0)
+      if (!asset.is_rollup && v > 0)
         byProv[asset.province] = (byProv[asset.province] || 0) + v;
     }
     const provEntries = Object.entries(byProv).sort((a,b) => b[1]-a[1]);
@@ -1008,7 +1072,7 @@ function renderMetrics(aggregated) {
   if (sysEl) {
     const bySys = {};
     for (const { asset, kbbl: v } of byAsset.values()) {
-      if (!asset.is_rollup && asset.latitude != null && v > 0) {
+      if (!asset.is_rollup && v > 0) {
         const label = systemMeta(asset.production_system).label;
         bySys[label] = (bySys[label] || 0) + v;
       }
@@ -1054,6 +1118,7 @@ function renderDetails(aggregated) {
     els.detailVolume.textContent = "--";
     els.detailSource.textContent = "--";
     els.detailStatus.textContent = "--";
+    if (els.detailLocationQuality) els.detailLocationQuality.textContent = "--";
     renderTopAssets(aggregated);
     if (els.streamBreakdown) els.streamBreakdown.innerHTML = "";
     if (els.fireRiskSection) els.fireRiskSection.hidden = true;
@@ -1070,6 +1135,11 @@ function renderDetails(aggregated) {
   els.detailVolume.textContent = kbbl(selected.kbbl);
   els.detailSource.textContent = [...selected.sources].map((s) => SOURCE_SHORT[s] || s).join(", ");
   els.detailStatus.textContent = [...selected.scenarios].join(", ");
+  if (els.detailLocationQuality) {
+    const quality = locationConfidenceMeta(asset);
+    els.detailLocationQuality.textContent = locationQualityText(asset);
+    els.detailLocationQuality.className = `quality-value ${quality.className}`;
+  }
 
   renderTopAssets(aggregated);
   renderStreamBreakdown(asset.asset_id, selected.streams);
@@ -1104,6 +1174,7 @@ function renderTopAssets(aggregated) {
     const topStream = [...streams.entries()].sort((a, b) => b[1] - a[1])[0];
     const color = topStream ? streamColor(topStream[0]) : meta.color;
     const isSelected = asset.asset_id === state.selectedAssetId;
+    const quality = locationConfidenceMeta(asset);
 
     const riskBadge = "";
 
@@ -1111,6 +1182,7 @@ function renderTopAssets(aggregated) {
       <span class="top-rank">${i + 1}</span>
       <i class="top-swatch" style="background:${color}"></i>
       <span class="top-name">${escapeHtml(asset.display_name)}</span>
+      <span class="quality-pill ${quality.className}">${escapeHtml(quality.short)}</span>
       ${riskBadge}
       <strong class="top-vol">${kbbl(vol)}</strong>
     </div>`;
@@ -1267,6 +1339,10 @@ function renderFormationLayer() {
       state.map.removeLayer(state.formationLayer);
       state.formationLayer = null;
     }
+    if (state.assetFootprintLayer) {
+      state.map.removeLayer(state.assetFootprintLayer);
+      state.assetFootprintLayer = null;
+    }
     if (state.facilityLayer) {
       state.map.removeLayer(state.facilityLayer);
       state.facilityLayer = null;
@@ -1300,6 +1376,8 @@ function renderFormationLayer() {
     state.formationLayer.bringToBack();
   }
 
+  renderAssetFootprintLayer();
+
   const facilities = state.st102Facilities;
   if (facilities?.features?.length && !state.facilityLayer && legendVisible("st102-facility")) {
     state.facilityLayer = L.geoJSON(facilities, {
@@ -1327,6 +1405,61 @@ function renderFormationLayer() {
   }
 }
 
+function renderAssetFootprintLayer() {
+  if (!state.map || !window.L) return;
+  if (state.assetFootprintLayer) {
+    state.map.removeLayer(state.assetFootprintLayer);
+    state.assetFootprintLayer = null;
+  }
+  const source = state.assetGeometries;
+  if (!source?.features?.length || !legendVisible("asset-footprint")) return;
+
+  const { byAsset } = aggregateForDate();
+  state.assetFootprintLayer = L.geoJSON(source, {
+    filter(feature) {
+      const assetId = feature.properties?.asset_id;
+      const point = byAsset.get(assetId);
+      if (!point || point.kbbl <= 0) return false;
+      if (!legendVisible(pointLegendKey(point))) return false;
+      return state.selectedLocationConfidence.has(locationConfidenceKey(point.asset));
+    },
+    style(feature) {
+      const point = byAsset.get(feature.properties?.asset_id);
+      const topStream = point ? [...point.streams.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] : null;
+      const color = topStream ? streamColor(topStream) : systemMeta(feature.properties?.production_system).color;
+      return {
+        color,
+        fillColor: color,
+        fillOpacity: 0.28,
+        weight: 2.2,
+        opacity: 0.92,
+      };
+    },
+    onEachFeature(feature, layer) {
+      const p = feature.properties || {};
+      const point = byAsset.get(p.asset_id);
+      const asset = point?.asset || state.assetById.get(p.asset_id);
+      layer.bindTooltip(
+        `<strong style="font-size:12px">${escapeHtml(p.display_name || "Production footprint")}</strong><br>` +
+          `${point ? kbbl(point.kbbl) + "<br>" : ""}` +
+          `${escapeHtml(p.geometry_source || "Asset geometry")}<br>` +
+          `Location: ${escapeHtml(locationQualityText(asset))}`,
+        { sticky: true, opacity: 0.94, className: "formation-tip" }
+      );
+      layer.on("click", () => {
+        if (p.asset_id) {
+          state.selectedAssetId = p.asset_id;
+          render();
+        }
+      });
+    },
+  }).addTo(state.map);
+
+  if (state.formationLayer?.bringToBack) state.formationLayer.bringToBack();
+  state.assetFootprintLayer.bringToBack();
+  if (state.formationLayer?.bringToBack) state.formationLayer.bringToBack();
+}
+
 function toggleFormations() {
   state.formationEnabled = !state.formationEnabled;
   if (state.formationEnabled) {
@@ -1334,6 +1467,10 @@ function toggleFormations() {
   } else if (state.formationLayer) {
     state.map.removeLayer(state.formationLayer);
     state.formationLayer = null;
+  }
+  if (!state.formationEnabled && state.assetFootprintLayer) {
+    state.map.removeLayer(state.assetFootprintLayer);
+    state.assetFootprintLayer = null;
   }
   if (!state.formationEnabled && state.facilityLayer) {
     state.map.removeLayer(state.facilityLayer);

@@ -27,7 +27,8 @@ import time
 import urllib.parse
 import urllib.request
 import zipfile as _zipfile
-from dataclasses import dataclass
+from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -45,18 +46,28 @@ ST44_PATH = RAW_DIR / "aer_st44_2025_q4.xlsx"
 ST102_SHP_PATH = RAW_DIR / "aer_st102_facility_list_shapefile.zip"
 SCHEME_GEOJSON_PATH = PUBLIC_DATA_DIR / "aer_scheme_approvals.geojson"
 ST102_OIL_SANDS_GEOJSON_PATH = PUBLIC_DATA_DIR / "aer_st102_oil_sands_facilities.geojson"
+ASSET_GEOMETRIES_GEOJSON_PATH = PUBLIC_DATA_DIR / "asset_geometries.geojson"
 
 PETRINEX_DIR = RAW_DIR / "petrinex"
 PETRINEX_AB_VOL_DIR = PETRINEX_DIR / "ab" / "vol"
 PETRINEX_AB_INFRA_DIR = PETRINEX_DIR / "ab" / "infra"
 PETRINEX_BC_REF_DIR = PETRINEX_DIR / "bc" / "reference"
+BCER_DIR = RAW_DIR / "bcer"
+BCER_PRODUCTION_ZIP = BCER_DIR / "prod_csv.zip"
+BCER_WELL_INDEX_CSV = BCER_DIR / "well_index.csv"
+BCER_WELL_SURFACE_GEOJSON = BCER_DIR / "well_surface_locations.geojson"
 M3_TO_BBL = 6.28981077
-ON_DEMAND_RECORD_SOURCES = {"petrinex_ab_conventional_vol", "petrinex_ab_pentanes_plus_vol", "petrinex_ab_condensate_vol"}
+ON_DEMAND_RECORD_SOURCES = {
+    "petrinex_ab_conventional_vol",
+    "petrinex_ab_pentanes_plus_vol",
+    "petrinex_ab_condensate_vol",
+    "bcer_well_production",
+}
 PETRINEX_AB_EARLIEST_PUBLIC_PERIOD = "2022-01"
 
 DEFAULT_WORKBOOK = Path(
     r"C:\Users\aftik\Documents\Projects\Western Canada crude oil S&D"
-    r"\st53_company_scheme_breakdown_v22.xlsx"
+    r"\st53_company_scheme_breakdown_v25.xlsx"
 )
 
 CUTOFF = dt.date(2015, 1, 1)
@@ -153,6 +164,33 @@ SOURCE_MANIFEST = [
         "url": "https://www.petrinex.gov.ab.ca/bbreportsBC/PRAActivityCodes.csv",
         "raw_file": "petrinex/bc/reference/PRAActivityCodes.csv",
         "grain": "BC activity reference",
+    },
+    {
+        "source_id": "bcer_well_production",
+        "agency": "British Columbia Energy Regulator",
+        "name": "BCER Production Data for All Wells in B.C.",
+        "url": "https://iris.bcogc.ca/download/prod_csv.zip",
+        "raw_file": "bcer/prod_csv.zip",
+        "grain": "monthly well/completion/zone production",
+        "download": False,
+    },
+    {
+        "source_id": "bcer_well_index",
+        "agency": "British Columbia Energy Regulator",
+        "name": "BCER Well Index",
+        "url": "https://iris.bcogc.ca/download/well_index.csv",
+        "raw_file": "bcer/well_index.csv",
+        "grain": "well reference",
+        "download": False,
+    },
+    {
+        "source_id": "bcer_well_surface_locations",
+        "agency": "British Columbia Energy Regulator",
+        "name": "BCER Well Surface Hole Locations",
+        "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query",
+        "raw_file": "bcer/well_surface_locations.geojson",
+        "grain": "well surface point geometry",
+        "download": False,
     },
 ]
 
@@ -283,10 +321,24 @@ def read_workbook_latest_actual(workbook_path: Path) -> dt.date:
         if "Trading Dashboard" in wb.sheetnames:
             latest = as_date(wb["Trading Dashboard"]["D6"].value)
             if latest:
-                return latest
+                return month_end(latest)
     except Exception as exc:  # noqa: BLE001
         log(f"  warning: could not read workbook latest actual date: {exc}")
-    return dt.date.today()
+    cached_petrinex_months: list[dt.date] = []
+    for path in PETRINEX_AB_VOL_DIR.glob("Vol_????-??-AB.zip"):
+        match = re.search(r"Vol_(\d{4}-\d{2})-AB\.zip$", path.name)
+        if not match:
+            continue
+        period = parse_period(match.group(1))
+        if not period:
+            continue
+        cached_petrinex_months.append(month_end(dt.date(period[0], period[1], 1)))
+    if cached_petrinex_months:
+        # Use the latest common AB Petrinex month as the app default when the
+        # workbook summary cell is blank. This avoids defaulting to a partial
+        # forecast/current-day date where the location-specific layers are absent.
+        return max(cached_petrinex_months)
+    return month_end(dt.date.today().replace(day=1))
 
 
 def petrinex_ab_vol_path(period: str) -> Path:
@@ -422,6 +474,116 @@ def ensure_petrinex_cache(
             }
         )
         status.append(item)
+    return status
+
+
+def download_bcer_well_surface_points(force: bool = False) -> dict[str, Any]:
+    url_base = (
+        "https://geoweb-ags.bc-er.ca/arcgis/rest/services/"
+        "PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query"
+    )
+    BCER_WELL_SURFACE_GEOJSON.parent.mkdir(parents=True, exist_ok=True)
+    if BCER_WELL_SURFACE_GEOJSON.exists() and not force:
+        return {
+            "url": url_base,
+            "local_path": str(BCER_WELL_SURFACE_GEOJSON.relative_to(ROOT)),
+            "status": "cached",
+            "error": None,
+            "source_id": "bcer_well_surface_locations",
+            "agency": "British Columbia Energy Regulator",
+            "name": "BCER Well Surface Hole Locations",
+            "raw_file": str(BCER_WELL_SURFACE_GEOJSON.relative_to(RAW_DIR)),
+            "grain": "well surface point geometry",
+        }
+
+    features: list[dict[str, Any]] = []
+    offset = 0
+    page_size = 2000
+    try:
+        while True:
+            params = {
+                "where": "1=1",
+                "outFields": "WELL_AUTHORITY_NUMBER,WELL_NAME,OPERATOR_ABBREVIATION,WELL_SURFACE_LOCATION",
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page_size),
+                "f": "geojson",
+            }
+            url = f"{url_base}?{urllib.parse.urlencode(params)}"
+            log(f"Downloading BCER well surface points offset {offset:,}")
+            req = urllib.request.Request(url, headers={"User-Agent": "western-canada-production-etl/1.0"})
+            with urllib.request.urlopen(req, timeout=120) as response:
+                page = json.loads(response.read().decode("utf-8"))
+            if page.get("error"):
+                raise RuntimeError(page["error"])
+            page_features = page.get("features", [])
+            if not page_features:
+                break
+            features.extend(page_features)
+            if len(page_features) < page_size or not page.get("properties", {}).get("exceededTransferLimit"):
+                break
+            offset += page_size
+
+        BCER_WELL_SURFACE_GEOJSON.write_text(
+            json.dumps({"type": "FeatureCollection", "features": features}, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        return {
+            "url": url_base,
+            "local_path": str(BCER_WELL_SURFACE_GEOJSON.relative_to(ROOT)),
+            "status": "downloaded",
+            "error": None,
+            "source_id": "bcer_well_surface_locations",
+            "agency": "British Columbia Energy Regulator",
+            "name": "BCER Well Surface Hole Locations",
+            "raw_file": str(BCER_WELL_SURFACE_GEOJSON.relative_to(RAW_DIR)),
+            "grain": f"{len(features):,} well surface point geometries",
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "url": url_base,
+            "local_path": str(BCER_WELL_SURFACE_GEOJSON.relative_to(ROOT)),
+            "status": "failed",
+            "error": str(exc),
+            "source_id": "bcer_well_surface_locations",
+            "agency": "British Columbia Energy Regulator",
+            "name": "BCER Well Surface Hole Locations",
+            "raw_file": str(BCER_WELL_SURFACE_GEOJSON.relative_to(RAW_DIR)),
+            "grain": "well surface point geometry",
+        }
+
+
+def ensure_bcer_cache(force: bool = False, refresh: bool = False) -> list[dict[str, Any]]:
+    status = []
+    for source_id, name, url, target, grain in [
+        (
+            "bcer_well_production",
+            "BCER Production Data for All Wells in B.C.",
+            "https://iris.bcogc.ca/download/prod_csv.zip",
+            BCER_PRODUCTION_ZIP,
+            "monthly well/completion/zone production",
+        ),
+        (
+            "bcer_well_index",
+            "BCER Well Index",
+            "https://iris.bcogc.ca/download/well_index.csv",
+            BCER_WELL_INDEX_CSV,
+            "well reference",
+        ),
+    ]:
+        item = download_url(url, target, force=force if refresh else False)
+        item.update(
+            {
+                "source_id": source_id,
+                "agency": "British Columbia Energy Regulator",
+                "name": name,
+                "raw_file": str(target.relative_to(RAW_DIR)),
+                "grain": grain,
+            }
+        )
+        status.append(item)
+    status.append(download_bcer_well_surface_points(force=force if refresh else False))
     return status
 
 
@@ -678,6 +840,63 @@ class Asset:
     ownership_text: str = ""
     is_rollup: bool = False
     notes: str = ""
+    coordinate_method: str = ""
+    location_confidence: str = ""
+    location_basis: str = ""
+    geometry_kind: str = ""
+    geometry_source: str = ""
+    geometry_features: list[dict[str, Any]] = field(default_factory=list)
+
+
+def infer_coordinate_method(
+    latitude: float | None,
+    longitude: float | None,
+    notes: str = "",
+    registry_row: dict[str, str] | None = None,
+) -> str:
+    if latitude is None or longitude is None:
+        return "unmapped"
+    text = clean_text(notes)
+    match = re.search(r"coordinate method:\s*([^.;]+)", text, flags=re.I)
+    if match:
+        return slug(match.group(1))
+    lower = text.lower()
+    if "aer st102" in lower:
+        return "aer_st102_facility_point"
+    if "aer scheme approval spatial data centroid" in lower or "aer spatial centroid" in lower:
+        return "aer_scheme_approval_centroid"
+    if "st44" in lower and "dls" in lower:
+        return "aer_st44_dls_centroid"
+    if "approx" in lower:
+        return "asset_registry_manual_estimate" if registry_row else "manual_estimate"
+    if registry_row:
+        return "asset_registry_manual"
+    return "manual_or_unspecified"
+
+
+def coordinate_confidence(
+    latitude: float | None,
+    longitude: float | None,
+    method: str,
+    geometry_kind: str = "",
+    is_rollup: bool = False,
+    asset_kind: str = "",
+) -> str:
+    if latitude is None or longitude is None:
+        return "unmapped"
+    if is_rollup or asset_kind in {"province", "province_refinery", "region", "company_rollup", "asset_bucket"}:
+        return "aggregate"
+    method = slug(method)
+    geometry_kind = slug(geometry_kind)
+    if method in {"aer_st102_facility_point", "bcer_well_surface_point", "aer_st37_well_surface_point"}:
+        return "exact"
+    if geometry_kind == "scheme_polygon" or method in {"aer_scheme_approval_centroid"}:
+        return "high"
+    if method in {"ags_ats_v4_1_web_converter", "aer_st44_dls_centroid", "asset_registry_manual"}:
+        return "medium"
+    if method in {"approx_dls_centroid", "asset_registry_manual_estimate", "manual_estimate", "manual_or_unspecified"}:
+        return "low"
+    return "medium"
 
 
 def load_registry() -> dict[tuple[str, str, str], dict[str, str]]:
@@ -1149,6 +1368,9 @@ def resolve_scheme_location(
                 "latitude": coords[0],
                 "longitude": coords[1],
                 "method": "aer_scheme_approval_centroid",
+                "geometry_kind": "scheme_polygon",
+                "geometry_source": "AER Scheme Approval Spatial Data",
+                "geometry_features": [item["feature"] for item in selected if item.get("feature")],
                 "notes": f"Location from AER Scheme Approval Spatial Data centroid; matched scheme(s): {', '.join(names[:4])}; approval(s): {', '.join(approvals[:5])}.",
             }
     if rule:
@@ -1166,6 +1388,8 @@ def resolve_scheme_location(
                     "latitude": coords[0],
                     "longitude": coords[1],
                     "method": "aer_st44_dls_centroid",
+                    "geometry_kind": "dls_centroid",
+                    "geometry_source": "AER ST44 Active Oil Sands Schemes",
                     "notes": f"Location from AER ST44 township/DLS location {item.get('location', '')}; approval {item.get('approval', '')}.",
                 }
     return None
@@ -1232,6 +1456,8 @@ def resolve_st102_facility_location(
         "latitude": facility["latitude"],
         "longitude": facility["longitude"],
         "method": "aer_st102_facility_point",
+        "geometry_kind": "facility_point",
+        "geometry_source": "AER ST102 Facility List Shapefile",
         "notes": (
             "Location from AER ST102 Facility List Shapefile point: "
             f"{facility.get('FAC_ID', '')} {facility.get('FAC_NAME', '')}; "
@@ -1568,6 +1794,10 @@ def append_petrinex_ab_conventional(
             asset_kind="dls_site",
             latitude=lat,
             longitude=lon,
+            coordinate_method=clean_text(cache_row.get("method")),
+            location_basis=site["location_basis"],
+            geometry_kind="dls_centroid",
+            geometry_source="Petrinex DLS / AGS ATS lookup",
             notes=" ".join(note_bits),
         )
         add_record(
@@ -1647,6 +1877,10 @@ def append_petrinex_ab_conventional(
             asset_kind="dls_site",
             latitude=lat,
             longitude=lon,
+            coordinate_method=clean_text(cache_row.get("method")),
+            location_basis="reporting_facility_dls",
+            geometry_kind="dls_centroid",
+            geometry_source="Petrinex DLS / AGS ATS lookup",
             notes=" ".join(note_bits),
         )
         add_record(
@@ -1728,6 +1962,10 @@ def append_petrinex_ab_conventional(
             asset_kind="dls_site",
             latitude=lat,
             longitude=lon,
+            coordinate_method=clean_text(cache_row.get("method")),
+            location_basis=site["location_basis"],
+            geometry_kind="dls_centroid",
+            geometry_source="Petrinex DLS / AGS ATS lookup",
             notes=" ".join(note_bits),
         )
         add_record(
@@ -1849,6 +2087,10 @@ def append_petrinex_ab_conventional(
                     asset_kind="dls_site",
                     latitude=lat,
                     longitude=lon,
+                    coordinate_method=clean_text(cache_row.get("method")),
+                    location_basis="reporting_facility_dls",
+                    geometry_kind="dls_centroid",
+                    geometry_source="Petrinex DLS / AGS ATS lookup",
                     notes=" ".join(note_bits),
                 )
                 add_record(
@@ -1868,6 +2110,193 @@ def append_petrinex_ab_conventional(
             )
 
 
+def load_bcer_well_index() -> dict[str, dict[str, str]]:
+    if not BCER_WELL_INDEX_CSV.exists():
+        return {}
+    wells: dict[str, dict[str, str]] = {}
+    try:
+        with BCER_WELL_INDEX_CSV.open("r", newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                wa = clean_text(row.get("WA")).zfill(5)
+                if not wa:
+                    continue
+                wells[wa] = row
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: could not read BCER well index: {exc}")
+    return wells
+
+
+def load_bcer_surface_locations() -> dict[str, dict[str, Any]]:
+    if not BCER_WELL_SURFACE_GEOJSON.exists():
+        return {}
+    try:
+        payload = json.loads(BCER_WELL_SURFACE_GEOJSON.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: could not read BCER well surface locations: {exc}")
+        return {}
+    locations: dict[str, dict[str, Any]] = {}
+    for feature in payload.get("features", []):
+        props = feature.get("properties") or {}
+        wa = clean_text(props.get("WELL_AUTHORITY_NUMBER")).zfill(5)
+        coords = (feature.get("geometry") or {}).get("coordinates") or []
+        if not wa or len(coords) < 2:
+            continue
+        lon = as_float(coords[0])
+        lat = as_float(coords[1])
+        if lat is None or lon is None:
+            continue
+        locations[wa] = {
+            "latitude": lat,
+            "longitude": lon,
+            "well_name": clean_text(props.get("WELL_NAME")),
+            "operator": clean_text(props.get("OPERATOR_ABBREVIATION")),
+            "surface_location": clean_text(props.get("WELL_SURFACE_LOCATION")),
+        }
+    return locations
+
+
+def bcer_production_members(zf: _zipfile.ZipFile) -> list[str]:
+    names = [name for name in zf.namelist() if name.lower().endswith(".csv")]
+    preferred = [
+        name
+        for name in names
+        if any(token in name.lower() for token in ("2007_to_2015", "2016_to_present"))
+    ]
+    return preferred or [name for name in names if Path(name).name.lower() == "zone_prd.csv"]
+
+
+def iter_bcer_production_rows(zf: _zipfile.ZipFile, member: str) -> Any:
+    with zf.open(member) as raw:
+        wrapper = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
+        first = wrapper.readline()
+        if "Wa_num" not in first:
+            reader = csv.DictReader(wrapper)
+        else:
+            wrapper.seek(0)
+            reader = csv.DictReader(wrapper)
+        for row in reader:
+            yield row
+
+
+def append_bcer_well_production(add_asset: Any, add_record: Any) -> None:
+    if not BCER_PRODUCTION_ZIP.exists():
+        log("  BCER production cache is empty - skipping British Columbia conventional crude layer.")
+        return
+
+    well_index = load_bcer_well_index()
+    surface_locations = load_bcer_surface_locations()
+    sites: dict[tuple[str, str], dict[str, Any]] = {}
+    raw_rows = 0
+    used_rows = 0
+    missing_location_was: set[str] = set()
+    try:
+        with _zipfile.ZipFile(BCER_PRODUCTION_ZIP) as zf:
+            members = bcer_production_members(zf)
+            if not members:
+                log("  BCER production ZIP contains no CSV production members.")
+                return
+            for member in members:
+                log(f"  Parsing BCER production {member}")
+                for row in iter_bcer_production_rows(zf, member):
+                    raw_rows += 1
+                    period = clean_text(row.get("Prod_period"))
+                    if not re.fullmatch(r"\d{6}", period):
+                        continue
+                    year = int(period[:4])
+                    month = int(period[4:6])
+                    if not 1 <= month <= 12:
+                        continue
+                    date_value = dt.date(year, month, 1)
+                    if month_end(date_value) < CUTOFF:
+                        continue
+                    oil_m3 = as_float(row.get("Oil_prod_vol (m3)"))
+                    if oil_m3 is None or oil_m3 <= 0:
+                        continue
+                    wa = clean_text(row.get("Wa_num")).zfill(5)
+                    if not wa:
+                        continue
+                    key = (month_end(date_value).isoformat(), wa)
+                    site = sites.setdefault(
+                        key,
+                        {
+                            "date": date_value,
+                            "wa": wa,
+                            "volume_m3": 0.0,
+                            "uwis": set(),
+                            "formations": set(),
+                            "areas": set(),
+                        },
+                    )
+                    site["volume_m3"] += oil_m3
+                    if row.get("UWI"):
+                        site["uwis"].add(clean_text(row.get("UWI")))
+                    if row.get("Formtn_code"):
+                        site["formations"].add(clean_text(row.get("Formtn_code")))
+                    if row.get("Area_code"):
+                        site["areas"].add(clean_text(row.get("Area_code")))
+                    used_rows += 1
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: BCER production parse failed: {exc}")
+        return
+
+    added = 0
+    asset_ids: dict[str, str] = {}
+    for site in sites.values():
+        wa = site["wa"]
+        surface = surface_locations.get(wa, {})
+        index_row = well_index.get(wa, {})
+        lat = as_float(surface.get("latitude"))
+        lon = as_float(surface.get("longitude"))
+        if lat is None or lon is None:
+            missing_location_was.add(wa)
+        well_name = clean_text(surface.get("well_name")) or clean_text(index_row.get("Well Name")) or f"BC well {wa}"
+        operator = clean_text(surface.get("operator")) or clean_text(index_row.get("Oper")) or "Unknown operator"
+        surface_location = clean_text(surface.get("surface_location")) or clean_text(index_row.get("Bottom Hole"))
+        if wa not in asset_ids:
+            notes = [
+                "BCER zone production Oil_prod_vol (m3) aggregated by well authority number.",
+                "Location basis: well_surface_point; coordinate method: bcer_well_surface_point."
+                if lat is not None and lon is not None
+                else "Location basis: missing BCER well surface point.",
+            ]
+            if surface_location:
+                notes.append(f"Surface location: {surface_location}.")
+            asset_ids[wa] = add_asset(
+                display_name=f"WA {wa} - {well_name}",
+                source_id="bcer_well_production",
+                production_system="conventional",
+                company=operator,
+                province="British Columbia",
+                asset_kind="well",
+                latitude=lat,
+                longitude=lon,
+                coordinate_method="bcer_well_surface_point" if lat is not None and lon is not None else "unmapped",
+                location_basis="well_surface_point" if lat is not None and lon is not None else "missing_well_surface_point",
+                geometry_kind="well_surface_point" if lat is not None and lon is not None else "",
+                geometry_source="BCER Well Surface Hole Locations" if lat is not None and lon is not None else "",
+                notes=" ".join(notes),
+            )
+        days = calendar.monthrange(site["date"].year, site["date"].month)[1]
+        add_record(
+            site["date"],
+            asset_ids[wa],
+            "Conventional crude oil",
+            site["volume_m3"] * M3_TO_BBL / days,
+            "BCER Production Data",
+            wa,
+            "bcer_well_production",
+            scenario="actual",
+        )
+        added += 1
+
+    log(
+        "  BCER conventional crude: "
+        f"{added:,} well-month records from {used_rows:,} positive oil rows "
+        f"({raw_rows:,} raw rows); {len(missing_location_was):,} producing wells missing surface coordinates."
+    )
+
+
 def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], list[dict[str, Any]], dict[str, Any]]:
     if not workbook_path.exists():
         raise FileNotFoundError(f"Workbook not found: {workbook_path}")
@@ -1878,10 +2307,7 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
     assets: dict[str, Asset] = {}
     records: list[dict[str, Any]] = []
 
-    latest_actual = None
-    if "Trading Dashboard" in wb.sheetnames:
-        latest_actual = as_date(wb["Trading Dashboard"]["D6"].value)
-    latest_actual = latest_actual or dt.date.today()
+    latest_actual = read_workbook_latest_actual(workbook_path)
     oil_sands_locations = build_oil_sands_location_index()
 
     def add_asset(
@@ -1896,6 +2322,11 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
         ownership_text: str = "",
         is_rollup: bool = False,
         notes: str = "",
+        coordinate_method: str | None = None,
+        location_basis: str = "",
+        geometry_kind: str = "",
+        geometry_source: str = "",
+        geometry_features: list[dict[str, Any]] | None = None,
     ) -> str:
         key_source = source_id
         asset_id = f"{key_source}:{slug(production_system)}:{slug(company)}:{slug(display_name)}"
@@ -1914,6 +2345,17 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                 lat, lon = PROVINCE_COORDS.get(display_name, (lat, lon))
             elif province in PROVINCE_COORDS and (is_rollup or asset_kind in {"region", "company_rollup"}):
                 lat, lon = PROVINCE_COORDS[province]
+        final_notes = notes or reg_notes
+        final_method = coordinate_method or (reg.get("coordinate_method", "").strip() if reg else "")
+        final_method = final_method or infer_coordinate_method(lat, lon, final_notes, reg)
+        final_confidence = coordinate_confidence(
+            lat,
+            lon,
+            final_method,
+            geometry_kind=geometry_kind,
+            is_rollup=is_rollup,
+            asset_kind=asset_kind,
+        )
         if asset_id not in assets:
             assets[asset_id] = Asset(
                 asset_id=asset_id,
@@ -1928,7 +2370,13 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                 longitude=lon,
                 ownership_text=ownership_text,
                 is_rollup=is_rollup,
-                notes=notes or reg_notes,
+                notes=final_notes,
+                coordinate_method=final_method,
+                location_confidence=final_confidence,
+                location_basis=location_basis,
+                geometry_kind=geometry_kind or ("point" if lat is not None and lon is not None else ""),
+                geometry_source=geometry_source,
+                geometry_features=list(geometry_features or []),
             )
         return asset_id
 
@@ -1966,22 +2414,47 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
         )
 
     # AER ST53: in-situ asset production plus rollups.
-    if "In-Situ Production" in wb.sheetnames:
-        ws = wb["In-Situ Production"]
+    # Prefer "In-Situ (All Sites)" (individual sites) when available; fall back to "In-Situ Production".
+    _insitu_sheet_name = "In-Situ (All Sites)" if "In-Situ (All Sites)" in wb.sheetnames else (
+        "In-Situ Production" if "In-Situ Production" in wb.sheetnames else None
+    )
+    if _insitu_sheet_name:
+        ws = wb[_insitu_sheet_name]
         company_row = [cell.value for cell in next(ws.iter_rows(min_row=3, max_row=3))]
         headers = [cell.value for cell in next(ws.iter_rows(min_row=4, max_row=4))]
 
-        company_markers: list[tuple[int, str]] = []
-        for idx, value in enumerate(company_row, start=1):
-            label = clean_text(value)
-            if label and label not in {"Company", "GRAND TOTAL"}:
-                company_markers.append((idx, label))
-        company_by_col: dict[int, str] = {}
-        start_col = 2
-        for marker_col, company in company_markers:
-            for col in range(start_col, marker_col + 1):
-                company_by_col[col] = company
-            start_col = marker_col + 1
+        if _insitu_sheet_name == "In-Situ (All Sites)":
+            # "In-Situ (All Sites)" uses left-aligned company markers (company name at first col of
+            # each group); group boundaries are determined by "XYZ Total" header columns.
+            company_by_col: dict[int, str] = {}
+            group_start = 2
+            for idx, raw_h in enumerate(headers, start=1):
+                h = clean_text(raw_h)
+                if h and "total" in h.lower() and "grand" not in h.lower():
+                    # "Cenovus Total" → company = "Cenovus"
+                    company_name = h.replace(" Total", "").strip()
+                    for col in range(group_start, idx + 1):
+                        company_by_col[col] = company_name
+                    group_start = idx + 1
+            # For remaining columns after the last Total (small individual producers),
+            # use the explicit company name from the company row at that column.
+            for idx, raw_co in enumerate(company_row, start=1):
+                co = clean_text(raw_co)
+                if co and co not in {"Company", "GRAND TOTAL"} and idx not in company_by_col:
+                    company_by_col[idx] = co
+        else:
+            # "In-Situ Production" uses right-aligned company markers (name at Total column).
+            company_markers: list[tuple[int, str]] = []
+            for idx, value in enumerate(company_row, start=1):
+                label = clean_text(value)
+                if label and label not in {"Company", "GRAND TOTAL"}:
+                    company_markers.append((idx, label))
+            company_by_col = {}
+            start_col = 2
+            for marker_col, company in company_markers:
+                for col in range(start_col, marker_col + 1):
+                    company_by_col[col] = company
+                start_col = marker_col + 1
 
         header_by_col: dict[int, str] = {}
         for idx, raw_header in enumerate(headers, start=1):
@@ -2002,10 +2475,14 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                 latitude=as_float(location.get("latitude")) if location else None,
                 longitude=as_float(location.get("longitude")) if location else None,
                 is_rollup=is_rollup,
+                coordinate_method=clean_text(location.get("method")) if location else None,
+                geometry_kind=clean_text(location.get("geometry_kind")) if location else "",
+                geometry_source=clean_text(location.get("geometry_source")) if location else "",
+                geometry_features=location.get("geometry_features") if location else None,
                 notes=" ".join(
                     bit
                     for bit in [
-                        "Imported from workbook sheet In-Situ Production.",
+                        f"Imported from workbook sheet {_insitu_sheet_name}.",
                         clean_text(location.get("notes")) if location else "",
                     ]
                     if bit
@@ -2024,7 +2501,7 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                     asset_id,
                     "In-situ bitumen",
                     as_float(row[col_idx - 1] if col_idx - 1 < len(row) else None),
-                    "In-Situ Production",
+                    _insitu_sheet_name,
                     header,
                     "aer_st53",
                 )
@@ -2063,6 +2540,10 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                 longitude=as_float(location.get("longitude")) if location else None,
                 ownership_text=ownership,
                 is_rollup=is_rollup,
+                coordinate_method=clean_text(location.get("method")) if location else None,
+                geometry_kind=clean_text(location.get("geometry_kind")) if location else "",
+                geometry_source=clean_text(location.get("geometry_source")) if location else "",
+                geometry_features=location.get("geometry_features") if location else None,
                 notes=" ".join(
                     bit
                     for bit in [
@@ -2133,6 +2614,9 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                     asset_kind="upgrader",
                     latitude=lat,
                     longitude=lon,
+                    coordinate_method=clean_text(location.get("method")) if location else None,
+                    geometry_kind=clean_text(location.get("geometry_kind")) if location else "",
+                    geometry_source=clean_text(location.get("geometry_source")) if location else "",
                     notes=" ".join(
                         bit
                         for bit in [
@@ -2158,6 +2642,7 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                     )
 
     append_petrinex_ab_conventional(assets, records, add_asset, add_record)
+    append_bcer_well_production(add_asset, add_record)
 
     # AER ST3-style workbook conventional crude series.
     if False and "Conventional Oil" in wb.sheetnames:
@@ -2422,6 +2907,11 @@ def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metada
           longitude REAL,
           ownership_text TEXT,
           is_rollup INTEGER NOT NULL DEFAULT 0,
+          coordinate_method TEXT,
+          location_confidence TEXT,
+          location_basis TEXT,
+          geometry_kind TEXT,
+          geometry_source TEXT,
           notes TEXT
         );
 
@@ -2464,9 +2954,10 @@ def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metada
         INSERT INTO assets (
           asset_id, display_name, source_id, source_name, production_system,
           asset_kind, company, province, latitude, longitude, ownership_text,
-          is_rollup, notes
+          is_rollup, coordinate_method, location_confidence, location_basis,
+          geometry_kind, geometry_source, notes
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         [
             (
@@ -2482,6 +2973,11 @@ def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metada
                 a.longitude,
                 a.ownership_text,
                 1 if a.is_rollup else 0,
+                a.coordinate_method,
+                a.location_confidence,
+                a.location_basis,
+                a.geometry_kind,
+                a.geometry_source,
                 a.notes,
             )
             for a in assets.values()
@@ -2511,6 +3007,40 @@ def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metada
     return db_path
 
 
+def write_json_file(path: Path, payload: Any, **json_kwargs: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f"{path.name}.tmp")
+    with tmp_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, **json_kwargs)
+    tmp_path.replace(path)
+
+
+def derive_default_map_date(records: list[dict[str, Any]], latest_actual_date: str | None) -> str | None:
+    """Pick the latest month with complete crude-system coverage for the first map view."""
+    minimums = {
+        "Conventional crude oil": 500.0,
+        "In-situ bitumen": 500.0,
+        "Mined bitumen gross": 500.0,
+        "Synthetic crude oil": 500.0,
+    }
+    by_date_stream: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    for record in records:
+        date = record.get("date")
+        stream = record.get("stream")
+        if latest_actual_date and date > latest_actual_date:
+            continue
+        if stream not in minimums:
+            continue
+        if record.get("scenario") != "actual":
+            continue
+        by_date_stream[date][stream] += float(record.get("volume_kbbl_d") or 0.0)
+    for date in sorted(by_date_stream, reverse=True):
+        totals = by_date_stream[date]
+        if all(totals.get(stream, 0.0) >= minimum for stream, minimum in minimums.items()):
+            return date
+    return latest_actual_date
+
+
 def write_web_exports(
     assets: dict[str, Asset],
     records: list[dict[str, Any]],
@@ -2537,6 +3067,11 @@ def write_web_exports(
             "longitude": a.longitude,
             "ownership_text": a.ownership_text,
             "is_rollup": a.is_rollup,
+            "coordinate_method": a.coordinate_method,
+            "location_confidence": a.location_confidence,
+            "location_basis": a.location_basis,
+            "geometry_kind": a.geometry_kind,
+            "geometry_source": a.geometry_source,
             "notes": a.notes,
         }
         for a in sorted(assets.values(), key=lambda x: (x.production_system, x.company, x.display_name))
@@ -2578,6 +3113,11 @@ def write_web_exports(
                     "production_system": asset.production_system,
                     "asset_kind": asset.asset_kind,
                     "is_rollup": asset.is_rollup,
+                    "coordinate_method": asset.coordinate_method,
+                    "location_confidence": asset.location_confidence,
+                    "location_basis": asset.location_basis,
+                    "geometry_kind": asset.geometry_kind,
+                    "geometry_source": asset.geometry_source,
                     "latest_date": latest_date,
                     "latest_kbbl_d": round(latest_kbbl_d, 3),
                     "ownership_text": asset.ownership_text,
@@ -2585,6 +3125,39 @@ def write_web_exports(
                 },
             }
         )
+
+    asset_geometry_features: list[dict[str, Any]] = []
+    for asset in assets.values():
+        if not asset.geometry_features:
+            continue
+        latest_date = latest_record_date.get(asset.asset_id)
+        latest_kbbl_d = by_asset_date.get((asset.asset_id, latest_date), 0.0) if latest_date else 0.0
+        for idx, feature in enumerate(asset.geometry_features):
+            geometry = feature.get("geometry")
+            if not geometry:
+                continue
+            props = dict(feature.get("properties") or {})
+            props.update(
+                {
+                    "asset_id": asset.asset_id,
+                    "display_name": asset.display_name,
+                    "company": asset.company,
+                    "province": asset.province,
+                    "source_id": asset.source_id,
+                    "source_name": asset.source_name,
+                    "production_system": asset.production_system,
+                    "asset_kind": asset.asset_kind,
+                    "coordinate_method": asset.coordinate_method,
+                    "location_confidence": asset.location_confidence,
+                    "location_basis": asset.location_basis,
+                    "geometry_kind": asset.geometry_kind,
+                    "geometry_source": asset.geometry_source,
+                    "latest_date": latest_date,
+                    "latest_kbbl_d": round(latest_kbbl_d, 3),
+                    "part_index": idx + 1,
+                }
+            )
+            asset_geometry_features.append({"type": "Feature", "geometry": geometry, "properties": props})
 
     base_records: list[dict[str, Any]] = []
     on_demand_records: dict[str, list[dict[str, Any]]] = {}
@@ -2596,13 +3169,24 @@ def write_web_exports(
 
     monthly_record_files: dict[str, str] = {}
     for date, date_records in sorted(on_demand_records.items()):
-        path = monthly_dir / f"petrinex_ab_{date}.json"
-        path.write_text(json.dumps(date_records, separators=(",", ":")), encoding="utf-8")
+        path = monthly_dir / f"on_demand_{date}.json"
+        write_json_file(path, date_records, separators=(",", ":"))
         monthly_record_files[date] = str(path.relative_to(ROOT)).replace("\\", "/")
 
     st102_facility_payload = oil_sands_facility_geojson(load_st102_facilities())
 
     periods = sorted({record["date"] for record in records})
+    default_date = derive_default_map_date(records, metadata.get("latest_actual_date"))
+    location_quality_assets = Counter(a.location_confidence or "unknown" for a in assets.values())
+    location_quality_latest_kbbl_d: dict[str, float] = defaultdict(float)
+    latest_actual = metadata.get("latest_actual_date")
+    for record in records:
+        if record["date"] != latest_actual or record.get("scenario") != "actual":
+            continue
+        asset = assets.get(record["asset_id"])
+        if not asset or asset.is_rollup:
+            continue
+        location_quality_latest_kbbl_d[asset.location_confidence or "unknown"] += record["volume_kbbl_d"]
     manifest = {
         **metadata,
         "record_count": len(records),
@@ -2610,8 +3194,14 @@ def write_web_exports(
         "on_demand_record_count": sum(len(items) for items in on_demand_records.values()),
         "asset_count": len(assets),
         "mapped_asset_count": len(features),
+        "asset_geometry_feature_count": len(asset_geometry_features),
+        "location_quality_asset_count": dict(sorted(location_quality_assets.items())),
+        "location_quality_latest_actual_kbbl_d": {
+            key: round(value, 4) for key, value in sorted(location_quality_latest_kbbl_d.items())
+        },
         "periods": periods,
         "latest_period": max(periods) if periods else None,
+        "default_date": default_date,
         "monthly_record_files": monthly_record_files,
         "date_totals_kbbl_d": {date: round(value, 4) for date, value in sorted(date_totals_kbbl_d.items())},
         "source_manifest": SOURCE_MANIFEST,
@@ -2621,26 +3211,23 @@ def write_web_exports(
             "assets": "public/data/assets.json",
             "monthly_production": "public/data/monthly_production.json",
             "geojson": "public/data/production_assets.geojson",
+            "asset_geometries": "public/data/asset_geometries.geojson",
             "scheme_approvals": "public/data/aer_scheme_approvals.geojson",
             "st102_oil_sands_facilities": "public/data/aer_st102_oil_sands_facilities.geojson",
         },
     }
 
-    (PUBLIC_DATA_DIR / "assets.json").write_text(json.dumps(assets_payload, indent=2), encoding="utf-8")
-    (PUBLIC_DATA_DIR / "monthly_production.json").write_text(
-        json.dumps(base_records, separators=(",", ":")),
-        encoding="utf-8",
+    write_json_file(PUBLIC_DATA_DIR / "assets.json", assets_payload, indent=2)
+    write_json_file(PUBLIC_DATA_DIR / "monthly_production.json", base_records, separators=(",", ":"))
+    write_json_file(PUBLIC_DATA_DIR / "production_assets.geojson", {"type": "FeatureCollection", "features": features}, indent=2)
+    write_json_file(
+        ASSET_GEOMETRIES_GEOJSON_PATH,
+        {"type": "FeatureCollection", "features": asset_geometry_features},
+        separators=(",", ":"),
     )
-    (PUBLIC_DATA_DIR / "production_assets.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": features}, indent=2),
-        encoding="utf-8",
-    )
-    ST102_OIL_SANDS_GEOJSON_PATH.write_text(
-        json.dumps(st102_facility_payload, separators=(",", ":")),
-        encoding="utf-8",
-    )
-    (PUBLIC_DATA_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    (DATA_DIR / "sources.json").write_text(json.dumps(SOURCE_MANIFEST, indent=2), encoding="utf-8")
+    write_json_file(ST102_OIL_SANDS_GEOJSON_PATH, st102_facility_payload, separators=(",", ":"))
+    write_json_file(PUBLIC_DATA_DIR / "manifest.json", manifest, indent=2)
+    write_json_file(DATA_DIR / "sources.json", SOURCE_MANIFEST, indent=2)
 
 
 def validate_exports(db_path: Path) -> dict[str, Any]:
@@ -2716,6 +3303,8 @@ def main() -> int:
                 refresh=args.download or args.force_download,
             )
         )
+    if args.download or args.force_download:
+        download_status.extend(ensure_bcer_cache(force=args.force_download, refresh=True))
     try:
         from build_scheme_geojson import main as build_scheme_geojson
 

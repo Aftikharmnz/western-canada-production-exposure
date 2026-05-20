@@ -89,5 +89,32 @@
     "url": "https://www.petrinex.gov.ab.ca/bbreportsBC/PRAActivityCodes.csv",
     "raw_file": "petrinex/bc/reference/PRAActivityCodes.csv",
     "grain": "BC activity reference"
+  },
+  {
+    "source_id": "bcer_well_production",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Production Data for All Wells in B.C.",
+    "url": "https://iris.bcogc.ca/download/prod_csv.zip",
+    "raw_file": "bcer/prod_csv.zip",
+    "grain": "monthly well/completion/zone production",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_index",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Index",
+    "url": "https://iris.bcogc.ca/download/well_index.csv",
+    "raw_file": "bcer/well_index.csv",
+    "grain": "well reference",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_surface_locations",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Surface Hole Locations",
+    "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query",
+    "raw_file": "bcer/well_surface_locations.geojson",
+    "grain": "well surface point geometry",
+    "download": false
   }
 ]

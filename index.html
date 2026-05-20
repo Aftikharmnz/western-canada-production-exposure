@@ -51,6 +51,10 @@
             <h2>Streams</h2>
             <div id="streamFilters" class="toggle-list"></div>
           </section>
+          <section class="filter-section">
+            <h2>Location Quality</h2>
+            <div id="locationQualityFilters" class="toggle-list"></div>
+          </section>
           <section class="filter-section metrics">
             <h2>Exposure</h2>
             <div class="metric-row">
@@ -60,6 +64,10 @@
             <div class="metric-row">
               <span>Mapped points</span>
               <strong id="mappedCount">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Unmapped volume</span>
+              <strong id="unmappedVolume">--</strong>
             </div>
             <div class="metric-row">
               <span>Largest asset</span>
@@ -104,6 +112,7 @@
             <button type="button" class="legend-item" data-legend-key="bc-fire-fon" aria-pressed="true"><i class="dot bc-fire-fon"></i><span>BC Fire of Note</span></button>
             <button type="button" class="legend-item" data-legend-key="formation-os" aria-pressed="true"><i class="dot formation-os"></i><span>In-situ Approval</span></button>
             <button type="button" class="legend-item" data-legend-key="formation-tp" aria-pressed="true"><i class="dot formation-tp"></i><span>Mineable Approval</span></button>
+            <button type="button" class="legend-item" data-legend-key="asset-footprint" aria-pressed="true"><i class="dot asset-footprint"></i><span>Production Footprint</span></button>
             <button type="button" class="legend-item" data-legend-key="st102-facility" aria-pressed="true"><i class="dot st102-facility"></i><span>ST102 Facility</span></button>
           </div>
           <div id="pipelineLegend" class="pipeline-legend-panel" hidden></div>
@@ -133,6 +142,10 @@
             <div>
               <span>Status</span>
               <strong id="detailStatus">--</strong>
+            </div>
+            <div>
+              <span>Location</span>
+              <strong id="detailLocationQuality">--</strong>
             </div>
           </section>
           <section id="fireRiskSection" class="fire-risk-section" hidden>
