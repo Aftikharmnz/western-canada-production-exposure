@@ -292,6 +292,7 @@ function formationLegendKey(feature) {
 
 function albertaFireLegendKey(feature) {
   const p = feature?.properties || {};
+  if (p.FIRE_TYPE === "Municipal")  return "ab-fire-mun";
   if (p.FIRE_TYPE === "Mutual Aid") return "ab-fire-ma";
   if (p.CO_FLAG === "Y") return "ab-fire-carryover";
   if (p.FIRE_STATUS === "Out of Control") return "ab-fire-oc";
@@ -1388,6 +1389,16 @@ const ALBERTA_FIRES_URL =
   "&returnGeometry=true" +
   "&f=geojson";
 
+// Purely municipal fires (RMR, etc.) — reported by municipalities with no provincial mutual aid yet.
+// Completely different schema: DDM coordinates, FireIncidentStatus, Hectares, LocalGovernment.
+// Normalized to the common LABEL/FIRE_STATUS/AREA_ESTIMATE schema before merging.
+const ALBERTA_MUNICIPAL_URL =
+  "https://services.arcgis.com/Eb8P5h4CJk8utIBz/arcgis/rest/services/Active_Municipal_Wildfire_Prod/FeatureServer/4/query" +
+  "?where=FireIncidentStatus%20%3C%3E%20%27Inactive%27" +
+  "&outFields=MRFireNumber%2CFireIncidentStatus%2CHectares%2CEstimatedStartDate%2CLatitudeDDM%2CLongitudeDDM%2CLocalGovernment%2CMutualAidContactZone" +
+  "&returnGeometry=false" +
+  "&f=geojson";
+
 // Mutual Aid fires — provincial assistance to municipal/county fires (RCU, CCU, WCU, etc.).
 // Same schema as Active_Wildfires_(PROD). Status "Assistance Started" = actively assisted;
 // "Assistance Ended" = province has stood down (excluded from map).
@@ -1407,6 +1418,17 @@ function haversineKm(lat1, lon1, lat2, lon2) {
     Math.sin(dLat / 2) ** 2 +
     Math.cos(lat1 * d2r) * Math.cos(lat2 * d2r) * Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Parses Degrees Decimal Minutes strings used by the municipal fire service.
+// e.g. "53° 18.5410" → 53.309017,  "-112° 56.7841" → -113.046402
+function parseDDM(str) {
+  if (!str) return NaN;
+  const m = String(str).match(/^(-?\d+)[°\s]+(\d+\.?\d*)$/);
+  if (!m) return NaN;
+  const deg = Number(m[1]);
+  const min = Number(m[2]);
+  return deg < 0 ? deg - min / 60 : deg + min / 60;
 }
 
 function geojsonCentroid(feature) {
@@ -1509,8 +1531,9 @@ const ALBERTA_STAGE_STYLE = {
   "Out of Control":      { color: "#7f1d1d", fill: "#ef4444", weight: 2.5, opacity: 0.95, label: "Out of Control"     },
   "Being Held":          { color: "#7c2d12", fill: "#f97316", weight: 2,   opacity: 0.90, label: "Being Held"         },
   "Under Control":       { color: "#78350f", fill: "#fbbf24", weight: 2,   opacity: 0.85, label: "Under Control"      },
-  "Assistance Started":  { color: "#4c1d95", fill: "#7c3aed", weight: 2,   opacity: 0.90, label: "Mutual Aid — Active" },
-  default:               { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown"            },
+  "Assistance Started":  { color: "#4c1d95", fill: "#7c3aed", weight: 2,   opacity: 0.90, label: "Mutual Aid — Active"   },
+  "Active":              { color: "#92400e", fill: "#d97706", weight: 2,   opacity: 0.90, label: "Municipal Fire — Active" },
+  default:               { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown"              },
 };
 
 // BC uses full English status strings; Fire of Note gets a distinct purple marker.
@@ -1528,17 +1551,19 @@ async function fetchAlbertaFires() {
   state.albertaFireLoading = true;
   state.albertaFireError = null;
   try {
-    // Fetch provincial fires and mutual aid fires in parallel
-    const [provResp, maResp] = await Promise.all([
+    // Fetch provincial, mutual aid, and municipal fires in parallel
+    const [provResp, maResp, munResp] = await Promise.all([
       fetch(ALBERTA_FIRES_URL,       { mode: "cors" }),
       fetch(ALBERTA_MUTUAL_AID_URL,  { mode: "cors" }),
+      fetch(ALBERTA_MUNICIPAL_URL,   { mode: "cors" }),
     ]);
     if (!provResp.ok) throw new Error(`HTTP ${provResp.status} (provincial)`);
     if (!maResp.ok)   throw new Error(`HTTP ${maResp.status} (mutual aid)`);
-
+    // Municipal endpoint failure is non-fatal — log and continue
     const [provRaw, maRaw] = await Promise.all([provResp.json(), maResp.json()]);
+    const munRaw = munResp.ok ? await munResp.json() : { features: [] };
 
-    // Normalize: use explicit LATITUDE/LONGITUDE props over geometry
+    // Normalize provincial + mutual aid: use LATITUDE/LONGITUDE props over geometry
     // (geometry may be in a projected CRS on some ArcGIS exports).
     const normalize = f => {
       const p = f.properties || {};
@@ -1548,9 +1573,36 @@ async function fetchAlbertaFires() {
       return { ...f, geometry: { type: "Point", coordinates: [lon, lat] } };
     };
 
+    // Normalize municipal fires: different schema + DDM coordinates → common format
+    const normalizeMunicipal = f => {
+      const p = f.properties || {};
+      const lat = parseDDM(p.LatitudeDDM);
+      const lon = parseDDM(p.LongitudeDDM);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      const startMs = Number(p.EstimatedStartDate);
+      return {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [lon, lat] },
+        properties: {
+          LABEL:                      p.MRFireNumber || "Municipal Fire",
+          FIRE_TYPE:                  "Municipal",
+          FIRE_STATUS:                p.FireIncidentStatus || "Active",
+          AREA_ESTIMATE:              Number(p.Hectares) || 0,
+          SIZE_CLASS:                 null,
+          RESP_AREA:                  p.LocalGovernment || null,
+          GENERAL_CAUSE:              null,
+          RESPONSE_TYPE:              p.MutualAidContactZone || null,
+          ASSESSMENT_ASSISTANCE_DATE: Number.isFinite(startMs) ? startMs : null,
+          FIRE_YEAR:                  startMs > 0 ? new Date(startMs).getFullYear() : new Date().getFullYear(),
+          CO_FLAG:                    "N",
+        },
+      };
+    };
+
     const features = [
       ...(provRaw.features || []).map(normalize),
       ...(maRaw.features   || []).map(normalize),
+      ...(munRaw.features  || []).map(normalizeMunicipal),
     ].filter(Boolean);
 
     state.albertaFires = { type: "FeatureCollection", features };
@@ -1614,14 +1666,17 @@ function renderAlbertaFireLayer() {
       const carryoverNote = isCarryover
         ? `<span style="color:#b45309">⚠️ Carryover — fire from ${fireYear}</span><br>`
         : `<span style="color:#166534">🔥 New fire (${fireYear})</span><br>`;
-      const isMutualAid = p.FIRE_TYPE === "Mutual Aid";
-      const maBadge   = isMutualAid ? `<span style="color:#7c3aed;font-weight:700">🤝 Mutual Aid Fire</span><br>` : "";
+      const isMutualAid  = p.FIRE_TYPE === "Mutual Aid";
+      const isMunicipal  = p.FIRE_TYPE === "Municipal";
+      const maBadge  = isMutualAid ? `<span style="color:#7c3aed;font-weight:700">🤝 Mutual Aid Fire</span><br>`   : "";
+      const munBadge = isMunicipal  ? `<span style="color:#d97706;font-weight:700">🏘️ Municipal Fire</span><br>`    : "";
       const respArea  = p.RESP_AREA      ? `📍 ${escapeHtml(p.RESP_AREA)}<br>`            : "";
       const cause     = p.GENERAL_CAUSE  ? `Cause: ${escapeHtml(p.GENERAL_CAUSE)}<br>`    : "";
       const respType  = p.RESPONSE_TYPE  ? `Response: ${escapeHtml(p.RESPONSE_TYPE)}<br>` : "";
       layer.bindTooltip(
         `<strong>${escapeHtml(label)}</strong><br>` +
         maBadge +
+        munBadge +
         carryoverNote +
         respArea +
         `Status: ${escapeHtml(stageStyle.label)}<br>` +
@@ -1765,19 +1820,21 @@ function buildFireStatusMsg() {
 
   // Alberta official fires (provincial + mutual aid combined)
   const abFeatures   = state.albertaFires?.features ?? [];
-  const abCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE !== "Mutual Aid").length;
+  const abCount      = abFeatures.filter(f => !["Mutual Aid","Municipal"].includes(f.properties?.FIRE_TYPE)).length;
   const maCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Mutual Aid").length;
+  const munCount     = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Municipal").length;
   if (state.albertaFireError && !abFeatures.length) {
     parts.push(`AB: ${state.albertaFireError}`);
   } else if (abFeatures.length > 0) {
     const ooc = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Out of Control").length;
     const bh  = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Being Held").length;
     const stageSummary = [
-      ooc  > 0 ? `${ooc} OC`    : "",
-      bh   > 0 ? `${bh} BH`     : "",
-      maCount > 0 ? `${maCount} MA` : "",
+      ooc    > 0 ? `${ooc} OC`     : "",
+      bh     > 0 ? `${bh} BH`      : "",
+      maCount  > 0 ? `${maCount} MA`  : "",
+      munCount > 0 ? `${munCount} MUN` : "",
     ].filter(Boolean).join(", ");
-    const total = abCount + maCount;
+    const total = abCount + maCount + munCount;
     parts.push(`${total} AB fire${total !== 1 ? "s" : ""}${stageSummary ? ` (${stageSummary})` : ""}`);
   }
 

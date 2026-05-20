@@ -804,6 +804,7 @@ select {
 .dot.ab-fire-uc        { background: #fbbf24; border: 2px solid #78350f; }
 .dot.ab-fire-carryover { background: #fbbf24; border: 2px dashed #78350f; opacity: 0.75; }
 .dot.ab-fire-ma        { background: #7c3aed; border: 2px solid #4c1d95; }
+.dot.ab-fire-mun       { background: #d97706; border: 2px solid #92400e; }
 .dot.bc-fire-oc        { background: #dc2626; border: 2px solid #7f1d1d; }
 .dot.bc-fire-bh        { background: #ea580c; border: 2px solid #9a3412; }
 .dot.bc-fire-uc        { background: #84cc16; border: 2px solid #3f6212; }
