@@ -42,6 +42,7 @@
               <span id="dateScenario">--</span>
             </div>
             <input id="dateSlider" class="range" type="range" min="0" max="0" value="0" />
+            <div id="coverageNotice" class="coverage-notice" hidden></div>
           </section>
           <section class="filter-section">
             <h2>Sources</h2>
@@ -121,7 +122,7 @@
             <h2>Local refresh command</h2>
             <p>Run this from the project folder after updating the workbook or refreshing raw sources.</p>
             <code id="etlCommand"></code>
-            <p style="margin-top:12px;font-size:12px;">Add --download to also re-fetch AER, CER and StatCan raw files.</p>
+            <p style="margin-top:12px;font-size:12px;">Add --download to also re-fetch cached public source files where public endpoints are configured.</p>
           </div>
         </section>
         <aside class="detail-panel" aria-label="Selected production detail">
@@ -229,7 +230,7 @@
             <h2>Volume Terminology &amp; NGL Streams</h2>
 
             <h3>Units</h3>
-            <p>All volumes are shown in <strong>bbl/d</strong> — barrels per day (one barrel = 158.99 litres). Monthly raw data from Petrinex and AER is reported in cubic metres (m³); the ETL converts to bbl/d using 6.2898 bbl per m³ and divides by days in the production month.</p>
+            <p>All dashboard volumes are shown in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB and BCER monthly liquids are reported in cubic metres and converted with 6.2898 bbl per cubic metre divided by calendar days in the production month. The historical AER ST39/ST53 oil-sands rows are currently workbook-normalized bbl/d series, with current-month ST39 synthetic crude reconciled against the cached official AER ST39 XLS when the local R/readxl extractor is available.</p>
 
             <h3>Activity Codes (Petrinex)</h3>
             <p>Petrinex tracks what happens to a product at a facility using activity codes. The two most relevant for NGL volumes are:</p>
@@ -242,7 +243,7 @@
                 <tr><td><strong>DISP</strong></td><td>Disposition</td><td>Sales or transfer volumes. Used for tracking downstream movement, not production.</td></tr>
               </tbody>
             </table>
-            <p class="docs-note">⚠️ This map uses <strong>PROC only</strong> for NGL volumes. This avoids double-counting: propane and butane extracted at a gas plant (PROC) may be shipped to a fractionator and re-reported as FRAC. Counting both would inflate totals.</p>
+            <p class="docs-note">Important: propane and butane use <strong>PROC only</strong> in the current app. That is a plant extraction view, not a full market supply view. Pentanes Plus is intentionally different: it uses C5-SP PROC plus FRAC because that is the total definition requested for this app.</p>
 
             <h3>Mix vs. Spec (MX vs. SP)</h3>
             <table class="docs-table">
@@ -325,7 +326,7 @@
             <p>Approval for an <strong>open-pit surface mining</strong> oil sands scheme. The operator has AER approval to mine bitumen-bearing ore from the surface. Generally applies to deposits less than ~75 metres deep where in-situ methods are uneconomic. Mining produces large volumes of tailings that must be managed on-site.</p>
 
             <h3>ST102 Facilities</h3>
-            <p>AER ST102 is the <em>Oil Sands Facility Data Report</em>, which lists all approved oil sands facilities with their approved capacities. ST102 facility markers show the registered location of active or approved oil sands facilities — useful for cross-referencing production volumes against regulatory approvals.</p>
+            <p>AER ST102 is the Facility List. In this app the ST102 markers are the subset of mapped oil-sands-related facility points from the AER Facility List Shapefile, useful for cross-referencing production volumes against physical facility locations and Petrinex facility IDs where available.</p>
 
             <p class="docs-note">ℹ️ Scheme boundaries are regulatory approval polygons sourced from the AER open data portal. They may not exactly match the current operational footprint or the extent shown on satellite imagery.</p>
           </section>
@@ -333,24 +334,24 @@
           <!-- ── PIPELINES ── -->
           <section class="docs-section" id="tab-pipelines" hidden>
             <h2>Pipeline Layer</h2>
-            <p>The pipeline layer shows federally regulated interprovincial pipelines from the <strong>Canada Energy Regulator (CER)</strong> facility and pipeline registry. These are pipelines that cross provincial or international borders and are therefore under federal jurisdiction (NEB/CER Act).</p>
+            <p>The pipeline layer currently shows <strong>AER Alberta feeder pipelines and pipeline installations</strong> from the local GeoJSON exports. It is provincial Alberta infrastructure context, not a complete CER-regulated export pipeline map.</p>
 
             <h3>What is shown</h3>
-            <p>Line segments represent approved pipeline routes. Each segment is attributed with the operator, commodity type, and (where available) nominal capacity. Not all provincial or gathering pipelines are included — this data covers CER-regulated facilities only.</p>
+            <p>Line segments represent AER feeder pipeline records where geometry is available. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
 
             <h3>Commodity types</h3>
             <table class="docs-table">
               <thead><tr><th>Type</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td>Crude Oil</td><td>Conventional crude, bitumen blend (dilbit/synbit), and synthetic crude pipelines. Includes the Enbridge Mainline, Trans Mountain, Keystone, and Express systems.</td></tr>
-                <tr><td>Natural Gas</td><td>Transmission pipelines carrying natural gas for domestic consumption or export. Includes NGTL (TC Energy), Alliance, and Westcoast systems.</td></tr>
-                <tr><td>NGL / Products</td><td>Pipelines carrying natural gas liquids (ethane, propane, butane, condensate) or refined petroleum products.</td></tr>
-                <tr><td>Multi-product</td><td>Pipelines approved to carry more than one commodity class.</td></tr>
+                <tr><td>Oil-Well Effluent</td><td>Field gathering or feeder infrastructure carrying produced fluids.</td></tr>
+                <tr><td>Crude Oil</td><td>AER crude oil pipeline segments inside Alberta.</td></tr>
+                <tr><td>HVP / LVP Products</td><td>High vapour pressure and low vapour pressure product pipeline segments.</td></tr>
+                <tr><td>Condensate / Diluents</td><td>Condensate and hydrocarbon diluent pipeline segments where tagged in the AER data.</td></tr>
               </tbody>
             </table>
 
             <h3>What is not shown</h3>
-            <p>Provincially regulated pipelines, gathering lines, and field infrastructure are <em>not</em> included. For Alberta intra-provincial pipeline data, refer to the AER pipeline database (Line Pipe Safety program). The pipeline layer is best used as reference context for understanding transport connectivity, not for detailed infrastructure analysis.</p>
+            <p>What is not shown yet: a complete CER long-haul export route layer with capacity, flow, apportionment, and terminal connectivity. For trading use, that should be a separate egress/infrastructure layer rather than mixed into the AER feeder layer.</p>
           </section>
 
           <!-- ── DATA SOURCES ── -->
@@ -363,15 +364,15 @@
               <tbody>
                 <tr>
                   <td><strong>AER ST53</strong></td>
-                  <td>Alberta Energy Regulator Statistical Table 53 — Oil Sands Production</td>
+                  <td>Alberta Energy Regulator ST53, normalized from the analyst workbook in this build</td>
                   <td>Monthly, Alberta oil sands projects</td>
-                  <td>In-situ bitumen, Mined bitumen, Synthetic crude oil</td>
+                  <td>In-situ bitumen</td>
                 </tr>
                 <tr>
                   <td><strong>AER ST39</strong></td>
-                  <td>AER Statistical Table 39 — Crude Oil and Equivalent</td>
-                  <td>Monthly, Alberta conventional facilities</td>
-                  <td>Conventional crude, Heavy crude, Condensate, Pentanes plus (AER facilities)</td>
+                  <td>Alberta Energy Regulator ST39, workbook-normalized with current-month official synthetic overlay</td>
+                  <td>Monthly, Alberta mined oil sands and upgraders</td>
+                  <td>Mined bitumen gross, Synthetic crude oil</td>
                 </tr>
                 <tr>
                   <td><strong>Petrinex AB</strong></td>
@@ -382,14 +383,14 @@
                 <tr>
                   <td><strong>Petrinex BC</strong></td>
                   <td>Petrinex BC facility reference data (formation codes, activity codes)</td>
-                  <td>Reference tables, BC facilities</td>
-                  <td>Used for facility lookup and stream classification only</td>
+                  <td>Reference tables only in this build</td>
+                  <td>Facility, formation, and activity code reference. BC production comes from BCER well production data.</td>
                 </tr>
                 <tr>
                   <td><strong>Statistics Canada</strong></td>
                   <td>Table 25-10-0063-01 — Crude oil and equivalent production, by type</td>
                   <td>Monthly, national and provincial totals</td>
-                  <td>National context: Total WC crude, Oil sands totals, dilbit, SCO</td>
+                  <td>Not currently plotted as provincial production points; cached for context and reconciliation.</td>
                 </tr>
                 <tr>
                   <td><strong>CWFIS (NRCan)</strong></td>
@@ -410,10 +411,10 @@
                   <td>Fire polygons with status + Fires of Note designation</td>
                 </tr>
                 <tr>
-                  <td><strong>CER</strong></td>
-                  <td>Canada Energy Regulator — pipeline and facility registry</td>
-                  <td>Federally regulated pipelines, Canada-wide</td>
-                  <td>Pipeline routes by commodity type</td>
+                  <td><strong>AER Pipelines</strong></td>
+                  <td>AER feeder pipeline and pipeline installation GeoJSON exports</td>
+                  <td>Alberta pipeline context</td>
+                  <td>Oil-well effluent, crude, HVP/LVP products, condensate, diluents, installations</td>
                 </tr>
                 <tr>
                   <td><strong>AER Scheme Approvals</strong></td>
@@ -422,24 +423,4 @@
                   <td>Approval polygons: in-situ (teal), mineable (amber)</td>
                 </tr>
                 <tr>
-                  <td><strong>AER ST102</strong></td>
-                  <td>Oil Sands Facility Data Report — approved facility locations and capacities</td>
-                  <td>All approved oil sands facilities, Alberta</td>
-                  <td>Facility points for cross-reference</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <h3>ETL Refresh</h3>
-            <p>Click <strong>Run ETL</strong> in the top bar to see the refresh command. Run <code>python scripts/run_etl.py</code> from the project root to rebuild the database from any locally cached raw files. Add <code>--download</code> to also re-fetch the latest AER, Petrinex, and StatCan source files from their public endpoints before processing.</p>
-            <p class="docs-note">ℹ️ Wildfire data (CWFIS, ABFP, BCWS) is fetched live in the browser when you click the Fire Layer button — it does not go through the ETL.</p>
-          </section>
-
-        </div><!-- .docs-body -->
-      </div><!-- .docs-inner -->
-    </div><!-- #docsPanel -->
-    <!-- ============================================================ -->
-
-    <script type="module" src="src/main.js?v=20260514-perf"></script>
-  </body>
-</html>
+                  <t

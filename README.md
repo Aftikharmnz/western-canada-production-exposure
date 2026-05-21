@@ -35,15 +35,13 @@ Then open `http://localhost:5173`.
 
 ## Notes
 
-- ST53/ST39 are the oil-sands source layers: ST53 in-situ schemes, ST39 mined bitumen, and ST39 Section 5 synthetic crude by upgrader.
+- ST53/ST39 are the oil-sands source layers: ST53 in-situ schemes, ST39 mined bitumen, and ST39 Section 5 synthetic crude by upgrader. Historical ST53/ST39 rows are still normalized from the analyst workbook; current-month ST39 synthetic crude is reconciled from the cached official AER ST39 XLS when local R/readxl is available.
 - ST53/ST39 oil-sands assets are located from AER data first: Scheme Approval Spatial Data centroids for in-situ and mined project footprints, ST44 active schemes as the approval/name bridge, and ST102 facility points for upgrader/facility locations. Non-specific workbook buckets such as `Other`/`Assets` are kept in the database but excluded from map markers.
 - Petrinex AB OIL/PROD rows are converted from m3/month to bbl/d and mapped by operator plus DLS site using the current public well-to-facility link where available. Zero or negative site-months are not exported to the monthly conventional map layer.
 - Petrinex AB history is exported as date-specific JSON under `public/data/monthly/`, so the browser loads the conventional layer only for the selected month instead of loading all 1.49 million conventional records up front.
-- BC Petrinex reference files are cached, but the public BC page does not expose a tested monthly volumetric endpoint equivalent to Alberta's `/AB/Vol/YYYY-MM/CSV` API.
+- BC Petrinex reference files are cached, but the public BC page does not expose a tested monthly volumetric endpoint equivalent to Alberta's `/AB/Vol/YYYY-MM/CSV` API. BC production volumes come from BCER well production data; the app now exports both `Oil_prod_vol (m3)` as conventional crude and `Cond_prod_vol (m3)` as condensate production.
 - `data/sources.json` records the official AER and Petrinex URLs used by the raw-cache refresh.
 - `data/asset_registry.csv` remains as a fallback for assets not resolved from AER spatial sources.
 - `public/data/aer_scheme_approvals.geojson` is generated from the cached AER Scheme Approval shapefile and is used by the map's AER Sites overlay. It replaces the earlier rough hand-drawn Athabasca/Cold Lake/Peace River basin polygons.
 - `public/data/aer_st102_oil_sands_facilities.geojson` is generated from the cached AER ST102 Facility List Shapefile and adds active oil-sands facility dots to the AER Sites overlay.
-- `data/processed/dls_centroids.csv` caches DLS-to-lat/lon conversions. The ETL uses the AGS ATS v4.1 web converter for the highest-volume Alberta DLS sites it has not seen before, then uses a clearly labelled approximate DLS centroid fallback for the rest.
-- Values are stored in `bbl/d` and also exported as `kbbl/d` for dashboard display.
-- If a public endpoint is unavailable during `--download`, the ETL logs the failure in `public/data/manifest.json` and still rebuilds the local store from the workbook seed.
+- `data/processed/dls_centroids.csv` caches DLS-to-lat/lon conversions. The ETL uses the AGS ATS v4.1 web converter for the highest-volume Alber

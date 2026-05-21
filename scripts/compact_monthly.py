@@ -86,8 +86,10 @@ def compact_file(path: Path) -> tuple[int, int]:
         ]
 
     out = json.dumps(compact, separators=(",", ":"), ensure_ascii=False)
-    path.write_text(out, encoding="utf-8")
-    return original_size, len(out.encode())
+    tmp_path = path.with_name(f"{path.name}.tmp")
+    tmp_path.write_text(out, encoding="utf-8")
+    tmp_path.replace(path)
+    return original_size, len(out.encode("utf-8"))
 
 
 def main():
@@ -110,12 +112,8 @@ def main():
         total_before += before
         total_after += after
         saved_pct = (1 - after / before) * 100 if before > 0 else 0
-        print(f"  {f.name}  {before/1024/1024:.1f} MB → {after/1024/1024:.1f} MB  ({saved_pct:.0f}% smaller)")
+        print(f"  {f.name}  {before/1024/1024:.1f} MB -> {after/1024/1024:.1f} MB  ({saved_pct:.0f}% smaller)")
 
-    print(f"\nTotal: {total_before/1024/1024:.1f} MB → {total_after/1024/1024:.1f} MB  "
+    print(f"\nTotal: {total_before/1024/1024:.1f} MB -> {total_after/1024/1024:.1f} MB  "
           f"({(1 - total_after/total_before)*100:.0f}% reduction)")
-    print("\nDone. Run 'git add -f public/data/monthly/' and commit to push the compacted files.")
-
-
-if __name__ == "__main__":
-    main()
+    print("\nDone. Run 'git
