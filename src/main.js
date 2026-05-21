@@ -360,9 +360,10 @@ async function loadData() {
       })
     )
   );
+  const assetRows = expandAssetRecords(assets);
   state.manifest = manifest;
-  state.assets = assets;
-  state.assetById = new Map(assets.map((a) => [a.asset_id, a]));
+  state.assets = assetRows;
+  state.assetById = new Map(assetRows.map((a) => [a.asset_id, a]));
   state.baseRecords = records;
   state.records = records;
   // Build O(1) date index so recordsForDate never scans the full array
@@ -402,6 +403,18 @@ async function loadData() {
   if (!state.selectedStreams.size) {
     [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
   }
+}
+
+function expandAssetRecords(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (!raw || !Array.isArray(raw.fields) || !Array.isArray(raw.rows)) return [];
+  return raw.rows.map((row) => {
+    const asset = {};
+    raw.fields.forEach((field, idx) => {
+      asset[field] = row[idx];
+    });
+    return asset;
+  });
 }
 
 function recordsForDate(date = state.selectedDate) {
@@ -2573,5 +2586,502 @@ function pipelineLegendCounts() {
   }
   return counts;
 }
+function getPipelineLegendPanel() {
+  let panel = document.getElementById('pipelineLegend');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'pipelineLegend';
+    const mapStage = document.querySelector('.map-stage');
+    if (mapStage) mapStage.appendChild(panel);
+    else document.body.appendChild(panel);
+  }
+  // Always (re)apply inline styles — the CSS class has no rules.
+  // Preserve the current show/hide state while reapplying everything else.
+  const currentDisplay = panel.style.display;
+  panel.removeAttribute('hidden');
+  panel.style.cssText = [
+    'position:absolute',
+    'bottom:32px',
+    'right:10px',
+    'width:220px',
+    'max-height:480px',
+    'overflow-y:auto',
+    'background:#fff',
+    'border:1px solid #d1d5db',
+    'border-radius:8px',
+    'box-shadow:0 4px 16px rgba(0,0,0,0.18)',
+    'z-index:1100',
+    'font-size:12px',
+    'font-family:Inter,sans-serif',
+    'display:' + (currentDisplay || 'none'),
+  ].join(';');
+  return panel;
+}
 
-// Returns (or creates) 
+function buildPipelineLegendPanel() {
+  const panel = getPipelineLegendPanel();
+  const counts = pipelineLegendCounts();
+
+  let html = '<div style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:12px;color:#374151;">&#x2B21; Pipeline Layer</div>';
+
+  for (const item of PIPELINE_LEGEND_ITEMS) {
+    if (item.section) {
+      html += `<div style="padding:6px 10px 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;">${escapeHtml(item.section)}</div>`;
+      continue;
+    }
+    const count = counts[item.key] ?? 0;
+    const countStr = count > 0 ? count.toLocaleString('en-CA') : '';
+    const swatch = item.type === 'line'
+      ? `<span style="display:inline-block;width:20px;height:3px;border-radius:2px;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`
+      : `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`;
+    const isHidden = state.hiddenLegendKeys.has(item.key);
+    html += `<button data-pl-key="${item.key}" type="button" style="display:flex;align-items:center;gap:7px;width:100%;padding:4px 10px;border:none;background:transparent;cursor:pointer;text-align:left;opacity:${isHidden ? '0.35' : '1'};">${swatch}<span style="flex:1;color:#374151;">${escapeHtml(item.label)}</span>${countStr ? `<span style="color:#9ca3af;font-size:10px;">${countStr}</span>` : ''}</button>`;
+  }
+
+  panel.innerHTML = html;
+
+  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.plKey;
+      if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
+      else state.hiddenLegendKeys.add(key);
+      syncPipelineLegendPanel();
+      refreshPipelineLayers();
+    });
+  });
+}
+
+function syncPipelineLegendPanel() {
+  const panel = document.getElementById('pipelineLegend');
+  if (!panel) return;
+  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
+    btn.style.opacity = state.hiddenLegendKeys.has(btn.dataset.plKey) ? '0.35' : '1';
+  });
+}
+
+function showPipelineLegendPanel(visible) {
+  const panel = getPipelineLegendPanel();
+  panel.style.display = visible ? 'block' : 'none';
+}
+
+function refreshPipelineLayers() {
+  if (!state.pipelineEnabled) return;
+  renderPipelineSegmentLayer();
+  renderPipelineInstallLayer();
+  syncPipelineLegendPanel();
+}
+
+async function boot() {
+  try {
+    await loadData();
+    initControls();
+    initMap();
+    // Auto-enable fire layers on every open — fetches run in parallel,
+    // map updates as each source resolves.
+    state.wildfireEnabled = true;
+    updateFireToggleUI();
+    updateFormationToggleUI();
+    updatePipelineToggleUI();
+    showPipelineLegendPanel(false);
+    updateWildfireStatus("Fetching live wildfire data…");
+    render();
+    // Kick off both fire sources in parallel (non-blocking)
+    fetchWildfires();
+    fetchAlbertaFires();
+    fetchBCFires();
+  } catch (error) {
+    console.error(error);
+    if (els.freshness) {
+      els.freshness.textContent = "Data export failed to load. Run: python scripts/run_etl.py";
+    }
+    if (els.map) {
+      els.map.innerHTML = `
+        <div class="load-error">
+          <h2>Production data did not load</h2>
+          <p>${escapeHtml(error.message || error)}</p>
+          <code>python scripts/run_etl.py</code>
+        </div>`;
+    }
+  }
+}
+
+boot();
+
+// ============================================================
+// RUBBER-BAND MULTI-ASSET SELECTION
+// Right-click + drag to draw a selection rectangle.
+// All visible production markers inside are selected.
+// ============================================================
+
+function initRubberBand() {
+  const mapEl = document.getElementById("map");
+  const btn   = document.getElementById("selectModeBtn");
+  if (!mapEl) return;
+
+  let selectMode = false;
+  let startX, startY, box, active = false;
+
+  function setSelectMode(on) {
+    selectMode = on;
+    if (btn) {
+      btn.classList.toggle("active", on);
+      btn.title = on ? "Click to exit select mode (or press Esc)" : "Click to select multiple assets";
+    }
+    mapEl.style.cursor = on ? "crosshair" : "";
+  }
+
+  // Expose so distance tool can deactivate select mode
+  state.setSelectMode = setSelectMode;
+
+  if (btn) {
+    btn.addEventListener("click", () => setSelectMode(!selectMode));
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && selectMode) setSelectMode(false);
+  });
+
+  function getBox() {
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "rubberBand";
+      box.style.cssText =
+        "position:absolute;border:2px dashed #2980b9;background:rgba(41,128,185,0.10);" +
+        "pointer-events:none;z-index:2000;display:none;";
+      mapEl.appendChild(box);
+    }
+    return box;
+  }
+
+  mapEl.addEventListener("mousedown", (e) => {
+    if (!selectMode || e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = mapEl.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    const b = getBox();
+    b.style.left = startX + "px";
+    b.style.top  = startY + "px";
+    b.style.width  = "0";
+    b.style.height = "0";
+    b.style.display = "block";
+    active = true;
+    state.rubberBandActive = true;
+    state.map.dragging.disable();
+  }, true);
+
+  document.addEventListener("mousemove", (e) => {
+    if (!active || !box) return;
+    const rect = mapEl.getBoundingClientRect();
+    const curX = e.clientX - rect.left;
+    const curY = e.clientY - rect.top;
+    box.style.left   = Math.min(startX, curX) + "px";
+    box.style.top    = Math.min(startY, curY) + "px";
+    box.style.width  = Math.abs(curX - startX) + "px";
+    box.style.height = Math.abs(curY - startY) + "px";
+  });
+
+  document.addEventListener("mouseup", (e) => {
+    if (!active) return;
+    active = false;
+    state.rubberBandActive = false;
+    state.map.dragging.enable();
+    if (!box) return;
+
+    const bLeft   = parseFloat(box.style.left)   || 0;
+    const bTop    = parseFloat(box.style.top)    || 0;
+    const bRight  = bLeft + (parseFloat(box.style.width)  || 0);
+    const bBottom = bTop  + (parseFloat(box.style.height) || 0);
+    box.style.display = "none";
+
+    // Ignore tiny drags (accidental clicks)
+    if (bRight - bLeft < 6 || bBottom - bTop < 6) return;
+
+    const { byAsset } = aggregateForDate();
+    const hits = [];
+    for (const point of byAsset.values()) {
+      const { asset } = point;
+      if (asset.latitude == null) continue;
+      if (!legendVisible(pointLegendKey(point))) continue;
+      const pt = state.map.latLngToContainerPoint([asset.latitude, asset.longitude]);
+      if (pt.x >= bLeft && pt.x <= bRight && pt.y >= bTop && pt.y <= bBottom) {
+        hits.push(asset.asset_id);
+      }
+    }
+
+    if (hits.length > 0) {
+      state.selectedAssets = hits;
+      showSeasonalityPanel(hits);
+    }
+
+    // Exit select mode after each selection
+    setSelectMode(false);
+  });
+}
+
+// ============================================================
+// SEASONALITY CHART PANEL
+// ============================================================
+
+const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const SEA_COLORS   = { band: "#d1d5db", y0: "#2563eb", y1: "#16a34a", yCur: "#dc2626" };
+
+function computeSeasonality(assetIds) {
+  const ym = {};
+  const assetSet = new Set(assetIds); // O(1) lookup instead of O(n) includes()
+
+  // Base records (oil sands, petrinex NGL — always loaded at startup)
+  for (const r of state.baseRecords) {
+    if (!assetSet.has(r.asset_id)) continue;
+    const year  = Number(r.date.slice(0, 4));
+    const month = Number(r.date.slice(5, 7));
+    if (!ym[year]) ym[year] = {};
+    ym[year][month] = (ym[year][month] || 0) + r.volume_kbbl_d;
+  }
+
+  // Petrinex / BCER historical index (pre-aggregated; covers AB conventional + BC)
+  if (state.seasonalityIndex) {
+    for (const aid of assetIds) {
+      const entry = state.seasonalityIndex[aid];
+      if (!entry) continue;
+      for (const [ym_str, vol] of Object.entries(entry)) {
+        const year  = Number(ym_str.slice(0, 4));
+        const month = Number(ym_str.slice(5, 7));
+        if (!ym[year]) ym[year] = {};
+        ym[year][month] = (ym[year][month] || 0) + vol;
+      }
+    }
+  }
+
+  // On-demand cache (BC + AB conventional for dates the user has already visited).
+  // This fills in BC production history from already-loaded on_demand files.
+  if (state.dateRecordCache) {
+    for (const records of state.dateRecordCache.values()) {
+      for (const r of records) {
+        if (!assetSet.has(r.asset_id)) continue;
+        const year  = Number(r.date.slice(0, 4));
+        const month = Number(r.date.slice(5, 7));
+        if (!ym[year]) ym[year] = {};
+        ym[year][month] = (ym[year][month] || 0) + (r.volume_kbbl_d || 0);
+      }
+    }
+  }
+  const years = Object.keys(ym).map(Number).sort();
+  if (!years.length) return null;
+  const currentYear = years[years.length - 1];
+  let latestFull = null;
+  for (let i = years.length - 1; i >= 0; i--) {
+    if (Object.keys(ym[years[i]]).length === 12) { latestFull = years[i]; break; }
+  }
+  return { ym, years, currentYear, latestFull };
+}
+
+async function showSeasonalityPanel(assetIds) {
+  const existing = document.getElementById("seasonalityPanel");
+  if (existing) existing.remove();
+
+  if (!state.seasonalityIndex && !state.seasonalityIndexLoading) {
+    state.seasonalityIndexLoading = true;
+    const loadingPanel = document.createElement("div");
+    loadingPanel.id = "seasonalityPanel";
+    loadingPanel.innerHTML = `
+      <div class="sea-header">
+        <div><strong class="sea-title">Loading historical data…</strong>
+        <span class="sea-sub">Fetching Petrinex production index (first time only)</span></div>
+      </div>
+      <div style="padding:24px;text-align:center;color:#6b7280;font-size:13px;">
+        <div style="margin-bottom:8px">⏳ Building seasonality from full Petrinex history…</div>
+      </div>`;
+    document.getElementById("map").appendChild(loadingPanel);
+    try {
+      const resp = await fetch("public/data/asset_seasonality.json?v=20260521");
+      state.seasonalityIndex = await resp.json();
+    } catch(e) {
+      console.warn("Could not load asset_seasonality.json:", e);
+      state.seasonalityIndex = {};
+    }
+    state.seasonalityIndexLoading = false;
+    loadingPanel.remove();
+  } else if (state.seasonalityIndexLoading) {
+    setTimeout(() => showSeasonalityPanel(assetIds), 300);
+    return;
+  }
+
+  const data = computeSeasonality(assetIds);
+  const { byAsset } = aggregateForDate();
+
+  const names = assetIds.slice(0, 3).map(id => {
+    const hit = byAsset.get(id);
+    return hit ? hit.asset.display_name : id;
+  });
+  const titleStr = names.join(", ") + (assetIds.length > 3 ? ` +${assetIds.length - 3} more` : "");
+
+  const panel = document.createElement("div");
+  panel.id = "seasonalityPanel";
+  panel.innerHTML = `
+    <div class="sea-header">
+      <div>
+        <strong class="sea-title">${escapeHtml(titleStr)}</strong>
+        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · 12-month seasonality</span>
+      </div>
+      <button id="closeSeasonality" class="sea-close" title="Close">&#x2715;</button>
+    </div>
+    <canvas id="seasonalityCanvas" width="580" height="240"></canvas>
+    <div class="sea-legend" id="seaLegend"></div>
+  `;
+  document.getElementById("map").appendChild(panel);
+
+  document.getElementById("closeSeasonality").addEventListener("click", () => {
+    panel.remove();
+    state.selectedAssets = [];
+  });
+
+  if (!data) {
+    panel.querySelector("canvas").insertAdjacentHTML("afterend",
+      '<p style="padding:12px;color:#6b7280">No production data for selected assets.</p>');
+    return;
+  }
+
+  drawSeasonalityChart(data, assetIds.length);
+}
+
+function drawSeasonalityChart(data, assetCount) {
+  const canvas = document.getElementById("seasonalityCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const pad = { top: 16, right: 20, bottom: 36, left: 58 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  const { ym, years, currentYear, latestFull } = data;
+
+  const fullYears = years.filter(y => y !== currentYear && Object.keys(ym[y] || {}).length === 12);
+  const envYears  = fullYears.slice(-5);
+  const lineYears = fullYears.slice(-2);
+
+  const envMin = new Array(12).fill(Infinity);
+  const envMax = new Array(12).fill(-Infinity);
+  for (const y of envYears) {
+    for (let m = 1; m <= 12; m++) {
+      const v = ym[y]?.[m] ?? 0;
+      if (v < envMin[m-1]) envMin[m-1] = v;
+      if (v > envMax[m-1]) envMax[m-1] = v;
+    }
+  }
+  for (let i = 0; i < 12; i++) {
+    if (envMin[i] === Infinity)  envMin[i] = 0;
+    if (envMax[i] === -Infinity) envMax[i] = 0;
+  }
+
+  let globalMax = 0;
+  for (const y of [...envYears, ...lineYears, currentYear]) {
+    for (let m = 1; m <= 12; m++) {
+      const v = ym[y]?.[m] ?? 0;
+      if (v > globalMax) globalMax = v;
+    }
+  }
+  if (globalMax === 0) globalMax = 1;
+
+  const xPos = (m) => pad.left + ((m - 0.5) / 12) * cW;
+  const yPos = (v) => pad.top + cH - (v / globalMax) * cH;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#f9fafb";
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 1;
+  const ticks = 4;
+  for (let t = 0; t <= ticks; t++) {
+    const v = (globalMax / ticks) * t;
+    const y = yPos(v);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "10px Inter, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(Math.round(v).toLocaleString(), pad.left - 5, y + 3);
+  }
+
+  ctx.save();
+  ctx.translate(12, pad.top + cH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "#6b7280";
+  ctx.font = "10px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("kbbl/d", 0, 0);
+  ctx.restore();
+
+  ctx.fillStyle = "#6b7280";
+  ctx.font = "10px Inter, sans-serif";
+  ctx.textAlign = "center";
+  for (let m = 1; m <= 12; m++) {
+    ctx.fillText(MONTH_LABELS[m-1], xPos(m), H - pad.bottom + 14);
+  }
+
+  if (envYears.length > 0) {
+    ctx.beginPath();
+    for (let m = 1; m <= 12; m++) ctx.lineTo(xPos(m), yPos(envMax[m-1]));
+    for (let m = 12; m >= 1; m--) ctx.lineTo(xPos(m), yPos(envMin[m-1]));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(156,163,175,0.28)";
+    ctx.fill();
+    ctx.beginPath();
+    for (let m = 1; m <= 12; m++) {
+      m === 1 ? ctx.moveTo(xPos(m), yPos(envMax[m-1])) : ctx.lineTo(xPos(m), yPos(envMax[m-1]));
+    }
+    ctx.strokeStyle = "rgba(156,163,175,0.5)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.beginPath();
+    for (let m = 1; m <= 12; m++) {
+      m === 1 ? ctx.moveTo(xPos(m), yPos(envMin[m-1])) : ctx.lineTo(xPos(m), yPos(envMin[m-1]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  const lineColors = [SEA_COLORS.y0, SEA_COLORS.y1];
+  lineYears.forEach((yr, i) => {
+    ctx.beginPath();
+    for (let m = 1; m <= 12; m++) {
+      const v = ym[yr]?.[m] ?? 0;
+      m === 1 ? ctx.moveTo(xPos(m), yPos(v)) : ctx.lineTo(xPos(m), yPos(v));
+    }
+    ctx.strokeStyle = lineColors[i % 2];
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+  });
+
+  const curMonths = Object.keys(ym[currentYear] || {}).map(Number);
+  if (curMonths.length) {
+    ctx.strokeStyle = SEA_COLORS.yCur;
+    ctx.fillStyle = SEA_COLORS.yCur;
+    ctx.lineWidth = 2;
+    const sorted = curMonths.sort((a,b) => a-b);
+    ctx.beginPath();
+    sorted.forEach((m, i) => {
+      const v = ym[currentYear][m] ?? 0;
+      i === 0 ? ctx.moveTo(xPos(m), yPos(v)) : ctx.lineTo(xPos(m), yPos(v));
+    });
+    ctx.stroke();
+    sorted.forEach(m => {
+      const v = ym[currentYear][m] ?? 0;
+      ctx.beginPath();
+      ctx.arc(xPos(m), yPos(v), 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  const legEl = document.getElementById("seaLegend");
+  if (legEl) {
+    const enStr = envYears.length ? `${envYears[0]}–${envYears[envYears.length-1]} range` : "";
+    legEl.innerHTML = [
+      envYears.length ? `<span><i style="background:rgba(156,163,175,0.45)"></i>${enStr}</span>` : "",
+      ...lineYears.map((y, i) => `<span><i style="background:${lineColors[i]}"></i>${y}</span>`),
+      curMonths.length ? `<span><i style="background:${SEA_COLORS.yCur};border-radius:50%"></i>${currentYear} (known months)</span>` : "",
+    ].filter(Boolean).join("");
+  }
+}

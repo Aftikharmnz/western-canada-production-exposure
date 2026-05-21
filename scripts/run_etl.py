@@ -2769,4 +2769,965 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                 break
             for col_idx, asset_id in mined_cols.items():
                 add_record(
-                    date_valu
+                    date_value,
+                    asset_id,
+                    "Mined bitumen gross",
+                    as_float(row[col_idx - 1] if col_idx - 1 < len(row) else None),
+                    "Mined Bitumen",
+                    clean_text(headers[col_idx - 1]),
+                    "aer_st39",
+                )
+
+    # AER ST39 Section 5: synthetic crude oil production by upgrader.
+    if "Mined Bitumen" in wb.sheetnames:
+        ws = wb["Mined Bitumen"]
+        sco_header_row = None
+        for row_idx in range(1, ws.max_row + 1):
+            value = clean_text(ws.cell(row_idx, 1).value)
+            if value.upper().startswith("SECTION 5") and "SYNTHETIC CRUDE OIL" in value.upper():
+                sco_header_row = row_idx + 1
+                break
+        if sco_header_row:
+            headers = [cell.value for cell in next(ws.iter_rows(min_row=sco_header_row, max_row=sco_header_row))]
+            synthetic_registry = {
+                "CNRL Horizon": ("CNRL", "Horizon Upgrader", 57.300, -111.670, "Alberta"),
+                "CNRL Scotford Upgrader": ("CNRL", "Scotford Upgrader", 53.825, -113.115, "Alberta"),
+                "Suncor OSG": ("Suncor", "Suncor Base Plant Upgrader", 56.990, -111.450, "Alberta"),
+                "Syncrude Mildred Lake": ("Syncrude JV", "Syncrude Mildred Lake Upgrader", 57.040, -111.560, "Alberta"),
+                "Nexen Long Lake": ("CNOOC/Nexen", "Long Lake Upgrader", 56.380, -111.460, "Alberta"),
+                "Saskatchewan": ("Cenovus", "Lloydminster Upgrader", 53.291, -110.010, "Saskatchewan"),
+            }
+            sco_cols: dict[int, str] = {}
+            for idx, raw_header in enumerate(headers, start=1):
+                header = normalize_stream(clean_text(raw_header))
+                if idx == 1 or not header or "TOTAL" in header.upper():
+                    continue
+                matched = None
+                for token, item in synthetic_registry.items():
+                    if token.upper() in header.upper():
+                        matched = item
+                        break
+                if not matched:
+                    continue
+                company, display_name, lat, lon, province = matched
+                location = resolve_oil_sands_asset_location("synthetic", company, display_name, oil_sands_locations)
+                if location and as_float(location.get("latitude")) is not None and as_float(location.get("longitude")) is not None:
+                    lat = as_float(location.get("latitude"))
+                    lon = as_float(location.get("longitude"))
+                sco_cols[idx] = add_asset(
+                    display_name=display_name,
+                    source_id="aer_st39",
+                    production_system="synthetic",
+                    company=company,
+                    province=province,
+                    asset_kind="upgrader",
+                    latitude=lat,
+                    longitude=lon,
+                    coordinate_method=clean_text(location.get("method")) if location else None,
+                    geometry_kind=clean_text(location.get("geometry_kind")) if location else "",
+                    geometry_source=clean_text(location.get("geometry_source")) if location else "",
+                    notes=" ".join(
+                        bit
+                        for bit in [
+                            "Imported from ST39 workbook Section 5 synthetic crude oil production.",
+                            clean_text(location.get("notes")) if location else "",
+                        ]
+                        if bit
+                    ),
+                )
+            for row in ws.iter_rows(min_row=sco_header_row + 1, values_only=True):
+                date_value = as_date(row[0] if row else None)
+                if not date_value:
+                    break
+                for col_idx, asset_id in sco_cols.items():
+                    add_record(
+                        date_value,
+                        asset_id,
+                        "Synthetic crude oil",
+                        as_float(row[col_idx - 1] if col_idx - 1 < len(row) else None),
+                        "Mined Bitumen",
+                        clean_text(headers[col_idx - 1]),
+                        "aer_st39",
+                    )
+
+    overlay_official_st39_current_synthetic(records, add_asset, add_record, oil_sands_locations)
+
+    append_petrinex_ab_conventional(assets, records, add_asset, add_record)
+    append_bcer_well_production(add_asset, add_record)
+
+    # AER ST3-style workbook conventional crude series.
+    if False and "Conventional Oil" in wb.sheetnames:
+        ws = wb["Conventional Oil"]
+        headers = [cell.value for cell in next(ws.iter_rows(min_row=3, max_row=3))]
+        for row in ws.iter_rows(min_row=4, values_only=True):
+            date_value = as_date(row[3] if len(row) > 3 else None)
+            if not date_value:
+                continue
+            for col_idx in range(5, min(len(headers), len(row), 16) + 1):
+                header = clean_text(headers[col_idx - 1])
+                if not header:
+                    continue
+                asset_id = add_asset(
+                    "Western Canada",
+                    "aer_st3_current",
+                    "conventional",
+                    company="Regional aggregate",
+                    province="Western Canada",
+                    asset_kind="region",
+                    is_rollup=False,  # region aggregate, not a company rollup — show on map
+                    notes="Workbook conventional crude series from AER ST3-derived model.",
+                )
+                add_record(
+                    date_value,
+                    asset_id,
+                    normalize_stream(header),
+                    as_float(row[col_idx - 1]),
+                    "Conventional Oil",
+                    header,
+                    "aer_st3_current",
+                )
+
+    if False and "Condensate Supply" in wb.sheetnames:
+        ws = wb["Condensate Supply"]
+        headers = [cell.value for cell in next(ws.iter_rows(min_row=2, max_row=2))]
+        asset_id = add_asset(
+            "Western Canada Condensate",
+            "aer_st3_current",
+            "condensate",
+            company="Regional aggregate",
+            province="Western Canada",
+            asset_kind="region",
+            is_rollup=False,  # geographic aggregate — show on map
+            notes="Workbook condensate supply series from AER ST3-derived model.",
+        )
+        for row in ws.iter_rows(min_row=3, values_only=True):
+            date_value = as_date(row[3] if len(row) > 3 else None)
+            if not date_value:
+                continue
+            for col_idx in range(5, min(len(headers), len(row), 7) + 1):
+                header = clean_text(headers[col_idx - 1])
+                add_record(
+                    date_value,
+                    asset_id,
+                    normalize_stream(header),
+                    as_float(row[col_idx - 1]),
+                    "Condensate Supply",
+                    header,
+                    "aer_st3_current",
+                )
+
+    # Provincial light crude production helper sheet.
+    if False and "lights" in wb.sheetnames:
+        ws = wb["lights"]
+        headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+        province_map = {
+            "MB": "Manitoba",
+            "NWT": "Northwest Territories",
+            "SK light": "Saskatchewan",
+            "AB conv light": "Alberta",
+            "BC Light": "British Columbia",
+        }
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            date_value = as_date(row[1] if len(row) > 1 else None) or as_date(row[0] if row else None)
+            if not date_value:
+                continue
+            for idx, header_raw in enumerate(headers, start=1):
+                header = clean_text(header_raw)
+                province = province_map.get(header)
+                if not province:
+                    continue
+                asset_id = add_asset(
+                    province,
+                    "aer_st3_current",
+                    "provincial_light",
+                    company="Provincial aggregate",
+                    province=province,
+                    asset_kind="province",
+                    is_rollup=False,  # province-level light crude — show on map
+                    notes="Workbook provincial light crude helper series.",
+                )
+                add_record(
+                    date_value,
+                    asset_id,
+                    "Light crude production",
+                    as_float(row[idx - 1] if idx - 1 < len(row) else None),
+                    "lights",
+                    header,
+                    "aer_st3_current",
+                )
+
+    # StatCan refinery/provincial input table carried inside the workbook.
+    if False and "provinces_wide_bbl_day" in wb.sheetnames:
+        ws = wb["provinces_wide_bbl_day"]
+        headers = [clean_text(cell.value) for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+        metric_cols = [
+            "domestic_crude_receipts_total",
+            "receipts_western_canada",
+            "refinery_input_bitumen",
+            "refinery_input_condensates_pentanes",
+            "refinery_input_heavy",
+            "refinery_input_light_medium",
+            "refinery_input_synthetic",
+            "refinery_input_total",
+        ]
+        header_index = {header: i for i, header in enumerate(headers)}
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            geography = clean_text(row[header_index["geography"]])
+            date_value = as_date(row[header_index["ref_date"]])
+            if not geography or not date_value:
+                continue
+            asset_id = add_asset(
+                geography,
+                "statcan_25100041",
+                "refinery_input",
+                company="Provincial aggregate",
+                province=geography,
+                asset_kind="province_refinery",
+                is_rollup=True,
+                notes="StatCan provincial refinery input series embedded in workbook.",
+            )
+            for metric in metric_cols:
+                if metric in header_index:
+                    add_record(
+                        date_value,
+                        asset_id,
+                        metric.replace("_", " ").title(),
+                        as_float(row[header_index[metric]]),
+                        "provinces_wide_bbl_day",
+                        metric,
+                        "statcan_25100041",
+                    )
+
+    # StatCan 25100063: province-level crude production by type.
+    # Imports Heavy crude, Light+Medium, Synthetic crude, and Condensate by province.
+    # Intentionally excludes In-Situ and Mined bitumen totals to avoid double-counting with AER ST53/ST39.
+    SC63_PATH = RAW_DIR / "statcan_25100063_eng.zip"
+    if False and SC63_PATH.exists():
+        log(f"  Parsing StatCan 25100063 from {SC63_PATH}")
+        SC63_MEASURE_MAP: dict[str, tuple[str, str]] = {
+            "Heavy crude oil": ("Heavy crude oil", "heavy_conventional"),
+            "Light and medium crude oil": ("Light & medium crude oil", "conventional"),
+            "Synthetic crude oil production": ("Synthetic crude oil", "synthetic"),
+            "Condensate": ("Condensate Production", "condensate"),
+        }
+        SC63_PROVINCES = {"Alberta", "Saskatchewan", "British Columbia", "Manitoba", "Northwest Territories"}
+        sc63_count = 0
+        try:
+            with _zipfile.ZipFile(SC63_PATH) as zf:
+                csv_names = [n for n in zf.namelist() if n.lower().endswith(".csv") and "meta" not in n.lower()]
+                if not csv_names:
+                    log("  warning: no data CSV found in statcan_25100063 ZIP")
+                else:
+                    with zf.open(csv_names[0]) as cf:
+                        sc63_lines = cf.read().decode("utf-8-sig").splitlines()
+                    reader63 = csv.DictReader(sc63_lines)
+                    for row in reader63:
+                        measure = row.get("Supply and disposition", "").strip()
+                        geo = row.get("GEO", "").strip()
+                        units = row.get("Units of measure", "").strip()
+                        ref_date_str = row.get("REF_DATE", "").strip()
+                        value_str = (row.get("VALUE") or "").strip()
+                        if measure not in SC63_MEASURE_MAP:
+                            continue
+                        if geo not in SC63_PROVINCES:
+                            continue
+                        if units != "Barrels":
+                            continue
+                        if not value_str:
+                            continue
+                        try:
+                            year, month = int(ref_date_str[:4]), int(ref_date_str[5:7])
+                            date_value = dt.date(year, month, 1)
+                        except (ValueError, IndexError):
+                            continue
+                        if date_value < CUTOFF:
+                            continue
+                        try:
+                            volume_barrels_monthly = float(value_str)
+                        except ValueError:
+                            continue
+                        days_in_month = calendar.monthrange(year, month)[1]
+                        volume_bbl_d = volume_barrels_monthly / days_in_month
+                        stream_name, production_system = SC63_MEASURE_MAP[measure]
+                        display_name = f"{geo} — {stream_name}"
+                        sc63_asset_id = add_asset(
+                            display_name=display_name,
+                            source_id="statcan_25100063",
+                            production_system=production_system,
+                            company="Provincial aggregate",
+                            province=geo,
+                            asset_kind="province",
+                            is_rollup=False,
+                            notes=f"StatCan 25-10-0063: {measure}, {geo}. Monthly total ÷ days.",
+                        )
+                        add_record(
+                            date_value,
+                            sc63_asset_id,
+                            stream_name,
+                            volume_bbl_d,
+                            "statcan_25100063",
+                            measure,
+                            "statcan_25100063",
+                        )
+                        sc63_count += 1
+            log(f"  StatCan 25100063: {sc63_count} records added.")
+        except Exception as exc:  # noqa: BLE001
+            log(f"  warning: StatCan 25100063 parse failed: {exc}")
+    elif SC63_PATH.exists():
+        log(f"  StatCan 25100063 cached at {SC63_PATH} but disabled for location-specific Petrinex mapping.")
+
+    metadata = {
+        "workbook_path": str(workbook_path),
+        "workbook_modified": dt.datetime.fromtimestamp(workbook_path.stat().st_mtime).isoformat(),
+        "latest_actual_date": latest_actual.isoformat(),
+        "cutoff_date": CUTOFF.isoformat(),
+        "generated_at": RUN_DATE.isoformat(),
+    }
+    return assets, records, metadata
+
+
+def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metadata: dict[str, Any]) -> Path:
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    db_path = PROCESSED_DIR / "production.db"
+    if db_path.exists():
+        db_path.unlink()
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.executescript(
+        """
+        CREATE TABLE sources (
+          source_id TEXT PRIMARY KEY,
+          agency TEXT NOT NULL,
+          name TEXT NOT NULL,
+          url TEXT NOT NULL,
+          raw_file TEXT,
+          grain TEXT
+        );
+
+        CREATE TABLE assets (
+          asset_id TEXT PRIMARY KEY,
+          display_name TEXT NOT NULL,
+          source_id TEXT NOT NULL,
+          source_name TEXT NOT NULL,
+          production_system TEXT NOT NULL,
+          asset_kind TEXT NOT NULL,
+          company TEXT,
+          province TEXT,
+          latitude REAL,
+          longitude REAL,
+          ownership_text TEXT,
+          is_rollup INTEGER NOT NULL DEFAULT 0,
+          coordinate_method TEXT,
+          location_confidence TEXT,
+          location_basis TEXT,
+          geometry_kind TEXT,
+          geometry_source TEXT,
+          notes TEXT
+        );
+
+        CREATE TABLE monthly_production (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          date TEXT NOT NULL,
+          period TEXT NOT NULL,
+          asset_id TEXT NOT NULL,
+          source_id TEXT NOT NULL,
+          source_name TEXT NOT NULL,
+          stream TEXT NOT NULL,
+          volume_bbl_d REAL NOT NULL,
+          volume_kbbl_d REAL NOT NULL,
+          units TEXT NOT NULL,
+          scenario TEXT NOT NULL,
+          workbook_sheet TEXT,
+          workbook_column TEXT,
+          FOREIGN KEY(asset_id) REFERENCES assets(asset_id)
+        );
+
+        CREATE TABLE etl_metadata (
+          key TEXT PRIMARY KEY,
+          value TEXT NOT NULL
+        );
+
+        CREATE INDEX idx_monthly_date ON monthly_production(date);
+        CREATE INDEX idx_monthly_asset_date ON monthly_production(asset_id, date);
+        CREATE INDEX idx_monthly_source_stream ON monthly_production(source_id, stream);
+        """
+    )
+    conn.executemany(
+        """
+        INSERT INTO sources (source_id, agency, name, url, raw_file, grain)
+        VALUES (:source_id, :agency, :name, :url, :raw_file, :grain)
+        """,
+        SOURCE_MANIFEST,
+    )
+    conn.executemany(
+        """
+        INSERT INTO assets (
+          asset_id, display_name, source_id, source_name, production_system,
+          asset_kind, company, province, latitude, longitude, ownership_text,
+          is_rollup, coordinate_method, location_confidence, location_basis,
+          geometry_kind, geometry_source, notes
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        [
+            (
+                a.asset_id,
+                a.display_name,
+                a.source_id,
+                a.source_name,
+                a.production_system,
+                a.asset_kind,
+                a.company,
+                a.province,
+                a.latitude,
+                a.longitude,
+                a.ownership_text,
+                1 if a.is_rollup else 0,
+                a.coordinate_method,
+                a.location_confidence,
+                a.location_basis,
+                a.geometry_kind,
+                a.geometry_source,
+                a.notes,
+            )
+            for a in assets.values()
+        ],
+    )
+    conn.executemany(
+        """
+        INSERT INTO monthly_production (
+          date, period, asset_id, source_id, source_name, stream,
+          volume_bbl_d, volume_kbbl_d, units, scenario, workbook_sheet,
+          workbook_column
+        )
+        VALUES (
+          :date, :period, :asset_id, :source_id, :source_name, :stream,
+          :volume_bbl_d, :volume_kbbl_d, :units, :scenario, :workbook_sheet,
+          :workbook_column
+        )
+        """,
+        records,
+    )
+    conn.executemany(
+        "INSERT INTO etl_metadata (key, value) VALUES (?, ?)",
+        [(k, json.dumps(v) if not isinstance(v, str) else v) for k, v in metadata.items()],
+    )
+    conn.commit()
+    conn.close()
+    return db_path
+
+
+def write_json_file(path: Path, payload: Any, **json_kwargs: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f"{path.name}.tmp")
+    with tmp_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, **json_kwargs)
+    tmp_path.replace(path)
+
+
+def browser_asset_notes(asset: Asset) -> str:
+    """Keep browser payload small while preserving full notes in SQLite."""
+    if asset.asset_kind in {"dls_site", "well"}:
+        return ""
+    return asset.notes
+
+
+def compact_asset_payload(assets_payload: list[dict[str, Any]]) -> dict[str, Any]:
+    fields = [
+        "asset_id",
+        "display_name",
+        "source_id",
+        "production_system",
+        "asset_kind",
+        "company",
+        "province",
+        "latitude",
+        "longitude",
+        "is_rollup",
+        "coordinate_method",
+        "location_confidence",
+    ]
+    return {
+        "fields": fields,
+        "rows": [[item.get(field) for field in fields] for item in assets_payload],
+    }
+
+
+def derive_default_map_date(records: list[dict[str, Any]], latest_actual_date: str | None) -> str | None:
+    """Pick the latest month with complete crude-system coverage for the first map view."""
+    minimums = {
+        "Conventional crude oil": 500.0,
+        "In-situ bitumen": 500.0,
+        "Mined bitumen gross": 500.0,
+        "Synthetic crude oil": 500.0,
+    }
+    by_date_stream: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    for record in records:
+        date = record.get("date")
+        stream = record.get("stream")
+        if latest_actual_date and date > latest_actual_date:
+            continue
+        if stream not in minimums:
+            continue
+        if record.get("scenario") != "actual":
+            continue
+        by_date_stream[date][stream] += float(record.get("volume_kbbl_d") or 0.0)
+    for date in sorted(by_date_stream, reverse=True):
+        totals = by_date_stream[date]
+        if all(totals.get(stream, 0.0) >= minimum for stream, minimum in minimums.items()):
+            return date
+    return latest_actual_date
+
+
+def export_legend_key(asset: Asset, stream: str) -> str:
+    return STREAM_LEGEND_KEYS_EXPORT.get(stream) or SYSTEM_LEGEND_KEYS_EXPORT.get(asset.production_system, "unknown")
+
+
+def build_source_coverage(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for record in records:
+        key = (record["source_id"], record["stream"], record["scenario"])
+        item = grouped.setdefault(
+            key,
+            {
+                "source_id": record["source_id"],
+                "source_name": record["source_name"],
+                "stream": record["stream"],
+                "scenario": record["scenario"],
+                "first_date": record["date"],
+                "last_date": record["date"],
+                "record_count": 0,
+                "asset_ids": set(),
+                "total_kbbl_d_sum": 0.0,
+            },
+        )
+        item["first_date"] = min(item["first_date"], record["date"])
+        item["last_date"] = max(item["last_date"], record["date"])
+        item["record_count"] += 1
+        item["asset_ids"].add(record["asset_id"])
+        item["total_kbbl_d_sum"] += float(record.get("volume_kbbl_d") or 0.0)
+    out = []
+    for item in grouped.values():
+        out.append(
+            {
+                "source_id": item["source_id"],
+                "source_name": item["source_name"],
+                "stream": item["stream"],
+                "scenario": item["scenario"],
+                "first_date": item["first_date"],
+                "last_date": item["last_date"],
+                "record_count": item["record_count"],
+                "asset_count": len(item["asset_ids"]),
+                "sum_kbbl_d_observations": round(item["total_kbbl_d_sum"], 4),
+            }
+        )
+    return sorted(out, key=lambda x: (x["source_id"], x["stream"], x["scenario"]))
+
+
+def build_date_filter_totals(records: list[dict[str, Any]], assets: dict[str, Asset]) -> dict[str, list[dict[str, Any]]]:
+    grouped: dict[tuple[str, str, str, str, str, str], float] = defaultdict(float)
+    for record in records:
+        asset = assets.get(record["asset_id"])
+        if not asset:
+            continue
+        if asset.is_rollup or asset.asset_kind in {"province", "province_refinery", "region"}:
+            continue
+        if not NumberLike(record.get("volume_kbbl_d")) or float(record.get("volume_kbbl_d") or 0.0) <= 0:
+            continue
+        key = (
+            record["date"],
+            record["source_id"],
+            record["stream"],
+            record["scenario"],
+            asset.location_confidence or "unknown",
+            export_legend_key(asset, record["stream"]),
+        )
+        grouped[key] += float(record["volume_kbbl_d"])
+
+    by_date: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for (date, source_id, stream, scenario, confidence, legend_key), value in grouped.items():
+        by_date[date].append(
+            {
+                "source_id": source_id,
+                "stream": stream,
+                "scenario": scenario,
+                "location_confidence": confidence,
+                "legend_key": legend_key,
+                "kbbl_d": round(value, 4),
+            }
+        )
+    return {date: sorted(items, key=lambda x: (x["source_id"], x["stream"], x["location_confidence"])) for date, items in sorted(by_date.items())}
+
+
+def NumberLike(value: Any) -> bool:
+    return isinstance(value, (int, float)) and math.isfinite(float(value))
+
+
+def build_data_quality_report(records: list[dict[str, Any]], assets: dict[str, Asset]) -> dict[str, Any]:
+    zero_or_negative = [
+        r for r in records
+        if isinstance(r.get("volume_kbbl_d"), (int, float)) and r.get("volume_kbbl_d", 0) <= 0
+    ]
+    duplicate_counter: Counter[tuple[str, str, str, str]] = Counter(
+        (r["date"], r["asset_id"], r["source_id"], r["stream"]) for r in records
+    )
+    duplicate_groups = [
+        {"date": k[0], "asset_id": k[1], "source_id": k[2], "stream": k[3], "count": v}
+        for k, v in duplicate_counter.items()
+        if v > 1
+    ]
+
+    totals: dict[tuple[str, str, str], float] = defaultdict(float)
+    for record in records:
+        if record.get("scenario") != "actual":
+            continue
+        totals[(record["source_id"], record["stream"], record["date"])] += float(record.get("volume_kbbl_d") or 0.0)
+
+    date_warnings: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    source_stream_warnings: list[dict[str, Any]] = []
+    by_source_stream: dict[tuple[str, str], list[tuple[str, float]]] = defaultdict(list)
+    for (source_id, stream, date), value in totals.items():
+        by_source_stream[(source_id, stream)].append((date, value))
+    for (source_id, stream), items in by_source_stream.items():
+        actual_dates = sorted((date, total) for date, total in items)
+        if len(actual_dates) < 2:
+            continue
+        prev_date, prev_total = actual_dates[-2]
+        latest_date, latest_total = actual_dates[-1]
+        if prev_total >= 100 and latest_total < prev_total * 0.55:
+            warning = {
+                "severity": "high",
+                "source_id": source_id,
+                "stream": stream,
+                "date": latest_date,
+                "message": (
+                    f"{stream} total is {latest_total:.1f} kbbl/d on {latest_date}, "
+                    f"down from {prev_total:.1f} kbbl/d on {prev_date}. "
+                    "Treat this month as incomplete until source reconciliation passes."
+                ),
+            }
+            source_stream_warnings.append(warning)
+            date_warnings[latest_date].append(warning)
+
+    unmapped_by_date: dict[str, float] = defaultdict(float)
+    low_conf_by_date: dict[str, float] = defaultdict(float)
+    for record in records:
+        asset = assets.get(record["asset_id"])
+        if not asset or asset.is_rollup:
+            continue
+        volume = float(record.get("volume_kbbl_d") or 0.0)
+        if asset.location_confidence == "unmapped":
+            unmapped_by_date[record["date"]] += volume
+        if asset.location_confidence == "low":
+            low_conf_by_date[record["date"]] += volume
+
+    return {
+        "zero_or_negative_record_count": len(zero_or_negative),
+        "duplicate_asset_date_stream_group_count": len(duplicate_groups),
+        "duplicate_examples": duplicate_groups[:25],
+        "workbook_driven_sources": [
+            {
+                "source_id": "aer_st53",
+                "message": "Production rows are currently normalized from the analyst workbook; official AER ST53 raw files are cached for reconciliation.",
+            },
+            {
+                "source_id": "aer_st39",
+                "message": "Historical mined/synthetic rows are workbook-normalized; current-month ST39 synthetic is overlaid from the cached official AER ST39 XLS when R/readxl is available.",
+            },
+        ],
+        "source_stream_warnings": source_stream_warnings,
+        "date_warnings": {date: warnings for date, warnings in sorted(date_warnings.items())},
+        "unmapped_kbbl_d_by_date": {date: round(v, 4) for date, v in sorted(unmapped_by_date.items()) if v > 0},
+        "low_confidence_kbbl_d_by_date": {date: round(v, 4) for date, v in sorted(low_conf_by_date.items()) if v > 0},
+    }
+
+
+def write_web_exports(
+    assets: dict[str, Asset],
+    records: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    download_status: list[dict[str, Any]],
+) -> None:
+    PUBLIC_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    monthly_dir = PUBLIC_DATA_DIR / "monthly"
+    monthly_dir.mkdir(parents=True, exist_ok=True)
+    for old_file in monthly_dir.glob("*.json"):
+        old_file.unlink()
+
+    assets_payload = [
+        {
+            "asset_id": a.asset_id,
+            "display_name": a.display_name,
+            "source_id": a.source_id,
+            "source_name": a.source_name,
+            "production_system": a.production_system,
+            "asset_kind": a.asset_kind,
+            "company": a.company,
+            "province": a.province,
+            "latitude": a.latitude,
+            "longitude": a.longitude,
+            "ownership_text": a.ownership_text,
+            "is_rollup": a.is_rollup,
+            "coordinate_method": a.coordinate_method,
+            "location_confidence": a.location_confidence,
+            "location_basis": a.location_basis,
+            "geometry_kind": a.geometry_kind,
+            "geometry_source": a.geometry_source,
+            "notes": browser_asset_notes(a),
+        }
+        for a in sorted(assets.values(), key=lambda x: (x.production_system, x.company, x.display_name))
+    ]
+
+    asset_by_id = assets
+    by_asset_date: dict[tuple[str, str], float] = {}
+    latest_record_date: dict[str, str] = {}
+    date_totals_kbbl_d: dict[str, float] = {}
+    for record in records:
+        key = (record["asset_id"], record["date"])
+        by_asset_date[key] = by_asset_date.get(key, 0.0) + record["volume_kbbl_d"]
+        if record["asset_id"] not in latest_record_date or record["date"] > latest_record_date[record["asset_id"]]:
+            latest_record_date[record["asset_id"]] = record["date"]
+        asset = asset_by_id.get(record["asset_id"])
+        if asset and not asset.is_rollup and asset.asset_kind not in {"province", "province_refinery", "region"}:
+            date_totals_kbbl_d[record["date"]] = date_totals_kbbl_d.get(record["date"], 0.0) + record["volume_kbbl_d"]
+
+    features = []
+    for asset in assets.values():
+        if asset.latitude is None or asset.longitude is None:
+            continue
+        latest_date = latest_record_date.get(asset.asset_id)
+        latest_kbbl_d = by_asset_date.get((asset.asset_id, latest_date), 0.0) if latest_date else 0.0
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [asset.longitude, asset.latitude],
+                },
+                "properties": {
+                    "asset_id": asset.asset_id,
+                    "display_name": asset.display_name,
+                    "company": asset.company,
+                    "province": asset.province,
+                    "source_id": asset.source_id,
+                    "source_name": asset.source_name,
+                    "production_system": asset.production_system,
+                    "asset_kind": asset.asset_kind,
+                    "is_rollup": asset.is_rollup,
+                    "coordinate_method": asset.coordinate_method,
+                    "location_confidence": asset.location_confidence,
+                    "location_basis": asset.location_basis,
+                    "geometry_kind": asset.geometry_kind,
+                    "geometry_source": asset.geometry_source,
+                    "latest_date": latest_date,
+                    "latest_kbbl_d": round(latest_kbbl_d, 3),
+                    "ownership_text": asset.ownership_text,
+                    "notes": browser_asset_notes(asset),
+                },
+            }
+        )
+
+    asset_geometry_features: list[dict[str, Any]] = []
+    for asset in assets.values():
+        if not asset.geometry_features:
+            continue
+        latest_date = latest_record_date.get(asset.asset_id)
+        latest_kbbl_d = by_asset_date.get((asset.asset_id, latest_date), 0.0) if latest_date else 0.0
+        for idx, feature in enumerate(asset.geometry_features):
+            geometry = feature.get("geometry")
+            if not geometry:
+                continue
+            props = dict(feature.get("properties") or {})
+            props.update(
+                {
+                    "asset_id": asset.asset_id,
+                    "display_name": asset.display_name,
+                    "company": asset.company,
+                    "province": asset.province,
+                    "source_id": asset.source_id,
+                    "source_name": asset.source_name,
+                    "production_system": asset.production_system,
+                    "asset_kind": asset.asset_kind,
+                    "coordinate_method": asset.coordinate_method,
+                    "location_confidence": asset.location_confidence,
+                    "location_basis": asset.location_basis,
+                    "geometry_kind": asset.geometry_kind,
+                    "geometry_source": asset.geometry_source,
+                    "latest_date": latest_date,
+                    "latest_kbbl_d": round(latest_kbbl_d, 3),
+                    "part_index": idx + 1,
+                }
+            )
+            asset_geometry_features.append({"type": "Feature", "geometry": geometry, "properties": props})
+
+    base_records: list[dict[str, Any]] = []
+    on_demand_records: dict[str, list[dict[str, Any]]] = {}
+    for record in records:
+        if record["source_id"] in ON_DEMAND_RECORD_SOURCES:
+            on_demand_records.setdefault(record["date"], []).append(record)
+        else:
+            base_records.append(record)
+
+    monthly_record_files: dict[str, str] = {}
+    for date, date_records in sorted(on_demand_records.items()):
+        path = monthly_dir / f"on_demand_{date}.json"
+        write_json_file(path, date_records, separators=(",", ":"))
+        monthly_record_files[date] = str(path.relative_to(ROOT)).replace("\\", "/")
+
+    st102_facility_payload = oil_sands_facility_geojson(load_st102_facilities())
+
+    periods = sorted({record["date"] for record in records})
+    default_date = derive_default_map_date(records, metadata.get("latest_actual_date"))
+    location_quality_assets = Counter(a.location_confidence or "unknown" for a in assets.values())
+    location_quality_latest_kbbl_d: dict[str, float] = defaultdict(float)
+    latest_actual = metadata.get("latest_actual_date")
+    for record in records:
+        if record["date"] != latest_actual or record.get("scenario") != "actual":
+            continue
+        asset = assets.get(record["asset_id"])
+        if not asset or asset.is_rollup:
+            continue
+        location_quality_latest_kbbl_d[asset.location_confidence or "unknown"] += record["volume_kbbl_d"]
+    source_coverage = build_source_coverage(records)
+    date_filter_totals = build_date_filter_totals(records, assets)
+    data_quality = build_data_quality_report(records, assets)
+    manifest = {
+        **metadata,
+        "record_count": len(records),
+        "base_record_count": len(base_records),
+        "on_demand_record_count": sum(len(items) for items in on_demand_records.values()),
+        "asset_count": len(assets),
+        "mapped_asset_count": len(features),
+        "asset_geometry_feature_count": len(asset_geometry_features),
+        "location_quality_asset_count": dict(sorted(location_quality_assets.items())),
+        "location_quality_latest_actual_kbbl_d": {
+            key: round(value, 4) for key, value in sorted(location_quality_latest_kbbl_d.items())
+        },
+        "periods": periods,
+        "latest_period": max(periods) if periods else None,
+        "default_date": default_date,
+        "monthly_record_files": monthly_record_files,
+        "date_totals_kbbl_d": {date: round(value, 4) for date, value in sorted(date_totals_kbbl_d.items())},
+        "date_filter_totals": date_filter_totals,
+        "source_coverage": source_coverage,
+        "data_quality": data_quality,
+        "source_manifest": SOURCE_MANIFEST,
+        "download_status": download_status,
+        "outputs": {
+            "sqlite": "data/processed/production.db",
+            "assets": "public/data/assets.json",
+            "monthly_production": "public/data/monthly_production.json",
+            "geojson": "public/data/production_assets.geojson",
+            "asset_geometries": "public/data/asset_geometries.geojson",
+            "scheme_approvals": "public/data/aer_scheme_approvals.geojson",
+            "st102_oil_sands_facilities": "public/data/aer_st102_oil_sands_facilities.geojson",
+        },
+    }
+
+    write_json_file(PUBLIC_DATA_DIR / "assets.json", compact_asset_payload(assets_payload), separators=(",", ":"))
+    write_json_file(PUBLIC_DATA_DIR / "monthly_production.json", base_records, separators=(",", ":"))
+    write_json_file(PUBLIC_DATA_DIR / "production_assets.geojson", {"type": "FeatureCollection", "features": features}, indent=2)
+    write_json_file(
+        ASSET_GEOMETRIES_GEOJSON_PATH,
+        {"type": "FeatureCollection", "features": asset_geometry_features},
+        separators=(",", ":"),
+    )
+    write_json_file(ST102_OIL_SANDS_GEOJSON_PATH, st102_facility_payload, separators=(",", ":"))
+    write_json_file(PUBLIC_DATA_DIR / "manifest.json", manifest, indent=2)
+    write_json_file(DATA_DIR / "sources.json", SOURCE_MANIFEST, indent=2)
+
+
+def validate_exports(db_path: Path) -> dict[str, Any]:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute(
+        """
+        SELECT COUNT(*) AS records,
+               COUNT(DISTINCT asset_id) AS assets,
+               MIN(date) AS min_date,
+               MAX(date) AS max_date
+        FROM monthly_production
+        """
+    ).fetchone()
+    top = conn.execute(
+        """
+        SELECT a.display_name, a.company, a.production_system, p.date,
+               SUM(p.volume_kbbl_d) AS kbbl_d
+        FROM monthly_production p
+        JOIN assets a USING(asset_id)
+        WHERE a.is_rollup = 0
+        GROUP BY a.asset_id, p.date
+        ORDER BY p.date DESC, kbbl_d DESC
+        LIMIT 10
+        """
+    ).fetchall()
+    conn.close()
+    return {
+        "records": row["records"],
+        "assets": row["assets"],
+        "min_date": row["min_date"],
+        "max_date": row["max_date"],
+        "top_latest_assets": [dict(item) for item in top],
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Run Western Canada crude production ETL.")
+    parser.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK, help="Source workbook path.")
+    parser.add_argument("--download", action="store_true", help="Refresh official raw-source files into data/raw.")
+    parser.add_argument("--force-download", action="store_true", help="Re-download raw-source files even if cached.")
+    parser.add_argument(
+        "--petrinex-months",
+        type=int,
+        default=1,
+        help="Number of recent Petrinex AB volume months to cache when --petrinex-start is not supplied.",
+    )
+    parser.add_argument(
+        "--petrinex-start",
+        default=None,
+        help=(
+            "Optional YYYY-MM start period for Petrinex AB volume caching through workbook latest actual month. "
+            "Default is 2022-01, the earliest public monthly API period verified by this ETL."
+        ),
+    )
+    parser.add_argument("--skip-petrinex", action="store_true", help="Skip Petrinex cache/download and parsing.")
+    args = parser.parse_args()
+
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    PUBLIC_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    latest_actual = read_workbook_latest_actual(args.workbook)
+    download_status = download_sources(force=args.force_download) if args.download or args.force_download else []
+    if not args.skip_petrinex:
+        petrinex_start = args.petrinex_start or PETRINEX_AB_EARLIEST_PUBLIC_PERIOD
+        download_status.extend(
+            ensure_petrinex_cache(
+                latest_actual=latest_actual,
+                months=args.petrinex_months,
+                start_period=petrinex_start,
+                force=args.force_download,
+                refresh=args.download or args.force_download,
+            )
+        )
+    if args.download or args.force_download:
+        download_status.extend(ensure_bcer_cache(force=args.force_download, refresh=True))
+    try:
+        from build_scheme_geojson import main as build_scheme_geojson
+
+        build_scheme_geojson()
+    except Exception as exc:  # noqa: BLE001 - production data should still rebuild
+        log(f"warning: AER scheme approval GeoJSON was not rebuilt before location matching: {exc}")
+    assets, records, metadata = build_assets_and_records(args.workbook)
+    db_path = write_sqlite(assets, records, metadata)
+    write_web_exports(assets, records, metadata, download_status)
+    summary = validate_exports(db_path)
+
+    log("ETL complete.")
+    log(json.dumps(summary, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
