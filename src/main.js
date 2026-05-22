@@ -9,6 +9,7 @@ const DATA_PATHS = {
   schemeApprovals: "public/data/aer_scheme_approvals.geojson",
   st102Facilities: "public/data/aer_st102_oil_sands_facilities.geojson",
   assetGeometries: "public/data/asset_geometries.geojson",
+  refineries: "public/data/refineries.geojson",
 };
 
 // ============================================================
@@ -152,6 +153,7 @@ const state = {
   schemeApprovals: null,
   st102Facilities: null,
   assetGeometries: null,
+  refineries: null,
   assetGeometryById: new Map(),
   dates: [],
   selectedDate: null,
@@ -185,6 +187,8 @@ const state = {
   formationEnabled: false,
   formationLayer: null,
   assetFootprintLayer: null,
+  refineryEnabled: false,
+  refineryLayer: null,
   // Seasonality index (lazy-loaded from asset_seasonality.json)
   seasonalityIndex: null,
   seasonalityIndexLoading: false,
@@ -246,6 +250,7 @@ const els = {
   wildfireToggle:   document.querySelector("#wildfireToggle"),
   wildfireStatus:   document.querySelector("#wildfireStatus"),
   formationToggle:  document.querySelector("#formationToggle"),
+  refineryToggle:   document.querySelector("#refineryToggle"),
   distanceToggle:   document.querySelector("#distanceToggle"),
   distanceStatus:   document.querySelector("#distanceStatus"),
   mapLegend:        document.querySelector("#mapLegend"),
@@ -352,7 +357,7 @@ function locationQualityText(asset) {
 // ============================================================
 
 async function loadData() {
-  const [manifest, assets, records, schemeApprovals, st102Facilities, assetGeometries] = await Promise.all(
+  const [manifest, assets, records, schemeApprovals, st102Facilities, assetGeometries, refineries] = await Promise.all(
     Object.values(DATA_PATHS).map((path) =>
       fetch(path).then((r) => {
         if (!r.ok) throw new Error(`Could not load ${path}`);
@@ -378,6 +383,7 @@ async function loadData() {
   state.schemeApprovals = schemeApprovals;
   state.st102Facilities = st102Facilities;
   state.assetGeometries = assetGeometries;
+  state.refineries = refineries;
   state.assetGeometryById = new Map();
   for (const feature of assetGeometries?.features || []) {
     const assetId = feature?.properties?.asset_id;
@@ -581,6 +587,9 @@ function initControls() {
   if (els.formationToggle) {
     els.formationToggle.addEventListener("click", toggleFormations);
   }
+  if (els.refineryToggle) {
+    els.refineryToggle.addEventListener("click", toggleRefineries);
+  }
   const pipelineToggleBtn = document.getElementById("pipelineToggle");
   if (pipelineToggleBtn) {
     pipelineToggleBtn.addEventListener("click", togglePipelines);
@@ -644,6 +653,10 @@ function initLegendControls() {
       if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
       if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
       if (state.assetFootprintLayer) { state.map.removeLayer(state.assetFootprintLayer); state.assetFootprintLayer = null; }
+    }
+    if (key === "refinery-plant" && state.refineryLayer) {
+      state.map.removeLayer(state.refineryLayer);
+      state.refineryLayer = null;
     }
     if (key.startsWith("pipe-") || key.startsWith("inst-")) {
       refreshPipelineLayers();
@@ -1046,7 +1059,7 @@ function renderMap(aggregated) {
         const swatch = `<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${streamColor(stream)};margin-right:4px;"></i>`;
         ttLines.push(`${swatch}${escapeHtml(stream)}: ${kbbl(vol)}`);
       });
-      marker.bindTooltip(ttLines.join("<br>"), { direction: "top", opacity: 0.96 });
+      marker.bindTooltip(ttLines.join("<br>"), { direction: "top", opacity: 0.96, className: "asset-tip" });
       marker.on("click", (event) => {
         if (state.distanceMode) {
           if (event.originalEvent && window.L) L.DomEvent.stop(event.originalEvent);
@@ -1060,6 +1073,7 @@ function renderMap(aggregated) {
     });
 
     renderFormationLayer();
+    renderRefineryLayer();
     renderFireLayer();
   } else {
     renderFallbackMap(visiblePoints);
@@ -1568,6 +1582,228 @@ function updateFormationToggleUI() {
   } else {
     btn.textContent = "AER Sites";
     btn.className = "formation-toggle-btn";
+  }
+}
+
+function refineryCapacityLabel(value, uom) {
+  if (value == null || value === "") return "";
+  const n = Number(value);
+  const formatted = Number.isFinite(n) ? n.toLocaleString("en-CA") : String(value);
+  return `${formatted}${uom ? " " + uom : ""}`;
+}
+
+function refineryCapacityRowsHtml(rows, limit = 8) {
+  const capacities = Array.isArray(rows) ? rows : [];
+  if (!capacities.length) return '<div class="refinery-unit-row muted">No unit capacity rows provided</div>';
+  const shown = capacities.slice(0, limit).map((item) => {
+    const actual = refineryCapacityLabel(item.actual_capacity, item.uom);
+    const design = refineryCapacityLabel(item.design_capacity, item.uom);
+    const value = actual || design || "--";
+    const basis = actual ? "Actual" : (design ? "Design" : "");
+    const kind = item.kind ? `${escapeHtml(item.kind)} · ` : "";
+    return `<div class="refinery-unit-row">` +
+      `<span>${kind}${escapeHtml(item.product_desc || item.product_id || "Capacity unit")}</span>` +
+      `<strong>${escapeHtml(value)}</strong>` +
+      `${basis ? `<em>${basis}</em>` : ""}` +
+      `</div>`;
+  }).join("");
+  const extra = capacities.length > limit
+    ? `<div class="refinery-unit-row muted">+ ${capacities.length - limit} more unit rows</div>`
+    : "";
+  return shown + extra;
+}
+
+function refineryTooltipHtml(properties) {
+  const p = properties || {};
+  const capacity = refineryCapacityLabel(p.crud_capacity_bbl_d, "BBL/d");
+  const location = [p.city, p.state_name, p.country_name].filter(Boolean).join(", ");
+  const operator = p.operator_name || p.owner_name || p.parent_company || "";
+  const sector = p.plant_sectors || p.primary_sic_desc || "";
+  return `<div class="refinery-tip-inner">` +
+    `<strong>${escapeHtml(p.plant_name || "Refinery / upgrader")}</strong>` +
+    `${operator ? `<div class="rt-sub">${escapeHtml(operator)}</div>` : ""}` +
+    `${location ? `<div class="rt-sub">${escapeHtml(location)}</div>` : ""}` +
+    `<div class="rt-meta">` +
+      `${p.plant_status_desc ? `<span>${escapeHtml(p.plant_status_desc)}</span>` : ""}` +
+      `${capacity ? `<span>${escapeHtml(capacity)}</span>` : ""}` +
+    `</div>` +
+    `${sector ? `<div class="rt-sub">${escapeHtml(sector)}</div>` : ""}` +
+    `<div class="refinery-units">${refineryCapacityRowsHtml(p.unit_capacities)}</div>` +
+  `</div>`;
+}
+
+function refineryUnitCapacityText(unit) {
+  if (!unit) return "";
+  const direct = refineryCapacityLabel(unit.capacity, unit.capacity_uom);
+  if (direct) return direct;
+  const kbbl = refineryCapacityLabel(unit.capacity_kbbl_d, "kbbl/d");
+  if (kbbl) return kbbl;
+  const rows = Array.isArray(unit.capacity_rows) ? unit.capacity_rows : [];
+  const first = rows.find((row) => row.capacity != null || row.actual_capacity != null || row.design_capacity != null);
+  if (!first) return "";
+  return refineryCapacityLabel(first.capacity ?? first.actual_capacity ?? first.design_capacity, first.uom);
+}
+
+function refineryUnitProductText(unit) {
+  if (!unit) return "";
+  if (unit.unit_capacity_product_desc) return unit.unit_capacity_product_desc;
+  const rows = Array.isArray(unit.capacity_rows) ? unit.capacity_rows : [];
+  return rows.map((row) => row.product_desc).filter(Boolean).slice(0, 2).join(", ");
+}
+
+function refineryAreaNameIsUseful(area, unitName) {
+  if (!area) return false;
+  const a = String(area).toLowerCase();
+  const u = String(unitName || "").toLowerCase();
+  return a !== u && !["crude", "refinery"].includes(a);
+}
+
+function refineryUnitRowsHtml(units, limit = 10) {
+  const rows = Array.isArray(units) ? units : [];
+  if (!rows.length) return '<div class="refinery-unit-card muted">No detailed unit rows linked to this plant</div>';
+  const shown = rows.slice(0, limit).map((unit) => {
+    const cap = refineryUnitCapacityText(unit);
+    const product = refineryUnitProductText(unit);
+    const type = unit.unit_type_short || unit.unit_type_group || "Unit";
+    const status = unit.unit_status_desc || unit.unit_status_group || "";
+    const area = refineryAreaNameIsUseful(unit.area_name, unit.unit_name) ? unit.area_name : "";
+    return `<div class="refinery-unit-card">` +
+      `<div class="ru-head">` +
+        `<span class="ru-type">${escapeHtml(type)}</span>` +
+        `<strong>${escapeHtml(unit.unit_name || unit.unit_type_desc || "Refinery unit")}</strong>` +
+        `${cap ? `<em>${escapeHtml(cap)}</em>` : ""}` +
+      `</div>` +
+      `<div class="ru-sub">${escapeHtml([unit.unit_type_desc, product, area].filter(Boolean).join(" · "))}</div>` +
+      `${status ? `<div class="ru-status">${escapeHtml(status)}${unit.unit_startup_date ? " · Start " + escapeHtml(String(unit.unit_startup_date).slice(0, 10)) : ""}</div>` : ""}` +
+    `</div>`;
+  }).join("");
+  const extra = rows.length > limit
+    ? `<div class="refinery-unit-card muted">+ ${rows.length - limit} more units in click popup</div>`
+    : "";
+  return shown + extra;
+}
+
+function refineryUnitSummaryHtml(summary) {
+  const rows = Array.isArray(summary) ? summary : [];
+  if (!rows.length) return "";
+  return `<div class="refinery-unit-summary">` +
+    rows.slice(0, 8).map((item) =>
+      `<span>${escapeHtml(item.group || "Unit")} <strong>${formatNumber(item.count || 0)}</strong></span>`
+    ).join("") +
+  `</div>`;
+}
+
+function refineryTooltipDetailedHtml(properties) {
+  const p = properties || {};
+  const capacity = refineryCapacityLabel(p.crud_capacity_bbl_d, "BBL/d");
+  const location = [p.city, p.state_name, p.country_name].filter(Boolean).join(", ");
+  const operator = p.operator_name || p.owner_name || p.parent_company || "";
+  const sector = p.plant_sectors || p.primary_sic_desc || "";
+  const units = Array.isArray(p.refinery_units) ? p.refinery_units : [];
+  const plantCapacities = p.plant_capacities || p.unit_capacities || [];
+  return `<div class="refinery-tip-inner">` +
+    `<strong>${escapeHtml(p.plant_name || "Refinery / upgrader")}</strong>` +
+    `${operator ? `<div class="rt-sub">${escapeHtml(operator)}</div>` : ""}` +
+    `${location ? `<div class="rt-sub">${escapeHtml(location)}</div>` : ""}` +
+    `<div class="rt-meta">` +
+      `${p.plant_status_desc ? `<span>${escapeHtml(p.plant_status_desc)}</span>` : ""}` +
+      `${capacity ? `<span>${escapeHtml(capacity)}</span>` : ""}` +
+      `${units.length ? `<span>${formatNumber(units.length)} units</span>` : ""}` +
+    `</div>` +
+    `${sector ? `<div class="rt-sub">${escapeHtml(sector)}</div>` : ""}` +
+    `${units.length ? refineryUnitSummaryHtml(p.refinery_unit_summary) : ""}` +
+    `<div class="refinery-units">${refineryCapacityRowsHtml(plantCapacities, 5)}</div>` +
+    `${units.length ? `<div class="refinery-units detailed">${refineryUnitRowsHtml(units, 5)}</div>` : ""}` +
+  `</div>`;
+}
+
+function refineryPopupHtml(properties) {
+  const p = properties || {};
+  const capacity = refineryCapacityLabel(p.crud_capacity_bbl_d, "BBL/d");
+  const location = [p.city, p.state_name, p.country_name].filter(Boolean).join(", ");
+  const operator = p.operator_name || p.owner_name || p.parent_company || "";
+  const units = Array.isArray(p.refinery_units) ? p.refinery_units : [];
+  const plantCapacities = p.plant_capacities || p.unit_capacities || [];
+  return `<div class="refinery-popup-inner">` +
+    `<h2>${escapeHtml(p.plant_name || "Refinery / upgrader")}</h2>` +
+    `<div class="rp-sub">${escapeHtml([operator, location].filter(Boolean).join(" · "))}</div>` +
+    `<div class="rt-meta">` +
+      `${p.plant_status_desc ? `<span>${escapeHtml(p.plant_status_desc)}</span>` : ""}` +
+      `${capacity ? `<span>${escapeHtml(capacity)}</span>` : ""}` +
+      `${units.length ? `<span>${formatNumber(units.length)} units</span>` : ""}` +
+    `</div>` +
+    `${p.plant_sectors ? `<p>${escapeHtml(p.plant_sectors)}</p>` : ""}` +
+    `<h3>Plant Capacities</h3>` +
+    `<div class="refinery-units">${refineryCapacityRowsHtml(plantCapacities, 20)}</div>` +
+    `<h3>Refinery Units</h3>` +
+    `${refineryUnitSummaryHtml(p.refinery_unit_summary)}` +
+    `<div class="refinery-unit-list">${refineryUnitRowsHtml(units, 160)}</div>` +
+  `</div>`;
+}
+
+function refineryMarkerRadius(properties) {
+  const capacity = Number(properties?.crud_capacity_kbbl_d);
+  if (!Number.isFinite(capacity) || capacity <= 0) return 7;
+  return Math.max(7, Math.min(20, Math.sqrt(capacity) * 1.08));
+}
+
+function renderRefineryLayer() {
+  if (!state.map || !window.L) return;
+  if (state.refineryLayer) {
+    state.map.removeLayer(state.refineryLayer);
+    state.refineryLayer = null;
+  }
+  if (!state.refineryEnabled || !legendVisible("refinery-plant") || !state.refineries?.features?.length) return;
+
+  state.refineryLayer = L.geoJSON(state.refineries, {
+    pointToLayer(feature, latlng) {
+      const radius = refineryMarkerRadius(feature.properties);
+      return L.circleMarker(latlng, {
+        radius,
+        color: "#4a1f13",
+        weight: 1.8,
+        fillColor: "#b4532a",
+        fillOpacity: 0.76,
+        opacity: 0.96,
+      });
+    },
+    onEachFeature(feature, layer) {
+      layer.bindTooltip(refineryTooltipDetailedHtml(feature.properties), {
+        sticky: true,
+        opacity: 0.97,
+        className: "refinery-tip",
+      });
+      layer.bindPopup(refineryPopupHtml(feature.properties), {
+        className: "refinery-popup",
+        maxWidth: 620,
+      });
+    },
+  }).addTo(state.map);
+}
+
+function toggleRefineries() {
+  state.refineryEnabled = !state.refineryEnabled;
+  if (state.refineryEnabled) {
+    renderRefineryLayer();
+  } else if (state.refineryLayer) {
+    state.map.removeLayer(state.refineryLayer);
+    state.refineryLayer = null;
+  }
+  updateRefineryToggleUI();
+}
+
+function updateRefineryToggleUI() {
+  const btn = els.refineryToggle;
+  if (!btn) return;
+  if (state.refineryEnabled) {
+    const count = state.refineries?.features?.length ?? 0;
+    btn.textContent = "Refineries ON";
+    btn.title = `${count.toLocaleString("en-CA")} refinery and upgrader plants`;
+    btn.className = "refinery-toggle-btn active";
+  } else {
+    btn.textContent = "Refineries";
+    btn.title = "Refinery and upgrader plants with unit-level capacity rows";
+    btn.className = "refinery-toggle-btn";
   }
 }
 
@@ -2285,7 +2521,7 @@ function renderFireLayer() {
         `<strong>Fire hotspot</strong> (${escapeHtml(p.agency || "?")})<br>` +
         `${escapeHtml(fwi)}${fuel}<br>` +
         `${escapeHtml(p.sensor || "")}${date ? " · " + date : ""}`,
-        { opacity: 0.95 }
+        { opacity: 0.95, className: "fire-hotspot-tip" }
       );
     },
   }).addTo(state.map);
