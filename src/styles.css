@@ -1006,19 +1006,39 @@ select {
   font-weight: 760;
 }
 
-/* Leaflet tooltip for AER scheme names */
+/* Leaflet tooltip for AER scheme names / ST102 facilities */
 .formation-tip {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  padding: 4px 9px;
+  padding: 6px 10px;
   color: var(--ink);
   pointer-events: none;
-  max-width: min(340px, calc(100vw - 40px));
+  min-width: 200px;
+  max-width: min(320px, calc(100vw - 40px));
   white-space: normal;
   overflow-wrap: break-word;
+  font-size: 12px;
+  line-height: 1.5;
 }
+.formation-tip .ft-sub {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 1px;
+}
+.formation-tip .ft-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  margin-top: 3px;
+}
+.ft-badge.insitu   { background: #0e7490; }
+.ft-badge.mineable { background: #a16207; }
 
 .asset-tip {
   width: max-content;

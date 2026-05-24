@@ -1456,11 +1456,15 @@ function renderFormationLayer() {
       onEachFeature(feature, layer) {
         const p = feature.properties || {};
         const name = p.name || p.scheme_no || "AER scheme approval";
+        const badgeClass = (p.layer || "").toLowerCase().includes("mineab") ? "mineable" : "insitu";
+        const badgeLabel = (p.layer || "").toLowerCase().includes("mineab") ? "Mineable" : "In-situ";
         layer.bindTooltip(
-          `<strong style="font-size:12px">${escapeHtml(name)}</strong><br>` +
-            `${escapeHtml(p.layer || "AER scheme approval")}<br>` +
-            `${p.holder ? escapeHtml(p.holder) + "<br>" : ""}` +
-            `${p.scheme_no ? "Scheme " + escapeHtml(p.scheme_no) : ""}`,
+          `<div>` +
+          `<strong>${escapeHtml(name)}</strong>` +
+          `<span class="ft-badge ${badgeClass}">${badgeLabel}</span>` +
+          `${p.holder ? `<div class="ft-sub">${escapeHtml(p.holder)}</div>` : ""}` +
+          `${p.scheme_no ? `<div class="ft-sub">Scheme ${escapeHtml(p.scheme_no)}</div>` : ""}` +
+          `</div>`,
           { sticky: true, opacity: 0.92, className: "formation-tip" }
         );
       },
@@ -1488,10 +1492,12 @@ function renderFormationLayer() {
       onEachFeature(feature, layer) {
         const p = feature.properties || {};
         layer.bindTooltip(
-          `<strong style="font-size:12px">${escapeHtml(p.name || "ST102 facility")}</strong><br>` +
-            `${escapeHtml(p.subtype || "Facility")}<br>` +
-            `${p.operator ? escapeHtml(p.operator) + "<br>" : ""}` +
-            `${p.facility_id ? escapeHtml(p.facility_id) + " · " : ""}${escapeHtml(p.status || "")}`,
+          `<div>` +
+          `<strong>${escapeHtml(p.name || "ST102 facility")}</strong>` +
+          `<div class="ft-sub">${escapeHtml(p.subtype || "Facility")}</div>` +
+          `${p.operator ? `<div class="ft-sub">${escapeHtml(p.operator)}</div>` : ""}` +
+          `${p.facility_id || p.status ? `<div class="ft-sub">${p.facility_id ? escapeHtml(p.facility_id) + " · " : ""}${escapeHtml(p.status || "")}</div>` : ""}` +
+          `</div>`,
           { sticky: true, opacity: 0.92, className: "formation-tip" }
         );
       },
