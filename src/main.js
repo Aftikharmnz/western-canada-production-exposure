@@ -2673,8 +2673,9 @@ function renderPipelineSegmentLayer() {
         `<div>` +
         `<strong><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.company || '—')}</strong>` +
         `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.field_ctr || '—')}</div>` +
-        `<div class="pt-sub" style="margin-top:4px">` +
-        `<b>From:</b> ${escapeHtml(from)}<br><b>To:</b> ${escapeHtml(to)}` +
+        `<div class="pt-route">` +
+        `<span class="pt-route-label">From</span><span class="pt-route-val">${escapeHtml(from)}</span>` +
+        `<span class="pt-route-label">To</span><span class="pt-route-val">${escapeHtml(to)}</span>` +
         `</div>` +
         `<div class="pt-sub" style="margin-top:4px">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
         `${p.material ? `<div class="pt-sub">${escapeHtml(p.material)}${p.joint ? ' · ' + escapeHtml(p.joint) : ''}</div>` : ''}` +
@@ -2725,11 +2726,13 @@ function renderPipelineInstallLayer() {
       const extras = [pwr && src ? `${pwr} (${src})` : (pwr || src), h2s].filter(Boolean).join(' · ');
 
       layer.bindTooltip(
+        `<div>` +
         `<strong>${escapeHtml(type)}</strong>` +
         `<div class="pt-sub">${escapeHtml(p.company || '—')}</div>` +
-        `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.location || '—')}</div>` +
-        `<div class="pt-sub">${escapeHtml(p.substance || '')}${p.field_ctr ? ' · ' + escapeHtml(p.field_ctr) : ''}</div>` +
-        (extras ? `<div class="pt-sub">${escapeHtml(extras)}</div>` : ''),
+        `<div class="pt-sub">Lic. ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.location || '—')}</div>` +
+        `${p.substance || p.field_ctr ? `<div class="pt-sub">${escapeHtml(p.substance || '')}${p.field_ctr ? ' · ' + escapeHtml(p.field_ctr) : ''}</div>` : ''}` +
+        `${extras ? `<div class="pt-sub" style="margin-top:2px">${escapeHtml(extras)}</div>` : ''}` +
+        `</div>`,
         { sticky: true, opacity: 0.96, className: 'inst-tip' }
       );
     },
