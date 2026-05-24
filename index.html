@@ -27,7 +27,44 @@
           <button id="selectModeBtn" class="select-mode-btn" type="button" title="Ctrl+drag to select assets">&#9638; Select</button>
           <button id="formationToggle" class="formation-toggle-btn" type="button">AER Sites</button>
           <button id="refineryToggle" class="refinery-toggle-btn" type="button">Refineries</button>
-          <button id="pipelineToggle" class="pipeline-toggle-btn" type="button">Pipelines</button>
+          <div id="pipelineControl" class="pipeline-control">
+            <button id="pipelineToggle" class="pipeline-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Pipelines</button>
+            <div id="pipelineMenu" class="pipeline-menu" hidden>
+              <div class="pipeline-menu-header">
+                <strong>AER Feeder Pipelines</strong>
+                <span>Choose categories</span>
+              </div>
+              <div class="pipeline-menu-actions">
+                <button type="button" data-pipeline-action="core">Core</button>
+                <button type="button" data-pipeline-action="all">All</button>
+                <button type="button" data-pipeline-action="none">None</button>
+              </div>
+              <div id="pipelineOptions" class="pipeline-options"></div>
+            </div>
+          </div>
+          <div id="marketPipelineControl" class="market-pipeline-control">
+            <button id="marketPipelineToggle" class="market-pipeline-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Market Pipes</button>
+            <div id="marketPipelineMenu" class="market-pipeline-menu" hidden>
+              <div class="market-pipeline-menu-header">
+                <strong>Market Pipes</strong>
+                <span>Choose routes to show</span>
+              </div>
+              <div class="market-pipeline-menu-actions">
+                <button type="button" data-market-action="defaults">Core</button>
+                <button type="button" data-market-action="all">All</button>
+                <button type="button" data-market-action="none">None</button>
+              </div>
+              <div id="marketPipelineOptions" class="market-pipeline-options"></div>
+              <label class="market-pipeline-option hub-option">
+                <input id="marketHubToggle" type="checkbox" checked />
+                <span class="market-pipeline-hub-dot"></span>
+                <span class="market-pipeline-option-text">
+                  <strong>Market hubs</strong>
+                  <em>Terminals, refineries, and route nodes</em>
+                </span>
+              </label>
+            </div>
+          </div>
           <button id="wildfireToggle" class="fire-toggle-btn" type="button">Fire Layer</button>
           <button id="distanceToggle" class="distance-mode-btn" type="button">Distance</button>
           <button id="docsBtn" class="docs-btn" type="button">&#9432; Docs</button>
@@ -118,7 +155,6 @@
             <button type="button" class="legend-item" data-legend-key="st102-facility" aria-pressed="true"><i class="dot st102-facility"></i><span>ST102 Facility</span></button>
             <button type="button" class="legend-item" data-legend-key="refinery-plant" aria-pressed="true"><i class="dot refinery-plant"></i><span>Refinery / Upgrader</span></button>
           </div>
-          <div id="pipelineLegend" class="pipeline-legend-panel" hidden></div>
           <div id="etlPanel" class="etl-panel" hidden>
             <button id="closeEtl" type="button" aria-label="Close ETL panel">x</button>
             <h2>Local refresh command</h2>
@@ -335,10 +371,10 @@
 
           <!-- ── PIPELINES ── -->
           <section class="docs-section" id="tab-pipelines" hidden>
-            <h2>Pipeline Layer</h2>
-            <p>The pipeline layer currently shows <strong>AER Alberta feeder pipelines and pipeline installations</strong> from the local GeoJSON exports. It is provincial Alberta infrastructure context, not a complete CER-regulated export pipeline map.</p>
+            <h2>Pipeline Layers</h2>
+            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude export/import and diluent corridors that connect Western Canadian production to external markets.</p>
 
-            <h3>What is shown</h3>
+            <h3>AER feeder layer</h3>
             <p>Line segments represent AER feeder pipeline records where geometry is available. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
 
             <h3>Commodity types</h3>
@@ -352,8 +388,10 @@
               </tbody>
             </table>
 
-            <h3>What is not shown</h3>
-            <p>What is not shown yet: a complete CER long-haul export route layer with capacity, flow, apportionment, and terminal connectivity. For trading use, that should be a separate egress/infrastructure layer rather than mixed into the AER feeder layer.</p>
+            <h3>Market access layer</h3>
+            <p>The market access layer is intentionally compact and route-level. It includes Enbridge Mainline/Lakehead, Trans Mountain/Puget Sound, Keystone, Express/Platte, Southern Lights, Cochin, Line 9, Wascana, Westspur, Enbridge Bakken/North Dakota, and optional downstream Enbridge/CER liquid systems. Canadian linework is selected from the public CER pipeline systems FeatureServer. U.S. continuations are selected from EIA ArcGIS FeatureServers, with Skagit County GIS filling the Trans Mountain Puget Sound Anacortes-area segment. Yellow hub markers identify key terminals, refineries, interconnects, and route nodes from the CAPP map reference.</p>
+
+            <p class="docs-note">Market access lines are analytical context only. They are approximate and must not be used for construction, ground disturbance, or exact underground pipeline location checks.</p>
           </section>
 
           <!-- ── DATA SOURCES ── -->
@@ -417,6 +455,12 @@
                   <td>AER feeder pipeline and pipeline installation GeoJSON exports</td>
                   <td>Alberta pipeline context</td>
                   <td>Oil-well effluent, crude, HVP/LVP products, condensate, diluents, installations</td>
+                </tr>
+                <tr>
+                  <td><strong>Market Access Pipelines</strong></td>
+                  <td>CER liquid pipeline systems plus selected EIA U.S. Energy Atlas and Skagit County ArcGIS linework</td>
+                  <td>Canadian crude export/import trunks, U.S. continuations, and named market hubs</td>
+                  <td>Crude oil, diluent, condensate/HGL corridors</td>
                 </tr>
                 <tr>
                   <td><strong>AER Scheme Approvals</strong></td>

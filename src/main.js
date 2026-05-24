@@ -10,6 +10,7 @@ const DATA_PATHS = {
   st102Facilities: "public/data/aer_st102_oil_sands_facilities.geojson",
   assetGeometries: "public/data/asset_geometries.geojson",
   refineries: "public/data/refineries.geojson",
+  marketPipelines: "public/data/market_access_pipelines.geojson",
 };
 
 // ============================================================
@@ -189,6 +190,15 @@ const state = {
   assetFootprintLayer: null,
   refineryEnabled: false,
   refineryLayer: null,
+  marketPipelineEnabled: false,
+  marketPipelineData: null,
+  marketPipelineLoading: false,
+  marketPipelineError: null,
+  marketPipelineLineLayer: null,
+  marketHubLayer: null,
+  selectedMarketPipelineIds: new Set(),
+  marketHubsEnabled: true,
+  marketPipelineMenuOpen: false,
   // Seasonality index (lazy-loaded from asset_seasonality.json)
   seasonalityIndex: null,
   seasonalityIndexLoading: false,
@@ -594,6 +604,30 @@ function initControls() {
   if (pipelineToggleBtn) {
     pipelineToggleBtn.addEventListener("click", togglePipelines);
   }
+  const pipelineMenu = document.getElementById("pipelineMenu");
+  if (pipelineMenu) {
+    pipelineMenu.addEventListener("change", handlePipelineMenuChange);
+    pipelineMenu.addEventListener("click", handlePipelineMenuClick);
+  }
+  const marketPipelineToggleBtn = document.getElementById("marketPipelineToggle");
+  if (marketPipelineToggleBtn) {
+    marketPipelineToggleBtn.addEventListener("click", toggleMarketPipelines);
+  }
+  const marketPipelineMenu = document.getElementById("marketPipelineMenu");
+  if (marketPipelineMenu) {
+    marketPipelineMenu.addEventListener("change", handleMarketPipelineMenuChange);
+    marketPipelineMenu.addEventListener("click", handleMarketPipelineMenuClick);
+  }
+  document.addEventListener("click", (event) => {
+    const control = document.getElementById("marketPipelineControl");
+    if (control && !control.contains(event.target)) {
+      setMarketPipelineMenuOpen(false);
+    }
+    const pipelineControl = document.getElementById("pipelineControl");
+    if (pipelineControl && !pipelineControl.contains(event.target)) {
+      setPipelineMenuOpen(false);
+    }
+  });
   initLegendControls();
 }
 
@@ -2588,6 +2622,246 @@ const INSTALLATION_LEGEND_KEY = {
   'Line Heater':          'inst-meter',
 };
 
+// ============================================================
+// MARKET ACCESS PIPELINES - Canadian export/import trunks
+// ============================================================
+
+function marketPipelineFeatures() {
+  return (state.marketPipelineData?.features || [])
+    .filter((feature) => feature.properties?.feature_kind === 'pipeline')
+    .sort((a, b) => (a.properties?.display_order || 999) - (b.properties?.display_order || 999));
+}
+
+function marketHubFeatures() {
+  return (state.marketPipelineData?.features || [])
+    .filter((feature) => feature.properties?.feature_kind === 'hub');
+}
+
+function selectedMarketPipelineFeatures() {
+  return marketPipelineFeatures()
+    .filter((feature) => state.selectedMarketPipelineIds.has(feature.properties?.route_id));
+}
+
+function initializeMarketPipelineSelection() {
+  if (state.selectedMarketPipelineIds.size || !state.marketPipelineData) return;
+  for (const feature of marketPipelineFeatures()) {
+    if (feature.properties?.default_visible !== false) {
+      state.selectedMarketPipelineIds.add(feature.properties.route_id);
+    }
+  }
+}
+
+function marketPipelineStyle(feature) {
+  return {
+    color: feature.properties?.color || '#334155',
+    weight: 2.1,
+    opacity: 0.78,
+    lineCap: 'round',
+    lineJoin: 'round',
+  };
+}
+
+async function fetchMarketPipelineData() {
+  if (state.marketPipelineData) return true;
+  if (state.marketPipelineLoading) return false;
+
+  state.marketPipelineLoading = true;
+  state.marketPipelineError = null;
+  updateMarketPipelineToggleUI();
+  updatePipelineStatus('Loading market access pipelines (<100 KB)...');
+
+  try {
+    const response = await fetch(DATA_PATHS.marketPipelines);
+    if (!response.ok) throw new Error(`Market pipelines: HTTP ${response.status}`);
+    state.marketPipelineData = await response.json();
+    initializeMarketPipelineSelection();
+    buildMarketPipelineMenu();
+  } catch (err) {
+    state.marketPipelineError = err.message || String(err);
+    updatePipelineStatus(`Market pipeline data unavailable: ${state.marketPipelineError}`);
+    state.marketPipelineLoading = false;
+    updateMarketPipelineToggleUI();
+    return false;
+  }
+
+  state.marketPipelineLoading = false;
+  updateMarketPipelineToggleUI();
+  updatePipelineStatus('');
+  return true;
+}
+
+function renderMarketPipelineLayers() {
+  if (!state.map || !window.L) return;
+  if (state.marketPipelineLineLayer) {
+    state.map.removeLayer(state.marketPipelineLineLayer);
+    state.marketPipelineLineLayer = null;
+  }
+  if (state.marketHubLayer) {
+    state.map.removeLayer(state.marketHubLayer);
+    state.marketHubLayer = null;
+  }
+  if (!state.marketPipelineEnabled || !state.marketPipelineData?.features?.length) return;
+
+  const lineFeatures = selectedMarketPipelineFeatures();
+  if (!lineFeatures.length) return;
+
+  state.marketPipelineLineLayer = L.geoJSON({ type: 'FeatureCollection', features: lineFeatures }, {
+    style: marketPipelineStyle,
+    onEachFeature(feature, layer) {
+      const p = feature.properties || {};
+      const source = p.source_summary || 'public GIS';
+      const confidence = p.geometry_confidence || 'route-level linework';
+      layer.bindTooltip(
+        `<div>` +
+        `<strong>${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
+        `<div class="pt-sub">${escapeHtml(p.operator || '')}${p.commodity ? ' · ' + escapeHtml(p.commodity) : ''}</div>` +
+        `<div class="pt-sub">${escapeHtml(p.flow_role || '')}</div>` +
+        `<div class="pt-route">` +
+        `<span class="pt-route-label">Source</span><span class="pt-route-val">${escapeHtml(source)}</span>` +
+        `<span class="pt-route-label">Direction</span><span class="pt-route-val">${escapeHtml(p.direction || '—')}</span>` +
+        `</div>` +
+        `<div class="pt-sub" style="margin-top:4px">${escapeHtml(source)} · ${escapeHtml(confidence)}</div>` +
+        `</div>`,
+        { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+      );
+    },
+  }).addTo(state.map);
+
+  if (state.marketHubsEnabled) {
+    state.marketHubLayer = L.geoJSON(
+      { type: 'FeatureCollection', features: marketHubFeatures() },
+      {
+        pointToLayer(feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 4,
+            color: '#111827',
+            weight: 1.4,
+            fillColor: '#facc15',
+            fillOpacity: 0.92,
+            opacity: 0.9,
+          });
+        },
+        onEachFeature(feature, layer) {
+          const p = feature.properties || {};
+          layer.bindTooltip(
+            `<div><strong>${escapeHtml(p.name || 'Market hub')}</strong>` +
+            `${p.hub_type ? `<div class="pt-sub">${escapeHtml(p.hub_type)}</div>` : ''}</div>`,
+            { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+          );
+        },
+      }
+    ).addTo(state.map);
+  }
+
+  state.marketPipelineLineLayer.bringToBack();
+  if (state.pipelineSegmentLayer) state.pipelineSegmentLayer.bringToBack();
+  if (state.formationLayer) state.formationLayer.bringToBack();
+}
+
+async function toggleMarketPipelines() {
+  const ok = await fetchMarketPipelineData();
+  if (!ok) return;
+  state.marketPipelineEnabled = true;
+  setMarketPipelineMenuOpen(!state.marketPipelineMenuOpen);
+  renderMarketPipelineLayers();
+  updateMarketPipelineToggleUI();
+}
+
+function updateMarketPipelineToggleUI() {
+  const btn = document.getElementById('marketPipelineToggle');
+  if (!btn) return;
+  const selectedCount = state.selectedMarketPipelineIds.size;
+  const totalCount = marketPipelineFeatures().length;
+  if (state.marketPipelineLoading) {
+    btn.textContent = 'Loading...';
+    btn.className = 'market-pipeline-toggle-btn loading';
+    btn.setAttribute('aria-expanded', 'false');
+  } else if (state.marketPipelineEnabled && selectedCount) {
+    btn.textContent = `Market Pipes (${selectedCount})`;
+    btn.title = `${selectedCount.toLocaleString('en-CA')} of ${totalCount.toLocaleString('en-CA')} market-access routes selected`;
+    btn.className = 'market-pipeline-toggle-btn active';
+    btn.setAttribute('aria-expanded', state.marketPipelineMenuOpen ? 'true' : 'false');
+  } else {
+    btn.textContent = 'Market Pipes';
+    btn.title = 'Major Canadian crude export/import and diluent market-access pipelines';
+    btn.className = 'market-pipeline-toggle-btn';
+    btn.setAttribute('aria-expanded', state.marketPipelineMenuOpen ? 'true' : 'false');
+  }
+}
+
+function setMarketPipelineMenuOpen(open) {
+  state.marketPipelineMenuOpen = open;
+  const menu = document.getElementById('marketPipelineMenu');
+  if (menu) menu.hidden = !open;
+  updateMarketPipelineToggleUI();
+}
+
+function buildMarketPipelineMenu() {
+  const options = document.getElementById('marketPipelineOptions');
+  if (!options || !state.marketPipelineData) return;
+  options.innerHTML = marketPipelineFeatures().map((feature) => {
+    const p = feature.properties || {};
+    const checked = state.selectedMarketPipelineIds.has(p.route_id);
+    const color = p.color || '#334155';
+    return `
+      <label class="market-pipeline-option" title="${escapeHtml(p.flow_role || p.route_name)}">
+        <input type="checkbox" data-market-pipeline-id="${escapeHtml(p.route_id)}" ${checked ? 'checked' : ''} />
+        <span class="market-pipeline-swatch" style="background:${color}"></span>
+        <span class="market-pipeline-option-text">
+          <strong>${escapeHtml(p.route_name || p.route_id)}</strong>
+          <em>${escapeHtml(p.commodity || '')}</em>
+        </span>
+      </label>`;
+  }).join('');
+  const hubsToggle = document.getElementById('marketHubToggle');
+  if (hubsToggle) hubsToggle.checked = state.marketHubsEnabled;
+}
+
+function handleMarketPipelineMenuChange(event) {
+  const pipelineInput = event.target.closest('input[data-market-pipeline-id]');
+  if (pipelineInput) {
+    const id = pipelineInput.dataset.marketPipelineId;
+    if (pipelineInput.checked) state.selectedMarketPipelineIds.add(id);
+    else state.selectedMarketPipelineIds.delete(id);
+    state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0;
+    refreshMarketPipelineLayers();
+    updateMarketPipelineToggleUI();
+    return;
+  }
+
+  if (event.target.id === 'marketHubToggle') {
+    state.marketHubsEnabled = event.target.checked;
+    refreshMarketPipelineLayers();
+  }
+}
+
+function handleMarketPipelineMenuClick(event) {
+  const action = event.target.closest('[data-market-action]')?.dataset.marketAction;
+  if (!action) return;
+  if (action === 'all') {
+    for (const feature of marketPipelineFeatures()) {
+      state.selectedMarketPipelineIds.add(feature.properties.route_id);
+    }
+  } else if (action === 'none') {
+    state.selectedMarketPipelineIds.clear();
+  } else if (action === 'defaults') {
+    state.selectedMarketPipelineIds.clear();
+    for (const feature of marketPipelineFeatures()) {
+      if (feature.properties?.default_visible !== false) {
+        state.selectedMarketPipelineIds.add(feature.properties.route_id);
+      }
+    }
+  }
+  state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0;
+  buildMarketPipelineMenu();
+  refreshMarketPipelineLayers();
+  updateMarketPipelineToggleUI();
+}
+
+function refreshMarketPipelineLayers() {
+  renderMarketPipelineLayers();
+}
+
 // Extend app state for pipelines
 Object.assign(state, {
   pipelineEnabled:      false,
@@ -2597,6 +2871,7 @@ Object.assign(state, {
   pipelineError:        null,
   pipelineSegmentLayer: null,
   pipelineInstallLayer: null,
+  pipelineMenuOpen:     false,
 });
 
 function pipelineSubstanceWeight(diamMm) {
@@ -2627,6 +2902,7 @@ async function fetchPipelineData() {
     const [pipJson, instJson] = await Promise.all([pipRes.json(), instRes.json()]);
     state.pipelineData        = pipJson;
     state.pipelineInstallData = instJson;
+    buildPipelineMenu();
   } catch (err) {
     state.pipelineError = err.message || String(err);
     updatePipelineStatus(`Pipeline data unavailable: ${state.pipelineError}`);
@@ -2748,40 +3024,34 @@ function renderPipelineInstallLayer() {
 }
 
 async function togglePipelines() {
-  state.pipelineEnabled = !state.pipelineEnabled;
-
-  if (state.pipelineEnabled) {
-    updatePipelineToggleUI();
-    const ok = await fetchPipelineData();
-    if (!ok) { state.pipelineEnabled = false; updatePipelineToggleUI(); return; }
-    renderPipelineSegmentLayer();
-    renderPipelineInstallLayer();
-    buildPipelineLegendPanel();
-    showPipelineLegendPanel(true);
-  } else {
-    if (state.pipelineSegmentLayer) { state.map.removeLayer(state.pipelineSegmentLayer); state.pipelineSegmentLayer = null; }
-    if (state.pipelineInstallLayer) { state.map.removeLayer(state.pipelineInstallLayer); state.pipelineInstallLayer = null; }
-    showPipelineLegendPanel(false);
-    updatePipelineStatus('');
-  }
+  const ok = await fetchPipelineData();
+  if (!ok) return;
+  state.pipelineEnabled = pipelineSelectedCount() > 0;
+  setPipelineMenuOpen(!state.pipelineMenuOpen);
+  renderPipelineSegmentLayer();
+  renderPipelineInstallLayer();
   updatePipelineToggleUI();
 }
 
 function updatePipelineToggleUI() {
   const btn = document.getElementById('pipelineToggle');
   if (!btn) return;
+  const selectedCount = pipelineSelectedCount();
+  const totalCount = pipelineFilterItems().length;
   if (state.pipelineLoading) {
     btn.textContent = 'Loading…';
     btn.className   = 'pipeline-toggle-btn loading';
-  } else if (state.pipelineEnabled) {
-    btn.textContent = 'Pipelines ON';
-    btn.title       = `${(state.pipelineData?.features?.length ?? 0).toLocaleString('en-CA')} segments · ` +
-                      `${(state.pipelineInstallData?.features?.length ?? 0).toLocaleString('en-CA')} installations`;
+    btn.setAttribute('aria-expanded', 'false');
+  } else if (state.pipelineEnabled && selectedCount) {
+    btn.textContent = `Pipelines (${selectedCount})`;
+    btn.title       = `${selectedCount.toLocaleString('en-CA')} of ${totalCount.toLocaleString('en-CA')} AER feeder categories selected`;
     btn.className   = 'pipeline-toggle-btn active';
+    btn.setAttribute('aria-expanded', state.pipelineMenuOpen ? 'true' : 'false');
   } else {
     btn.textContent = 'Pipelines';
     btn.title       = 'AER feeder pipelines — crude, HVP/LVP, condensate, diluents, well effluent';
     btn.className   = 'pipeline-toggle-btn';
+    btn.setAttribute('aria-expanded', state.pipelineMenuOpen ? 'true' : 'false');
   }
 }
 
@@ -2792,8 +3062,7 @@ function updatePipelineStatus(msg) {
   el.hidden      = !msg;
 }
 
-// ── Pipeline legend panel ─────────────────────────────────────
-// Built once after data loads; sync() just refreshes muted state.
+// AER feeder pipeline category dropdown.
 
 const PIPELINE_LEGEND_ITEMS = [
   // Lines section
@@ -2811,6 +3080,87 @@ const PIPELINE_LEGEND_ITEMS = [
   { key: 'inst-terminal',   label: 'Oil Terminals / Tank Farms', color: '#f59e0b', type: 'dot' },
   { key: 'inst-meter',      label: 'Meter / Regulator Stns.', color: '#a78bfa', type: 'dot' },
 ];
+
+const PIPELINE_CORE_KEYS = new Set([
+  'pipe-crude',
+  'pipe-condensate',
+  'pipe-diluent',
+  'inst-pump',
+  'inst-terminal',
+]);
+
+function pipelineFilterItems() {
+  return PIPELINE_LEGEND_ITEMS.filter((item) => !item.section);
+}
+
+function pipelineSelectedCount() {
+  return pipelineFilterItems().filter((item) => !state.hiddenLegendKeys.has(item.key)).length;
+}
+
+function setPipelineMenuOpen(open) {
+  state.pipelineMenuOpen = open;
+  const menu = document.getElementById('pipelineMenu');
+  if (menu) menu.hidden = !open;
+  updatePipelineToggleUI();
+}
+
+function buildPipelineMenu() {
+  const options = document.getElementById('pipelineOptions');
+  if (!options) return;
+  const counts = pipelineLegendCounts();
+  let currentSection = '';
+  let html = '';
+  for (const item of PIPELINE_LEGEND_ITEMS) {
+    if (item.section) {
+      currentSection = item.section;
+      html += `<div class="pipeline-menu-section">${escapeHtml(item.section)}</div>`;
+      continue;
+    }
+    const checked = !state.hiddenLegendKeys.has(item.key);
+    const count = counts[item.key] ? counts[item.key].toLocaleString('en-CA') : '';
+    const swatchClass = item.type === 'line' ? 'pipeline-swatch' : 'pipeline-dot-swatch';
+    html += `
+      <label class="pipeline-option" title="${escapeHtml(currentSection)}">
+        <input type="checkbox" data-pipeline-key="${escapeHtml(item.key)}" ${checked ? 'checked' : ''} />
+        <span class="${swatchClass}" style="background:${item.color}"></span>
+        <span class="pipeline-option-text">
+          <strong>${escapeHtml(item.label)}</strong>
+          <em>${count ? `${count} features` : currentSection}</em>
+        </span>
+      </label>`;
+  }
+  options.innerHTML = html;
+}
+
+function handlePipelineMenuChange(event) {
+  const input = event.target.closest('input[data-pipeline-key]');
+  if (!input) return;
+  const key = input.dataset.pipelineKey;
+  if (input.checked) state.hiddenLegendKeys.delete(key);
+  else state.hiddenLegendKeys.add(key);
+  state.pipelineEnabled = pipelineSelectedCount() > 0;
+  refreshPipelineLayers();
+  updatePipelineToggleUI();
+}
+
+function handlePipelineMenuClick(event) {
+  const action = event.target.closest('[data-pipeline-action]')?.dataset.pipelineAction;
+  if (!action) return;
+  for (const item of pipelineFilterItems()) {
+    if (action === 'all') {
+      state.hiddenLegendKeys.delete(item.key);
+    } else if (action === 'none') {
+      state.hiddenLegendKeys.add(item.key);
+    } else if (action === 'core') {
+      if (PIPELINE_CORE_KEYS.has(item.key)) state.hiddenLegendKeys.delete(item.key);
+      else state.hiddenLegendKeys.add(item.key);
+    }
+  }
+  state.pipelineEnabled = pipelineSelectedCount() > 0;
+  buildPipelineMenu();
+  refreshPipelineLayers();
+  updatePipelineToggleUI();
+}
 
 // Count features per legend key from the loaded data
 function pipelineLegendCounts() {
@@ -2831,89 +3181,10 @@ function pipelineLegendCounts() {
   }
   return counts;
 }
-function getPipelineLegendPanel() {
-  let panel = document.getElementById('pipelineLegend');
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'pipelineLegend';
-    const mapStage = document.querySelector('.map-stage');
-    if (mapStage) mapStage.appendChild(panel);
-    else document.body.appendChild(panel);
-  }
-  // Always (re)apply inline styles — the CSS class has no rules.
-  // Preserve the current show/hide state while reapplying everything else.
-  const currentDisplay = panel.style.display;
-  panel.removeAttribute('hidden');
-  panel.style.cssText = [
-    'position:absolute',
-    'bottom:32px',
-    'right:10px',
-    'width:220px',
-    'max-height:480px',
-    'overflow-y:auto',
-    'background:#fff',
-    'border:1px solid #d1d5db',
-    'border-radius:8px',
-    'box-shadow:0 4px 16px rgba(0,0,0,0.18)',
-    'z-index:1100',
-    'font-size:12px',
-    'font-family:Inter,sans-serif',
-    'display:' + (currentDisplay || 'none'),
-  ].join(';');
-  return panel;
-}
-
-function buildPipelineLegendPanel() {
-  const panel = getPipelineLegendPanel();
-  const counts = pipelineLegendCounts();
-
-  let html = '<div style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:12px;color:#374151;">&#x2B21; Pipeline Layer</div>';
-
-  for (const item of PIPELINE_LEGEND_ITEMS) {
-    if (item.section) {
-      html += `<div style="padding:6px 10px 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;">${escapeHtml(item.section)}</div>`;
-      continue;
-    }
-    const count = counts[item.key] ?? 0;
-    const countStr = count > 0 ? count.toLocaleString('en-CA') : '';
-    const swatch = item.type === 'line'
-      ? `<span style="display:inline-block;width:20px;height:3px;border-radius:2px;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`
-      : `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.color};vertical-align:middle;flex-shrink:0;"></span>`;
-    const isHidden = state.hiddenLegendKeys.has(item.key);
-    html += `<button data-pl-key="${item.key}" type="button" style="display:flex;align-items:center;gap:7px;width:100%;padding:4px 10px;border:none;background:transparent;cursor:pointer;text-align:left;opacity:${isHidden ? '0.35' : '1'};">${swatch}<span style="flex:1;color:#374151;">${escapeHtml(item.label)}</span>${countStr ? `<span style="color:#9ca3af;font-size:10px;">${countStr}</span>` : ''}</button>`;
-  }
-
-  panel.innerHTML = html;
-
-  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const key = btn.dataset.plKey;
-      if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
-      else state.hiddenLegendKeys.add(key);
-      syncPipelineLegendPanel();
-      refreshPipelineLayers();
-    });
-  });
-}
-
-function syncPipelineLegendPanel() {
-  const panel = document.getElementById('pipelineLegend');
-  if (!panel) return;
-  panel.querySelectorAll('button[data-pl-key]').forEach(btn => {
-    btn.style.opacity = state.hiddenLegendKeys.has(btn.dataset.plKey) ? '0.35' : '1';
-  });
-}
-
-function showPipelineLegendPanel(visible) {
-  const panel = getPipelineLegendPanel();
-  panel.style.display = visible ? 'block' : 'none';
-}
-
 function refreshPipelineLayers() {
-  if (!state.pipelineEnabled) return;
   renderPipelineSegmentLayer();
   renderPipelineInstallLayer();
-  syncPipelineLegendPanel();
+  buildPipelineMenu();
 }
 
 async function boot() {
@@ -2927,7 +3198,7 @@ async function boot() {
     updateFireToggleUI();
     updateFormationToggleUI();
     updatePipelineToggleUI();
-    showPipelineLegendPanel(false);
+    updateMarketPipelineToggleUI();
     updateWildfireStatus("Fetching live wildfire data…");
     render();
     // Kick off both fire sources in parallel (non-blocking)
