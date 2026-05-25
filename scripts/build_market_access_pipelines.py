@@ -32,6 +32,7 @@ EIA_HGL_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/service
 SKAGIT_PIPELINES_URL = "https://geo.skagitcountywa.gov/server/rest/services/TransportationUtilities/PipelinesMap/MapServer/2"
 CAPP_MAP_URL = "https://www.capp.ca/wp-content/uploads/2024/03/CAPP-2023-Pipeline-and-Refinery-Map-36x22-wall-size.pdf"
 TM_PUGET_URL = "https://www.transmountain.com/news/2019/trans-mountains-puget-sound-pipeline-shipping-products-to-washington-state-refineries-since-1954"
+AER_FEEDER_PIPELINES = ROOT / "public" / "data" / "aer_feeder_pipelines.geojson"
 
 
 ROUTES: list[dict[str, Any]] = [
@@ -76,6 +77,7 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#60a5fa",
         "display_order": 12,
         "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'EnbridgeBakken'"},
             {"source": "EIA", "url": EIA_CRUDE_URL, "where": "Opername = 'ENBRIDGE' AND Pipename = 'North Dakota System'"},
@@ -91,6 +93,7 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#93c5fd",
         "display_order": 19,
         "default_visible": False,
+        "menu_section": "Selected Other Crude Oil Pipelines",
         "parts": [
             {
                 "source": "EIA",
@@ -209,6 +212,7 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#b45309",
         "display_order": 70,
         "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
         "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'Wascana'"}],
     },
     {
@@ -221,7 +225,48 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#d97706",
         "display_order": 71,
         "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
         "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'Westspur'"}],
+    },
+    {
+        "route_id": "rangeland-aurora-glacier",
+        "route_name": "Rangeland / Aurora / Glacier",
+        "operator": "Plains / Aurora / Phillips 66 / CHS",
+        "commodity": "Crude oil / LVP products",
+        "flow_role": "Selected other crude oil route from central Alberta to Montana/Rockies refining markets",
+        "direction": "Edmonton/Sundre corridor to Carway/Cut Bank/Billings and Rockies connections",
+        "color": "#9333ea",
+        "display_order": 72,
+        "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
+        "parts": [
+            {
+                "source": "AER",
+                "local_geojson": AER_FEEDER_PIPELINES,
+                "licences": ["64941", "179", "1386", "64954", "80010"],
+            },
+            {
+                "source": "EIA",
+                "url": EIA_CRUDE_URL,
+                "where": "Opername = 'PHILLIPS 66 PIPELINE' AND Pipename = 'Glacier Pipeline'",
+            },
+            {
+                "source": "EIA",
+                "url": EIA_CRUDE_URL,
+                "where": "Opername = 'CHS ENERGY' AND Pipename = 'Front Range'",
+            },
+        ],
+        "manual_lines": [
+            [
+                [-113.49, 53.55],
+                [-113.48, 53.43],
+            ],
+            [
+                [-113.39, 49.00],
+                [-112.33, 48.63],
+            ],
+        ],
+        "manual_note": "Alberta geometry uses AER operating pipeline licences; short Edmonton and border connectors are route-level only.",
     },
     {
         "route_id": "enbridge-lines-7-11",
@@ -233,6 +278,7 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#bfdbfe",
         "display_order": 80,
         "default_visible": False,
+        "menu_section": "Selected Other Crude Oil Pipelines",
         "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID IN ('EnbridgeLine7', 'EnbridgeLine11')"}],
     },
     {
@@ -245,6 +291,7 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#64748b",
         "display_order": 90,
         "default_visible": False,
+        "menu_section": "Other Liquids / Products",
         "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'TransNorthern'"}],
     },
     {
@@ -257,11 +304,12 @@ ROUTES: list[dict[str, Any]] = [
         "color": "#94a3b8",
         "display_order": 100,
         "default_visible": False,
+        "menu_section": "Other Liquids / Products",
         "parts": [
             {
                 "source": "CER",
                 "url": CER_PIPELINES_URL,
-                "where": "PipelineID IN ('Aurora', 'Genesis', 'Montreal', 'NormanWells')",
+                "where": "PipelineID IN ('Genesis', 'Montreal', 'NormanWells')",
             }
         ],
     },
@@ -272,6 +320,8 @@ MARKET_HUBS = [
     ("Hardisty", "Terminal / hub", -111.31, 52.67),
     ("Edmonton", "Refining / pipeline hub", -113.49, 53.55),
     ("Fort Saskatchewan", "Diluent / NGL hub", -113.22, 53.71),
+    ("Sundre", "Rangeland corridor node", -114.64, 51.80),
+    ("Carway", "Canada-U.S. border interconnect", -113.38, 49.00),
     ("Kamloops", "Pipeline terminal", -120.33, 50.67),
     ("Burnaby / Westridge", "Marine terminal / refinery market", -122.95, 49.25),
     ("Sumas", "Border / Puget Sound interconnect", -122.27, 49.00),
@@ -286,6 +336,7 @@ MARKET_HUBS = [
     ("Cut Bank", "Montana hub", -112.33, 48.63),
     ("Billings", "Refinery market", -108.50, 45.78),
     ("Guernsey", "Pipeline hub", -104.74, 42.27),
+    ("Casper", "Pipeline hub / refinery market", -106.31, 42.85),
     ("Patoka", "Midwest crude hub", -89.09, 38.75),
     ("Wood River", "Midwest refinery market", -90.20, 38.86),
     ("Cushing", "U.S. crude hub", -96.77, 35.99),
@@ -331,6 +382,23 @@ def query_arcgis_geojson(service_url: str, where: str, page_size: int = 2000) ->
     return features
 
 
+def query_local_geojson(path: Path, part: dict[str, Any]) -> list[dict[str, Any]]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    features = data.get("features") or []
+    licences = {str(value) for value in part.get("licences", [])}
+    statuses = {str(value) for value in part.get("statuses", ["Operating"])}
+
+    selected: list[dict[str, Any]] = []
+    for feature in features:
+        properties = feature.get("properties") or {}
+        if licences and str(properties.get("licence")) not in licences:
+            continue
+        if statuses and str(properties.get("status")) not in statuses:
+            continue
+        selected.append(feature)
+    return selected
+
+
 def feature_lines(feature: dict[str, Any]) -> list[list[list[float]]]:
     geometry = feature.get("geometry") or {}
     geom_type = geometry.get("type")
@@ -348,12 +416,35 @@ def geometry_from_lines(lines: list[list[list[float]]]) -> dict[str, Any]:
     return {"type": "MultiLineString", "coordinates": lines}
 
 
+def source_reference(part: dict[str, Any]) -> str:
+    if part.get("url"):
+        return str(part["url"])
+    path = Path(part["local_geojson"])
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str, Any] | None, list[str]]:
     lines: list[list[list[float]]] = []
     sources: list[str] = []
     warnings: list[str] = []
 
     for part in route.get("parts", []):
+        if part.get("local_geojson"):
+            path = Path(part["local_geojson"])
+            try:
+                part_features = query_local_geojson(path, part)
+            except Exception as exc:  # noqa: BLE001
+                warnings.append(f"{route['route_name']}: {part['source']} local read failed: {exc}")
+                continue
+            for feature in part_features:
+                lines.extend(feature_lines(feature))
+            if part_features:
+                sources.append(f"{part['source']} ({len(part_features)} local feature{'s' if len(part_features) != 1 else ''})")
+            continue
+
         if not include_remote:
             continue
         try:
@@ -375,6 +466,16 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         warnings.append(f"{route['route_name']}: no geometry returned")
         return None, warnings
 
+    unique_lines: list[list[list[float]]] = []
+    seen_lines: set[str] = set()
+    for line in lines:
+        line_key = json.dumps(line, separators=(",", ":"))
+        if line_key in seen_lines:
+            continue
+        seen_lines.add(line_key)
+        unique_lines.append(line)
+    lines = unique_lines
+
     properties = {
         "feature_kind": "pipeline",
         "route_id": route["route_id"],
@@ -386,8 +487,9 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "color": route["color"],
         "display_order": route["display_order"],
         "default_visible": bool(route.get("default_visible", True)),
+        "menu_section": route.get("menu_section", "Core Market Access Pipelines"),
         "source_summary": "; ".join(sources),
-        "source_urls": sorted({part["url"] for part in route.get("parts", [])}),
+        "source_urls": sorted({source_reference(part) for part in route.get("parts", [])}),
         "geometry_confidence": "public GIS linework, route-level display",
     }
     if route.get("manual_note"):
@@ -431,6 +533,7 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
             "generated_with": "scripts/build_market_access_pipelines.py",
             "source_notes": [
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
+                "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
                 "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available.",
                 "Trans Mountain Puget Sound Anacortes-area linework uses Skagit County GIS; the Whatcom/Ferndale connector is route-level only.",
                 "CAPP's 2023 Pipeline and Refinery Map is used as route/hub reference, not as coordinate geometry.",
@@ -441,6 +544,7 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
                 "eia_crude": EIA_CRUDE_URL,
                 "eia_products": EIA_PRODUCTS_URL,
                 "eia_hgl": EIA_HGL_URL,
+                "aer_feeder_pipelines": AER_FEEDER_PIPELINES.relative_to(ROOT).as_posix(),
                 "skagit_pipelines": SKAGIT_PIPELINES_URL,
                 "capp_reference_map": CAPP_MAP_URL,
                 "trans_mountain_puget_reference": TM_PUGET_URL,

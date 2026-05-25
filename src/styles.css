@@ -218,6 +218,12 @@ select {
   accent-color: var(--teal);
 }
 
+.date-select {
+  width: 100%;
+  max-width: 100%;
+  cursor: pointer;
+}
+
 .coverage-notice {
   margin-top: 9px;
   padding: 8px;
@@ -885,7 +891,7 @@ select {
 .dot.ab-fire-oc        { background: #ef4444; border: 2px solid #7f1d1d; }
 .dot.ab-fire-bh        { background: #f97316; border: 2px solid #7c2d12; }
 .dot.ab-fire-uc        { background: #fbbf24; border: 2px solid #78350f; }
-.dot.ab-fire-carryover { background: #fbbf24; border: 2px dashed #78350f; opacity: 0.75; }
+.dot.ab-fire-carryover { background: #94a3b8; border: 2px dashed #475569; opacity: 0.85; }
 .dot.ab-fire-ma        { background: #7c3aed; border: 2px solid #4c1d95; }
 .dot.ab-fire-mun       { background: #d97706; border: 2px solid #92400e; }
 .dot.bc-fire-oc        { background: #dc2626; border: 2px solid #7f1d1d; }
@@ -1838,9 +1844,192 @@ select {
   border-top: 1px solid var(--line);
 }
 
+.formation-control,
+.refinery-control,
+.fire-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.formation-menu,
+.refinery-menu,
+.fire-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 286px;
+  max-height: min(520px, calc(100vh - 96px));
+  overflow: auto;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(20,26,29,0.18);
+  z-index: 1800;
+}
+
+.formation-menu-header,
+.refinery-menu-header,
+.fire-menu-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.formation-menu-header strong,
+.refinery-menu-header strong,
+.fire-menu-header strong {
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.formation-menu-header span,
+.refinery-menu-header span,
+.fire-menu-header span {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.formation-menu-actions,
+.refinery-menu-actions,
+.fire-menu-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  padding: 8px 0;
+}
+
+.formation-menu-actions button,
+.refinery-menu-actions button,
+.fire-menu-actions button {
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #f8fafc;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.formation-menu-actions button:hover,
+.refinery-menu-actions button:hover,
+.fire-menu-actions button:hover {
+  border-color: #2563eb;
+  color: #1e3a8a;
+}
+
+.formation-options,
+.refinery-options,
+.fire-options {
+  display: grid;
+  gap: 2px;
+}
+
+.formation-menu-section,
+.refinery-menu-section,
+.fire-menu-section,
+.market-pipeline-menu-section {
+  padding: 7px 4px 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.formation-option,
+.refinery-option,
+.fire-option {
+  display: grid;
+  grid-template-columns: 16px 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 5px 4px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.formation-option:hover,
+.refinery-option:hover,
+.fire-option:hover {
+  background: var(--panel-strong);
+}
+
+.formation-option input,
+.refinery-option input,
+.fire-option input {
+  width: 14px;
+  height: 14px;
+  accent-color: #2563eb;
+}
+
+.formation-area-swatch {
+  width: 22px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.24);
+}
+
+.formation-dot-swatch,
+.refinery-dot-swatch,
+.fire-dot-swatch {
+  width: 10px;
+  height: 10px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.28);
+}
+
+.refinery-dot-swatch {
+  background: #b4532a;
+}
+
+.formation-option-text,
+.refinery-option-text,
+.fire-option-text {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.formation-option-text strong,
+.formation-option-text em,
+.refinery-option-text strong,
+.refinery-option-text em,
+.fire-option-text strong,
+.fire-option-text em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formation-option-text strong,
+.refinery-option-text strong,
+.fire-option-text strong {
+  font-size: 11.5px;
+  color: var(--ink);
+  font-style: normal;
+}
+
+.formation-option-text em,
+.refinery-option-text em,
+.fire-option-text em {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: normal;
+}
+
 @media (max-width: 900px) {
   .pipeline-menu,
-  .market-pipeline-menu {
+  .market-pipeline-menu,
+  .formation-menu,
+  .refinery-menu,
+  .fire-menu {
     left: 0;
     right: auto;
     width: min(286px, calc(100vw - 28px));

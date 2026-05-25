@@ -99,13 +99,6 @@ const PRIMARY_STREAMS = [
   "In-situ bitumen",
   "Mined bitumen gross",
   "Synthetic crude oil",
-  "Conventional crude oil",
-  "Pentanes plus total",
-  "Condensate production",
-  "Propane mix",
-  "Propane spec",
-  "Butane mix",
-  "Butane spec",
 ];
 
 const STREAM_LEGEND_KEYS = {
@@ -134,6 +127,24 @@ const LOCATION_CONFIDENCE_META = {
 };
 
 const DEFAULT_LOCATION_CONFIDENCE = ["exact", "high", "medium", "low", "aggregate", "unmapped", "unknown"];
+
+const DEFAULT_HIDDEN_LEGEND_KEYS = [
+  "fire-zone",
+  "pipe-hvp",
+  "pipe-diluent",
+  "inst-pump",
+  "inst-compressor",
+  "inst-terminal",
+  "inst-meter",
+];
+
+const DEFAULT_REFINERY_GROUP_KEYS = [
+  "canada-western",
+  "canada-central",
+  "canada-eastern",
+  "us-padd-ii",
+  "us-padd-v",
+];
 
 // ============================================================
 // APPLICATION STATE
@@ -184,12 +195,16 @@ const state = {
   bcFireLoading: false,
   bcFireError: null,
   bcFireLayer: null,
+  fireMenuOpen: false,
   // Formation overlay state
   formationEnabled: false,
   formationLayer: null,
   assetFootprintLayer: null,
+  formationMenuOpen: false,
   refineryEnabled: false,
   refineryLayer: null,
+  refineryMenuOpen: false,
+  selectedRefineryGroups: new Set(DEFAULT_REFINERY_GROUP_KEYS),
   marketPipelineEnabled: false,
   marketPipelineData: null,
   marketPipelineLoading: false,
@@ -207,7 +222,7 @@ const state = {
   rubberBandActive: false,
   selectMode: false,
   setSelectMode: null,
-  hiddenLegendKeys: new Set(),
+  hiddenLegendKeys: new Set(DEFAULT_HIDDEN_LEGEND_KEYS),
   distanceMode: false,
   distancePoints: [],
   distanceLayer: null,
@@ -220,7 +235,7 @@ const state = {
 
 const els = {
   freshness:        document.querySelector("#freshness"),
-  dateSlider:       document.querySelector("#dateSlider"),
+  dateSelect:       document.querySelector("#dateSelect"),
   selectedDate:     document.querySelector("#selectedDate"),
   dateScenario:     document.querySelector("#dateScenario"),
   coverageNotice:   document.querySelector("#coverageNotice"),
@@ -367,8 +382,17 @@ function locationQualityText(asset) {
 // ============================================================
 
 async function loadData() {
+  const appDataPaths = [
+    DATA_PATHS.manifest,
+    DATA_PATHS.assets,
+    DATA_PATHS.production,
+    DATA_PATHS.schemeApprovals,
+    DATA_PATHS.st102Facilities,
+    DATA_PATHS.assetGeometries,
+    DATA_PATHS.refineries,
+  ];
   const [manifest, assets, records, schemeApprovals, st102Facilities, assetGeometries, refineries] = await Promise.all(
-    Object.values(DATA_PATHS).map((path) =>
+    appDataPaths.map((path) =>
       fetch(path).then((r) => {
         if (!r.ok) throw new Error(`Could not load ${path}`);
         return r.json();
@@ -413,12 +437,7 @@ async function loadData() {
   [...new Set(sourceIds)].sort().forEach((s) => state.selectedSources.add(s));
 
   const initialRecords = recordsForDate(state.selectedDate);
-  PRIMARY_STREAMS.forEach((stream) => {
-    if (initialRecords.some((r) => r.stream === stream)) state.selectedStreams.add(stream);
-  });
-  if (!state.selectedStreams.size) {
-    [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
-  }
+  [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
 }
 
 function expandAssetRecords(raw) {
@@ -520,13 +539,17 @@ function initControls() {
   const sourceCount = new Set((state.manifest.source_coverage || []).map((item) => item.source_id)).size;
   els.freshness.textContent = `ETL: ${new Date(state.manifest.generated_at).toLocaleString("en-CA")} · default: ${dateLabel(state.manifest.default_date || state.manifest.latest_actual_date)} · ${formatNumber(state.manifest.record_count)} records · ${sourceCount || "--"} sources`;
 
-  els.dateSlider.max = String(Math.max(0, state.dates.length - 1));
-  els.dateSlider.value = String(state.dates.indexOf(state.selectedDate));
-  els.dateSlider.addEventListener("input", () => {
-    state.selectedDate = state.dates[Number(els.dateSlider.value)];
-    requestDateRecords(state.selectedDate);
-    scheduleRender(); // debounce rapid slider drags
-  });
+  if (els.dateSelect) {
+    els.dateSelect.innerHTML = state.dates
+      .map((date) => `<option value="${escapeHtml(date)}">${escapeHtml(dateLabel(date))}</option>`)
+      .join("");
+    els.dateSelect.value = state.selectedDate;
+    els.dateSelect.addEventListener("change", () => {
+      state.selectedDate = els.dateSelect.value;
+      requestDateRecords(state.selectedDate);
+      scheduleRender();
+    });
+  }
 
   const sourceIds = [...new Set(state.records.map((r) => r.source_id))].sort();
   els.sourceFilters.innerHTML = sourceIds
@@ -594,11 +617,29 @@ function initControls() {
   if (els.wildfireToggle) {
     els.wildfireToggle.addEventListener("click", toggleWildfires);
   }
+  const fireMenu = document.getElementById("fireMenu");
+  if (fireMenu) {
+    fireMenu.addEventListener("change", handleFireMenuChange);
+    fireMenu.addEventListener("click", handleFireMenuClick);
+    buildFireMenu();
+  }
   if (els.formationToggle) {
     els.formationToggle.addEventListener("click", toggleFormations);
   }
+  const formationMenu = document.getElementById("formationMenu");
+  if (formationMenu) {
+    formationMenu.addEventListener("change", handleFormationMenuChange);
+    formationMenu.addEventListener("click", handleFormationMenuClick);
+    buildFormationMenu();
+  }
   if (els.refineryToggle) {
     els.refineryToggle.addEventListener("click", toggleRefineries);
+  }
+  const refineryMenu = document.getElementById("refineryMenu");
+  if (refineryMenu) {
+    refineryMenu.addEventListener("change", handleRefineryMenuChange);
+    refineryMenu.addEventListener("click", handleRefineryMenuClick);
+    buildRefineryMenu();
   }
   const pipelineToggleBtn = document.getElementById("pipelineToggle");
   if (pipelineToggleBtn) {
@@ -626,6 +667,18 @@ function initControls() {
     const pipelineControl = document.getElementById("pipelineControl");
     if (pipelineControl && !pipelineControl.contains(event.target)) {
       setPipelineMenuOpen(false);
+    }
+    const formationControl = document.getElementById("formationControl");
+    if (formationControl && !formationControl.contains(event.target)) {
+      setFormationMenuOpen(false);
+    }
+    const refineryControl = document.getElementById("refineryControl");
+    if (refineryControl && !refineryControl.contains(event.target)) {
+      setRefineryMenuOpen(false);
+    }
+    const fireControl = document.getElementById("fireControl");
+    if (fireControl && !fireControl.contains(event.target)) {
+      setFireMenuOpen(false);
     }
   });
   initLegendControls();
@@ -1038,6 +1091,9 @@ function scheduleRender() {
 
 function render() {
   requestDateRecords(state.selectedDate);
+  if (els.dateSelect && els.dateSelect.value !== state.selectedDate) {
+    els.dateSelect.value = state.selectedDate;
+  }
   els.selectedDate.textContent = dateLabel(state.selectedDate);
   els.dateScenario.textContent = scenarioLabelForDate(state.selectedDate);
   renderCoverageNotice(state.selectedDate);
@@ -1211,7 +1267,7 @@ function renderMetrics(aggregated) {
 
   // Fire exposure
   if (els.fireExposureRow) {
-    if (state.wildfireEnabled && state.wildfires) {
+    if (state.wildfireEnabled && activeFireFeatures(true).length) {
       let atRiskKbbl = 0;
       for (const { asset, kbbl: v } of byAsset.values()) {
         if (asset.latitude == null) continue;
@@ -1354,18 +1410,10 @@ function renderFireRisk(asset) {
   }
   els.fireRiskSection.hidden = false;
 
-  if (state.wildfireLoading) {
+  if (state.wildfireLoading || state.albertaFireLoading || state.bcFireLoading) {
     els.fireRiskBadge.textContent = "Loading…";
     els.fireRiskBadge.className = "risk-badge loading";
     els.fireDistDisplay.textContent = "--";
-    els.fireVolAtRisk.textContent = "--";
-    return;
-  }
-
-  if (!state.wildfires || state.wildfireError) {
-    els.fireRiskBadge.textContent = "Data unavailable";
-    els.fireRiskBadge.className = "risk-badge";
-    els.fireDistDisplay.textContent = state.wildfireError || "--";
     els.fireVolAtRisk.textContent = "--";
     return;
   }
@@ -1436,7 +1484,7 @@ function renderTimeline() {
     els.timelineBars.querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.selectedDate = btn.dataset.date;
-        els.dateSlider.value = String(state.dates.indexOf(state.selectedDate));
+        if (els.dateSelect) els.dateSelect.value = state.selectedDate;
         render();
       });
     });
@@ -1457,6 +1505,93 @@ const FORMATION_KIND_STYLE = {
   oil_sands:        { color: "#b45309", fillColor: "#f59e0b", fillOpacity: 0.14, weight: 1.2, opacity: 0.4, dashArray: null },
   tight_play:       { color: "#3d6b00", fillColor: "#84cc16", fillOpacity: 0.13, weight: 1.2, opacity: 0.38, dashArray: "5 4" },
 };
+
+const FORMATION_MENU_ITEMS = [
+  { key: "formation-os", label: "In-situ Approval", color: "#2dd4bf", type: "area" },
+  { key: "formation-tp", label: "Mineable Approval", color: "#f59e0b", type: "area" },
+  { key: "st102-facility", label: "ST102 Facility", color: "#ffffff", type: "dot" },
+  { key: "asset-footprint", label: "Production Footprint", color: "#2980b9", type: "area" },
+];
+
+const FORMATION_CORE_KEYS = new Set(["formation-os", "formation-tp", "st102-facility", "asset-footprint"]);
+
+function formationSelectedCount() {
+  return FORMATION_MENU_ITEMS.filter((item) => !state.hiddenLegendKeys.has(item.key)).length;
+}
+
+function setFormationMenuOpen(open) {
+  state.formationMenuOpen = open;
+  const menu = document.getElementById("formationMenu");
+  if (menu) menu.hidden = !open;
+  updateFormationToggleUI();
+}
+
+function formationCounts() {
+  const counts = { "formation-os": 0, "formation-tp": 0, "st102-facility": 0, "asset-footprint": 0 };
+  for (const feature of state.schemeApprovals?.features || []) {
+    const key = formationLegendKey(feature);
+    if (key) counts[key] = (counts[key] || 0) + 1;
+  }
+  counts["st102-facility"] = state.st102Facilities?.features?.length || 0;
+  counts["asset-footprint"] = state.assetGeometries?.features?.length || 0;
+  return counts;
+}
+
+function buildFormationMenu() {
+  const options = document.getElementById("formationOptions");
+  if (!options) return;
+  const counts = formationCounts();
+  options.innerHTML = FORMATION_MENU_ITEMS.map((item) => {
+    const checked = !state.hiddenLegendKeys.has(item.key);
+    const swatchClass = item.type === "area" ? "formation-area-swatch" : "formation-dot-swatch";
+    return `
+      <label class="formation-option">
+        <input type="checkbox" data-formation-key="${escapeHtml(item.key)}" ${checked ? "checked" : ""} />
+        <span class="${swatchClass}" style="background:${item.color}"></span>
+        <span class="formation-option-text">
+          <strong>${escapeHtml(item.label)}</strong>
+          <em>${(counts[item.key] || 0).toLocaleString("en-CA")} features</em>
+        </span>
+      </label>`;
+  }).join("");
+}
+
+function handleFormationMenuChange(event) {
+  const input = event.target.closest("input[data-formation-key]");
+  if (!input) return;
+  const key = input.dataset.formationKey;
+  if (input.checked) state.hiddenLegendKeys.delete(key);
+  else state.hiddenLegendKeys.add(key);
+  state.formationEnabled = formationSelectedCount() > 0;
+  refreshFormationLayers();
+  updateFormationToggleUI();
+}
+
+function handleFormationMenuClick(event) {
+  const action = event.target.closest("[data-formation-action]")?.dataset.formationAction;
+  if (!action) return;
+  for (const item of FORMATION_MENU_ITEMS) {
+    if (action === "all") {
+      state.hiddenLegendKeys.delete(item.key);
+    } else if (action === "none") {
+      state.hiddenLegendKeys.add(item.key);
+    } else if (action === "core") {
+      if (FORMATION_CORE_KEYS.has(item.key)) state.hiddenLegendKeys.delete(item.key);
+      else state.hiddenLegendKeys.add(item.key);
+    }
+  }
+  state.formationEnabled = formationSelectedCount() > 0;
+  buildFormationMenu();
+  refreshFormationLayers();
+  updateFormationToggleUI();
+}
+
+function refreshFormationLayers() {
+  if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
+  if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
+  if (state.assetFootprintLayer) { state.map.removeLayer(state.assetFootprintLayer); state.assetFootprintLayer = null; }
+  renderFormationLayer();
+}
 
 function renderFormationLayer() {
   if (!state.map || !window.L) return;
@@ -1595,33 +1730,26 @@ function renderAssetFootprintLayer() {
 }
 
 function toggleFormations() {
-  state.formationEnabled = !state.formationEnabled;
-  if (state.formationEnabled) {
-    renderFormationLayer();
-  } else if (state.formationLayer) {
-    state.map.removeLayer(state.formationLayer);
-    state.formationLayer = null;
-  }
-  if (!state.formationEnabled && state.assetFootprintLayer) {
-    state.map.removeLayer(state.assetFootprintLayer);
-    state.assetFootprintLayer = null;
-  }
-  if (!state.formationEnabled && state.facilityLayer) {
-    state.map.removeLayer(state.facilityLayer);
-    state.facilityLayer = null;
-  }
+  state.formationEnabled = formationSelectedCount() > 0;
+  setFormationMenuOpen(!state.formationMenuOpen);
+  refreshFormationLayers();
   updateFormationToggleUI();
 }
 
 function updateFormationToggleUI() {
   const btn = els.formationToggle;
   if (!btn) return;
-  if (state.formationEnabled) {
-    btn.textContent = "AER Sites ON";
+  const selectedCount = formationSelectedCount();
+  if (state.formationEnabled && selectedCount) {
+    btn.textContent = `AER Sites (${selectedCount})`;
+    btn.title = `${selectedCount.toLocaleString("en-CA")} AER site overlays selected`;
     btn.className = "formation-toggle-btn active";
+    btn.setAttribute("aria-expanded", state.formationMenuOpen ? "true" : "false");
   } else {
     btn.textContent = "AER Sites";
+    btn.title = "AER oil sands approvals and ST102 facilities";
     btn.className = "formation-toggle-btn";
+    btn.setAttribute("aria-expanded", state.formationMenuOpen ? "true" : "false");
   }
 }
 
@@ -1787,15 +1915,140 @@ function refineryMarkerRadius(properties) {
   return Math.max(7, Math.min(20, Math.sqrt(capacity) * 1.08));
 }
 
+const REFINERY_GROUP_ITEMS = [
+  { section: "Canada" },
+  { key: "canada-western", label: "Western Canada" },
+  { key: "canada-central", label: "Central Canada" },
+  { key: "canada-eastern", label: "Eastern Canada" },
+  { section: "United States" },
+  { key: "us-padd-i", label: "PADD I" },
+  { key: "us-padd-ii", label: "PADD II" },
+  { key: "us-padd-iii", label: "PADD III" },
+  { key: "us-padd-iv", label: "PADD IV" },
+  { key: "us-padd-v", label: "PADD V" },
+  { section: "Other North America" },
+  { key: "mexico", label: "Mexico" },
+  { section: "Europe" },
+  { key: "europe", label: "European refineries" },
+];
+
+function refineryGroupItems() {
+  return REFINERY_GROUP_ITEMS.filter((item) => !item.section);
+}
+
+function refineryGroupKey(properties) {
+  const p = properties || {};
+  const padd = String(p.country_padd || "").trim();
+  const country = String(p.country_name || "").trim();
+  const paddKey = padd.toLowerCase().replace(/\s+/g, "-");
+
+  if (country === "Canada") {
+    if (padd === "Western Canada") return "canada-western";
+    if (padd === "Central Canada") return "canada-central";
+    if (padd === "Eastern Canada") return "canada-eastern";
+  }
+  if (country === "U.S.A.") {
+    if (paddKey === "padd-i") return "us-padd-i";
+    if (paddKey === "padd-ii") return "us-padd-ii";
+    if (paddKey === "padd-iii") return "us-padd-iii";
+    if (paddKey === "padd-iv") return "us-padd-iv";
+    if (paddKey === "padd-v") return "us-padd-v";
+  }
+  if (country === "Mexico") return "mexico";
+  if (country) return "europe";
+  return "other";
+}
+
+function refinerySelectedCount() {
+  return refineryGroupItems().filter((item) => state.selectedRefineryGroups.has(item.key)).length;
+}
+
+function refineryVisibleFeatures() {
+  return (state.refineries?.features || [])
+    .filter((feature) => state.selectedRefineryGroups.has(refineryGroupKey(feature.properties)));
+}
+
+function refineryGroupCounts() {
+  const counts = {};
+  for (const feature of state.refineries?.features || []) {
+    const key = refineryGroupKey(feature.properties);
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
+function setRefineryMenuOpen(open) {
+  state.refineryMenuOpen = open;
+  const menu = document.getElementById("refineryMenu");
+  if (menu) menu.hidden = !open;
+  updateRefineryToggleUI();
+}
+
+function buildRefineryMenu() {
+  const options = document.getElementById("refineryOptions");
+  if (!options) return;
+  const counts = refineryGroupCounts();
+  let currentSection = "";
+  let html = "";
+  for (const item of REFINERY_GROUP_ITEMS) {
+    if (item.section) {
+      currentSection = item.section;
+      html += `<div class="refinery-menu-section">${escapeHtml(item.section)}</div>`;
+      continue;
+    }
+    const checked = state.selectedRefineryGroups.has(item.key);
+    const count = counts[item.key] ? counts[item.key].toLocaleString("en-CA") : "";
+    html += `
+      <label class="refinery-option" title="${escapeHtml(currentSection)}">
+        <input type="checkbox" data-refinery-key="${escapeHtml(item.key)}" ${checked ? "checked" : ""} />
+        <span class="refinery-dot-swatch"></span>
+        <span class="refinery-option-text">
+          <strong>${escapeHtml(item.label)}</strong>
+          <em>${count ? `${count} plants` : currentSection}</em>
+        </span>
+      </label>`;
+  }
+  options.innerHTML = html;
+}
+
+function handleRefineryMenuChange(event) {
+  const input = event.target.closest("input[data-refinery-key]");
+  if (!input) return;
+  const key = input.dataset.refineryKey;
+  if (input.checked) state.selectedRefineryGroups.add(key);
+  else state.selectedRefineryGroups.delete(key);
+  state.refineryEnabled = refinerySelectedCount() > 0;
+  buildRefineryMenu();
+  renderRefineryLayer();
+  updateRefineryToggleUI();
+}
+
+function handleRefineryMenuClick(event) {
+  const action = event.target.closest("[data-refinery-action]")?.dataset.refineryAction;
+  if (!action) return;
+  if (action === "all") {
+    for (const item of refineryGroupItems()) state.selectedRefineryGroups.add(item.key);
+  } else if (action === "none") {
+    state.selectedRefineryGroups.clear();
+  } else if (action === "defaults") {
+    state.selectedRefineryGroups = new Set(DEFAULT_REFINERY_GROUP_KEYS);
+  }
+  state.refineryEnabled = refinerySelectedCount() > 0;
+  buildRefineryMenu();
+  renderRefineryLayer();
+  updateRefineryToggleUI();
+}
+
 function renderRefineryLayer() {
   if (!state.map || !window.L) return;
   if (state.refineryLayer) {
     state.map.removeLayer(state.refineryLayer);
     state.refineryLayer = null;
   }
-  if (!state.refineryEnabled || !legendVisible("refinery-plant") || !state.refineries?.features?.length) return;
+  const features = refineryVisibleFeatures();
+  if (!state.refineryEnabled || !features.length) return;
 
-  state.refineryLayer = L.geoJSON(state.refineries, {
+  state.refineryLayer = L.geoJSON({ type: "FeatureCollection", features }, {
     pointToLayer(feature, latlng) {
       const radius = refineryMarkerRadius(feature.properties);
       return L.circleMarker(latlng, {
@@ -1822,28 +2075,27 @@ function renderRefineryLayer() {
 }
 
 function toggleRefineries() {
-  state.refineryEnabled = !state.refineryEnabled;
-  if (state.refineryEnabled) {
-    renderRefineryLayer();
-  } else if (state.refineryLayer) {
-    state.map.removeLayer(state.refineryLayer);
-    state.refineryLayer = null;
-  }
+  state.refineryEnabled = refinerySelectedCount() > 0;
+  setRefineryMenuOpen(!state.refineryMenuOpen);
+  renderRefineryLayer();
   updateRefineryToggleUI();
 }
 
 function updateRefineryToggleUI() {
   const btn = els.refineryToggle;
   if (!btn) return;
-  if (state.refineryEnabled) {
-    const count = state.refineries?.features?.length ?? 0;
-    btn.textContent = "Refineries ON";
-    btn.title = `${count.toLocaleString("en-CA")} refinery and upgrader plants`;
+  const groupCount = refinerySelectedCount();
+  const featureCount = refineryVisibleFeatures().length;
+  if (state.refineryEnabled && groupCount) {
+    btn.textContent = `Refineries (${groupCount})`;
+    btn.title = `${featureCount.toLocaleString("en-CA")} refinery and upgrader plants selected`;
     btn.className = "refinery-toggle-btn active";
+    btn.setAttribute("aria-expanded", state.refineryMenuOpen ? "true" : "false");
   } else {
     btn.textContent = "Refineries";
     btn.title = "Refinery and upgrader plants with unit-level capacity rows";
     btn.className = "refinery-toggle-btn";
+    btn.setAttribute("aria-expanded", state.refineryMenuOpen ? "true" : "false");
   }
 }
 
@@ -1937,12 +2189,15 @@ function geojsonCentroid(feature) {
   return { lat, lon };
 }
 
-function activeFireFeatures() {
-  return [
-    ...(state.wildfires?.features || []),
-    ...(state.albertaFires?.features || []),
-    ...(state.bcFires?.features || []),
-  ];
+function activeFireFeatures(visibleOnly = false) {
+  const cwfis = visibleOnly && !legendVisible("fire-zone")
+    ? []
+    : (state.wildfires?.features || []);
+  const alberta = (state.albertaFires?.features || [])
+    .filter((feature) => !visibleOnly || legendVisible(albertaFireLegendKey(feature)));
+  const bc = (state.bcFires?.features || [])
+    .filter((feature) => !visibleOnly || legendVisible(bcFireLegendKey(feature)));
+  return [...cwfis, ...alberta, ...bc];
 }
 
 function geometryRings(geometry) {
@@ -1996,24 +2251,7 @@ function getFireRisk(assetLat, assetLon) {
   let minDist = Infinity;
   let nearestFire = null;
 
-  // Check CWFIS hotspots
-  for (const feature of state.wildfires?.features || []) {
-    const c = geojsonCentroid(feature);
-    if (!c) continue;
-    const dist = haversineKm(assetLat, assetLon, c.lat, c.lon);
-    if (dist < minDist) { minDist = dist; nearestFire = feature; }
-  }
-
-  // Check Alberta provincial fires
-  for (const feature of state.albertaFires?.features || []) {
-    const c = geojsonCentroid(feature);
-    if (!c) continue;
-    const dist = haversineKm(assetLat, assetLon, c.lat, c.lon);
-    if (dist < minDist) { minDist = dist; nearestFire = feature; }
-  }
-
-  // Check BC provincial fires
-  for (const feature of state.bcFires?.features || []) {
+  for (const feature of activeFireFeatures(true)) {
     const c = geojsonCentroid(feature);
     if (!c) continue;
     const dist = haversineKm(assetLat, assetLon, c.lat, c.lon);
@@ -2033,7 +2271,7 @@ function getAssetFireRisk(asset) {
   const footprints = state.assetGeometryById.get(asset.asset_id) || [];
   if (!footprints.length) return best;
 
-  for (const fire of activeFireFeatures()) {
+  for (const fire of activeFireFeatures(true)) {
     const c = geojsonCentroid(fire);
     if (!c) continue;
     for (const footprint of footprints) {
@@ -2083,6 +2321,7 @@ async function fetchWildfires() {
     state.wildfires = null;
   } finally {
     state.wildfireLoading = false;
+    buildFireMenu();
     updateFireToggleUI();
     updateWildfireStatus(buildFireStatusMsg());
     render();
@@ -2101,6 +2340,7 @@ const ALBERTA_STAGE_STYLE = {
   "Out of Control":      { color: "#7f1d1d", fill: "#ef4444", weight: 2.5, opacity: 0.95, label: "Out of Control"     },
   "Being Held":          { color: "#7c2d12", fill: "#f97316", weight: 2,   opacity: 0.90, label: "Being Held"         },
   "Under Control":       { color: "#78350f", fill: "#fbbf24", weight: 2,   opacity: 0.85, label: "Under Control"      },
+  "Carryover":           { color: "#475569", fill: "#94a3b8", weight: 2.2, opacity: 0.88, label: "Carryover"          },
   "Assistance Started":  { color: "#4c1d95", fill: "#7c3aed", weight: 2,   opacity: 0.90, label: "Mutual Aid — Active"   },
   "Active":              { color: "#92400e", fill: "#d97706", weight: 2,   opacity: 0.90, label: "Municipal Fire — Active" },
   default:               { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown"              },
@@ -2115,6 +2355,165 @@ const BC_STATUS_STYLE = {
   "New":            { color: "#9a3412", fill: "#fb923c", weight: 2,   opacity: 0.88, label: "New"             },
   default:          { color: "#1e293b", fill: "#94a3b8", weight: 1.5, opacity: 0.75, label: "Unknown"         },
 };
+
+const FIRE_MENU_ITEMS = [
+  { section: "FWI / Satellite" },
+  { key: "fire-zone", label: "NRCan CWFIS hotspots", color: "#ef4444", type: "dot" },
+  { section: "Alberta Official" },
+  { key: "ab-fire-oc", label: "Out of Control", color: ALBERTA_STAGE_STYLE["Out of Control"].fill, type: "dot" },
+  { key: "ab-fire-bh", label: "Being Held", color: ALBERTA_STAGE_STYLE["Being Held"].fill, type: "dot" },
+  { key: "ab-fire-uc", label: "Under Control", color: ALBERTA_STAGE_STYLE["Under Control"].fill, type: "dot" },
+  { key: "ab-fire-carryover", label: "Carryover", color: ALBERTA_STAGE_STYLE.Carryover.fill, type: "dot" },
+  { key: "ab-fire-ma", label: "Mutual Aid", color: ALBERTA_STAGE_STYLE["Assistance Started"].fill, type: "dot" },
+  { key: "ab-fire-mun", label: "Municipal", color: ALBERTA_STAGE_STYLE.Active.fill, type: "dot" },
+  { section: "BC Official" },
+  { key: "bc-fire-oc", label: "Out of Control", color: BC_STATUS_STYLE["Out of Control"].fill, type: "dot" },
+  { key: "bc-fire-bh", label: "Being Held", color: BC_STATUS_STYLE["Being Held"].fill, type: "dot" },
+  { key: "bc-fire-uc", label: "Under Control", color: BC_STATUS_STYLE["Under Control"].fill, type: "dot" },
+  { key: "bc-fire-fon", label: "Fire of Note", color: BC_STATUS_STYLE["Fire of Note"].fill, type: "dot" },
+];
+
+const FIRE_DEFAULT_KEYS = new Set([
+  "ab-fire-oc",
+  "ab-fire-bh",
+  "ab-fire-uc",
+  "ab-fire-carryover",
+  "ab-fire-ma",
+  "ab-fire-mun",
+  "bc-fire-oc",
+  "bc-fire-bh",
+  "bc-fire-uc",
+  "bc-fire-fon",
+]);
+
+function fireFilterItems() {
+  return FIRE_MENU_ITEMS.filter((item) => !item.section);
+}
+
+function fireSelectedCount() {
+  return fireFilterItems().filter((item) => !state.hiddenLegendKeys.has(item.key)).length;
+}
+
+function setFireMenuOpen(open) {
+  state.fireMenuOpen = open;
+  const menu = document.getElementById("fireMenu");
+  if (menu) menu.hidden = !open;
+  updateFireToggleUI();
+}
+
+function fireLegendCounts() {
+  const counts = {};
+  if (state.wildfires?.features?.length) {
+    counts["fire-zone"] = state.wildfires.features.length;
+  }
+  for (const feature of state.albertaFires?.features || []) {
+    const key = albertaFireLegendKey(feature);
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  for (const feature of state.bcFires?.features || []) {
+    const key = bcFireLegendKey(feature);
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
+function buildFireMenu() {
+  const options = document.getElementById("fireOptions");
+  if (!options) return;
+  const counts = fireLegendCounts();
+  let currentSection = "";
+  let html = "";
+  for (const item of FIRE_MENU_ITEMS) {
+    if (item.section) {
+      currentSection = item.section;
+      html += `<div class="fire-menu-section">${escapeHtml(item.section)}</div>`;
+      continue;
+    }
+    const checked = !state.hiddenLegendKeys.has(item.key);
+    const count = counts[item.key] ? counts[item.key].toLocaleString("en-CA") : "";
+    html += `
+      <label class="fire-option" title="${escapeHtml(currentSection)}">
+        <input type="checkbox" data-fire-key="${escapeHtml(item.key)}" ${checked ? "checked" : ""} />
+        <span class="fire-dot-swatch" style="background:${item.color}"></span>
+        <span class="fire-option-text">
+          <strong>${escapeHtml(item.label)}</strong>
+          <em>${count ? `${count} fires` : currentSection}</em>
+        </span>
+      </label>`;
+  }
+  options.innerHTML = html;
+}
+
+function selectedFireKeys() {
+  return new Set(fireFilterItems()
+    .filter((item) => !state.hiddenLegendKeys.has(item.key))
+    .map((item) => item.key));
+}
+
+function ensureSelectedFireSources() {
+  const keys = selectedFireKeys();
+  let started = false;
+  const wantsCwfis = keys.has("fire-zone");
+  const wantsAlberta = [...keys].some((key) => key.startsWith("ab-fire-"));
+  const wantsBC = [...keys].some((key) => key.startsWith("bc-fire-"));
+
+  if (wantsCwfis && !state.wildfires && !state.wildfireLoading) {
+    fetchWildfires();
+    started = true;
+  }
+  if (wantsAlberta && !state.albertaFires && !state.albertaFireLoading) {
+    fetchAlbertaFires();
+    started = true;
+  }
+  if (wantsBC && !state.bcFires && !state.bcFireLoading) {
+    fetchBCFires();
+    started = true;
+  }
+  return started;
+}
+
+function handleFireMenuChange(event) {
+  const input = event.target.closest("input[data-fire-key]");
+  if (!input) return;
+  const key = input.dataset.fireKey;
+  if (input.checked) state.hiddenLegendKeys.delete(key);
+  else state.hiddenLegendKeys.add(key);
+  state.wildfireEnabled = fireSelectedCount() > 0;
+  ensureSelectedFireSources();
+  refreshFireLayers();
+  updateFireToggleUI();
+}
+
+function handleFireMenuClick(event) {
+  const action = event.target.closest("[data-fire-action]")?.dataset.fireAction;
+  if (!action) return;
+  for (const item of fireFilterItems()) {
+    if (action === "all") {
+      state.hiddenLegendKeys.delete(item.key);
+    } else if (action === "none") {
+      state.hiddenLegendKeys.add(item.key);
+    } else if (action === "defaults") {
+      if (FIRE_DEFAULT_KEYS.has(item.key)) state.hiddenLegendKeys.delete(item.key);
+      else state.hiddenLegendKeys.add(item.key);
+    }
+  }
+  state.wildfireEnabled = fireSelectedCount() > 0;
+  ensureSelectedFireSources();
+  buildFireMenu();
+  refreshFireLayers();
+  updateFireToggleUI();
+}
+
+function refreshFireLayers() {
+  if (!state.wildfireEnabled) {
+    clearFireLayers();
+  } else {
+    renderFireLayer();
+  }
+  buildFireMenu();
+  updateWildfireStatus(buildFireStatusMsg());
+  render();
+}
 
 async function fetchAlbertaFires() {
   if (state.albertaFireLoading) return;
@@ -2181,6 +2580,8 @@ async function fetchAlbertaFires() {
     state.albertaFires = null;
   } finally {
     state.albertaFireLoading = false;
+    buildFireMenu();
+    updateFireToggleUI();
     updateWildfireStatus(buildFireStatusMsg());
     render();
   }
@@ -2203,13 +2604,14 @@ function renderAlbertaFireLayer() {
     pointToLayer(feature, latlng) {
       const p = feature.properties || {};
       const status = p.FIRE_STATUS || "";
-      const style = ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default;
+      const isCarryover = p.CO_FLAG === "Y";
+      const style = isCarryover
+        ? ALBERTA_STAGE_STYLE.Carryover
+        : (ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default);
       const ha = Number(p.AREA_ESTIMATE);
       const r = Number.isFinite(ha) && ha > 0
         ? Math.min(22, 8 + Math.log10(ha + 1) * 4)
         : 8;
-      // CO_FLAG = "Y" is the authoritative carryover indicator from the official service
-      const isCarryover = p.CO_FLAG === "Y";
       return L.circleMarker(latlng, {
         radius: r,
         color: style.color,
@@ -2232,7 +2634,9 @@ function renderAlbertaFireLayer() {
       const fireYear = Number(p.FIRE_YEAR) || currentYear;
       const isCarryover = p.CO_FLAG === "Y";
       const status = p.FIRE_STATUS || "";
-      const stageStyle = ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default;
+      const stageStyle = isCarryover
+        ? ALBERTA_STAGE_STYLE.Carryover
+        : (ALBERTA_STAGE_STYLE[status] || ALBERTA_STAGE_STYLE.default);
       const carryoverNote = isCarryover
         ? `<span style="color:#b45309">⚠️ Carryover — fire from ${fireYear}</span><br>`
         : `<span style="color:#166534">🔥 New fire (${fireYear})</span><br>`;
@@ -2291,6 +2695,8 @@ async function fetchBCFires() {
     state.bcFires = null;
   } finally {
     state.bcFireLoading = false;
+    buildFireMenu();
+    updateFireToggleUI();
     updateWildfireStatus(buildFireStatusMsg());
     render();
   }
@@ -2380,7 +2786,7 @@ function buildFireStatusMsg() {
   }
 
   // CWFIS satellite hotspots
-  const cwfisCount = state.wildfires?.features?.length ?? 0;
+  const cwfisCount = legendVisible("fire-zone") ? (state.wildfires?.features?.length ?? 0) : 0;
   if (state.wildfireError && !cwfisCount) {
     parts.push(`NRCan CWFIS: ${state.wildfireError}`);
   } else if (cwfisCount > 0) {
@@ -2389,7 +2795,8 @@ function buildFireStatusMsg() {
   }
 
   // Alberta official fires (provincial + mutual aid combined)
-  const abFeatures   = state.albertaFires?.features ?? [];
+  const abFeatures   = (state.albertaFires?.features ?? [])
+    .filter((feature) => legendVisible(albertaFireLegendKey(feature)));
   const abCount      = abFeatures.filter(f => !["Mutual Aid","Municipal"].includes(f.properties?.FIRE_TYPE)).length;
   const maCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Mutual Aid").length;
   const munCount     = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Municipal").length;
@@ -2409,12 +2816,14 @@ function buildFireStatusMsg() {
   }
 
   // BC official fires
-  const bcCount = state.bcFires?.features?.length ?? 0;
+  const bcFeatures = (state.bcFires?.features ?? [])
+    .filter((feature) => legendVisible(bcFireLegendKey(feature)));
+  const bcCount = bcFeatures.length;
   if (state.bcFireError && !bcCount) {
     parts.push(`BC: ${state.bcFireError}`);
   } else if (bcCount > 0) {
-    const ooc = state.bcFires.features.filter(f => f.properties?.FIRE_STATUS === "Out of Control").length;
-    const fon = state.bcFires.features.filter(f => f.properties?.FIRE_OF_NOTE_IND === "Y").length;
+    const ooc = bcFeatures.filter(f => f.properties?.FIRE_STATUS === "Out of Control").length;
+    const fon = bcFeatures.filter(f => f.properties?.FIRE_OF_NOTE_IND === "Y").length;
     const stageSummary = [ooc > 0 ? `${ooc} OC` : "", fon > 0 ? `${fon} FON` : ""].filter(Boolean).join(", ");
     parts.push(`${bcCount} BC fire${bcCount !== 1 ? "s" : ""}${stageSummary ? ` (${stageSummary})` : ""}`);
   }
@@ -2423,19 +2832,18 @@ function buildFireStatusMsg() {
 }
 
 function toggleWildfires() {
-  state.wildfireEnabled = !state.wildfireEnabled;
+  state.wildfireEnabled = fireSelectedCount() > 0;
+  setFireMenuOpen(!state.fireMenuOpen);
   if (state.wildfireEnabled) {
-    let needRender = false;
-    if (!state.wildfires      && !state.wildfireLoading)     { fetchWildfires();    } else { needRender = true; }
-    if (!state.albertaFires   && !state.albertaFireLoading)  { fetchAlbertaFires(); } else { needRender = true; }
-    if (!state.bcFires        && !state.bcFireLoading)       { fetchBCFires();      } else { needRender = true; }
-    if (needRender) render();
-    return;
+    const started = ensureSelectedFireSources();
+    if (!started) render();
+    updateWildfireStatus(buildFireStatusMsg());
+  } else {
+    clearFireLayers();
+    updateWildfireStatus("");
+    render();
   }
-  clearFireLayers();
-  updateWildfireStatus("");
   updateFireToggleUI();
-  render();
 }
 
 function clearFireLayers() {
@@ -2446,16 +2854,24 @@ function clearFireLayers() {
 }
 
 function updateFireToggleUI() {
-  if (!els.wildfireToggle) return;
-  if (state.wildfireLoading) {
-    els.wildfireToggle.textContent = "Loading fires...";
-    els.wildfireToggle.className = "fire-toggle-btn loading";
-  } else if (state.wildfireEnabled) {
-    els.wildfireToggle.textContent = "Fires ON";
-    els.wildfireToggle.className = "fire-toggle-btn active";
+  const btn = els.wildfireToggle;
+  if (!btn) return;
+  const selectedCount = fireSelectedCount();
+  const loading = state.wildfireLoading || state.albertaFireLoading || state.bcFireLoading;
+  if (loading) {
+    btn.textContent = "Loading fires...";
+    btn.className = "fire-toggle-btn loading";
+    btn.setAttribute("aria-expanded", state.fireMenuOpen ? "true" : "false");
+  } else if (state.wildfireEnabled && selectedCount) {
+    btn.textContent = `Fires (${selectedCount})`;
+    btn.title = `${selectedCount.toLocaleString("en-CA")} fire source categories selected`;
+    btn.className = "fire-toggle-btn active";
+    btn.setAttribute("aria-expanded", state.fireMenuOpen ? "true" : "false");
   } else {
-    els.wildfireToggle.textContent = "Fire Layer";
-    els.wildfireToggle.className = "fire-toggle-btn";
+    btn.textContent = "Fires";
+    btn.title = "Official Alberta and BC fires plus optional NRCan CWFIS hotspots";
+    btn.className = "fire-toggle-btn";
+    btn.setAttribute("aria-expanded", state.fireMenuOpen ? "true" : "false");
   }
 }
 
@@ -2493,7 +2909,7 @@ function summarizeFireSeverity(features) {
 function renderRiskBuffers(byAsset) {
   if (!state.map || !window.L) return;
   if (state.riskBufferLayer) { state.map.removeLayer(state.riskBufferLayer); state.riskBufferLayer = null; }
-  if (!state.wildfireEnabled || !state.wildfires?.features?.length) return;
+  if (!state.wildfireEnabled || !activeFireFeatures(true).length) return;
 
   const group = L.layerGroup();
   for (const { asset, kbbl } of byAsset.values()) {
@@ -2528,7 +2944,7 @@ function renderFireLayer() {
   renderAlbertaFireLayer();
   renderBCFireLayer();
 
-  if (!state.wildfireEnabled || !state.wildfires?.features?.length) return;
+  if (!state.wildfireEnabled || state.hiddenLegendKeys.has("fire-zone") || !state.wildfires?.features?.length) return;
 
   const SEVERITY_COLOR = { extreme: "#b91c1c", high: "#ef4444", moderate: "#f97316", low: "#f6ad55", unknown: "#64748b" };
 
@@ -2654,8 +3070,8 @@ function initializeMarketPipelineSelection() {
 function marketPipelineStyle(feature) {
   return {
     color: feature.properties?.color || '#334155',
-    weight: 2.1,
-    opacity: 0.78,
+    weight: 1.55,
+    opacity: 0.72,
     lineCap: 'round',
     lineJoin: 'round',
   };
@@ -2799,11 +3215,18 @@ function setMarketPipelineMenuOpen(open) {
 function buildMarketPipelineMenu() {
   const options = document.getElementById('marketPipelineOptions');
   if (!options || !state.marketPipelineData) return;
-  options.innerHTML = marketPipelineFeatures().map((feature) => {
+  let html = '';
+  let currentSection = '';
+  for (const feature of marketPipelineFeatures()) {
     const p = feature.properties || {};
+    const section = p.menu_section || 'Core Market Access Pipelines';
+    if (section !== currentSection) {
+      currentSection = section;
+      html += `<div class="market-pipeline-menu-section">${escapeHtml(section)}</div>`;
+    }
     const checked = state.selectedMarketPipelineIds.has(p.route_id);
     const color = p.color || '#334155';
-    return `
+    html += `
       <label class="market-pipeline-option" title="${escapeHtml(p.flow_role || p.route_name)}">
         <input type="checkbox" data-market-pipeline-id="${escapeHtml(p.route_id)}" ${checked ? 'checked' : ''} />
         <span class="market-pipeline-swatch" style="background:${color}"></span>
@@ -2812,7 +3235,8 @@ function buildMarketPipelineMenu() {
           <em>${escapeHtml(p.commodity || '')}</em>
         </span>
       </label>`;
-  }).join('');
+  }
+  options.innerHTML = html;
   const hubsToggle = document.getElementById('marketHubToggle');
   if (hubsToggle) hubsToggle.checked = state.marketHubsEnabled;
 }
@@ -2876,11 +3300,11 @@ Object.assign(state, {
 
 function pipelineSubstanceWeight(diamMm) {
   const d = parseFloat(diamMm) || 0;
-  if (d <= 0)   return 0.9;
-  if (d <= 60)  return 1.0;
-  if (d <= 114) return 1.6;
-  if (d <= 219) return 2.2;
-  return 3.0;
+  if (d <= 0)   return 0.7;
+  if (d <= 60)  return 0.8;
+  if (d <= 114) return 1.15;
+  if (d <= 219) return 1.55;
+  return 2.1;
 }
 
 async function fetchPipelineData() {
@@ -2936,7 +3360,7 @@ function renderPipelineSegmentLayer() {
       const sub = p.substance || '';
       const col = PIPELINE_SUBSTANCE_COLOR[sub] || '#888888';
       const w   = pipelineSubstanceWeight(p.diameter_mm);
-      return { color: col, weight: w, opacity: 0.72 };
+      return { color: col, weight: w, opacity: 0.62 };
     },
     onEachFeature(feature, layer) {
       const p     = feature.properties || {};
@@ -3082,11 +3506,10 @@ const PIPELINE_LEGEND_ITEMS = [
 ];
 
 const PIPELINE_CORE_KEYS = new Set([
+  'pipe-oilwell',
   'pipe-crude',
+  'pipe-lvp',
   'pipe-condensate',
-  'pipe-diluent',
-  'inst-pump',
-  'inst-terminal',
 ]);
 
 function pipelineFilterItems() {
@@ -3192,19 +3615,24 @@ async function boot() {
     await loadData();
     initControls();
     initMap();
-    // Auto-enable fire layers on every open — fetches run in parallel,
-    // map updates as each source resolves.
-    state.wildfireEnabled = true;
+    // Default map state: official AB/BC fires, selected AER pipeline liquids,
+    // and Canada + PADD II/V refinery regions.
+    state.wildfireEnabled = fireSelectedCount() > 0;
+    state.refineryEnabled = refinerySelectedCount() > 0;
+    state.pipelineEnabled = pipelineSelectedCount() > 0;
     updateFireToggleUI();
     updateFormationToggleUI();
+    updateRefineryToggleUI();
     updatePipelineToggleUI();
     updateMarketPipelineToggleUI();
-    updateWildfireStatus("Fetching live wildfire data…");
+    updateWildfireStatus("Fetching official Alberta and BC fire data...");
     render();
-    // Kick off both fire sources in parallel (non-blocking)
-    fetchWildfires();
+    // Fetch defaults in parallel. NRCan CWFIS/FWI stays off until selected.
     fetchAlbertaFires();
     fetchBCFires();
+    fetchPipelineData().then((ok) => {
+      if (ok) refreshPipelineLayers();
+    });
   } catch (error) {
     console.error(error);
     if (els.freshness) {

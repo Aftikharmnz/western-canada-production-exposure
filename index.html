@@ -25,8 +25,36 @@
             <input id="searchInput" type="search" placeholder="Asset, company, province, stream" />
           </label>
           <button id="selectModeBtn" class="select-mode-btn" type="button" title="Ctrl+drag to select assets">&#9638; Select</button>
-          <button id="formationToggle" class="formation-toggle-btn" type="button">AER Sites</button>
-          <button id="refineryToggle" class="refinery-toggle-btn" type="button">Refineries</button>
+          <div id="formationControl" class="formation-control">
+            <button id="formationToggle" class="formation-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">AER Sites</button>
+            <div id="formationMenu" class="formation-menu" hidden>
+              <div class="formation-menu-header">
+                <strong>AER Sites</strong>
+                <span>Choose overlays</span>
+              </div>
+              <div class="formation-menu-actions">
+                <button type="button" data-formation-action="core">Core</button>
+                <button type="button" data-formation-action="all">All</button>
+                <button type="button" data-formation-action="none">None</button>
+              </div>
+              <div id="formationOptions" class="formation-options"></div>
+            </div>
+          </div>
+          <div id="refineryControl" class="refinery-control">
+            <button id="refineryToggle" class="refinery-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Refineries</button>
+            <div id="refineryMenu" class="refinery-menu" hidden>
+              <div class="refinery-menu-header">
+                <strong>Refineries</strong>
+                <span>Choose regions</span>
+              </div>
+              <div class="refinery-menu-actions">
+                <button type="button" data-refinery-action="defaults">Core</button>
+                <button type="button" data-refinery-action="all">All</button>
+                <button type="button" data-refinery-action="none">None</button>
+              </div>
+              <div id="refineryOptions" class="refinery-options"></div>
+            </div>
+          </div>
           <div id="pipelineControl" class="pipeline-control">
             <button id="pipelineToggle" class="pipeline-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Pipelines</button>
             <div id="pipelineMenu" class="pipeline-menu" hidden>
@@ -65,7 +93,21 @@
               </label>
             </div>
           </div>
-          <button id="wildfireToggle" class="fire-toggle-btn" type="button">Fire Layer</button>
+          <div id="fireControl" class="fire-control">
+            <button id="wildfireToggle" class="fire-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Fires</button>
+            <div id="fireMenu" class="fire-menu" hidden>
+              <div class="fire-menu-header">
+                <strong>Fires</strong>
+                <span>Choose sources</span>
+              </div>
+              <div class="fire-menu-actions">
+                <button type="button" data-fire-action="defaults">Core</button>
+                <button type="button" data-fire-action="all">All</button>
+                <button type="button" data-fire-action="none">None</button>
+              </div>
+              <div id="fireOptions" class="fire-options"></div>
+            </div>
+          </div>
           <button id="distanceToggle" class="distance-mode-btn" type="button">Distance</button>
           <button id="docsBtn" class="docs-btn" type="button">&#9432; Docs</button>
           <button id="etlButton" class="primary-action" type="button">Run ETL</button>
@@ -79,7 +121,7 @@
               <strong id="selectedDate">--</strong>
               <span id="dateScenario">--</span>
             </div>
-            <input id="dateSlider" class="range" type="range" min="0" max="0" value="0" />
+            <select id="dateSelect" class="date-select" aria-label="Select production date"></select>
             <div id="coverageNotice" class="coverage-notice" hidden></div>
           </section>
           <section class="filter-section">
@@ -131,29 +173,12 @@
             <button type="button" class="legend-item" data-legend-key="in-situ" aria-pressed="true"><i class="dot in-situ"></i><span>In-situ Bitumen</span></button>
             <button type="button" class="legend-item" data-legend-key="mined" aria-pressed="true"><i class="dot mined"></i><span>Mined Bitumen</span></button>
             <button type="button" class="legend-item" data-legend-key="synthetic" aria-pressed="true"><i class="dot synthetic"></i><span>Synthetic Crude</span></button>
-            <button type="button" class="legend-item" data-legend-key="heavy-conv" aria-pressed="true"><i class="dot heavy-conv"></i><span>Heavy Crude</span></button>
             <button type="button" class="legend-item" data-legend-key="conventional" aria-pressed="true"><i class="dot conventional"></i><span>Conventional</span></button>
             <button type="button" class="legend-item" data-legend-key="pentanes-plus" aria-pressed="true"><i class="dot pentanes-plus"></i><span>Pentanes Plus</span></button>
             <button type="button" class="legend-item" data-legend-key="condensate" aria-pressed="true"><i class="dot condensate"></i><span>Condensate</span></button>
             <button type="button" class="legend-item" data-legend-key="gas-plant" aria-pressed="true"><i class="dot gas-plant"></i><span>Gas Plant</span></button>
             <button type="button" class="legend-item" data-legend-key="integrated-plant" aria-pressed="true"><i class="dot integrated-plant"></i><span>Integrated Plant</span></button>
             <button type="button" class="legend-item" data-legend-key="spec-plant" aria-pressed="true"><i class="dot spec-plant"></i><span>Spec Plant</span></button>
-            <button type="button" class="legend-item" data-legend-key="fire-zone" aria-pressed="true"><i class="dot fire-zone"></i><span>Fire Hotspot (FWI)</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-oc" aria-pressed="true"><i class="dot ab-fire-oc"></i><span>AB Fire - Out of Control</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-bh" aria-pressed="true"><i class="dot ab-fire-bh"></i><span>AB Fire - Being Held</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-uc" aria-pressed="true"><i class="dot ab-fire-uc"></i><span>AB Fire - Under Control</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-carryover" aria-pressed="true"><i class="dot ab-fire-carryover"></i><span>AB Fire - Carryover</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-ma" aria-pressed="true"><i class="dot ab-fire-ma"></i><span>AB Fire - Mutual Aid</span></button>
-            <button type="button" class="legend-item" data-legend-key="ab-fire-mun" aria-pressed="true"><i class="dot ab-fire-mun"></i><span>AB Fire - Municipal</span></button>
-            <button type="button" class="legend-item" data-legend-key="bc-fire-oc" aria-pressed="true"><i class="dot bc-fire-oc"></i><span>BC Fire - Out of Control</span></button>
-            <button type="button" class="legend-item" data-legend-key="bc-fire-bh" aria-pressed="true"><i class="dot bc-fire-bh"></i><span>BC Fire - Being Held</span></button>
-            <button type="button" class="legend-item" data-legend-key="bc-fire-uc" aria-pressed="true"><i class="dot bc-fire-uc"></i><span>BC Fire - Under Control</span></button>
-            <button type="button" class="legend-item" data-legend-key="bc-fire-fon" aria-pressed="true"><i class="dot bc-fire-fon"></i><span>BC Fire of Note</span></button>
-            <button type="button" class="legend-item" data-legend-key="formation-os" aria-pressed="true"><i class="dot formation-os"></i><span>In-situ Approval</span></button>
-            <button type="button" class="legend-item" data-legend-key="formation-tp" aria-pressed="true"><i class="dot formation-tp"></i><span>Mineable Approval</span></button>
-            <button type="button" class="legend-item" data-legend-key="asset-footprint" aria-pressed="true"><i class="dot asset-footprint"></i><span>Production Footprint</span></button>
-            <button type="button" class="legend-item" data-legend-key="st102-facility" aria-pressed="true"><i class="dot st102-facility"></i><span>ST102 Facility</span></button>
-            <button type="button" class="legend-item" data-legend-key="refinery-plant" aria-pressed="true"><i class="dot refinery-plant"></i><span>Refinery / Upgrader</span></button>
           </div>
           <div id="etlPanel" class="etl-panel" hidden>
             <button id="closeEtl" type="button" aria-label="Close ETL panel">x</button>
@@ -479,7 +504,7 @@
 
             <h3>ETL Refresh</h3>
             <p>Click <strong>Run ETL</strong> in the top bar to see the refresh command. Run <code>python scripts/run_etl.py</code> from the project root to rebuild the database from locally cached raw files and the workbook. Add <code>--download</code> to re-fetch public source files where configured.</p>
-            <p class="docs-note">ℹ️ Wildfire data (CWFIS, ABFP, BCWS) is fetched live in the browser when you click the Fire Layer button — it does not go through the ETL.</p>
+            <p class="docs-note">ℹ️ Wildfire data (CWFIS, ABFP, BCWS) is fetched live in the browser when you use the Fires dropdown — it does not go through the ETL.</p>
           </section>
 
         </div><!-- .docs-body -->
