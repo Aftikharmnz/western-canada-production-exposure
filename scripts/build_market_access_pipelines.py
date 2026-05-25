@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 import time
 import urllib.parse
@@ -29,7 +30,6 @@ CER_PIPELINES_URL = "https://services5.arcgis.com/vNzamREXvX2WcX6d/arcgis/rest/s
 EIA_CRUDE_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0"
 EIA_PRODUCTS_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0"
 EIA_HGL_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0"
-SKAGIT_PIPELINES_URL = "https://geo.skagitcountywa.gov/server/rest/services/TransportationUtilities/PipelinesMap/MapServer/2"
 CAPP_MAP_URL = "https://www.capp.ca/wp-content/uploads/2024/03/CAPP-2023-Pipeline-and-Refinery-Map-36x22-wall-size.pdf"
 TM_PUGET_URL = "https://www.transmountain.com/news/2019/trans-mountains-puget-sound-pipeline-shipping-products-to-washington-state-refineries-since-1954"
 AER_FEEDER_PIPELINES = ROOT / "public" / "data" / "aer_feeder_pipelines.geojson"
@@ -52,6 +52,7 @@ ROUTES: list[dict[str, Any]] = [
                 "source": "EIA",
                 "url": EIA_CRUDE_URL,
                 "where": "Opername = 'ENBRIDGE' AND Pipename IN ('Lakehead', 'Mainline', 'Alberta Clipper')",
+                "line_filter": {"max_lon": -82.0, "max_lat": 49.2},
             },
         ],
     },
@@ -119,28 +120,7 @@ ROUTES: list[dict[str, Any]] = [
         "default_visible": True,
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'TransMountain'"},
-            {"source": "Skagit County GIS", "url": SKAGIT_PIPELINES_URL, "where": "OWNER LIKE '%Trans Mountain%'"},
         ],
-        # Public Whatcom County pipeline GIS does not expose the Trans Mountain
-        # crude line. Add only a short route-level connector to avoid the former
-        # sea-jump while keeping the uncertainty explicit in properties.
-        "manual_lines": [
-            [
-                [-122.27, 49.00],
-                [-122.35, 48.95],
-                [-122.50, 48.86],
-                [-122.62, 48.84],
-                [-122.69, 48.87],
-                [-122.75, 48.93],
-            ],
-            [
-                [-122.50, 48.86],
-                [-122.53, 48.76],
-                [-122.47, 48.60],
-                [-122.58, 48.51],
-            ],
-        ],
-        "manual_note": "Short Whatcom County/Ferndale connector is route-level only; Skagit County provides the Anacortes-area linework.",
     },
     {
         "route_id": "keystone",
@@ -154,7 +134,12 @@ ROUTES: list[dict[str, Any]] = [
         "default_visible": True,
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'Keystone'"},
-            {"source": "EIA", "url": EIA_CRUDE_URL, "where": "Opername = 'TRANSCANADA' AND Pipename IN ('Keystone', 'Gulf Coast Project')"},
+            {
+                "source": "EIA",
+                "url": EIA_CRUDE_URL,
+                "where": "Opername = 'TRANSCANADA' AND Pipename IN ('Keystone', 'Gulf Coast Project')",
+                "line_filter": {"max_lat": 49.2},
+            },
         ],
     },
     {
@@ -184,7 +169,12 @@ ROUTES: list[dict[str, Any]] = [
         "default_visible": True,
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'SouthernLights'"},
-            {"source": "EIA", "url": EIA_PRODUCTS_URL, "where": "Opername = 'ENBRIDGE' AND Pipename = 'Southern Lights'"},
+            {
+                "source": "EIA",
+                "url": EIA_PRODUCTS_URL,
+                "where": "Opername = 'ENBRIDGE' AND Pipename = 'Southern Lights'",
+                "line_filter": {"max_lat": 49.2},
+            },
         ],
     },
     {
@@ -199,7 +189,12 @@ ROUTES: list[dict[str, Any]] = [
         "default_visible": True,
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'Cochin'"},
-            {"source": "EIA", "url": EIA_HGL_URL, "where": "Opername = 'KINDER MORGAN' AND Pipename = 'Cochin Pipeline'"},
+            {
+                "source": "EIA",
+                "url": EIA_HGL_URL,
+                "where": "Opername = 'KINDER MORGAN' AND Pipename = 'Cochin Pipeline'",
+                "line_filter": {"max_lat": 49.2},
+            },
         ],
     },
     {
@@ -250,23 +245,7 @@ ROUTES: list[dict[str, Any]] = [
                 "url": EIA_CRUDE_URL,
                 "where": "Opername = 'PHILLIPS 66 PIPELINE' AND Pipename = 'Glacier Pipeline'",
             },
-            {
-                "source": "EIA",
-                "url": EIA_CRUDE_URL,
-                "where": "Opername = 'CHS ENERGY' AND Pipename = 'Front Range'",
-            },
         ],
-        "manual_lines": [
-            [
-                [-113.49, 53.55],
-                [-113.48, 53.43],
-            ],
-            [
-                [-113.39, 49.00],
-                [-112.33, 48.63],
-            ],
-        ],
-        "manual_note": "Alberta geometry uses AER operating pipeline licences; short Edmonton and border connectors are route-level only.",
     },
     {
         "route_id": "enbridge-lines-7-11",
@@ -410,6 +389,39 @@ def feature_lines(feature: dict[str, Any]) -> list[list[list[float]]]:
     return []
 
 
+def line_bbox(line: list[list[float]]) -> tuple[float, float, float, float]:
+    lons = [float(point[0]) for point in line]
+    lats = [float(point[1]) for point in line]
+    return min(lons), max(lons), min(lats), max(lats)
+
+
+def line_max_segment_km(line: list[list[float]]) -> float:
+    max_segment = 0.0
+    for a, b in zip(line, line[1:]):
+        # Approximate enough for QA filtering in western Canada / northern U.S.
+        dx = (float(a[0]) - float(b[0])) * 85.0
+        dy = (float(a[1]) - float(b[1])) * 111.0
+        max_segment = max(max_segment, math.hypot(dx, dy))
+    return max_segment
+
+
+def line_allowed(line: list[list[float]], filters: dict[str, Any] | None) -> bool:
+    if not filters:
+        return True
+    min_lon, max_lon, min_lat, max_lat = line_bbox(line)
+    if "min_lon" in filters and min_lon < float(filters["min_lon"]):
+        return False
+    if "max_lon" in filters and max_lon > float(filters["max_lon"]):
+        return False
+    if "min_lat" in filters and min_lat < float(filters["min_lat"]):
+        return False
+    if "max_lat" in filters and max_lat > float(filters["max_lat"]):
+        return False
+    if "max_segment_km" in filters and line_max_segment_km(line) > float(filters["max_segment_km"]):
+        return False
+    return True
+
+
 def geometry_from_lines(lines: list[list[list[float]]]) -> dict[str, Any]:
     if len(lines) == 1:
         return {"type": "LineString", "coordinates": lines[0]}
@@ -440,7 +452,7 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
                 warnings.append(f"{route['route_name']}: {part['source']} local read failed: {exc}")
                 continue
             for feature in part_features:
-                lines.extend(feature_lines(feature))
+                lines.extend(line for line in feature_lines(feature) if line_allowed(line, part.get("line_filter")))
             if part_features:
                 sources.append(f"{part['source']} ({len(part_features)} local feature{'s' if len(part_features) != 1 else ''})")
             continue
@@ -453,14 +465,9 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
             warnings.append(f"{route['route_name']}: {part['source']} query failed: {exc}")
             continue
         for feature in part_features:
-            lines.extend(feature_lines(feature))
+            lines.extend(line for line in feature_lines(feature) if line_allowed(line, part.get("line_filter")))
         if part_features:
             sources.append(f"{part['source']} ({len(part_features)} feature{'s' if len(part_features) != 1 else ''})")
-
-    for line in route.get("manual_lines", []):
-        lines.append(line)
-    if route.get("manual_lines"):
-        sources.append(f"Manual route-level connector ({len(route['manual_lines'])})")
 
     if not lines:
         warnings.append(f"{route['route_name']}: no geometry returned")
@@ -492,10 +499,6 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "source_urls": sorted({source_reference(part) for part in route.get("parts", [])}),
         "geometry_confidence": "public GIS linework, route-level display",
     }
-    if route.get("manual_note"):
-        properties["geometry_note"] = route["manual_note"]
-        properties["geometry_confidence"] = "mixed public GIS linework plus route-level connector"
-
     return {"type": "Feature", "properties": properties, "geometry": geometry_from_lines(lines)}, warnings
 
 
@@ -534,8 +537,8 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
             "source_notes": [
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
                 "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
-                "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available.",
-                "Trans Mountain Puget Sound Anacortes-area linework uses Skagit County GIS; the Whatcom/Ferndale connector is route-level only.",
+                "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available; coarse EIA chords that duplicate Canadian CER linework are filtered out.",
+                "Route-level manual connectors are intentionally excluded to avoid straight-line artifacts over water or across border gaps.",
                 "CAPP's 2023 Pipeline and Refinery Map is used as route/hub reference, not as coordinate geometry.",
                 "Analytical context only; not for construction, excavation, or ground disturbance.",
             ],
@@ -545,7 +548,6 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
                 "eia_products": EIA_PRODUCTS_URL,
                 "eia_hgl": EIA_HGL_URL,
                 "aer_feeder_pipelines": AER_FEEDER_PIPELINES.relative_to(ROOT).as_posix(),
-                "skagit_pipelines": SKAGIT_PIPELINES_URL,
                 "capp_reference_map": CAPP_MAP_URL,
                 "trans_mountain_puget_reference": TM_PUGET_URL,
             },
@@ -561,7 +563,7 @@ def main() -> int:
     parser.add_argument(
         "--local-only",
         action="store_true",
-        help="Build only manual/local content. Useful for UI tests when network is unavailable.",
+        help="Build only local content. Useful for UI tests when network is unavailable.",
     )
     args = parser.parse_args()
 

@@ -5,6 +5,12 @@ __pycache__/
 *.pyc
 *.pyo
 
+# .NET build/cache artifacts
+.dotnet_home/
+.nuget_packages/
+tools/**/bin/
+tools/**/obj/
+
 # Local ETL inputs
 data/raw/
 data/processed/

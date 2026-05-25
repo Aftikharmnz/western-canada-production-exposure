@@ -2,6 +2,8 @@
 // DATA PATHS
 // ============================================================
 
+window.__PRODUCTION_APP_MODULE_LOADED__ = true;
+
 const DATA_PATHS = {
   manifest: "public/data/manifest.json",
   assets: "public/data/assets.json",
@@ -11,6 +13,7 @@ const DATA_PATHS = {
   assetGeometries: "public/data/asset_geometries.geojson",
   refineries: "public/data/refineries.geojson",
   marketPipelines: "public/data/market_access_pipelines.geojson",
+  pipelineIndex: "public/data/aer_pipeline_index.json",
 };
 
 // ============================================================
@@ -146,6 +149,19 @@ const DEFAULT_REFINERY_GROUP_KEYS = [
   "us-padd-v",
 ];
 
+const POINT_LEGEND_KEYS = new Set([
+  "in-situ",
+  "mined",
+  "synthetic",
+  "conventional",
+  "pentanes-plus",
+  "condensate",
+  "gas-plant",
+  "integrated-plant",
+  "spec-plant",
+  "heavy-conv",
+]);
+
 // ============================================================
 // APPLICATION STATE
 // ============================================================
@@ -177,6 +193,7 @@ const state = {
   search: "",
   map: null,
   markerLayer: null,
+  assetMarkerLayersByLegendKey: new Map(),
   fallbackReady: false,
   // Wildfire state — CWFIS hotspots (NRCan)
   wildfires: null,
@@ -736,25 +753,39 @@ function initLegendControls() {
     if (!key) return;
     if (state.hiddenLegendKeys.has(key)) state.hiddenLegendKeys.delete(key);
     else state.hiddenLegendKeys.add(key);
+
+    let handledFast = false;
     if (["formation-os", "formation-tp", "asset-footprint", "st102-facility"].includes(key)) {
       if (state.formationLayer) { state.map.removeLayer(state.formationLayer); state.formationLayer = null; }
       if (state.facilityLayer) { state.map.removeLayer(state.facilityLayer); state.facilityLayer = null; }
       if (state.assetFootprintLayer) { state.map.removeLayer(state.assetFootprintLayer); state.assetFootprintLayer = null; }
+      renderFormationLayer();
+      handledFast = true;
     }
-    if (key === "refinery-plant" && state.refineryLayer) {
-      state.map.removeLayer(state.refineryLayer);
-      state.refineryLayer = null;
+    if (key === "refinery-plant") {
+      if (state.refineryLayer) {
+        state.map.removeLayer(state.refineryLayer);
+        state.refineryLayer = null;
+      }
+      renderRefineryLayer();
+      handledFast = true;
     }
     if (key.startsWith("pipe-") || key.startsWith("inst-")) {
       refreshPipelineLayers();
+      handledFast = true;
     }
-    state.timelineCache = null; // visible streams changed — invalidate bar chart cache
+    if (POINT_LEGEND_KEYS.has(key) && state.map && state.markerLayer) {
+      applyMarkerLegendVisibility();
+      handledFast = true;
+    }
+
     updateLegendControls();
-    scheduleRender();
+    renderCoverageNotice(state.selectedDate);
+    if (els.dateScenario) els.dateScenario.textContent = scenarioLabelForDate(state.selectedDate);
+    if (!handledFast) scheduleRender();
   });
   updateLegendControls();
 }
-
 function updateLegendControls() {
   if (!els.mapLegend) return;
   els.mapLegend.querySelectorAll("[data-legend-key]").forEach((item) => {
@@ -788,23 +819,9 @@ function initMap() {
     { maxZoom: 13, attribution: "Tiles: Esri World Topographic Map" }
   ).addTo(state.map);
   state.markerLayer = L.layerGroup().addTo(state.map);
-  drawPipelines();
   initRubberBand();
   initDistanceTool();
-}
-
-function drawPipelines() {
-  if (!state.map || !window.L) return;
-  const lines = [
-    { name: "Mainline corridor",     color: "#4a6f88", coords: [[57.1,-111.4],[53.9,-110.0],[52.1,-106.7],[50.4,-104.6]] },
-    { name: "Keystone corridor",     color: "#7b6b58", coords: [[56.2,-111.2],[53.3,-110.0],[50.7,-108.3],[49.0,-104.8]] },
-    { name: "Trans Mountain corridor",color: "#6a7f59", coords: [[53.5,-113.5],[52.9,-118.1],[50.7,-121.3],[49.3,-123.1]] },
-  ];
-  lines.forEach(({ name, color, coords }) => {
-    L.polyline(coords, { color, weight: 2, opacity: 0.45, dashArray: "6 8" })
-      .bindTooltip(name)
-      .addTo(state.map);
-  });
+  state.map.on("moveend zoomend", schedulePipelineTileRefresh);
 }
 
 function initDistanceTool() {
@@ -1109,6 +1126,24 @@ function render() {
 // MAP RENDER
 // ============================================================
 
+function markerGroupForLegend(key) {
+  if (!state.assetMarkerLayersByLegendKey) state.assetMarkerLayersByLegendKey = new Map();
+  if (!state.assetMarkerLayersByLegendKey.has(key)) {
+    state.assetMarkerLayersByLegendKey.set(key, L.layerGroup());
+  }
+  return state.assetMarkerLayersByLegendKey.get(key);
+}
+
+function applyMarkerLegendVisibility() {
+  if (!state.markerLayer || !state.assetMarkerLayersByLegendKey) return;
+  for (const [key, group] of state.assetMarkerLayersByLegendKey.entries()) {
+    const visible = legendVisible(key);
+    const shown = state.markerLayer.hasLayer(group);
+    if (visible && !shown) state.markerLayer.addLayer(group);
+    if (!visible && shown) state.markerLayer.removeLayer(group);
+  }
+}
+
 function renderMap(aggregated) {
   const { byAsset } = aggregated || aggregateForDate();
   const points = [...byAsset.values()].filter(
@@ -1118,7 +1153,9 @@ function renderMap(aggregated) {
 
   if (state.map && state.markerLayer && window.L) {
     state.markerLayer.clearLayers();
-    visiblePoints.forEach((point) => {
+    state.assetMarkerLayersByLegendKey = new Map();
+    points.forEach((point) => {
+      const legendKey = pointLegendKey(point);
       const meta = systemMeta(point.asset.production_system);
       const color = meta.color;
       const isSelected = point.asset.asset_id === state.selectedAssetId;
@@ -1159,8 +1196,9 @@ function renderMap(aggregated) {
         state.selectedAssetId = point.asset.asset_id;
         render();
       });
-      marker.addTo(state.markerLayer);
+      marker.addTo(markerGroupForLegend(legendKey));
     });
+    applyMarkerLegendVisibility();
 
     renderFormationLayer();
     renderRefineryLayer();
@@ -2321,10 +2359,8 @@ async function fetchWildfires() {
     state.wildfires = null;
   } finally {
     state.wildfireLoading = false;
-    buildFireMenu();
     updateFireToggleUI();
-    updateWildfireStatus(buildFireStatusMsg());
-    render();
+    refreshFireLayers();
   }
 }
 
@@ -2512,7 +2548,13 @@ function refreshFireLayers() {
   }
   buildFireMenu();
   updateWildfireStatus(buildFireStatusMsg());
-  render();
+  refreshFireDependentPanels();
+}
+
+function refreshFireDependentPanels() {
+  const aggregated = aggregateForDate();
+  renderMetrics(aggregated);
+  renderDetails(aggregated);
 }
 
 async function fetchAlbertaFires() {
@@ -2580,10 +2622,8 @@ async function fetchAlbertaFires() {
     state.albertaFires = null;
   } finally {
     state.albertaFireLoading = false;
-    buildFireMenu();
     updateFireToggleUI();
-    updateWildfireStatus(buildFireStatusMsg());
-    render();
+    refreshFireLayers();
   }
 }
 
@@ -2695,10 +2735,8 @@ async function fetchBCFires() {
     state.bcFires = null;
   } finally {
     state.bcFireLoading = false;
-    buildFireMenu();
     updateFireToggleUI();
-    updateWildfireStatus(buildFireStatusMsg());
-    render();
+    refreshFireLayers();
   }
 }
 
@@ -2835,13 +2873,12 @@ function toggleWildfires() {
   state.wildfireEnabled = fireSelectedCount() > 0;
   setFireMenuOpen(!state.fireMenuOpen);
   if (state.wildfireEnabled) {
-    const started = ensureSelectedFireSources();
-    if (!started) render();
-    updateWildfireStatus(buildFireStatusMsg());
+    ensureSelectedFireSources();
+    refreshFireLayers();
   } else {
     clearFireLayers();
     updateWildfireStatus("");
-    render();
+    refreshFireDependentPanels();
   }
   updateFireToggleUI();
 }
@@ -3170,7 +3207,7 @@ function renderMarketPipelineLayers() {
   }
 
   state.marketPipelineLineLayer.bringToBack();
-  if (state.pipelineSegmentLayer) state.pipelineSegmentLayer.bringToBack();
+  bringPipelineLayersToBack();
   if (state.formationLayer) state.formationLayer.bringToBack();
 }
 
@@ -3289,14 +3326,19 @@ function refreshMarketPipelineLayers() {
 // Extend app state for pipelines
 Object.assign(state, {
   pipelineEnabled:      false,
-  pipelineData:         null,
-  pipelineInstallData:  null,
+  pipelineIndex:        null,
+  pipelineIndexPromise: null,
   pipelineLoading:      false,
   pipelineError:        null,
-  pipelineSegmentLayer: null,
-  pipelineInstallLayer: null,
+  pipelineSegmentLayersByKey: null,
+  pipelineInstallLayersByKey: null,
+  pipelineLayerPromisesByKey: null,
+  pipelineTileLayersByKey: null,
+  pipelineTileRefreshPending: false,
   pipelineMenuOpen:     false,
 });
+
+const PIPELINE_TILE_MIN_MAP_ZOOM = 6;
 
 function pipelineSubstanceWeight(diamMm) {
   const d = parseFloat(diamMm) || 0;
@@ -3307,144 +3349,83 @@ function pipelineSubstanceWeight(diamMm) {
   return 2.1;
 }
 
-async function fetchPipelineData() {
-  if (state.pipelineData && state.pipelineInstallData) return true;
-  if (state.pipelineLoading) return false;
-
-  state.pipelineLoading = true;
-  state.pipelineError   = null;
-  updatePipelineToggleUI();
-  updatePipelineStatus('Loading AER pipeline data (30 MB, one-time)…');
-
-  try {
-    const [pipRes, instRes] = await Promise.all([
-      fetch('public/data/aer_feeder_pipelines.geojson'),
-      fetch('public/data/aer_pipeline_installations.geojson'),
-    ]);
-    if (!pipRes.ok)  throw new Error(`Pipeline segments: HTTP ${pipRes.status}`);
-    if (!instRes.ok) throw new Error(`Installations: HTTP ${instRes.status}`);
-    const [pipJson, instJson] = await Promise.all([pipRes.json(), instRes.json()]);
-    state.pipelineData        = pipJson;
-    state.pipelineInstallData = instJson;
-    buildPipelineMenu();
-  } catch (err) {
-    state.pipelineError = err.message || String(err);
-    updatePipelineStatus(`Pipeline data unavailable: ${state.pipelineError}`);
-    state.pipelineLoading = false;
-    updatePipelineToggleUI();
-    return false;
-  }
-
-  state.pipelineLoading = false;
-  updatePipelineToggleUI();
-  updatePipelineStatus('');
-  return true;
+function pipelineSegmentStyle(feature) {
+  const p   = feature.properties || {};
+  const sub = p.substance || '';
+  const col = PIPELINE_SUBSTANCE_COLOR[sub] || '#888888';
+  const w   = pipelineSubstanceWeight(p.diameter_mm);
+  return { color: col, weight: w, opacity: 0.62 };
 }
 
-function renderPipelineSegmentLayer() {
-  if (!state.map || !window.L) return;
-  if (state.pipelineSegmentLayer) {
-    state.map.removeLayer(state.pipelineSegmentLayer);
-    state.pipelineSegmentLayer = null;
+function bindPipelineSegmentTooltip(feature, layer) {
+  const p     = feature.properties || {};
+  const sub   = p.substance || 'Unknown';
+  const badge = PIPELINE_SUBSTANCE_BADGE[sub] || '';
+  const from  = [p.from_fac, p.from_loc].filter(Boolean).join(' @ ') || '—';
+  const to    = [p.to_fac,   p.to_loc  ].filter(Boolean).join(' @ ') || '—';
+  const diam  = p.diameter_mm ? `${p.diameter_mm} mm OD` : '—';
+  const maop  = p.maop_kpa ? `${Number(p.maop_kpa).toLocaleString('en-CA')} kPa MAOP` : '';
+  const len   = p.length_km ? `${p.length_km} km` : '';
+  const h2s   = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
+  const env   = p.environ || '';
+  const extras = [maop, len, h2s, env].filter(Boolean).join(' · ');
+
+  layer.bindTooltip(
+    `<div>` +
+    `<strong><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.company || '—')}</strong>` +
+    `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.field_ctr || '—')}</div>` +
+    `<div class="pt-route">` +
+    `<span class="pt-route-label">From</span><span class="pt-route-val">${escapeHtml(from)}</span>` +
+    `<span class="pt-route-label">To</span><span class="pt-route-val">${escapeHtml(to)}</span>` +
+    `</div>` +
+    `<div class="pt-sub" style="margin-top:4px">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
+    `${p.material ? `<div class="pt-sub">${escapeHtml(p.material)}${p.joint ? ' · ' + escapeHtml(p.joint) : ''}</div>` : ''}` +
+    `</div>`,
+    { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+  );
+}
+
+function bindPipelineInstallTooltip(feature, layer) {
+  const p    = feature.properties || {};
+  const type = p.type || 'Installation';
+  const pwr  = p.power_kw ? `${parseFloat(p.power_kw).toLocaleString('en-CA')} kW` : '';
+  const src  = p.prime_source || '';
+  const h2s  = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
+  const extras = [pwr && src ? `${pwr} (${src})` : (pwr || src), h2s].filter(Boolean).join(' · ');
+
+  layer.bindTooltip(
+    `<div>` +
+    `<strong>${escapeHtml(type)}</strong>` +
+    `<div class="pt-sub">${escapeHtml(p.company || '—')}</div>` +
+    `<div class="pt-sub">Lic. ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.location || '—')}</div>` +
+    `${p.substance || p.field_ctr ? `<div class="pt-sub">${escapeHtml(p.substance || '')}${p.field_ctr ? ' · ' + escapeHtml(p.field_ctr) : ''}</div>` : ''}` +
+    `${extras ? `<div class="pt-sub" style="margin-top:2px">${escapeHtml(extras)}</div>` : ''}` +
+    `</div>`,
+    { sticky: true, opacity: 0.96, className: 'inst-tip' }
+  );
+}
+
+function setCachedLayerVisible(layer, visible) {
+  if (!layer || !state.map) return;
+  const shown = state.map.hasLayer(layer);
+  if (visible && !shown) layer.addTo(state.map);
+  if (!visible && shown) state.map.removeLayer(layer);
+}
+
+function bringPipelineLayersToBack() {
+  if (!state.map) return;
+  for (const layerMap of [state.pipelineSegmentLayersByKey, state.pipelineInstallLayersByKey]) {
+    if (!layerMap) continue;
+    for (const layer of layerMap.values()) {
+      if (state.map.hasLayer(layer) && typeof layer.bringToBack === 'function') layer.bringToBack();
+    }
   }
-  if (!state.pipelineEnabled || !state.pipelineData) return;
-
-  state.pipelineSegmentLayer = L.geoJSON(state.pipelineData, {
-    filter(feature) {
-      const sub = feature.properties?.substance || '';
-      const lk  = PIPELINE_LEGEND_KEY[sub];
-      return !lk || legendVisible(lk);
-    },
-    style(feature) {
-      const p   = feature.properties || {};
-      const sub = p.substance || '';
-      const col = PIPELINE_SUBSTANCE_COLOR[sub] || '#888888';
-      const w   = pipelineSubstanceWeight(p.diameter_mm);
-      return { color: col, weight: w, opacity: 0.62 };
-    },
-    onEachFeature(feature, layer) {
-      const p     = feature.properties || {};
-      const sub   = p.substance || 'Unknown';
-      const badge = PIPELINE_SUBSTANCE_BADGE[sub] || '';
-      const from  = [p.from_fac, p.from_loc].filter(Boolean).join(' @ ') || '—';
-      const to    = [p.to_fac,   p.to_loc  ].filter(Boolean).join(' @ ') || '—';
-      const diam  = p.diameter_mm ? `${p.diameter_mm} mm OD` : '—';
-      const maop  = p.maop_kpa ? `${Number(p.maop_kpa).toLocaleString('en-CA')} kPa MAOP` : '';
-      const len   = p.length_km ? `${p.length_km} km` : '';
-      const h2s   = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
-      const env   = p.environ || '';
-      const extras = [maop, len, h2s, env].filter(Boolean).join(' · ');
-
-      layer.bindTooltip(
-        `<div>` +
-        `<strong><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.company || '—')}</strong>` +
-        `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.field_ctr || '—')}</div>` +
-        `<div class="pt-route">` +
-        `<span class="pt-route-label">From</span><span class="pt-route-val">${escapeHtml(from)}</span>` +
-        `<span class="pt-route-label">To</span><span class="pt-route-val">${escapeHtml(to)}</span>` +
-        `</div>` +
-        `<div class="pt-sub" style="margin-top:4px">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
-        `${p.material ? `<div class="pt-sub">${escapeHtml(p.material)}${p.joint ? ' · ' + escapeHtml(p.joint) : ''}</div>` : ''}` +
-        `</div>`,
-        { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
-      );
-    },
-  }).addTo(state.map);
-
-  state.pipelineSegmentLayer.bringToBack();
+  for (const tileStore of state.pipelineTileLayersByKey?.values?.() || []) {
+    for (const layer of tileStore.layers.values()) {
+      if (state.map.hasLayer(layer) && typeof layer.bringToBack === 'function') layer.bringToBack();
+    }
+  }
   if (state.formationLayer) state.formationLayer.bringToBack();
-}
-
-function renderPipelineInstallLayer() {
-  if (!state.map || !window.L) return;
-  if (state.pipelineInstallLayer) {
-    state.map.removeLayer(state.pipelineInstallLayer);
-    state.pipelineInstallLayer = null;
-  }
-  if (!state.pipelineEnabled || !state.pipelineInstallData) return;
-
-  state.pipelineInstallLayer = L.geoJSON(state.pipelineInstallData, {
-    filter(feature) {
-      const t  = feature.properties?.type || '';
-      const st = feature.properties?.status || '';
-      if (['Abandoned', 'Removed', 'Discontinued'].includes(st)) return false;
-      const lk = INSTALLATION_LEGEND_KEY[t];
-      return !lk || legendVisible(lk);
-    },
-    pointToLayer(feature, latlng) {
-      const t     = feature.properties?.type || '';
-      const style = INSTALLATION_STYLE[t] || { color: '#374151', fill: '#94a3b8', radius: 4 };
-      return L.circleMarker(latlng, {
-        radius:      style.radius,
-        color:       style.color,
-        weight:      1.5,
-        fillColor:   style.fill,
-        fillOpacity: 0.88,
-        opacity:     0.9,
-      });
-    },
-    onEachFeature(feature, layer) {
-      const p    = feature.properties || {};
-      const type = p.type || 'Installation';
-      const pwr  = p.power_kw ? `${parseFloat(p.power_kw).toLocaleString('en-CA')} kW` : '';
-      const src  = p.prime_source || '';
-      const h2s  = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
-      const extras = [pwr && src ? `${pwr} (${src})` : (pwr || src), h2s].filter(Boolean).join(' · ');
-
-      layer.bindTooltip(
-        `<div>` +
-        `<strong>${escapeHtml(type)}</strong>` +
-        `<div class="pt-sub">${escapeHtml(p.company || '—')}</div>` +
-        `<div class="pt-sub">Lic. ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.location || '—')}</div>` +
-        `${p.substance || p.field_ctr ? `<div class="pt-sub">${escapeHtml(p.substance || '')}${p.field_ctr ? ' · ' + escapeHtml(p.field_ctr) : ''}</div>` : ''}` +
-        `${extras ? `<div class="pt-sub" style="margin-top:2px">${escapeHtml(extras)}</div>` : ''}` +
-        `</div>`,
-        { sticky: true, opacity: 0.96, className: 'inst-tip' }
-      );
-    },
-  }).addTo(state.map);
-
-  // Canvas layers render in add-order; no bringToFront() for canvas layers.
 }
 
 async function togglePipelines() {
@@ -3452,8 +3433,7 @@ async function togglePipelines() {
   if (!ok) return;
   state.pipelineEnabled = pipelineSelectedCount() > 0;
   setPipelineMenuOpen(!state.pipelineMenuOpen);
-  renderPipelineSegmentLayer();
-  renderPipelineInstallLayer();
+  refreshPipelineLayers();
   updatePipelineToggleUI();
 }
 
@@ -3585,29 +3565,314 @@ function handlePipelineMenuClick(event) {
   updatePipelineToggleUI();
 }
 
-// Count features per legend key from the loaded data
+// Fast path: load AER pipeline categories from pre-split GeoJSON files.
+// The old monolithic 30 MB file remains available as a source artifact, but
+// interactive toggles should only fetch/build the category the user selected.
+async function fetchPipelineData() {
+  if (state.pipelineIndex) return true;
+  if (state.pipelineIndexPromise) return state.pipelineIndexPromise;
+
+  state.pipelineIndexPromise = (async () => {
+    state.pipelineLoading = true;
+    state.pipelineError = null;
+    updatePipelineToggleUI();
+    updatePipelineStatus('Loading AER pipeline index...');
+
+    try {
+      const response = await fetch(DATA_PATHS.pipelineIndex);
+      if (!response.ok) throw new Error(`Pipeline index: HTTP ${response.status}`);
+      state.pipelineIndex = await response.json();
+      state.pipelineSegmentLayersByKey = new Map();
+      state.pipelineInstallLayersByKey = new Map();
+      state.pipelineLayerPromisesByKey = new Map();
+      state.pipelineTileLayersByKey = new Map();
+      buildPipelineMenu();
+      updatePipelineStatus('');
+      return true;
+    } catch (err) {
+      state.pipelineError = err.message || String(err);
+      updatePipelineStatus(`Pipeline data unavailable: ${state.pipelineError}`);
+      return false;
+    } finally {
+      state.pipelineLoading = false;
+      state.pipelineIndexPromise = null;
+      updatePipelineToggleUI();
+    }
+  })();
+
+  return state.pipelineIndexPromise;
+}
+
+function pipelineIndexEntry(key) {
+  return state.pipelineIndex?.line_categories?.[key]
+    || state.pipelineIndex?.installation_categories?.[key]
+    || null;
+}
+
+function pipelineLayerStore(key) {
+  if (key.startsWith('pipe-')) return state.pipelineSegmentLayersByKey;
+  if (key.startsWith('inst-')) return state.pipelineInstallLayersByKey;
+  return null;
+}
+
+function pipelineLayerOptions(key) {
+  if (key.startsWith('pipe-')) {
+    return {
+      style: pipelineSegmentStyle,
+      onEachFeature: bindPipelineSegmentTooltip,
+    };
+  }
+  return {
+    pointToLayer(feature, latlng) {
+      const t = feature.properties?.type || '';
+      const style = INSTALLATION_STYLE[t] || { color: '#374151', fill: '#94a3b8', radius: 4 };
+      return L.circleMarker(latlng, {
+        radius: style.radius,
+        color: style.color,
+        weight: 1.5,
+        fillColor: style.fill,
+        fillOpacity: 0.88,
+        opacity: 0.9,
+      });
+    },
+    onEachFeature: bindPipelineInstallTooltip,
+  };
+}
+
+async function ensurePipelineCategoryLayer(key) {
+  if (!state.map || !window.L || !state.pipelineIndex) return null;
+  const entry = pipelineIndexEntry(key);
+  if (pipelineUsesTiles(entry)) return null;
+  const store = pipelineLayerStore(key);
+  if (!store) return null;
+  if (store.has(key)) return store.get(key);
+  if (!state.pipelineLayerPromisesByKey) state.pipelineLayerPromisesByKey = new Map();
+  if (state.pipelineLayerPromisesByKey.has(key)) return state.pipelineLayerPromisesByKey.get(key);
+
+  if (!entry?.path) return null;
+  const item = pipelineFilterItems().find((candidate) => candidate.key === key);
+  updatePipelineStatus(`Loading ${item?.label || 'pipeline layer'}...`);
+
+  const promise = fetch(entry.path)
+    .then((response) => {
+      if (!response.ok) throw new Error(`${key}: HTTP ${response.status}`);
+      return response.json();
+    })
+    .then((geojson) => {
+      const layer = L.geoJSON(geojson, pipelineLayerOptions(key));
+      store.set(key, layer);
+      updatePipelineStatus('');
+      return layer;
+    })
+    .catch((err) => {
+      state.pipelineLayerPromisesByKey.delete(key);
+      state.pipelineError = err.message || String(err);
+      updatePipelineStatus(`Pipeline data unavailable: ${state.pipelineError}`);
+      updatePipelineToggleUI();
+      return null;
+    });
+
+  state.pipelineLayerPromisesByKey.set(key, promise);
+  return promise;
+}
+
+function pipelineUsesTiles(entry) {
+  return Boolean(entry?.tile_template && Number.isFinite(Number(entry.tile_zoom)));
+}
+
+function pipelineTileStore(key) {
+  if (!state.pipelineTileLayersByKey) state.pipelineTileLayersByKey = new Map();
+  if (!state.pipelineTileLayersByKey.has(key)) {
+    state.pipelineTileLayersByKey.set(key, {
+      layers: new Map(),
+      promises: new Map(),
+      tileKeys: null,
+    });
+  }
+  return state.pipelineTileLayersByKey.get(key);
+}
+
+function pipelineEntryTileKeys(entry) {
+  if (!entry) return new Set();
+  if (!entry._tileKeySet) entry._tileKeySet = new Set(entry.tile_keys || []);
+  return entry._tileKeySet;
+}
+
+function lonLatToTile(lon, lat, zoom) {
+  const n = 2 ** zoom;
+  const clampedLat = Math.max(-85.05112878, Math.min(85.05112878, lat));
+  const latRad = clampedLat * Math.PI / 180;
+  const x = Math.floor((lon + 180) / 360 * n);
+  const y = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
+  return {
+    x: Math.max(0, Math.min(n - 1, x)),
+    y: Math.max(0, Math.min(n - 1, y)),
+  };
+}
+
+function visiblePipelineTileCoords(entry) {
+  if (!state.map || !pipelineUsesTiles(entry)) return [];
+  const zoom = Number(entry.tile_zoom);
+  const bounds = state.map.getBounds().pad(0.12);
+  const nw = lonLatToTile(bounds.getWest(), bounds.getNorth(), zoom);
+  const se = lonLatToTile(bounds.getEast(), bounds.getSouth(), zoom);
+  const minX = Math.min(nw.x, se.x);
+  const maxX = Math.max(nw.x, se.x);
+  const minY = Math.min(nw.y, se.y);
+  const maxY = Math.max(nw.y, se.y);
+  const available = pipelineEntryTileKeys(entry);
+  const coords = [];
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      const id = `${x}/${y}`;
+      if (!available.size || available.has(id)) coords.push({ x, y, id });
+    }
+  }
+  return coords;
+}
+
+function pipelineTileUrl(entry, coord) {
+  return entry.tile_template
+    .replace('{z}', String(entry.tile_zoom))
+    .replace('{x}', String(coord.x))
+    .replace('{y}', String(coord.y));
+}
+
+function hidePipelineTileStore(store) {
+  if (!store || !state.map) return;
+  for (const layer of store.layers.values()) {
+    if (state.map.hasLayer(layer)) state.map.removeLayer(layer);
+  }
+}
+
+async function ensurePipelineTileLayer(key, entry, coord, store) {
+  if (store.layers.has(coord.id)) return store.layers.get(coord.id);
+  if (store.promises.has(coord.id)) return store.promises.get(coord.id);
+
+  const item = pipelineFilterItems().find((candidate) => candidate.key === key);
+  updatePipelineStatus(`Loading ${item?.label || 'pipeline'} map tile...`);
+  const promise = fetch(pipelineTileUrl(entry, coord))
+    .then((response) => {
+      if (!response.ok) throw new Error(`${key} tile ${coord.id}: HTTP ${response.status}`);
+      return response.json();
+    })
+    .then((geojson) => {
+      const layer = L.geoJSON(geojson, pipelineLayerOptions(key));
+      store.layers.set(coord.id, layer);
+      store.promises.delete(coord.id);
+      updatePipelineStatus('');
+      return layer;
+    })
+    .catch((err) => {
+      store.promises.delete(coord.id);
+      state.pipelineError = err.message || String(err);
+      updatePipelineStatus(`Pipeline tile unavailable: ${state.pipelineError}`);
+      return null;
+    });
+
+  store.promises.set(coord.id, promise);
+  return promise;
+}
+
+async function syncPipelineTileCategory(key, entry, visible) {
+  const store = pipelineTileStore(key);
+  if (!visible) {
+    hidePipelineTileStore(store);
+    return;
+  }
+  if (state.map.getZoom() < PIPELINE_TILE_MIN_MAP_ZOOM) {
+    hidePipelineTileStore(store);
+    updatePipelineStatus('Zoom in to load detailed AER feeder pipeline tiles.');
+    return;
+  }
+  updatePipelineStatus('');
+
+  const needed = visiblePipelineTileCoords(entry);
+  const neededIds = new Set(needed.map((coord) => coord.id));
+  for (const [id, layer] of store.layers.entries()) {
+    if (!neededIds.has(id) && state.map.hasLayer(layer)) state.map.removeLayer(layer);
+  }
+
+  await Promise.all(needed.map(async (coord) => {
+    const layer = await ensurePipelineTileLayer(key, entry, coord, store);
+    if (!layer || !state.map || !state.pipelineEnabled || !legendVisible(key)) return;
+    if (!state.map.hasLayer(layer)) layer.addTo(state.map);
+  }));
+}
+
+function hideNonVisiblePipelineLayers() {
+  for (const item of pipelineFilterItems()) {
+    const entry = pipelineIndexEntry(item.key);
+    const visible = state.pipelineEnabled && legendVisible(item.key);
+    if (pipelineUsesTiles(entry)) {
+      if (!visible) hidePipelineTileStore(state.pipelineTileLayersByKey?.get(item.key));
+      continue;
+    }
+    const store = pipelineLayerStore(item.key);
+    const layer = store?.get(item.key);
+    if (layer) setCachedLayerVisible(layer, visible);
+  }
+}
+
+function schedulePipelineTileRefresh() {
+  if (state.pipelineTileRefreshPending) return;
+  state.pipelineTileRefreshPending = true;
+  requestAnimationFrame(() => {
+    state.pipelineTileRefreshPending = false;
+    if (state.pipelineEnabled) syncPipelineLayerCache();
+  });
+}
+
+async function syncPipelineLayerCache() {
+  if (!state.map || !window.L) return;
+  if (!state.pipelineEnabled) {
+    hideNonVisiblePipelineLayers();
+    return;
+  }
+
+  const ok = await fetchPipelineData();
+  if (!ok) return;
+  const work = [];
+  for (const item of pipelineFilterItems()) {
+    const key = item.key;
+    const entry = pipelineIndexEntry(key);
+    const visible = legendVisible(key);
+    if (pipelineUsesTiles(entry)) {
+      work.push(syncPipelineTileCategory(key, entry, visible));
+    } else if (visible) {
+      work.push(ensurePipelineCategoryLayer(key));
+    }
+  }
+  await Promise.all(work);
+  hideNonVisiblePipelineLayers();
+  bringPipelineLayersToBack();
+}
+
+function renderPipelineSegmentLayer() {
+  syncPipelineLayerCache();
+}
+
+function renderPipelineInstallLayer() {
+  syncPipelineLayerCache();
+}
+
+function refreshPipelineLayers() {
+  syncPipelineLayerCache();
+  buildPipelineMenu();
+}
+
 function pipelineLegendCounts() {
   const counts = {};
-  if (state.pipelineData) {
-    for (const feat of state.pipelineData.features) {
-      const lk = PIPELINE_LEGEND_KEY[feat.properties?.substance || ''];
-      if (lk) counts[lk] = (counts[lk] || 0) + 1;
+  if (state.pipelineIndex) {
+    for (const [key, entry] of Object.entries(state.pipelineIndex.line_categories || {})) {
+      counts[key] = entry.count || 0;
     }
-  }
-  if (state.pipelineInstallData) {
-    for (const feat of state.pipelineInstallData.features) {
-      const st = feat.properties?.status || '';
-      if (['Abandoned','Removed','Discontinued'].includes(st)) continue;
-      const lk = INSTALLATION_LEGEND_KEY[feat.properties?.type || ''];
-      if (lk) counts[lk] = (counts[lk] || 0) + 1;
+    for (const [key, entry] of Object.entries(state.pipelineIndex.installation_categories || {})) {
+      counts[key] = entry.count || 0;
     }
+    return counts;
   }
   return counts;
-}
-function refreshPipelineLayers() {
-  renderPipelineSegmentLayer();
-  renderPipelineInstallLayer();
-  buildPipelineMenu();
 }
 
 async function boot() {

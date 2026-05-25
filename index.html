@@ -397,10 +397,10 @@
           <!-- ── PIPELINES ── -->
           <section class="docs-section" id="tab-pipelines" hidden>
             <h2>Pipeline Layers</h2>
-            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude export/import and diluent corridors that connect Western Canadian production to external markets.</p>
+            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude export/import and diluent pipeline systems that connect Western Canadian production to external markets.</p>
 
             <h3>AER feeder layer</h3>
-            <p>Line segments represent AER feeder pipeline records where geometry is available. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
+            <p>Line segments represent AER feeder pipeline records where geometry is available. Feeder line categories are pre-split into static map tiles and load only after zooming in to reduce first-load latency. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
 
             <h3>Commodity types</h3>
             <table class="docs-table">
@@ -414,7 +414,7 @@
             </table>
 
             <h3>Market access layer</h3>
-            <p>The market access layer is intentionally compact and route-level. It includes Enbridge Mainline/Lakehead, Trans Mountain/Puget Sound, Keystone, Express/Platte, Southern Lights, Cochin, Line 9, Wascana, Westspur, Enbridge Bakken/North Dakota, and optional downstream Enbridge/CER liquid systems. Canadian linework is selected from the public CER pipeline systems FeatureServer. U.S. continuations are selected from EIA ArcGIS FeatureServers, with Skagit County GIS filling the Trans Mountain Puget Sound Anacortes-area segment. Yellow hub markers identify key terminals, refineries, interconnects, and route nodes from the CAPP map reference.</p>
+            <p>The market access layer is intentionally compact and route-level. It includes Enbridge Mainline/Lakehead, Trans Mountain/Puget Sound, Keystone, Express/Platte, Southern Lights, Cochin, Line 9, Wascana, Westspur, Enbridge Bakken/North Dakota, and optional downstream Enbridge/CER liquid systems. Canadian linework is selected from the public CER pipeline systems FeatureServer. U.S. continuations are selected from EIA ArcGIS FeatureServers where public linework is available; route-level manual connectors are omitted rather than drawn as straight-line bridges. Yellow hub markers identify key terminals, refineries, interconnects, and route nodes from the CAPP map reference.</p>
 
             <p class="docs-note">Market access lines are analytical context only. They are approximate and must not be used for construction, ground disturbance, or exact underground pipeline location checks.</p>
           </section>
@@ -483,9 +483,9 @@
                 </tr>
                 <tr>
                   <td><strong>Market Access Pipelines</strong></td>
-                  <td>CER liquid pipeline systems plus selected EIA U.S. Energy Atlas and Skagit County ArcGIS linework</td>
+                  <td>CER liquid pipeline systems plus selected EIA U.S. Energy Atlas linework</td>
                   <td>Canadian crude export/import trunks, U.S. continuations, and named market hubs</td>
-                  <td>Crude oil, diluent, condensate/HGL corridors</td>
+                  <td>Crude oil, diluent, condensate/HGL pipeline systems</td>
                 </tr>
                 <tr>
                   <td><strong>AER Scheme Approvals</strong></td>
@@ -512,6 +512,27 @@
     </div><!-- #docsPanel -->
     <!-- ============================================================ -->
 
-    <script type="module" src="src/main.js?v=20260521-fix"></script>
+    <script>
+      window.__PRODUCTION_APP_MODULE_LOADED__ = false;
+      window.setTimeout(() => {
+        const freshness = document.getElementById("freshness");
+        const map = document.getElementById("map");
+        if (!freshness || !freshness.textContent.includes("Loading local production store")) return;
+        if (!window.__PRODUCTION_APP_MODULE_LOADED__) {
+          freshness.textContent = "App script did not load. Open through http://127.0.0.1, not file://.";
+          if (map) {
+            map.innerHTML = `
+              <div class="load-error">
+                <h2>App did not start</h2>
+                <p>Run the local web server from the project folder, then open http://127.0.0.1:8765/index.html.</p>
+                <code>python -m http.server 8765 --bind 127.0.0.1</code>
+              </div>`;
+          }
+          return;
+        }
+        freshness.textContent = "Still loading data... check the browser console for the failed public/data request.";
+      }, 8000);
+    </script>
+    <script src="src/main.js?v=20260524-startup-fix"></script>
   </body>
 </html>
