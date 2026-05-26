@@ -13,6 +13,7 @@ const DATA_PATHS = {
   assetGeometries: "public/data/asset_geometries.geojson",
   refineries: "public/data/refineries.geojson",
   marketPipelines: "public/data/market_access_pipelines.geojson",
+  marketTariffs: "public/data/market_access_tariffs.json",
   pipelineIndex: "public/data/aer_pipeline_index.json",
 };
 
@@ -224,6 +225,7 @@ const state = {
   selectedRefineryGroups: new Set(DEFAULT_REFINERY_GROUP_KEYS),
   marketPipelineEnabled: false,
   marketPipelineData: null,
+  marketTariffData: null,
   marketPipelineLoading: false,
   marketPipelineError: null,
   marketPipelineLineLayer: null,
@@ -3085,9 +3087,48 @@ function marketPipelineFeatures() {
     .sort((a, b) => (a.properties?.display_order || 999) - (b.properties?.display_order || 999));
 }
 
+function marketHubSlug(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function tariffHubIdFromName(name) {
+  const key = String(name || '').trim().toLowerCase();
+  return state.marketTariffData?.hub_aliases?.[key] || marketHubSlug(name);
+}
+
+function marketHubId(feature) {
+  const p = feature.properties || {};
+  return p.hub_id || tariffHubIdFromName(p.name);
+}
+
 function marketHubFeatures() {
-  return (state.marketPipelineData?.features || [])
+  const baseFeatures = (state.marketPipelineData?.features || [])
     .filter((feature) => feature.properties?.feature_kind === 'hub');
+  const features = [...baseFeatures];
+  const seenHubIds = new Set(baseFeatures.map(marketHubId));
+  const tariffHubs = state.marketTariffData?.hubs || {};
+
+  for (const [hubId, hub] of Object.entries(tariffHubs)) {
+    if (seenHubIds.has(hubId) || !Array.isArray(hub.coordinates)) continue;
+    seenHubIds.add(hubId);
+    features.push({
+      type: 'Feature',
+      properties: {
+        feature_kind: 'hub',
+        hub_id: hubId,
+        name: hub.name,
+        hub_type: hub.hub_type,
+        source_summary: 'Tariff document route-node reference and public geographic coordinates',
+      },
+      geometry: { type: 'Point', coordinates: hub.coordinates },
+    });
+  }
+
+  return features;
 }
 
 function selectedMarketPipelineFeatures() {
@@ -3121,12 +3162,21 @@ async function fetchMarketPipelineData() {
   state.marketPipelineLoading = true;
   state.marketPipelineError = null;
   updateMarketPipelineToggleUI();
-  updatePipelineStatus('Loading market access pipelines (<100 KB)...');
+  updatePipelineStatus('Loading market access pipelines and current tariffs...');
 
   try {
-    const response = await fetch(DATA_PATHS.marketPipelines);
+    const [response, tariffResponse] = await Promise.all([
+      fetch(DATA_PATHS.marketPipelines),
+      fetch(DATA_PATHS.marketTariffs),
+    ]);
     if (!response.ok) throw new Error(`Market pipelines: HTTP ${response.status}`);
     state.marketPipelineData = await response.json();
+    if (!tariffResponse.ok) {
+      state.marketTariffData = null;
+      console.warn(`Market tariffs unavailable: HTTP ${tariffResponse.status}`);
+    } else {
+      state.marketTariffData = await tariffResponse.json();
+    }
     initializeMarketPipelineSelection();
     buildMarketPipelineMenu();
   } catch (err) {
@@ -3141,6 +3191,176 @@ async function fetchMarketPipelineData() {
   updateMarketPipelineToggleUI();
   updatePipelineStatus('');
   return true;
+}
+
+function marketTariffRowsForHub(hubId) {
+  const rows = state.marketTariffData?.tariffs || [];
+  return rows
+    .filter((row) => row.destination_hub_id === hubId || row.origin_hub_id === hubId)
+    .sort((a, b) => {
+      const directionA = a.destination_hub_id === hubId ? 0 : 1;
+      const directionB = b.destination_hub_id === hubId ? 0 : 1;
+      if (directionA !== directionB) return directionA - directionB;
+      return [
+        a.pipeline || '',
+        a.destination || '',
+        a.origin || '',
+        a.service || '',
+        a.product || '',
+      ].join('|').localeCompare([
+        b.pipeline || '',
+        b.destination || '',
+        b.origin || '',
+        b.service || '',
+        b.product || '',
+      ].join('|'));
+    });
+}
+
+function tariffMoney(value, currency, unit) {
+  if (!Number.isFinite(value)) return '';
+  const digits = unit === 'bbl' ? 4 : 4;
+  return `${currency} ${formatNumber(value, digits)}/${unit}`;
+}
+
+function tariffSourceLink(label, url) {
+  if (!url) return escapeHtml(label || '');
+  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || 'Source')}</a>`;
+}
+
+function tariffCostItemText(item) {
+  if (!item) return '';
+  const unit = item.unit === 'bbl' ? 'bbl' : 'm3';
+  const value = Number.isFinite(item.value) ? tariffMoney(item.value, item.currency, unit) : '';
+  const bbl = item.unit === 'm3' && Number.isFinite(item.value_per_bbl)
+    ? ` (${tariffMoney(item.value_per_bbl, item.currency, 'bbl')})`
+    : '';
+  const text = item.text ? ` - ${item.text}` : '';
+  return `${item.name || 'Charge'}${value ? `: ${value}${bbl}` : ''}${text}`;
+}
+
+function renderTariffCostItems(title, items, className = '') {
+  if (!Array.isArray(items) || !items.length) return '';
+  const rows = items
+    .map((item) => {
+      const label = tariffCostItemText(item);
+      const link = item.source_label && item.source_url
+        ? ` ${tariffSourceLink(item.source_label, item.source_url)}`
+        : '';
+      return `<li>${escapeHtml(label)}${link}</li>`;
+    })
+    .join('');
+  return `<div class="tariff-detail ${className}"><span>${escapeHtml(title)}</span><ul>${rows}</ul></div>`;
+}
+
+function renderTariffTextList(title, items) {
+  if (!Array.isArray(items) || !items.length) return '';
+  return `<div class="tariff-detail"><span>${escapeHtml(title)}</span><ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>`;
+}
+
+function renderTariffCost(row) {
+  const unit = row.unit === 'bbl' ? 'bbl' : 'm3';
+  if (Number.isFinite(row.total)) {
+    const total = tariffMoney(row.total, row.currency, unit);
+    const bbl = unit === 'm3' && Number.isFinite(row.total_per_bbl)
+      ? ` (${tariffMoney(row.total_per_bbl, row.currency, 'bbl')})`
+      : '';
+    const baseBefore = Number.isFinite(row.base_before_included_costs)
+      ? `<span>Base before included costs ${tariffMoney(row.base_before_included_costs, row.currency, unit)}${unit === 'm3' && Number.isFinite(row.base_before_included_costs_per_bbl) ? ` (${tariffMoney(row.base_before_included_costs_per_bbl, row.currency, 'bbl')})` : ''}</span>`
+      : '';
+    const fixed = Number.isFinite(row.fixed)
+      ? `<span>Fixed ${tariffMoney(row.fixed, row.currency, unit)}${unit === 'm3' && Number.isFinite(row.fixed_per_bbl) ? ` (${tariffMoney(row.fixed_per_bbl, row.currency, 'bbl')})` : ''}</span>`
+      : '';
+    const variable = Number.isFinite(row.variable)
+      ? `<span>Variable ${tariffMoney(row.variable, row.currency, unit)}${unit === 'm3' && Number.isFinite(row.variable_per_bbl) ? ` (${tariffMoney(row.variable_per_bbl, row.currency, 'bbl')})` : ''}</span>`
+      : '';
+    const allIn = Number.isFinite(row.total_with_default_adders)
+      ? `<div class="tariff-all-in"><span>All-in with default adders</span><strong>${escapeHtml(tariffMoney(row.total_with_default_adders, row.currency, unit))}${unit === 'm3' && Number.isFinite(row.total_with_default_adders_per_bbl) ? ` (${escapeHtml(tariffMoney(row.total_with_default_adders_per_bbl, row.currency, 'bbl'))})` : ''}</strong></div>`
+      : '';
+    return `<strong>${escapeHtml(total)}${escapeHtml(bbl)}</strong>${baseBefore || fixed || variable ? `<div class="tariff-components">${baseBefore}${fixed}${variable}</div>` : ''}${allIn}`;
+  }
+
+  if (Number.isFinite(row.cad_component_m3) || Number.isFinite(row.usd_component_m3)) {
+    const cad = Number.isFinite(row.cad_component_m3)
+      ? `CAD ${formatNumber(row.cad_component_m3, 4)}/m3 (${formatNumber(row.cad_component_per_bbl, 4)}/bbl)`
+      : '';
+    const usd = Number.isFinite(row.usd_component_m3)
+      ? `USD ${formatNumber(row.usd_component_m3, 4)}/m3 (${formatNumber(row.usd_component_per_bbl, 4)}/bbl)`
+      : '';
+    return `<strong>${escapeHtml([cad, usd].filter(Boolean).join(' + '))}</strong>`;
+  }
+
+  return '<strong>Rate not published in loaded rows</strong>';
+}
+
+function renderTariffDetails(row) {
+  const notes = row.notes ? `<div class="tariff-note">${escapeHtml(row.notes)}</div>` : '';
+  const loss = Number.isFinite(row.loss_allowance_percent)
+    ? `<div class="tariff-note">Loss allowance: ${escapeHtml(formatNumber(row.loss_allowance_percent, 4))}% where applicable.</div>`
+    : '';
+  return [
+    renderTariffCostItems('Included in table rate', row.included_costs, 'included'),
+    renderTariffCostItems('Additional charges / credits', row.additional_costs, 'additional'),
+    renderTariffCostItems('Variable cost components', row.variable_components, 'variable-items'),
+    renderTariffTextList('Other tariff conditions', row.conditional_charges),
+    notes,
+    loss,
+  ].filter(Boolean).join('');
+}
+
+function renderMarketHubTooltip(p) {
+  const name = p.name || 'Market hub';
+  const hubId = p.hub_id || tariffHubIdFromName(name);
+  const rows = marketTariffRowsForHub(hubId);
+  const docs = new Set(rows.map((row) => row.document_id));
+  const inbound = rows.filter((row) => row.destination_hub_id === hubId).length;
+  const outbound = rows.length - inbound;
+
+  let html =
+    `<div class="hub-tip-head">` +
+    `<strong>${escapeHtml(name)}</strong>` +
+    `${p.hub_type ? `<div class="pt-sub">${escapeHtml(p.hub_type)}</div>` : ''}` +
+    `</div>`;
+
+  if (!rows.length) {
+    return html + '<div class="pt-sub">No current crude tariff rows loaded for this hub.</div>';
+  }
+
+  html +=
+    `<div class="tariff-summary">` +
+    `<span>${formatNumber(rows.length, 0)} tariff rows</span>` +
+    `<span>${formatNumber(inbound, 0)} inbound</span>` +
+    `<span>${formatNumber(outbound, 0)} outbound</span>` +
+    `<span>${formatNumber(docs.size, 0)} source docs</span>` +
+    `</div>` +
+    `<div class="tariff-list">`;
+
+  for (const row of rows) {
+    const direction = row.destination_hub_id === hubId ? 'Inbound' : 'Outbound';
+    const status = row.status === 'pending-effective-forward-use' ? 'pending forward' : row.status;
+    html +=
+      `<div class="tariff-row">` +
+      `<div class="tariff-row-title">` +
+      `<strong>${escapeHtml(row.pipeline)}</strong>` +
+      `<span>${escapeHtml(direction)}</span>` +
+      `</div>` +
+      `<div class="tariff-route">${escapeHtml(row.origin)} -> ${escapeHtml(row.destination)}</div>` +
+      `<div class="tariff-product">${escapeHtml(row.product)} · ${escapeHtml(row.service)}</div>` +
+      `<div class="tariff-cost">${renderTariffCost(row)}</div>` +
+      renderTariffDetails(row) +
+      `<div class="tariff-source">` +
+      `<span>Effective ${escapeHtml(row.effective)} · ${escapeHtml(status)}</span>` +
+      tariffSourceLink(row.source_label || `${row.document_page} - ${row.document_name}`, row.source_url) +
+      `</div>` +
+      `</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function renderMarketHubPopup(p) {
+  return `<div class="market-hub-popup-inner">${renderMarketHubTooltip(p)}</div>`;
 }
 
 function renderMarketPipelineLayers() {
@@ -3197,9 +3417,17 @@ function renderMarketPipelineLayers() {
         onEachFeature(feature, layer) {
           const p = feature.properties || {};
           layer.bindTooltip(
-            `<div><strong>${escapeHtml(p.name || 'Market hub')}</strong>` +
-            `${p.hub_type ? `<div class="pt-sub">${escapeHtml(p.hub_type)}</div>` : ''}</div>`,
-            { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+            renderMarketHubTooltip(p),
+            { sticky: true, opacity: 0.96, className: 'pipeline-tip market-hub-tip', interactive: true }
+          );
+          layer.bindPopup(
+            renderMarketHubPopup(p),
+            {
+              className: 'market-hub-popup',
+              maxWidth: 760,
+              autoPan: true,
+              closeOnClick: false,
+            }
           );
         },
       }

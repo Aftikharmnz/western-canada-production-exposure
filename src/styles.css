@@ -2239,6 +2239,153 @@ select {
 .pt-badge.condensate { background: #1d4ed8; }
 .pt-badge.diluent    { background: #15803d; }
 
+.market-hub-tip {
+  pointer-events: auto;
+  min-width: min(540px, calc(100vw - 40px));
+  max-width: min(640px, calc(100vw - 40px));
+}
+.market-hub-popup .leaflet-popup-content-wrapper {
+  border-radius: 7px;
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.22);
+}
+.market-hub-popup .leaflet-popup-content {
+  width: min(720px, calc(100vw - 64px)) !important;
+  max-width: min(720px, calc(100vw - 64px));
+  margin: 12px 14px;
+}
+.market-hub-popup-inner {
+  color: var(--ink);
+  font-size: 12px;
+}
+.market-hub-tip .hub-tip-head {
+  margin-bottom: 5px;
+}
+.market-hub-tip .tariff-summary,
+.market-hub-popup .tariff-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0;
+}
+.market-hub-tip .tariff-summary span,
+.market-hub-popup .tariff-summary span {
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #f7faf9;
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.market-hub-tip .tariff-list,
+.market-hub-popup .tariff-list {
+  display: grid;
+  gap: 6px;
+  max-height: min(430px, calc(100vh - 180px));
+  overflow-y: auto;
+  padding-right: 3px;
+}
+.market-hub-popup .tariff-list {
+  max-height: min(560px, calc(100vh - 160px));
+}
+.market-hub-tip .tariff-row,
+.market-hub-popup .tariff-row {
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.market-hub-tip .tariff-row-title,
+.market-hub-tip .tariff-source,
+.market-hub-tip .tariff-components,
+.market-hub-popup .tariff-row-title,
+.market-hub-popup .tariff-source,
+.market-hub-popup .tariff-components {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  align-items: baseline;
+}
+.market-hub-tip .tariff-row-title span,
+.market-hub-popup .tariff-row-title span {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.market-hub-tip .tariff-route,
+.market-hub-popup .tariff-route {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--ink);
+}
+.market-hub-tip .tariff-product,
+.market-hub-tip .tariff-source,
+.market-hub-tip .tariff-components,
+.market-hub-popup .tariff-product,
+.market-hub-popup .tariff-source,
+.market-hub-popup .tariff-components {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+.market-hub-tip .tariff-cost,
+.market-hub-popup .tariff-cost {
+  margin-top: 3px;
+  font-size: 11px;
+}
+.market-hub-tip .tariff-all-in,
+.market-hub-popup .tariff-all-in {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  align-items: baseline;
+  margin-top: 2px;
+  color: #14532d;
+}
+.market-hub-tip .tariff-all-in span,
+.market-hub-popup .tariff-all-in span {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.market-hub-tip .tariff-detail,
+.market-hub-popup .tariff-detail,
+.market-hub-tip .tariff-note,
+.market-hub-popup .tariff-note {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+.market-hub-tip .tariff-detail > span,
+.market-hub-popup .tariff-detail > span {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+}
+.market-hub-tip .tariff-detail ul,
+.market-hub-popup .tariff-detail ul {
+  margin: 2px 0 0;
+  padding-left: 14px;
+}
+.market-hub-tip .tariff-detail li,
+.market-hub-popup .tariff-detail li {
+  margin: 1px 0;
+  overflow-wrap: anywhere;
+}
+.market-hub-tip .tariff-detail.additional,
+.market-hub-popup .tariff-detail.additional {
+  color: #92400e;
+}
+.market-hub-tip .tariff-source a,
+.market-hub-tip .tariff-detail a,
+.market-hub-popup .tariff-source a,
+.market-hub-popup .tariff-detail a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ─── INSTALLATION TOOLTIP ─── */
 .inst-tip {
   background: rgba(255,255,255,0.96);
