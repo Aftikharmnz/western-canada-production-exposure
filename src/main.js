@@ -92,7 +92,10 @@ const SOURCE_SHORT = {
   petrinex_ab_pentanes_plus_vol: "Petrinex AB C5+",
   petrinex_ab_condensate_vol:    "Petrinex AB COND",
   petrinex_ab_ngl_vol:           "Petrinex AB NGL",
+  petrinex_sk_well_production:   "Petrinex SK",
   bcer_well_production:          "BCER wells",
+  ndic_well_production:          "NDIC wells",
+  manitoba_well_production:      "Manitoba wells",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
   petrinex_bc_activity_codes: "Petrinex BC ref",
@@ -478,6 +481,11 @@ function recordsForDate(date = state.selectedDate) {
   return onDemand.length ? [...base, ...onDemand] : base;
 }
 
+function monthlyAssetId(ref) {
+  if (typeof ref === "number") return state.assets?.[ref]?.asset_id || "";
+  return ref || "";
+}
+
 // Handles both file formats:
 //   Legacy : array of full record objects [{date, asset_id, source_id, stream, volume_kbbl_d, scenario}, ...]
 //   Compact: {date, source_id, stream, scenario, rows: [[asset_id, volume_kbbl_d], ...]}
@@ -489,9 +497,9 @@ function expandMonthlyRecords(raw) {
     if ("rows" in raw[0]) {
       // Array of compact group objects
       return raw.flatMap(group =>
-        (group.rows || []).map(([asset_id, volume_kbbl_d]) => ({
+        (group.rows || []).map(([asset_ref, volume_kbbl_d]) => ({
           date:           group.date,
-          asset_id,
+          asset_id:       monthlyAssetId(asset_ref),
           source_id:      group.source_id,
           stream:         group.stream,
           volume_kbbl_d,
@@ -504,9 +512,9 @@ function expandMonthlyRecords(raw) {
   }
   // Single compact group object
   if (raw && "rows" in raw) {
-    return (raw.rows || []).map(([asset_id, volume_kbbl_d]) => ({
+    return (raw.rows || []).map(([asset_ref, volume_kbbl_d]) => ({
       date:           raw.date,
-      asset_id,
+      asset_id:       monthlyAssetId(asset_ref),
       source_id:      raw.source_id,
       stream:         raw.stream,
       volume_kbbl_d,
@@ -4267,51 +4275,45 @@ const SEA_COLORS   = { band: "#d1d5db", y0: "#2563eb", y1: "#16a34a", yCur: "#dc
 function computeSeasonality(assetIds) {
   const ym = {};
   const assetSet = new Set(assetIds); // O(1) lookup instead of O(n) includes()
+  const indexedAssetMonths = new Set();
 
-  // Base records (oil sands, petrinex NGL — always loaded at startup)
-  for (const r of state.baseRecords) {
-    if (!assetSet.has(r.asset_id)) continue;
-    const year  = Number(r.date.slice(0, 4));
-    const month = Number(r.date.slice(5, 7));
+  const addYmValue = (aid, date, vol, markIndexed = false) => {
+    if (!assetSet.has(aid)) return;
+    const value = Number(vol || 0);
+    if (!Number.isFinite(value) || value <= 0) return;
+    const ymStr = date.slice(0, 7);
+    const year = Number(ymStr.slice(0, 4));
+    const month = Number(ymStr.slice(5, 7));
+    if (!year || !month) return;
+    const assetMonthKey = `${aid}:${ymStr}`;
+    if (!markIndexed && indexedAssetMonths.has(assetMonthKey)) return;
+    if (markIndexed) indexedAssetMonths.add(assetMonthKey);
     if (!ym[year]) ym[year] = {};
-    ym[year][month] = (ym[year][month] || 0) + r.volume_kbbl_d;
-  }
+    ym[year][month] = (ym[year][month] || 0) + value;
+  };
 
-  // Petrinex / BCER historical index (pre-aggregated; covers AB conventional + BC)
+  // Historical index (pre-aggregated; covers base records plus on-demand AB/BC/NDIC/SK/MB wells).
   if (state.seasonalityIndex) {
     for (const aid of assetIds) {
       const entry = state.seasonalityIndex[aid];
       if (!entry) continue;
       for (const [ym_str, vol] of Object.entries(entry)) {
-        const year  = Number(ym_str.slice(0, 4));
-        const month = Number(ym_str.slice(5, 7));
-        if (!ym[year]) ym[year] = {};
-        ym[year][month] = (ym[year][month] || 0) + vol;
+        addYmValue(aid, `${ym_str}-01`, vol, true);
       }
     }
   }
 
-  // On-demand cache (BC + AB conventional for dates the user has already visited).
-  // This fills in BC production history from already-loaded on_demand files.
+  // Fallbacks for local data if the seasonality index is unavailable or missing an asset-month.
+  for (const r of state.baseRecords) addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
   if (state.dateRecordCache) {
     for (const records of state.dateRecordCache.values()) {
-      for (const r of records) {
-        if (!assetSet.has(r.asset_id)) continue;
-        const year  = Number(r.date.slice(0, 4));
-        const month = Number(r.date.slice(5, 7));
-        if (!ym[year]) ym[year] = {};
-        ym[year][month] = (ym[year][month] || 0) + (r.volume_kbbl_d || 0);
-      }
+      for (const r of records) addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
     }
   }
   const years = Object.keys(ym).map(Number).sort();
   if (!years.length) return null;
   const currentYear = years[years.length - 1];
-  let latestFull = null;
-  for (let i = years.length - 1; i >= 0; i--) {
-    if (Object.keys(ym[years[i]]).length === 12) { latestFull = years[i]; break; }
-  }
-  return { ym, years, currentYear, latestFull };
+  return { ym, years, currentYear };
 }
 
 async function showSeasonalityPanel(assetIds) {
@@ -4325,14 +4327,14 @@ async function showSeasonalityPanel(assetIds) {
     loadingPanel.innerHTML = `
       <div class="sea-header">
         <div><strong class="sea-title">Loading historical data…</strong>
-        <span class="sea-sub">Fetching Petrinex production index (first time only)</span></div>
+        <span class="sea-sub">Fetching production history index (first time only)</span></div>
       </div>
       <div style="padding:24px;text-align:center;color:#6b7280;font-size:13px;">
-        <div style="margin-bottom:8px">⏳ Building seasonality from full Petrinex history…</div>
+        <div style="margin-bottom:8px">⏳ Building seasonality from production history…</div>
       </div>`;
     document.getElementById("map").appendChild(loadingPanel);
     try {
-      const resp = await fetch("public/data/asset_seasonality.json?v=20260521");
+      const resp = await fetch("public/data/asset_seasonality.json?v=20260527");
       state.seasonalityIndex = await resp.json();
     } catch(e) {
       console.warn("Could not load asset_seasonality.json:", e);
@@ -4360,7 +4362,7 @@ async function showSeasonalityPanel(assetIds) {
     <div class="sea-header">
       <div>
         <strong class="sea-title">${escapeHtml(titleStr)}</strong>
-        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · 12-month seasonality</span>
+        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · range plus recent years</span>
       </div>
       <button id="closeSeasonality" class="sea-close" title="Close">&#x2715;</button>
     </div>
@@ -4392,15 +4394,16 @@ function drawSeasonalityChart(data, assetCount) {
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
 
-  const { ym, years, currentYear, latestFull } = data;
+  const { ym, years, currentYear } = data;
 
-  const fullYears = years.filter(y => y !== currentYear && Object.keys(ym[y] || {}).length === 12);
-  const envYears  = fullYears.slice(-5);
-  const lineYears = fullYears.slice(-2);
+  const priorYears = years.filter(y => y < currentYear);
+  const fullPriorYears = priorYears.filter(y => Object.keys(ym[y] || {}).length === 12);
+  const rangeYears = fullPriorYears.length >= 2 ? fullPriorYears : priorYears;
+  const lineYears = priorYears.slice(-2);
 
   const envMin = new Array(12).fill(Infinity);
   const envMax = new Array(12).fill(-Infinity);
-  for (const y of envYears) {
+  for (const y of rangeYears) {
     for (let m = 1; m <= 12; m++) {
       const v = ym[y]?.[m] ?? 0;
       if (v < envMin[m-1]) envMin[m-1] = v;
@@ -4413,7 +4416,7 @@ function drawSeasonalityChart(data, assetCount) {
   }
 
   let globalMax = 0;
-  for (const y of [...envYears, ...lineYears, currentYear]) {
+  for (const y of [...rangeYears, ...lineYears, currentYear]) {
     for (let m = 1; m <= 12; m++) {
       const v = ym[y]?.[m] ?? 0;
       if (v > globalMax) globalMax = v;
@@ -4457,7 +4460,7 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.fillText(MONTH_LABELS[m-1], xPos(m), H - pad.bottom + 14);
   }
 
-  if (envYears.length > 0) {
+  if (rangeYears.length > 0) {
     ctx.beginPath();
     for (let m = 1; m <= 12; m++) ctx.lineTo(xPos(m), yPos(envMax[m-1]));
     for (let m = 12; m >= 1; m--) ctx.lineTo(xPos(m), yPos(envMin[m-1]));
@@ -4514,9 +4517,9 @@ function drawSeasonalityChart(data, assetCount) {
 
   const legEl = document.getElementById("seaLegend");
   if (legEl) {
-    const enStr = envYears.length ? `${envYears[0]}–${envYears[envYears.length-1]} range` : "";
+    const enStr = rangeYears.length ? `${rangeYears[0]}-${rangeYears[rangeYears.length-1]} high/low range` : "";
     legEl.innerHTML = [
-      envYears.length ? `<span><i style="background:rgba(156,163,175,0.45)"></i>${enStr}</span>` : "",
+      rangeYears.length ? `<span><i style="background:rgba(156,163,175,0.45)"></i>${enStr}</span>` : "",
       ...lineYears.map((y, i) => `<span><i style="background:${lineColors[i]}"></i>${y}</span>`),
       curMonths.length ? `<span><i style="background:${SEA_COLORS.yCur};border-radius:50%"></i>${currentYear} (known months)</span>` : "",
     ].filter(Boolean).join("");

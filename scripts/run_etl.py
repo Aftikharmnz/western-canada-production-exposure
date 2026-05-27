@@ -55,16 +55,37 @@ PETRINEX_DIR = RAW_DIR / "petrinex"
 PETRINEX_AB_VOL_DIR = PETRINEX_DIR / "ab" / "vol"
 PETRINEX_AB_INFRA_DIR = PETRINEX_DIR / "ab" / "infra"
 PETRINEX_BC_REF_DIR = PETRINEX_DIR / "bc" / "reference"
+PETRINEX_SK_VOL_DIR = PETRINEX_DIR / "sk" / "vol"
+PETRINEX_SK_INFRA_DIR = PETRINEX_DIR / "sk" / "infra"
 BCER_DIR = RAW_DIR / "bcer"
 BCER_PRODUCTION_ZIP = BCER_DIR / "prod_csv.zip"
 BCER_WELL_INDEX_CSV = BCER_DIR / "well_index.csv"
 BCER_WELL_SURFACE_GEOJSON = BCER_DIR / "well_surface_locations.geojson"
+NDIC_DIR = RAW_DIR / "nd" / "mpr"
+NDIC_MPR_INDEX_URL = "https://www.dmr.nd.gov/oilgas/mprindex.asp"
+NDIC_MPR_BASE_URL = "https://www.dmr.nd.gov/oilgas/mpr"
+NDIC_DEFAULT_HISTORY_MONTHS = 12
+NDIC_DEFAULT_START_PERIOD = "2024-01"
+PETRINEX_SK_DEFAULT_HISTORY_MONTHS = 12
+PETRINEX_SK_DEFAULT_START_PERIOD = "2024-01"
+MANITOBA_DIR = RAW_DIR / "manitoba"
+MANITOBA_PRODUCTION_ZIP = MANITOBA_DIR / "wmp_2023_2026_excel.zip"
+MANITOBA_PRODUCTION_REPORT_URL = "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip"
+MANITOBA_DEFAULT_START_PERIOD = "2024-01"
 M3_TO_BBL = 6.28981077
 ON_DEMAND_RECORD_SOURCES = {
     "petrinex_ab_conventional_vol",
     "petrinex_ab_pentanes_plus_vol",
     "petrinex_ab_condensate_vol",
+    "petrinex_sk_well_production",
     "bcer_well_production",
+    "ndic_well_production",
+    "manitoba_well_production",
+}
+PRODUCTION_GEOJSON_EXCLUDED_SOURCES = {
+    "ndic_well_production",
+    "petrinex_sk_well_production",
+    "manitoba_well_production",
 }
 PETRINEX_AB_EARLIEST_PUBLIC_PERIOD = "2022-01"
 
@@ -195,6 +216,42 @@ SOURCE_MANIFEST = [
         "grain": "well surface point geometry",
         "download": False,
     },
+    {
+        "source_id": "ndic_well_production",
+        "agency": "North Dakota Industrial Commission, Department of Mineral Resources",
+        "name": "NDIC Monthly Production Report - Oil Sheet",
+        "url": "https://www.dmr.nd.gov/oilgas/mpr/YYYY_MM.xlsx",
+        "raw_file": "nd/mpr/YYYY_MM.xlsx",
+        "grain": "monthly well crude oil production",
+        "download": False,
+    },
+    {
+        "source_id": "petrinex_sk_well_production",
+        "agency": "Petrinex",
+        "name": "Petrinex Saskatchewan Conventional Volumetrics",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/YYYY-MM/CSV",
+        "raw_file": "petrinex/sk/vol/Vol_YYYY-MM-SK.zip",
+        "grain": "monthly well crude oil production",
+        "download": False,
+    },
+    {
+        "source_id": "petrinex_sk_well_infrastructure",
+        "agency": "Petrinex",
+        "name": "Petrinex Saskatchewan Well Infrastructure",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+        "raw_file": "petrinex/sk/infra/well_infrastructure_sk.zip",
+        "grain": "current well/DLS reference",
+        "download": False,
+    },
+    {
+        "source_id": "manitoba_well_production",
+        "agency": "Province of Manitoba",
+        "name": "Manitoba Monthly Well Production Reports",
+        "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
+        "raw_file": "manitoba/wmp_2023_2026_excel.zip",
+        "grain": "monthly well crude oil production",
+        "download": False,
+    },
 ]
 
 
@@ -237,6 +294,7 @@ PROVINCE_COORDS = {
     "Saskatchewan": (52.9399, -106.4509),
     "British Columbia": (54.0, -125.0),
     "Manitoba": (53.7609, -98.8139),
+    "North Dakota": (47.5515, -101.0020),
     "Northwest Territories": (64.8255, -124.8457),
     "Western Canada": (55.4, -111.5),
 }
@@ -345,6 +403,15 @@ def recent_month_periods(end_period: str, count: int) -> list[str]:
     return sorted(periods)
 
 
+def previous_month_period(value: dt.date | None = None) -> str:
+    value = value or RUN_DATE.date()
+    year, month = value.year, value.month - 1
+    if month == 0:
+        year -= 1
+        month = 12
+    return f"{year:04d}-{month:02d}"
+
+
 def normalize_stream(header: str) -> str:
     text = clean_text(header)
     text = re.sub(r"\(bbl/d\)", "", text, flags=re.I).strip()
@@ -380,6 +447,10 @@ def read_workbook_latest_actual(workbook_path: Path) -> dt.date:
 
 def petrinex_ab_vol_path(period: str) -> Path:
     return PETRINEX_AB_VOL_DIR / f"Vol_{period}-AB.zip"
+
+
+def petrinex_sk_vol_path(period: str) -> Path:
+    return PETRINEX_SK_VOL_DIR / f"Vol_{period}-SK.zip"
 
 
 def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
@@ -514,6 +585,80 @@ def ensure_petrinex_cache(
     return status
 
 
+def ensure_petrinex_sk_cache(
+    months: int,
+    start_period: str | None,
+    force: bool = False,
+    refresh: bool = False,
+) -> list[dict[str, Any]]:
+    status: list[dict[str, Any]] = []
+    latest_period = previous_month_period()
+    periods = iter_month_periods(start_period, latest_period) if start_period else recent_month_periods(latest_period, max(1, months))
+    for period in periods:
+        if parse_period(period) is None:
+            continue
+        url = f"https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/{period}/CSV"
+        target = petrinex_sk_vol_path(period)
+        item = download_url(url, target, force=force if refresh else False)
+        item.update(
+            {
+                "source_id": "petrinex_sk_well_production",
+                "period": period,
+                "agency": "Petrinex",
+                "name": "Petrinex Saskatchewan Conventional Volumetrics",
+                "raw_file": str(target.relative_to(RAW_DIR)),
+                "grain": "monthly well crude oil production",
+            }
+        )
+        status.append(item)
+    for source_id, name, url, target in [
+        (
+            "petrinex_sk_well_facility_link",
+            "Petrinex Saskatchewan Well to Facility Link",
+            "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20to%20Facility%20Link/CSV",
+            PETRINEX_SK_INFRA_DIR / "well_to_facility_link_sk.zip",
+        ),
+        (
+            "petrinex_sk_facility_infrastructure",
+            "Petrinex Saskatchewan Facility Infrastructure",
+            "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Facility%20Infrastructure/CSV",
+            PETRINEX_SK_INFRA_DIR / "facility_infrastructure_sk.zip",
+        ),
+        (
+            "petrinex_sk_well_infrastructure",
+            "Petrinex Saskatchewan Well Infrastructure",
+            "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+            PETRINEX_SK_INFRA_DIR / "well_infrastructure_sk.zip",
+        ),
+    ]:
+        item = download_url(url, target, force=force if refresh else False)
+        item.update(
+            {
+                "source_id": source_id,
+                "agency": "Petrinex",
+                "name": name,
+                "raw_file": str(target.relative_to(RAW_DIR)),
+                "grain": "current infrastructure",
+            }
+        )
+        status.append(item)
+    return status
+
+
+def ensure_manitoba_cache(force: bool = False, refresh: bool = False) -> list[dict[str, Any]]:
+    item = download_url(MANITOBA_PRODUCTION_REPORT_URL, MANITOBA_PRODUCTION_ZIP, force=force if refresh else False)
+    item.update(
+        {
+            "source_id": "manitoba_well_production",
+            "agency": "Province of Manitoba",
+            "name": "Manitoba Monthly Well Production Reports",
+            "raw_file": str(MANITOBA_PRODUCTION_ZIP.relative_to(RAW_DIR)),
+            "grain": "monthly well crude oil production",
+        }
+    )
+    return [item]
+
+
 def download_bcer_well_surface_points(force: bool = False) -> dict[str, Any]:
     url_base = (
         "https://geoweb-ags.bc-er.ca/arcgis/rest/services/"
@@ -624,6 +769,81 @@ def ensure_bcer_cache(force: bool = False, refresh: bool = False) -> list[dict[s
     return status
 
 
+def ndic_mpr_path(period: str) -> Path:
+    return NDIC_DIR / f"{period.replace('-', '_')}.xlsx"
+
+
+def ndic_period_from_filename(name: str) -> str | None:
+    match = re.fullmatch(r"(\d{4})_(\d{2})\.xlsx", Path(name).name, flags=re.I)
+    if not match:
+        return None
+    period = f"{match.group(1)}-{match.group(2)}"
+    return period if parse_period(period) else None
+
+
+def parse_ndic_index_periods(html: str) -> list[str]:
+    periods = []
+    for match in re.finditer(r'fileName:\s*"(\d{4})_(\d{2})\.xlsx"', html, flags=re.I):
+        period = f"{match.group(1)}-{match.group(2)}"
+        if parse_period(period):
+            periods.append(period)
+    return sorted(set(periods))
+
+
+def discover_ndic_available_periods() -> list[str]:
+    cached = sorted(
+        period
+        for period in (ndic_period_from_filename(path.name) for path in NDIC_DIR.glob("*.xlsx"))
+        if period
+    )
+    try:
+        req = urllib.request.Request(NDIC_MPR_INDEX_URL, headers={"User-Agent": "western-canada-production-etl/1.0"})
+        html = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+        indexed = parse_ndic_index_periods(html)
+        if indexed:
+            return indexed
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: could not read NDIC monthly production report index: {exc}")
+    return cached
+
+
+def ensure_ndic_cache(
+    months: int,
+    start_period: str | None,
+    force: bool = False,
+    refresh: bool = False,
+) -> list[dict[str, Any]]:
+    status: list[dict[str, Any]] = []
+    if months <= 0 and not start_period:
+        return status
+    NDIC_DIR.mkdir(parents=True, exist_ok=True)
+    available_periods = discover_ndic_available_periods()
+    if not available_periods:
+        log("  NDIC monthly production report index has no available Excel periods.")
+        return status
+    if start_period:
+        start = parse_period(start_period)
+        selected_periods = [period for period in available_periods if start and period >= start_period] if start else available_periods[-max(1, months):]
+    else:
+        selected_periods = available_periods[-max(1, months):]
+    for period in selected_periods:
+        target = ndic_mpr_path(period)
+        url = f"{NDIC_MPR_BASE_URL}/{target.name}"
+        item = download_url(url, target, force=force if refresh else False)
+        item.update(
+            {
+                "source_id": "ndic_well_production",
+                "agency": "North Dakota Industrial Commission, Department of Mineral Resources",
+                "name": "NDIC Monthly Production Report - Oil Sheet",
+                "period": period,
+                "raw_file": str(target.relative_to(RAW_DIR)),
+                "grain": "monthly well crude oil production",
+            }
+        )
+        status.append(item)
+    return status
+
+
 def open_nested_petrinex_csv(zip_path: Path) -> csv.DictReader:
     data = zip_path.read_bytes()
     with _zipfile.ZipFile(io.BytesIO(data)) as outer:
@@ -653,14 +873,14 @@ def format_dls(lsd: Any, section: Any, township: Any, range_: Any, meridian: Any
 
 
 def parse_dls_label(label: str) -> tuple[int, int, int, int, int] | None:
-    match = re.fullmatch(r"(\d{1,2})-(\d{1,2})-(\d{2,3})-(\d{1,2})W([456])", clean_text(label))
+    match = re.fullmatch(r"(\d{1,2})-(\d{1,2})-(\d{2,3})-(\d{1,2})W([1-6])", clean_text(label))
     if not match:
         return None
     return tuple(int(part) for part in match.groups())  # type: ignore[return-value]
 
 
 def parse_bc_location(location: str) -> str | None:
-    match = re.fullmatch(r"(\d{1,2})-(\d{1,2})-(\d{2,3})-(\d{1,2})W([456])", clean_text(location))
+    match = re.fullmatch(r"(\d{1,2})-(\d{1,2})-(\d{2,3})-(\d{1,2})W([1-6])", clean_text(location))
     if not match:
         return None
     return format_dls(*match.groups())
@@ -751,7 +971,7 @@ def approximate_dls_centroid(dls: str) -> tuple[float, float] | None:
     if not parts:
         return None
     lsd, section, township, range_, meridian = parts
-    meridian_lon = {4: -110.0, 5: -114.0, 6: -118.0}.get(meridian)
+    meridian_lon = {1: -97.4579, 2: -102.0, 3: -106.0, 4: -110.0, 5: -114.0, 6: -118.0}.get(meridian)
     if meridian_lon is None:
         return None
 
@@ -2506,6 +2726,397 @@ def append_bcer_well_production(add_asset: Any, add_record: Any) -> None:
     )
 
 
+def _ndic_key_value(row: tuple[Any, ...], index: dict[str, int], *names: str) -> Any:
+    for name in names:
+        idx = index.get(name)
+        if idx is not None and idx < len(row):
+            value = row[idx]
+            if value not in (None, ""):
+                return value
+    return None
+
+
+def _ndic_coordinate(value: Any, kind: str) -> float | None:
+    number = as_float(value)
+    if number is None:
+        return None
+    if kind == "lat" and not (45.0 <= number <= 50.0):
+        return None
+    if kind == "lon" and not (-105.0 <= number <= -96.0):
+        return None
+    return number
+
+
+def append_ndic_well_production(add_asset: Any, add_record: Any) -> None:
+    files = sorted(NDIC_DIR.glob("*.xlsx"))
+    if not files:
+        log("  NDIC production cache is empty - skipping North Dakota crude layer.")
+        return
+    sites: dict[tuple[str, str], dict[str, Any]] = {}
+    raw_rows = 0
+    positive_oil_rows = 0
+    skipped_files = 0
+    for path in files:
+        period = ndic_period_from_filename(path.name)
+        if not period:
+            continue
+        try:
+            wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+        except Exception as exc:  # noqa: BLE001
+            skipped_files += 1
+            log(f"  warning: could not read NDIC workbook {path.name}: {exc}")
+            continue
+        if "Oil" not in wb.sheetnames:
+            skipped_files += 1
+            log(f"  warning: NDIC workbook {path.name} has no Oil sheet.")
+            continue
+        ws = wb["Oil"]
+        try:
+            headers = [clean_text(value) for value in next(ws.iter_rows(min_row=1, max_row=1, values_only=True))]
+        except StopIteration:
+            continue
+        index = {header: idx for idx, header in enumerate(headers) if header}
+        required = {"Oil"}
+        if not required.issubset(index):
+            log(f"  warning: NDIC workbook {path.name} missing expected Oil columns.")
+            continue
+        log(f"  Parsing NDIC crude oil {path.name}")
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            raw_rows += 1
+            date_value = as_date(_ndic_key_value(row, index, "ReportDate")) or dt.date(*parse_period(period), 1)  # type: ignore[arg-type]
+            report_month = month_end(date_value)
+            oil_bbl = as_float(_ndic_key_value(row, index, "Oil"))
+            if oil_bbl is None or oil_bbl <= 0:
+                continue
+            positive_oil_rows += 1
+            file_no = clean_text(_ndic_key_value(row, index, "FileNo", "File No", "File Number"))
+            api = clean_text(_ndic_key_value(row, index, "API_WELLNO", "API WellNo", "API"))
+            well_key = file_no or api
+            if not well_key:
+                continue
+            key = (report_month.isoformat(), well_key)
+            site = sites.setdefault(
+                key,
+                {
+                    "date": report_month,
+                    "well_key": well_key,
+                    "api": api,
+                    "file_no": file_no,
+                    "well_name": clean_text(_ndic_key_value(row, index, "WellName", "Well Name")) or well_key,
+                    "company": clean_text(_ndic_key_value(row, index, "Company", "CurrentOperator", "Operator")) or "Unknown operator",
+                    "lat": _ndic_coordinate(_ndic_key_value(row, index, "Lat", "Latitude"), "lat"),
+                    "lon": _ndic_coordinate(_ndic_key_value(row, index, "Long", "Longitude", "Lon"), "lon"),
+                    "oil_bbl": 0.0,
+                },
+            )
+            site["oil_bbl"] += oil_bbl
+    asset_ids: dict[str, str] = {}
+    added = 0
+    missing_location = 0
+    for site in sites.values():
+        days = calendar.monthrange(site["date"].year, site["date"].month)[1]
+        volume_bbl_d = site["oil_bbl"] / days
+        well_key = site["well_key"]
+        if well_key not in asset_ids:
+            lat = site.get("lat")
+            lon = site.get("lon")
+            has_location = lat is not None and lon is not None
+            note_bits = ["NDIC Monthly Production Report Oil sheet crude barrels aggregated by well file number."]
+            if site.get("api"):
+                note_bits.append(f"API: {site['api']}.")
+            if site.get("file_no"):
+                note_bits.append(f"File No: {site['file_no']}.")
+            asset_ids[well_key] = add_asset(
+                display_name=site["well_name"],
+                source_id="ndic_well_production",
+                production_system="conventional",
+                company=site["company"],
+                province="North Dakota",
+                asset_kind="well",
+                latitude=lat,
+                longitude=lon,
+                coordinate_method="ndic_report_lat_long" if has_location else "",
+                location_basis="ndic_report_lat_long" if has_location else "",
+                geometry_kind="well_point" if has_location else "",
+                geometry_source="NDIC Monthly Production Report Oil sheet" if has_location else "",
+                notes=" ".join(note_bits),
+                asset_id_override=f"ndic_well_production:conventional:well:{slug(well_key)}",
+            )
+        if site.get("lat") is None or site.get("lon") is None:
+            missing_location += 1
+        add_record(
+            site["date"],
+            asset_ids[well_key],
+            "Conventional crude oil",
+            volume_bbl_d,
+            f"NDIC Monthly Production Report {month_period(site['date'])}",
+            well_key,
+            "ndic_well_production",
+            scenario="actual",
+        )
+        added += 1
+    log(
+        "  NDIC crude oil wells: "
+        f"{added:,} well-month records from {positive_oil_rows:,} positive oil rows "
+        f"({raw_rows:,} Oil sheet rows, {len(files) - skipped_files:,} workbooks); "
+        f"{missing_location:,} well-month records missing report coordinates."
+    )
+
+
+def read_petrinex_sk_well_infrastructure(target_wells: set[str]) -> dict[str, dict[str, str]]:
+    path = PETRINEX_SK_INFRA_DIR / "well_infrastructure_sk.zip"
+    if not path.exists() or not target_wells:
+        return {}
+    wells: dict[str, dict[str, str]] = {}
+    log(f"  Parsing Petrinex SK well infrastructure for {len(target_wells):,} target wells")
+    reader = open_nested_petrinex_csv(path)
+    for row in reader:
+        well_id = clean_text(row.get("WellID"))
+        if well_id not in target_wells:
+            continue
+        dls = format_dls(
+            row.get("WellLegalSubdivision"),
+            row.get("WellSection"),
+            row.get("WellTownship"),
+            row.get("WellRange"),
+            row.get("WellMeridian"),
+        )
+        wells[well_id] = {
+            "dls": dls or "",
+            "well_name": clean_text(row.get("WellName")),
+            "field_name": clean_text(row.get("FieldName")),
+            "pool_name": clean_text(row.get("PoolDepositName")),
+            "licensee": clean_text(row.get("LicenseeName")),
+        }
+    log(f"  Petrinex SK well infrastructure matched {len(wells):,} wells")
+    return wells
+
+
+def append_petrinex_sk_well_production(add_asset: Any, add_record: Any) -> None:
+    files = sorted(PETRINEX_SK_VOL_DIR.glob("Vol_????-??-SK.zip"))
+    if not files:
+        log("  Petrinex SK volumetric cache is empty - skipping Saskatchewan crude layer.")
+        return
+    sites: dict[tuple[str, str], dict[str, Any]] = {}
+    target_wells: set[str] = set()
+    total_rows = 0
+    for path in files:
+        match = re.search(r"Vol_(\d{4}-\d{2})-SK\.zip$", path.name)
+        if not match:
+            continue
+        period = match.group(1)
+        parsed = parse_period(period)
+        if not parsed:
+            continue
+        date_value = dt.date(parsed[0], parsed[1], 1)
+        if month_end(date_value) < CUTOFF:
+            continue
+        log(f"  Parsing Petrinex SK crude oil {period}")
+        reader = open_nested_petrinex_csv(path)
+        for row in reader:
+            if row.get("ReportingFacilityProvinceState") != "SK":
+                continue
+            if row.get("ActivityID") != "PROD" or row.get("ProductID") != "OIL":
+                continue
+            volume_m3 = as_float(row.get("Volume"))
+            if volume_m3 is None or volume_m3 <= 0:
+                continue
+            well_id = clean_text(row.get("FromToID")) if row.get("FromToIDType") == "WI" else ""
+            if not well_id:
+                continue
+            facility_dls = format_dls(
+                row.get("FacilityLegalSubdivision"),
+                row.get("FacilitySection"),
+                row.get("FacilityTownship"),
+                row.get("FacilityRange"),
+                row.get("FacilityMeridian"),
+            )
+            key = (month_end(date_value).isoformat(), well_id)
+            site = sites.setdefault(
+                key,
+                {
+                    "date": date_value,
+                    "well_id": well_id,
+                    "operator": clean_text(row.get("OperatorName")) or "Unknown operator",
+                    "facility_dls": facility_dls or "",
+                    "facility_id": clean_text(row.get("ReportingFacilityID")),
+                    "facility_name": clean_text(row.get("ReportingFacilityName")),
+                    "volume_m3": 0.0,
+                },
+            )
+            site["volume_m3"] += volume_m3
+            total_rows += 1
+            target_wells.add(well_id)
+    if not sites:
+        log("  Petrinex SK crude layer found no positive OIL/PROD well rows.")
+        return
+    well_info = read_petrinex_sk_well_infrastructure(target_wells)
+    site_items: list[dict[str, Any]] = []
+    for site in sites.values():
+        info = well_info.get(site["well_id"], {})
+        dls = info.get("dls") or site.get("facility_dls")
+        if not dls:
+            continue
+        days = calendar.monthrange(site["date"].year, site["date"].month)[1]
+        site["dls"] = dls
+        site["province"] = "Saskatchewan"
+        site["volume_bbl_d"] = site["volume_m3"] * M3_TO_BBL / days
+        site["well_info"] = info
+        site_items.append(site)
+    location_cache = resolve_dls_locations(site_items, official_limit=0)
+    asset_ids: dict[str, str] = {}
+    added_records = 0
+    for site in site_items:
+        well_id = site["well_id"]
+        info = site.get("well_info", {})
+        if well_id not in asset_ids:
+            cache_row = location_cache.get((site["province"], site["dls"]))
+            lat = as_float(cache_row.get("latitude")) if cache_row else None
+            lon = as_float(cache_row.get("longitude")) if cache_row else None
+            well_name = clean_text(info.get("well_name")) or clean_text(site.get("facility_name")) or well_id
+            note_bits = [
+                "Petrinex SK OIL/PROD rows aggregated by well.",
+                f"Location basis: well DLS if available, otherwise reporting facility DLS; coordinate method: {cache_row.get('method', '') if cache_row else 'missing'}.",
+            ]
+            if info.get("field_name"):
+                note_bits.append(f"Field: {info['field_name']}.")
+            if info.get("pool_name"):
+                note_bits.append(f"Pool: {info['pool_name']}.")
+            asset_ids[well_id] = add_asset(
+                display_name=f"{well_name} ({site['dls']})",
+                source_id="petrinex_sk_well_production",
+                production_system="conventional",
+                company=site["operator"],
+                province=site["province"],
+                asset_kind="well",
+                latitude=lat,
+                longitude=lon,
+                coordinate_method=clean_text(cache_row.get("method")) if cache_row else "",
+                location_basis="well_dls_current_infrastructure" if info.get("dls") else "reporting_facility_dls",
+                geometry_kind="dls_centroid" if lat is not None and lon is not None else "",
+                geometry_source="Petrinex SK Well Infrastructure / DLS centroid" if lat is not None and lon is not None else "",
+                notes=" ".join(note_bits),
+                asset_id_override=f"petrinex_sk_well_production:conventional:well:{slug(well_id)}",
+            )
+        add_record(site["date"], asset_ids[well_id], "Conventional crude oil", site["volume_bbl_d"], f"Petrinex SK Vol {month_period(site['date'])}", site["dls"], "petrinex_sk_well_production", scenario="actual")
+        added_records += 1
+    log("  Petrinex SK crude oil wells: " f"{added_records:,} monthly well records across {len(asset_ids):,} wells from {total_rows:,} OIL/PROD rows.")
+
+
+def parse_manitoba_uwi_dls(uwi: Any) -> str | None:
+    text = clean_text(uwi)
+    match = re.search(r"\d{3}\.(\d{1,2})-(\d{1,2})-(\d{2,3})-(\d{1,2})W([1-6])", text)
+    if not match:
+        return None
+    return format_dls(*match.groups())
+
+
+def append_manitoba_well_production(add_asset: Any, add_record: Any, start_period: str | None = None) -> None:
+    if not MANITOBA_PRODUCTION_ZIP.exists():
+        log("  Manitoba production cache is empty - skipping Manitoba crude layer.")
+        return
+    start_parts = parse_period(start_period or MANITOBA_DEFAULT_START_PERIOD)
+    start_month = dt.date(start_parts[0], start_parts[1], 1) if start_parts else CUTOFF
+    month_headers = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+    sites: dict[tuple[str, str], dict[str, Any]] = {}
+    rows_read = 0
+    try:
+        with _zipfile.ZipFile(MANITOBA_PRODUCTION_ZIP) as zf:
+            members = [name for name in zf.namelist() if name.lower().endswith((".xlsx", ".xlsm"))]
+            if not members:
+                log("  Manitoba production ZIP contains no Excel workbook.")
+                return
+            workbook_bytes = zf.read(members[0])
+        wb = openpyxl.load_workbook(io.BytesIO(workbook_bytes), read_only=True, data_only=True)
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: could not read Manitoba production workbook: {exc}")
+        return
+    for ws in wb.worksheets:
+        rows = ws.iter_rows(values_only=True)
+        try:
+            headers = [clean_text(value).upper() for value in next(rows)]
+        except StopIteration:
+            continue
+        header_index = {name: idx for idx, name in enumerate(headers) if name}
+        if not {"LICENCE", "WELL_NAME", "UWI", "NAME", "FLUID_TYPE", "YEAR"}.issubset(header_index):
+            continue
+        month_indexes = [(i + 1, header_index[name]) for i, name in enumerate(month_headers) if name in header_index]
+        for row in rows:
+            rows_read += 1
+            if clean_text(row[header_index["FLUID_TYPE"]]).upper() != "OIL":
+                continue
+            year_val = as_float(row[header_index["YEAR"]])
+            if year_val is None:
+                continue
+            year = int(year_val)
+            uwi = clean_text(row[header_index["UWI"]])
+            dls = parse_manitoba_uwi_dls(uwi)
+            if not uwi or not dls:
+                continue
+            for month, idx in month_indexes:
+                volume_m3 = as_float(row[idx])
+                if volume_m3 is None or volume_m3 <= 0:
+                    continue
+                date_value = dt.date(year, month, 1)
+                if date_value < start_month or month_end(date_value) < CUTOFF:
+                    continue
+                days = calendar.monthrange(year, month)[1]
+                key = (month_end(date_value).isoformat(), uwi)
+                site = sites.setdefault(
+                    key,
+                    {
+                        "date": date_value,
+                        "uwi": uwi,
+                        "dls": dls,
+                        "province": "Manitoba",
+                        "well_name": clean_text(row[header_index["WELL_NAME"]]) or uwi,
+                        "operator": clean_text(row[header_index["NAME"]]) or "Unknown operator",
+                        "field_name": clean_text(row[header_index["FIELD_NAME"]]) if "FIELD_NAME" in header_index else "",
+                        "pool_name": clean_text(row[header_index["POOL_NAME"]]) if "POOL_NAME" in header_index else "",
+                        "licence": clean_text(row[header_index["LICENCE"]]),
+                        "volume_bbl_d": 0.0,
+                    },
+                )
+                site["volume_bbl_d"] += volume_m3 * M3_TO_BBL / days
+    if not sites:
+        log("  Manitoba crude layer found no positive OIL rows in the selected period.")
+        return
+    site_items = list(sites.values())
+    location_cache = resolve_dls_locations(site_items, official_limit=0)
+    asset_ids: dict[str, str] = {}
+    added_records = 0
+    for site in site_items:
+        uwi = site["uwi"]
+        if uwi not in asset_ids:
+            cache_row = location_cache.get((site["province"], site["dls"]))
+            lat = as_float(cache_row.get("latitude")) if cache_row else None
+            lon = as_float(cache_row.get("longitude")) if cache_row else None
+            note_bits = ["Manitoba monthly production OIL rows aggregated by UWI.", f"Location basis: UWI DLS; coordinate method: {cache_row.get('method', '') if cache_row else 'missing'}."]
+            if site.get("field_name"):
+                note_bits.append(f"Field: {site['field_name']}.")
+            if site.get("pool_name"):
+                note_bits.append(f"Pool: {site['pool_name']}.")
+            asset_ids[uwi] = add_asset(
+                display_name=f"{site['well_name']} ({site['dls']})",
+                source_id="manitoba_well_production",
+                production_system="conventional",
+                company=site["operator"],
+                province=site["province"],
+                asset_kind="well",
+                latitude=lat,
+                longitude=lon,
+                coordinate_method=clean_text(cache_row.get("method")) if cache_row else "",
+                location_basis="uwi_dls",
+                geometry_kind="dls_centroid" if lat is not None and lon is not None else "",
+                geometry_source="Manitoba UWI / DLS centroid" if lat is not None and lon is not None else "",
+                notes=" ".join(note_bits),
+                asset_id_override=f"manitoba_well_production:conventional:well:{slug(uwi)}",
+            )
+        add_record(site["date"], asset_ids[uwi], "Conventional crude oil", site["volume_bbl_d"], f"Manitoba Monthly Well Production {month_period(site['date'])}", site["dls"], "manitoba_well_production", scenario="actual")
+        added_records += 1
+    log("  Manitoba crude oil wells: " f"{added_records:,} monthly UWI records across {len(asset_ids):,} wells from {rows_read:,} workbook rows.")
+
+
 def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], list[dict[str, Any]], dict[str, Any]]:
     if not workbook_path.exists():
         raise FileNotFoundError(f"Workbook not found: {workbook_path}")
@@ -2536,9 +3147,10 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
         geometry_kind: str = "",
         geometry_source: str = "",
         geometry_features: list[dict[str, Any]] | None = None,
+        asset_id_override: str | None = None,
     ) -> str:
         key_source = source_id
-        asset_id = f"{key_source}:{slug(production_system)}:{slug(company)}:{slug(display_name)}"
+        asset_id = asset_id_override or f"{key_source}:{slug(production_system)}:{slug(company)}:{slug(display_name)}"
         reg = registry_lookup(registry, production_system, company, display_name)
         lat = latitude if latitude is not None else (as_float(reg.get("latitude")) if reg else None)
         lon = longitude if longitude is not None else (as_float(reg.get("longitude")) if reg else None)
@@ -2854,6 +3466,9 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
 
     append_petrinex_ab_conventional(assets, records, add_asset, add_record)
     append_bcer_well_production(add_asset, add_record)
+    append_ndic_well_production(add_asset, add_record)
+    append_petrinex_sk_well_production(add_asset, add_record)
+    append_manitoba_well_production(add_asset, add_record)
 
     # AER ST3-style workbook conventional crude series.
     if False and "Conventional Oil" in wb.sheetnames:
@@ -3254,6 +3869,36 @@ def compact_asset_payload(assets_payload: list[dict[str, Any]]) -> dict[str, Any
     }
 
 
+def compact_on_demand_payload(date_records: list[dict[str, Any]], asset_ref_by_id: dict[str, int]) -> dict[str, Any] | list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], list[list[Any]]] = defaultdict(list)
+    date_value = date_records[0]["date"] if date_records else ""
+    for record in date_records:
+        volume = float(record.get("volume_kbbl_d") or 0.0)
+        if volume <= 0.0:
+            continue
+        asset_ref = asset_ref_by_id.get(record["asset_id"])
+        if asset_ref is None:
+            continue
+        key = (
+            record.get("source_id", ""),
+            record.get("stream", ""),
+            record.get("scenario", "actual"),
+        )
+        grouped[key].append([asset_ref, round(volume, 6)])
+    groups = [
+        {
+            "date": date_value,
+            "source_id": source_id,
+            "stream": stream,
+            "scenario": scenario,
+            "asset_ref": "assets.rows",
+            "rows": rows,
+        }
+        for (source_id, stream, scenario), rows in sorted(grouped.items())
+    ]
+    return groups[0] if len(groups) == 1 else groups
+
+
 def derive_default_map_date(records: list[dict[str, Any]], latest_actual_date: str | None) -> str | None:
     """Pick the latest month with complete crude-system coverage for the first map view."""
     minimums = {
@@ -3478,6 +4123,7 @@ def write_web_exports(
         }
         for a in sorted(assets.values(), key=lambda x: (x.production_system, x.company, x.display_name))
     ]
+    asset_ref_by_id = {item["asset_id"]: idx for idx, item in enumerate(assets_payload)}
 
     asset_by_id = assets
     by_asset_date: dict[tuple[str, str], float] = {}
@@ -3572,7 +4218,7 @@ def write_web_exports(
     monthly_record_files: dict[str, str] = {}
     for date, date_records in sorted(on_demand_records.items()):
         path = monthly_dir / f"on_demand_{date}.json"
-        write_json_file(path, date_records, separators=(",", ":"))
+        write_json_file(path, compact_on_demand_payload(date_records, asset_ref_by_id), separators=(",", ":"))
         monthly_record_files[date] = str(path.relative_to(ROOT)).replace("\\", "/")
 
     st102_facility_payload = oil_sands_facility_geojson(load_st102_facilities())
@@ -3598,7 +4244,7 @@ def write_web_exports(
         "base_record_count": len(base_records),
         "on_demand_record_count": sum(len(items) for items in on_demand_records.values()),
         "asset_count": len(assets),
-        "mapped_asset_count": len(features),
+        "mapped_asset_count": sum(1 for a in assets.values() if a.latitude is not None and a.longitude is not None),
         "asset_geometry_feature_count": len(asset_geometry_features),
         "location_quality_asset_count": dict(sorted(location_quality_assets.items())),
         "location_quality_latest_actual_kbbl_d": {
@@ -3627,7 +4273,7 @@ def write_web_exports(
 
     write_json_file(PUBLIC_DATA_DIR / "assets.json", compact_asset_payload(assets_payload), separators=(",", ":"))
     write_json_file(PUBLIC_DATA_DIR / "monthly_production.json", base_records, separators=(",", ":"))
-    write_json_file(PUBLIC_DATA_DIR / "production_assets.geojson", {"type": "FeatureCollection", "features": features}, indent=2)
+    write_json_file(PUBLIC_DATA_DIR / "production_assets.geojson", {"type": "FeatureCollection", "features": []}, separators=(",", ":"))
     write_json_file(
         ASSET_GEOMETRIES_GEOJSON_PATH,
         {"type": "FeatureCollection", "features": asset_geometry_features},
@@ -3692,6 +4338,37 @@ def main() -> int:
         ),
     )
     parser.add_argument("--skip-petrinex", action="store_true", help="Skip Petrinex cache/download and parsing.")
+    parser.add_argument(
+        "--sk-months",
+        type=int,
+        default=PETRINEX_SK_DEFAULT_HISTORY_MONTHS,
+        help="Number of recent Saskatchewan Petrinex volume months to cache when --sk-start is not supplied.",
+    )
+    parser.add_argument(
+        "--sk-start",
+        default=None,
+        help=(
+            "Optional YYYY-MM start period for Saskatchewan Petrinex volume caching through the latest completed month. "
+            f"Default is {PETRINEX_SK_DEFAULT_START_PERIOD}; pass a later period to shrink GitHub Pages output."
+        ),
+    )
+    parser.add_argument("--skip-sk", action="store_true", help="Skip Saskatchewan Petrinex cache/download and parsing.")
+    parser.add_argument(
+        "--nd-months",
+        type=int,
+        default=NDIC_DEFAULT_HISTORY_MONTHS,
+        help="Number of recent North Dakota monthly production reports to cache when --nd-start is not supplied.",
+    )
+    parser.add_argument(
+        "--nd-start",
+        default=None,
+        help=(
+            "Optional YYYY-MM start period for North Dakota production report caching through the latest indexed report. "
+            f"Default is {NDIC_DEFAULT_START_PERIOD}; pass a later period to shrink GitHub Pages output."
+        ),
+    )
+    parser.add_argument("--skip-nd", action="store_true", help="Skip North Dakota cache/download and parsing.")
+    parser.add_argument("--skip-mb", action="store_true", help="Skip Manitoba production cache/download and parsing.")
     args = parser.parse_args()
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -3713,6 +4390,28 @@ def main() -> int:
         )
     if args.download or args.force_download:
         download_status.extend(ensure_bcer_cache(force=args.force_download, refresh=True))
+    if not args.skip_nd:
+        nd_start = args.nd_start if args.nd_start is not None else NDIC_DEFAULT_START_PERIOD
+        download_status.extend(
+            ensure_ndic_cache(
+                months=args.nd_months,
+                start_period=nd_start,
+                force=args.force_download,
+                refresh=args.download or args.force_download,
+            )
+        )
+    if not args.skip_sk:
+        sk_start = args.sk_start if args.sk_start is not None else PETRINEX_SK_DEFAULT_START_PERIOD
+        download_status.extend(
+            ensure_petrinex_sk_cache(
+                months=args.sk_months,
+                start_period=sk_start,
+                force=args.force_download,
+                refresh=args.download or args.force_download,
+            )
+        )
+    if not args.skip_mb:
+        download_status.extend(ensure_manitoba_cache(force=args.force_download, refresh=args.download or args.force_download))
     try:
         from build_scheme_geojson import main as build_scheme_geojson
 

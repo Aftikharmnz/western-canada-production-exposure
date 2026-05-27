@@ -90,3 +90,67 @@
     "raw_file": "petrinex/bc/reference/PRAActivityCodes.csv",
     "grain": "BC activity reference"
   },
+  {
+    "source_id": "bcer_well_production",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Production Data for All Wells in B.C.",
+    "url": "https://iris.bcogc.ca/download/prod_csv.zip",
+    "raw_file": "bcer/prod_csv.zip",
+    "grain": "monthly well/completion/zone production",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_index",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Index",
+    "url": "https://iris.bcogc.ca/download/well_index.csv",
+    "raw_file": "bcer/well_index.csv",
+    "grain": "well reference",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_surface_locations",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Surface Hole Locations",
+    "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query",
+    "raw_file": "bcer/well_surface_locations.geojson",
+    "grain": "well surface point geometry",
+    "download": false
+  },
+  {
+    "source_id": "ndic_well_production",
+    "agency": "North Dakota Industrial Commission, Department of Mineral Resources",
+    "name": "NDIC Monthly Production Report - Oil Sheet",
+    "url": "https://www.dmr.nd.gov/oilgas/mpr/YYYY_MM.xlsx",
+    "raw_file": "nd/mpr/YYYY_MM.xlsx",
+    "grain": "monthly well crude oil production",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_sk_well_production",
+    "agency": "Petrinex",
+    "name": "Petrinex Saskatchewan Conventional Volumetrics",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/YYYY-MM/CSV",
+    "raw_file": "petrinex/sk/vol/Vol_YYYY-MM-SK.zip",
+    "grain": "monthly well crude oil production",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_sk_well_infrastructure",
+    "agency": "Petrinex",
+    "name": "Petrinex Saskatchewan Well Infrastructure",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+    "raw_file": "petrinex/sk/infra/well_infrastructure_sk.zip",
+    "grain": "current well/DLS reference",
+    "download": false
+  },
+  {
+    "source_id": "manitoba_well_production",
+    "agency": "Province of Manitoba",
+    "name": "Manitoba Monthly Well Production Reports",
+    "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
+    "raw_file": "manitoba/wmp_2023_2026_excel.zip",
+    "grain": "monthly well crude oil production",
+    "download": false
+  }
+]

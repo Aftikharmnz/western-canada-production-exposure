@@ -116,4 +116,8 @@ def main():
 
     print(f"\nTotal: {total_before/1024/1024:.1f} MB -> {total_after/1024/1024:.1f} MB  "
           f"({(1 - total_after/total_before)*100:.0f}% reduction)")
-    print("\nDone. Run 'git
+    print("\nDone. Run 'git add -f public/data/monthly/' and commit to push the compacted files.")
+
+
+if __name__ == "__main__":
+    main()
