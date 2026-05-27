@@ -14,6 +14,7 @@ const DATA_PATHS = {
   refineries: "public/data/refineries.geojson",
   marketPipelines: "public/data/market_access_pipelines.geojson",
   marketTariffs: "public/data/market_access_tariffs.json",
+  railways: "public/data/railways.geojson",
   pipelineIndex: "public/data/aer_pipeline_index.json",
 };
 
@@ -145,6 +146,35 @@ const DEFAULT_HIDDEN_LEGEND_KEYS = [
   "inst-meter",
 ];
 
+const RAILWAY_CATEGORY_META = {
+  "rail-main": {
+    label: "Main rail network",
+    detail: "BTS/FRA NARN mainline network across Canada and connected U.S. corridors",
+    color: "#111827",
+    kind: "line",
+  },
+  "rail-industrial": {
+    label: "Industrial rail leads",
+    detail: "Major industrial and terminal access tracks from BTS/FRA NARN",
+    color: "#6b7280",
+    kind: "line",
+  },
+  "crude-rail-terminal": {
+    label: "Crude rail terminals",
+    detail: "EIA crude oil rail loading and unloading terminals",
+    color: "#111827",
+    kind: "point",
+  },
+  "product-terminal": {
+    label: "Refined-product terminals",
+    detail: "EIA bulk petroleum/refined-product terminals in connected U.S. regions",
+    color: "#0f766e",
+    kind: "point",
+  },
+};
+
+const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "product-terminal"];
+
 const DEFAULT_REFINERY_GROUP_KEYS = [
   "canada-western",
   "canada-central",
@@ -236,6 +266,13 @@ const state = {
   selectedMarketPipelineIds: new Set(),
   marketHubsEnabled: true,
   marketPipelineMenuOpen: false,
+  railwayEnabled: false,
+  railwayData: null,
+  railwayLoading: false,
+  railwayError: null,
+  railwayLayer: null,
+  selectedRailwayCategories: new Set(DEFAULT_RAILWAY_CATEGORIES),
+  railwayMenuOpen: false,
   // Seasonality index (lazy-loaded from asset_seasonality.json)
   seasonalityIndex: null,
   seasonalityIndexLoading: false,
@@ -298,6 +335,7 @@ const els = {
   wildfireStatus:   document.querySelector("#wildfireStatus"),
   formationToggle:  document.querySelector("#formationToggle"),
   refineryToggle:   document.querySelector("#refineryToggle"),
+  railwayToggle:    document.querySelector("#railwayToggle"),
   distanceToggle:   document.querySelector("#distanceToggle"),
   distanceStatus:   document.querySelector("#distanceStatus"),
   mapLegend:        document.querySelector("#mapLegend"),
@@ -686,10 +724,23 @@ function initControls() {
     marketPipelineMenu.addEventListener("change", handleMarketPipelineMenuChange);
     marketPipelineMenu.addEventListener("click", handleMarketPipelineMenuClick);
   }
+  if (els.railwayToggle) {
+    els.railwayToggle.addEventListener("click", toggleRailways);
+  }
+  const railwayMenu = document.getElementById("railwayMenu");
+  if (railwayMenu) {
+    railwayMenu.addEventListener("change", handleRailwayMenuChange);
+    railwayMenu.addEventListener("click", handleRailwayMenuClick);
+    buildRailwayMenu();
+  }
   document.addEventListener("click", (event) => {
     const control = document.getElementById("marketPipelineControl");
     if (control && !control.contains(event.target)) {
       setMarketPipelineMenuOpen(false);
+    }
+    const railwayControl = document.getElementById("railwayControl");
+    if (railwayControl && !railwayControl.contains(event.target)) {
+      setRailwayMenuOpen(false);
     }
     const pipelineControl = document.getElementById("pipelineControl");
     if (pipelineControl && !pipelineControl.contains(event.target)) {
@@ -3559,6 +3610,219 @@ function refreshMarketPipelineLayers() {
   renderMarketPipelineLayers();
 }
 
+// ============================================================
+// RAILWAYS LAYER - BTS/FRA NARN + EIA petroleum terminals
+// ============================================================
+
+function railwayFeatures() {
+  return state.railwayData?.features || [];
+}
+
+function selectedRailwayFeatures() {
+  return railwayFeatures()
+    .filter((feature) => state.selectedRailwayCategories.has(feature.properties?.category));
+}
+
+function railwaySelectedCount() {
+  return state.selectedRailwayCategories.size;
+}
+
+function railwayStyle(feature) {
+  const category = feature.properties?.category || "rail-main";
+  const meta = RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["rail-main"];
+  return {
+    color: meta.color,
+    weight: category === "rail-main" ? 1.05 : 0.75,
+    opacity: category === "rail-main" ? 0.72 : 0.46,
+    lineCap: "round",
+    lineJoin: "round",
+  };
+}
+
+function railwayTerminalMarker(feature, latlng) {
+  const category = feature.properties?.category || "product-terminal";
+  const meta = RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["product-terminal"];
+  return L.circleMarker(latlng, {
+    radius: category === "crude-rail-terminal" ? 4.4 : 3.7,
+    color: "#ffffff",
+    weight: 1.15,
+    fillColor: meta.color,
+    fillOpacity: 0.9,
+    opacity: 0.95,
+  });
+}
+
+function railwayTooltipHtml(p) {
+  const meta = RAILWAY_CATEGORY_META[p.category] || {};
+  const title = p.name || meta.label || "Railway feature";
+  const rows = [
+    ["Type", p.category_label || meta.label],
+    ["Owner", p.owner || p.operator],
+    ["Trackage rights", p.trackage_rights],
+    ["Subdivision", p.subdivision],
+    ["Division", p.division],
+    ["Location", [p.city, p.state || p.country].filter(Boolean).join(", ")],
+    ["Commodity", p.commodity],
+    ["Facility", p.facility_type],
+    ["Source", p.source],
+  ]
+    .filter(([, value]) => value)
+    .map(([label, value]) => `<span class="pt-route-label">${escapeHtml(label)}</span><span class="pt-route-val">${escapeHtml(String(value))}</span>`)
+    .join("");
+  return (
+    `<div>` +
+    `<strong>${escapeHtml(title)}</strong>` +
+    `${meta.detail ? `<div class="pt-sub">${escapeHtml(meta.detail)}</div>` : ""}` +
+    `<div class="pt-route">${rows}</div>` +
+    `</div>`
+  );
+}
+
+async function fetchRailwayData() {
+  if (state.railwayData) return true;
+  if (state.railwayLoading) return false;
+  state.railwayLoading = true;
+  state.railwayError = null;
+  updateRailwayToggleUI();
+  updatePipelineStatus("Loading railways and petroleum terminals...");
+
+  try {
+    const response = await fetch(DATA_PATHS.railways);
+    if (!response.ok) throw new Error(`Railways: HTTP ${response.status}`);
+    state.railwayData = await response.json();
+    buildRailwayMenu();
+  } catch (err) {
+    state.railwayError = err.message || String(err);
+    updatePipelineStatus(`Railway data unavailable: ${state.railwayError}`);
+    state.railwayLoading = false;
+    updateRailwayToggleUI();
+    return false;
+  }
+
+  state.railwayLoading = false;
+  updateRailwayToggleUI();
+  updatePipelineStatus("");
+  return true;
+}
+
+function renderRailwayLayer() {
+  if (!state.map || !window.L) return;
+  if (state.railwayLayer) {
+    state.map.removeLayer(state.railwayLayer);
+    state.railwayLayer = null;
+  }
+  if (!state.railwayEnabled || !state.railwayData?.features?.length || !railwaySelectedCount()) return;
+
+  const features = selectedRailwayFeatures();
+  if (!features.length) return;
+  state.railwayLayer = L.geoJSON({ type: "FeatureCollection", features }, {
+    style: railwayStyle,
+    pointToLayer: railwayTerminalMarker,
+    onEachFeature(feature, layer) {
+      layer.bindTooltip(
+        railwayTooltipHtml(feature.properties || {}),
+        { sticky: true, opacity: 0.96, className: "pipeline-tip railway-tip" }
+      );
+    },
+  }).addTo(state.map);
+
+  if (typeof state.railwayLayer.bringToBack === "function") state.railwayLayer.bringToBack();
+  bringPipelineLayersToBack();
+  if (state.formationLayer) state.formationLayer.bringToBack();
+}
+
+async function toggleRailways() {
+  const ok = await fetchRailwayData();
+  if (!ok) return;
+  state.railwayEnabled = true;
+  setRailwayMenuOpen(!state.railwayMenuOpen);
+  renderRailwayLayer();
+  updateRailwayToggleUI();
+}
+
+function updateRailwayToggleUI() {
+  const btn = els.railwayToggle || document.getElementById("railwayToggle");
+  if (!btn) return;
+  const selectedCount = railwaySelectedCount();
+  if (state.railwayLoading) {
+    btn.textContent = "Loading...";
+    btn.className = "railway-toggle-btn loading";
+    btn.setAttribute("aria-expanded", "false");
+  } else if (state.railwayEnabled && selectedCount) {
+    btn.textContent = `Railways (${selectedCount})`;
+    btn.title = `${selectedCount.toLocaleString("en-CA")} railway categories selected`;
+    btn.className = "railway-toggle-btn active";
+    btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
+  } else {
+    btn.textContent = "Railways";
+    btn.title = "Rail lines plus crude-by-rail and refined-product terminal overlays";
+    btn.className = "railway-toggle-btn";
+    btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
+  }
+}
+
+function setRailwayMenuOpen(open) {
+  state.railwayMenuOpen = open;
+  const menu = document.getElementById("railwayMenu");
+  if (menu) menu.hidden = !open;
+  updateRailwayToggleUI();
+}
+
+function buildRailwayMenu() {
+  const options = document.getElementById("railwayOptions");
+  if (!options) return;
+  const counts = {};
+  for (const feature of railwayFeatures()) {
+    const category = feature.properties?.category;
+    if (category) counts[category] = (counts[category] || 0) + 1;
+  }
+  options.innerHTML = Object.entries(RAILWAY_CATEGORY_META)
+    .map(([key, meta]) => {
+      const checked = state.selectedRailwayCategories.has(key);
+      const swatch = meta.kind === "point"
+        ? `<span class="railway-dot-swatch" style="background:${meta.color}"></span>`
+        : `<span class="railway-swatch" style="background:${meta.color}"></span>`;
+      const count = counts[key] ? ` · ${formatNumber(counts[key], 0)}` : "";
+      return `
+        <label class="railway-option" title="${escapeHtml(meta.detail)}">
+          <input type="checkbox" data-railway-category="${escapeHtml(key)}" ${checked ? "checked" : ""} />
+          ${swatch}
+          <span class="railway-option-text">
+            <strong>${escapeHtml(meta.label)}</strong>
+            <em>${escapeHtml(meta.detail)}${escapeHtml(count)}</em>
+          </span>
+        </label>`;
+    })
+    .join("");
+}
+
+function handleRailwayMenuChange(event) {
+  const input = event.target.closest("input[data-railway-category]");
+  if (!input) return;
+  const key = input.dataset.railwayCategory;
+  if (input.checked) state.selectedRailwayCategories.add(key);
+  else state.selectedRailwayCategories.delete(key);
+  state.railwayEnabled = railwaySelectedCount() > 0;
+  renderRailwayLayer();
+  updateRailwayToggleUI();
+}
+
+function handleRailwayMenuClick(event) {
+  const action = event.target.closest("[data-railway-action]")?.dataset.railwayAction;
+  if (!action) return;
+  if (action === "all") {
+    Object.keys(RAILWAY_CATEGORY_META).forEach((key) => state.selectedRailwayCategories.add(key));
+  } else if (action === "none") {
+    state.selectedRailwayCategories.clear();
+  } else if (action === "defaults") {
+    state.selectedRailwayCategories = new Set(DEFAULT_RAILWAY_CATEGORIES);
+  }
+  state.railwayEnabled = railwaySelectedCount() > 0;
+  buildRailwayMenu();
+  renderRailwayLayer();
+  updateRailwayToggleUI();
+}
+
 // Extend app state for pipelines
 Object.assign(state, {
   pipelineEnabled:      false,
@@ -4126,6 +4390,7 @@ async function boot() {
     updateRefineryToggleUI();
     updatePipelineToggleUI();
     updateMarketPipelineToggleUI();
+    updateRailwayToggleUI();
     updateWildfireStatus("Fetching official Alberta and BC fire data...");
     render();
     // Fetch defaults in parallel. NRCan CWFIS/FWI stays off until selected.

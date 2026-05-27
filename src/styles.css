@@ -1623,7 +1623,8 @@ select {
 
 /* ─── PIPELINE TOGGLE BUTTON ─── */
 .pipeline-toggle-btn,
-.market-pipeline-toggle-btn {
+.market-pipeline-toggle-btn,
+.railway-toggle-btn {
   height: 30px;
   border: 1.5px solid var(--line-strong);
   border-radius: 6px;
@@ -1637,7 +1638,8 @@ select {
 }
 
 .pipeline-toggle-btn:hover,
-.market-pipeline-toggle-btn:hover {
+.market-pipeline-toggle-btn:hover,
+.railway-toggle-btn:hover {
   border-color: #92400e;
   color: #78350f;
 }
@@ -1675,14 +1677,35 @@ select {
   cursor: wait;
 }
 
+.railway-toggle-btn:hover {
+  border-color: #111827;
+  color: #111827;
+}
+
+.railway-toggle-btn.active {
+  background: #f1f5f9;
+  border-color: #111827;
+  color: #111827;
+  font-weight: 760;
+}
+
+.railway-toggle-btn.loading {
+  background: #f8fafc;
+  border-color: #334155;
+  color: #334155;
+  cursor: wait;
+}
+
 .pipeline-control,
-.market-pipeline-control {
+.market-pipeline-control,
+.railway-control {
   position: relative;
   display: inline-flex;
 }
 
 .pipeline-menu,
-.market-pipeline-menu {
+.market-pipeline-menu,
+.railway-menu {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
@@ -1698,7 +1721,8 @@ select {
 }
 
 .pipeline-menu-header,
-.market-pipeline-menu-header {
+.market-pipeline-menu-header,
+.railway-menu-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -1708,19 +1732,22 @@ select {
 }
 
 .pipeline-menu-header strong,
-.market-pipeline-menu-header strong {
+.market-pipeline-menu-header strong,
+.railway-menu-header strong {
   font-size: 12px;
   color: var(--ink);
 }
 
 .pipeline-menu-header span,
-.market-pipeline-menu-header span {
+.market-pipeline-menu-header span,
+.railway-menu-header span {
   font-size: 10.5px;
   color: var(--muted);
 }
 
 .pipeline-menu-actions,
-.market-pipeline-menu-actions {
+.market-pipeline-menu-actions,
+.railway-menu-actions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
@@ -1728,7 +1755,8 @@ select {
 }
 
 .pipeline-menu-actions button,
-.market-pipeline-menu-actions button {
+.market-pipeline-menu-actions button,
+.railway-menu-actions button {
   height: 26px;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -1740,13 +1768,15 @@ select {
 }
 
 .pipeline-menu-actions button:hover,
-.market-pipeline-menu-actions button:hover {
+.market-pipeline-menu-actions button:hover,
+.railway-menu-actions button:hover {
   border-color: #2563eb;
   color: #1e3a8a;
 }
 
 .pipeline-options,
-.market-pipeline-options {
+.market-pipeline-options,
+.railway-options {
   display: grid;
   gap: 2px;
 }
@@ -1761,7 +1791,8 @@ select {
 }
 
 .pipeline-option,
-.market-pipeline-option {
+.market-pipeline-option,
+.railway-option {
   display: grid;
   grid-template-columns: 16px 24px minmax(0, 1fr);
   align-items: center;
@@ -1773,25 +1804,36 @@ select {
 }
 
 .pipeline-option:hover,
-.market-pipeline-option:hover {
+.market-pipeline-option:hover,
+.railway-option:hover {
   background: var(--panel-strong);
 }
 
 .pipeline-option input,
-.market-pipeline-option input {
+.market-pipeline-option input,
+.railway-option input {
   width: 14px;
   height: 14px;
   accent-color: #2563eb;
 }
 
 .pipeline-swatch,
-.market-pipeline-swatch {
+.market-pipeline-swatch,
+.railway-swatch {
   width: 22px;
   height: 3px;
   border-radius: 2px;
 }
 
 .pipeline-dot-swatch {
+  width: 10px;
+  height: 10px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.28);
+}
+
+.railway-dot-swatch {
   width: 10px;
   height: 10px;
   margin-left: 6px;
@@ -1809,7 +1851,8 @@ select {
 }
 
 .pipeline-option-text,
-.market-pipeline-option-text {
+.market-pipeline-option-text,
+.railway-option-text {
   min-width: 0;
   display: grid;
   gap: 1px;
@@ -1818,21 +1861,25 @@ select {
 .pipeline-option-text strong,
 .pipeline-option-text em,
 .market-pipeline-option-text strong,
-.market-pipeline-option-text em {
+.market-pipeline-option-text em,
+.railway-option-text strong,
+.railway-option-text em {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .pipeline-option-text strong,
-.market-pipeline-option-text strong {
+.market-pipeline-option-text strong,
+.railway-option-text strong {
   font-size: 11.5px;
   color: var(--ink);
   font-style: normal;
 }
 
 .pipeline-option-text em,
-.market-pipeline-option-text em {
+.market-pipeline-option-text em,
+.railway-option-text em {
   font-size: 10px;
   color: var(--muted);
   font-style: normal;
@@ -2027,6 +2074,7 @@ select {
 @media (max-width: 900px) {
   .pipeline-menu,
   .market-pipeline-menu,
+  .railway-menu,
   .formation-menu,
   .refinery-menu,
   .fire-menu {
@@ -2068,6 +2116,10 @@ select {
 .dot.inst-compressor  { background: #fb923c; }
 .dot.inst-terminal    { background: #f59e0b; }
 .dot.inst-meter       { background: #a78bfa; }
+.dot.rail-main        { background: #111827; border-radius: 2px; }
+.dot.rail-industrial  { background: #6b7280; border-radius: 2px; }
+.dot.crude-rail-terminal { background: #111827; }
+.dot.product-terminal { background: #0f766e; }
 
 /* ─── DEDICATED PIPELINE LEGEND PANEL ─── */
 .market-pipeline-legend-panel {

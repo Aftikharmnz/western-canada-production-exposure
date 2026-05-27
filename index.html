@@ -93,6 +93,21 @@
               </label>
             </div>
           </div>
+          <div id="railwayControl" class="railway-control">
+            <button id="railwayToggle" class="railway-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Railways</button>
+            <div id="railwayMenu" class="railway-menu" hidden>
+              <div class="railway-menu-header">
+                <strong>Railways</strong>
+                <span>Choose rail layers</span>
+              </div>
+              <div class="railway-menu-actions">
+                <button type="button" data-railway-action="defaults">Core</button>
+                <button type="button" data-railway-action="all">All</button>
+                <button type="button" data-railway-action="none">None</button>
+              </div>
+              <div id="railwayOptions" class="railway-options"></div>
+            </div>
+          </div>
           <div id="fireControl" class="fire-control">
             <button id="wildfireToggle" class="fire-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Fires</button>
             <div id="fireMenu" class="fire-menu" hidden>
@@ -397,7 +412,7 @@
           <!-- ── PIPELINES ── -->
           <section class="docs-section" id="tab-pipelines" hidden>
             <h2>Pipeline Layers</h2>
-            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude export/import and diluent pipeline systems that connect Western Canadian production to external markets.</p>
+            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude export/import and diluent pipeline systems that connect Western Canadian production to external markets. <strong>Railways</strong> adds main rail corridors, major industrial leads, crude-by-rail terminals, and refined-product/petroleum terminals for Canada, the Bakken, and connected U.S. supply-chain regions.</p>
 
             <h3>AER feeder layer</h3>
             <p>Line segments represent AER feeder pipeline records where geometry is available. Feeder line categories are pre-split into static map tiles and load only after zooming in to reduce first-load latency. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
@@ -417,6 +432,9 @@
             <p>The market access layer is intentionally compact and route-level. It includes Enbridge Mainline/Lakehead, Trans Mountain/Puget Sound, Keystone, Express/Platte, Southern Lights, Cochin, Line 9, Wascana, Westspur, Enbridge Bakken/North Dakota, and optional downstream Enbridge/CER liquid systems. Canadian linework is selected from the public CER pipeline systems FeatureServer. U.S. continuations are selected from EIA ArcGIS FeatureServers where public linework is available; route-level manual connectors are omitted rather than drawn as straight-line bridges. Yellow hub markers identify key terminals, refineries, interconnects, and route nodes from the CAPP map reference and tariff documents.</p>
 
             <p>Market hub tooltips and click-to-pin hub popups include current public crude, condensate, heavy, and super-heavy tariff rows where published by the carrier. Each row keeps the official currency, fixed and variable toll components where the tariff publishes them, additive charges, included charges, conditional charges, loss allowances, all-in values where the adders are numerically defined, per-barrel conversions for cubic-metre tariffs, effective date, status, document name, and a PDF page link.</p>
+
+            <h3>Railways layer</h3>
+            <p>The railways layer is lazy-loaded from <code>public/data/railways.geojson</code>. Rail linework is selected from the BTS/FRA North American Rail Network for all Canada plus U.S. states tied to Canadian/Bakken crude and refined-product supply chains. To stay browser-friendly, the app keeps main rail network and major industrial leads rather than every local spur. Crude-by-rail terminals come from EIA's crude rail terminal layer, and refined-product/petroleum terminals come from EIA's petroleum product terminal layer.</p>
 
             <p class="docs-note">Market access lines are analytical context only. They are approximate and must not be used for construction, ground disturbance, or exact underground pipeline location checks.</p>
           </section>
@@ -512,6 +530,12 @@
                   <td>CER liquid pipeline systems plus selected EIA U.S. Energy Atlas linework</td>
                   <td>Canadian crude export/import trunks, U.S. continuations, and named market hubs</td>
                   <td>Crude oil, diluent, condensate/HGL pipeline systems</td>
+                </tr>
+                <tr>
+                  <td><strong>Railways</strong></td>
+                  <td>BTS/FRA North American Rail Network plus EIA crude rail and petroleum product terminal layers</td>
+                  <td>All Canada plus Bakken and connected U.S. crude/refined-products supply-chain regions</td>
+                  <td>Main rail network, industrial leads, crude-by-rail terminals, refined-product/petroleum terminals</td>
                 </tr>
                 <tr>
                   <td><strong>AER Scheme Approvals</strong></td>

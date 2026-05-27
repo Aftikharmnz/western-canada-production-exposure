@@ -152,5 +152,32 @@
     "raw_file": "manitoba/wmp_2023_2026_excel.zip",
     "grain": "monthly well crude oil production",
     "download": false
+  },
+  {
+    "source_id": "railway_narn_lines",
+    "agency": "Bureau of Transportation Statistics / Federal Railroad Administration",
+    "name": "North American Rail Network Lines",
+    "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "rail line segments",
+    "download": false
+  },
+  {
+    "source_id": "eia_crude_rail_terminals",
+    "agency": "U.S. Energy Information Administration",
+    "name": "Crude Oil Rail Terminals",
+    "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "crude-by-rail terminal points",
+    "download": false
+  },
+  {
+    "source_id": "eia_petroleum_product_terminals",
+    "agency": "U.S. Energy Information Administration",
+    "name": "Petroleum Product Terminals",
+    "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "petroleum/refined-product terminal points",
+    "download": false
   }
 ]
