@@ -109,6 +109,263 @@ DEFAULT_RAIL_WHERE = (
 DEFAULT_CRUDE_TERMINAL_WHERE = "STATE IN ({})".format(",".join(f"'{state}'" for state in SUPPLY_CHAIN_US_STATES))
 DEFAULT_PRODUCT_TERMINAL_WHERE = "State_Name IN ({})".format(",".join(f"'{state}'" for state in SUPPLY_CHAIN_US_STATE_NAMES))
 
+SUNCOR_TERMINALS_URL = "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+TORQ_TERMINALS_URL = "https://torqlogistics.com/transloading-services/"
+GIBSON_OPERATIONS_URL = "https://www.gibsonenergy.com/operations/"
+USDG_DRU_URL = "https://usdg.com/terminal/dru/"
+KEYERA_ADT_URL = "https://www.keyera.com/investors/news/keyera-facilities-income-fund-announces-long-term-oil-sands-services-agreement-with-imperial-oil/"
+BRUDERHEIM_RAIL_URL = "https://www.ogj.com/general-interest/companies/article/17245710/cenovus-completes-purchase-of-rail-terminal"
+
+CANADIAN_TERMINALS: list[dict[str, Any]] = [
+    {
+        "name": "Hardisty Rail Terminal / DRU",
+        "operator": "Gibson Energy / USD Group",
+        "category": "crude-rail-terminal",
+        "city": "Hardisty",
+        "state": "Alberta",
+        "coordinates": [-111.309, 52.659],
+        "commodity": "Heavy Canadian crude / DRUbit / recovered diluent",
+        "facility_type": "Crude-by-rail / diluent recovery terminal",
+        "rail_connection": "CP/KCS-connected DRUbit rail movement to U.S. Gulf Coast markets",
+        "source": "USD Group DRU terminal and Gibson operations",
+        "source_url": USDG_DRU_URL,
+    },
+    {
+        "name": "Gibson Edmonton Terminal",
+        "operator": "Gibson Energy",
+        "category": "crude-rail-terminal",
+        "city": "Edmonton",
+        "state": "Alberta",
+        "coordinates": [-113.337, 53.557],
+        "commodity": "Crude oil",
+        "facility_type": "Crude storage and rail-loading terminal",
+        "rail_connection": "Rail loading capabilities",
+        "source": "Gibson Energy operations",
+        "source_url": GIBSON_OPERATIONS_URL,
+    },
+    {
+        "name": "Keyera Alberta Diluent Terminal",
+        "operator": "Keyera",
+        "category": "crude-rail-terminal",
+        "city": "Fort Saskatchewan",
+        "state": "Alberta",
+        "coordinates": [-113.101, 53.716],
+        "commodity": "Diluent / condensate",
+        "facility_type": "Diluent storage and rail-offload terminal",
+        "rail_connection": "Rail offload services",
+        "source": "Keyera oil sands services agreement",
+        "source_url": KEYERA_ADT_URL,
+    },
+    {
+        "name": "Keyera Edmonton Terminal",
+        "operator": "Keyera",
+        "category": "crude-rail-terminal",
+        "city": "Edmonton",
+        "state": "Alberta",
+        "coordinates": [-113.333, 53.562],
+        "commodity": "Diluent / condensate",
+        "facility_type": "Diluent storage and rail-offload terminal",
+        "rail_connection": "Rail offload services",
+        "source": "Keyera oil sands services agreement",
+        "source_url": KEYERA_ADT_URL,
+    },
+    {
+        "name": "Bruderheim Rail Terminal",
+        "operator": "Cenovus / Bruderheim terminal",
+        "category": "crude-rail-terminal",
+        "city": "Bruderheim",
+        "state": "Alberta",
+        "coordinates": [-112.923, 53.800],
+        "commodity": "Crude oil",
+        "facility_type": "Crude-by-rail terminal",
+        "rail_connection": "Links to Canadian Pacific and Canadian National rail lines",
+        "source": "Oil & Gas Journal, Cenovus terminal acquisition",
+        "source_url": BRUDERHEIM_RAIL_URL,
+    },
+    {
+        "name": "Torq Unity Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Unity",
+        "state": "Saskatchewan",
+        "coordinates": [-109.145, 52.444],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "Dual CN and CP main line connections",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Lloydminster Big Gully Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Lloydminster",
+        "state": "Saskatchewan",
+        "coordinates": [-109.977, 53.278],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "CP",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Kerrobert Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Kerrobert",
+        "state": "Saskatchewan",
+        "coordinates": [-109.131, 51.920],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "CP",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Instow Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Instow",
+        "state": "Saskatchewan",
+        "coordinates": [-107.424, 49.853],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "Great Western Railway interchange with CP",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Tilley Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Tilley",
+        "state": "Alberta",
+        "coordinates": [-111.666, 50.455],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "CP",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Whitecourt Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Whitecourt",
+        "state": "Alberta",
+        "coordinates": [-115.684, 54.139],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "CN local yard",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Torq Buick Terminal",
+        "operator": "Torq Energy Logistics",
+        "category": "crude-rail-terminal",
+        "city": "Buick",
+        "state": "British Columbia",
+        "coordinates": [-121.625, 56.750],
+        "commodity": "Crude oil / condensate / refined products / LPGs",
+        "facility_type": "Multi-product rail transload terminal",
+        "rail_connection": "CN",
+        "source": "Torq transloading services",
+        "source_url": TORQ_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Burrard Products Terminal",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Port Moody / Burnaby",
+        "state": "British Columbia",
+        "coordinates": [-122.939, 49.288],
+        "commodity": "Gasoline / diesel / jet fuel / ethanol / biodiesel",
+        "facility_type": "Refined-product terminal",
+        "rail_connection": "Marine and rail facilities",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Edmonton Terminal",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Edmonton",
+        "state": "Alberta",
+        "coordinates": [-113.358, 53.568],
+        "commodity": "Refined products",
+        "facility_type": "Refined-product terminal adjacent to refinery",
+        "rail_connection": "Refined-product terminal in Suncor network",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Saskatoon Terminal",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Saskatoon",
+        "state": "Saskatchewan",
+        "coordinates": [-106.664, 52.111],
+        "commodity": "Refined products",
+        "facility_type": "Refined-product terminal",
+        "rail_connection": "Product terminal in Suncor Saskatoon pipeline and terminal system",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Milden Tank Farm",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Milden",
+        "state": "Saskatchewan",
+        "coordinates": [-107.527, 51.488],
+        "commodity": "Refined products",
+        "facility_type": "Refined-product tank farm and pumping station",
+        "rail_connection": "Connected to Saskatoon terminal system",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Terrace Products Terminal",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Terrace",
+        "state": "British Columbia",
+        "coordinates": [-128.585, 54.513],
+        "commodity": "Gasoline / diesel",
+        "facility_type": "Refined-product terminal",
+        "rail_connection": "Receives gasoline and diesel by rail and truck",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Suncor Thunder Bay Products Terminal",
+        "operator": "Suncor",
+        "category": "product-terminal",
+        "city": "Thunder Bay",
+        "state": "Ontario",
+        "coordinates": [-89.220, 48.385],
+        "commodity": "Gasoline / diesel",
+        "facility_type": "Refined-product terminal",
+        "rail_connection": "Receives/distributes product via marine, rail cars, and trucks",
+        "source": "Suncor terminals",
+        "source_url": SUNCOR_TERMINALS_URL,
+    },
+    {
+        "name": "Gibson Moose Jaw Facility",
+        "operator": "Gibson Energy",
+        "category": "product-terminal",
+        "city": "Moose Jaw",
+        "state": "Saskatchewan",
+        "coordinates": [-105.547, 50.390],
+        "commodity": "Heavy crude oil / refined products",
+        "facility_type": "Heavy crude processing and refined-products facility",
+        "rail_connection": "Rail-served Moose Jaw industrial corridor",
+        "source": "Gibson Energy operations",
+        "source_url": GIBSON_OPERATIONS_URL,
+    },
+]
+
 RAIL_OUT_FIELDS = ",".join(
     [
         "OBJECTID",
@@ -333,6 +590,39 @@ def normalize_product_terminal(feature: dict[str, Any]) -> dict[str, Any] | None
     }
 
 
+def canadian_terminal_features() -> list[dict[str, Any]]:
+    features: list[dict[str, Any]] = []
+    for terminal in CANADIAN_TERMINALS:
+        props = {
+            "feature_kind": "terminal",
+            "category": terminal["category"],
+            "category_label": "Canadian crude / products rail terminals"
+            if terminal["category"] == "crude-rail-terminal"
+            else "Canadian petroleum product terminals",
+            "name": terminal["name"],
+            "city": terminal.get("city"),
+            "state": terminal.get("state"),
+            "operator": terminal.get("operator"),
+            "facility_type": terminal.get("facility_type"),
+            "rail_connection": terminal.get("rail_connection"),
+            "commodity": terminal.get("commodity"),
+            "source": terminal.get("source"),
+            "source_url": terminal.get("source_url"),
+            "location_confidence": "approximate public-location centroid",
+        }
+        features.append(
+            {
+                "type": "Feature",
+                "properties": compact_props(props),
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [round_coord(terminal["coordinates"][0]), round_coord(terminal["coordinates"][1])],
+                },
+            }
+        )
+    return features
+
+
 def compact_props(props: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in props.items() if value not in (None, "", [])}
 
@@ -364,8 +654,11 @@ def build_layer(
         feature["properties"] = compact_props(feature["properties"])
     print(f"  {len(products):,} petroleum product terminals")
 
+    canadian = canadian_terminal_features()
+    print(f"  {len(canadian):,} Canadian curated petroleum rail terminals")
+
     features = sorted(
-        [*lines, *crude, *products],
+        [*lines, *crude, *products, *canadian],
         key=lambda f: (
             f["properties"].get("feature_kind") != "rail_line",
             f["properties"].get("category") or "",
@@ -397,6 +690,11 @@ def build_layer(
                     "name": "EIA Petroleum Product Terminals",
                     "url": EIA_PRODUCT_TERMINALS_URL,
                     "coverage": "Bulk refined-product/petroleum terminals inside the app rail overlay extent",
+                },
+                {
+                    "name": "Curated Canadian petroleum rail terminals",
+                    "url": "See per-feature source_url values",
+                    "coverage": "Canadian crude, diluent, transload, and refined-product terminals identified from public operator/regulator pages",
                 },
             ],
         },

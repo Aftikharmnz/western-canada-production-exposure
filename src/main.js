@@ -3659,6 +3659,7 @@ function railwayTooltipHtml(p) {
     ["Type", p.category_label || meta.label],
     ["Owner", p.owner || p.operator],
     ["Trackage rights", p.trackage_rights],
+    ["Rail", p.rail_connection],
     ["Subdivision", p.subdivision],
     ["Division", p.division],
     ["Location", [p.city, p.state || p.country].filter(Boolean).join(", ")],

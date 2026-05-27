@@ -179,5 +179,14 @@
     "raw_file": "public/data/railways.geojson",
     "grain": "petroleum/refined-product terminal points",
     "download": false
+  },
+  {
+    "source_id": "canadian_petroleum_rail_terminals",
+    "agency": "Public operator/regulator pages",
+    "name": "Curated Canadian Petroleum Rail Terminals",
+    "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "Canadian crude, diluent, transload, and refined-product terminal points",
+    "download": false
   }
 ]
