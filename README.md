@@ -38,7 +38,7 @@ This writes `public/data/market_access_tariffs.json`. It keeps operator-publishe
 python scripts\build_railway_layer.py
 ```
 
-This writes `public/data/railways.geojson`. It covers all Canadian main rail and major industrial-lead linework plus Bakken and connected U.S. crude/refined-products supply-chain states from the BTS/FRA North American Rail Network. It also adds EIA crude-by-rail terminals and EIA petroleum/refined-product terminals for connected U.S. regions, plus curated Canadian crude/diluent/transload and refined-product terminals from public Suncor, Torq, Gibson, USDG, Keyera, and Bruderheim/Cenovus terminal references.
+This writes `public/data/railways.geojson`. It covers Canadian and U.S. main rail and major industrial-lead linework from the BTS/FRA North American Rail Network. It also adds all EIA crude-by-rail terminals and EIA petroleum/refined-product terminals, plus curated Canadian crude/diluent/transload and refined-product terminals from public Suncor, Torq, Gibson, USDG, Keyera, and Bruderheim/Cenovus terminal references.
 
 By default the ETL caches Petrinex AB monthly volumetric API files from
 `2022-01` through the workbook's latest actual month. `2022-01` is the earliest

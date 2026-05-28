@@ -27,87 +27,12 @@ NARN_LINES_URL = "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/servi
 EIA_CRUDE_RAIL_TERMINALS_URL = "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0"
 EIA_PRODUCT_TERMINALS_URL = "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0"
 
-# Full Canadian rail network plus U.S. states that are part of the common
-# Canada/Bakken crude and refined-product rail supply chain: border states,
-# Midwest/Great Lakes refining corridors, Rockies/Pacific corridors, and the
-# Midcontinent/Gulf route to Cushing and Texas/Louisiana export/refining markets.
-SUPPLY_CHAIN_US_STATES = [
-    "WA",
-    "OR",
-    "CA",
-    "ID",
-    "MT",
-    "WY",
-    "CO",
-    "ND",
-    "SD",
-    "NE",
-    "KS",
-    "OK",
-    "TX",
-    "LA",
-    "MN",
-    "IA",
-    "MO",
-    "WI",
-    "IL",
-    "IN",
-    "MI",
-    "OH",
-    "PA",
-    "NY",
-    "VT",
-    "NH",
-    "ME",
-    "MA",
-    "CT",
-    "RI",
-    "NJ",
-    "DE",
-    "MD",
-]
-SUPPLY_CHAIN_US_STATE_NAMES = [
-    "Washington",
-    "Oregon",
-    "California",
-    "Idaho",
-    "Montana",
-    "Wyoming",
-    "Colorado",
-    "North Dakota",
-    "South Dakota",
-    "Nebraska",
-    "Kansas",
-    "Oklahoma",
-    "Texas",
-    "Louisiana",
-    "Minnesota",
-    "Iowa",
-    "Missouri",
-    "Wisconsin",
-    "Illinois",
-    "Indiana",
-    "Michigan",
-    "Ohio",
-    "Pennsylvania",
-    "New York",
-    "Vermont",
-    "New Hampshire",
-    "Maine",
-    "Massachusetts",
-    "Connecticut",
-    "Rhode Island",
-    "New Jersey",
-    "Delaware",
-    "Maryland",
-]
+# Full Canadian and U.S. rail network context. The line filter keeps the BTS/FRA
+# main network and industrial leads; terminal layers include all U.S. EIA points.
 DEFAULT_BBOX = (-170.0, 24.0, -52.0, 72.0)
-DEFAULT_RAIL_WHERE = (
-    "(COUNTRY = 'CA' OR (COUNTRY = 'US' AND STATEAB IN ({}))) "
-    "AND NET IN ('M', 'I')"
-).format(",".join(f"'{state}'" for state in SUPPLY_CHAIN_US_STATES))
-DEFAULT_CRUDE_TERMINAL_WHERE = "STATE IN ({})".format(",".join(f"'{state}'" for state in SUPPLY_CHAIN_US_STATES))
-DEFAULT_PRODUCT_TERMINAL_WHERE = "State_Name IN ({})".format(",".join(f"'{state}'" for state in SUPPLY_CHAIN_US_STATE_NAMES))
+DEFAULT_RAIL_WHERE = "COUNTRY IN ('CA', 'US') AND NET IN ('M', 'I')"
+DEFAULT_CRUDE_TERMINAL_WHERE = "1=1"
+DEFAULT_PRODUCT_TERMINAL_WHERE = "1=1"
 
 SUNCOR_TERMINALS_URL = "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
 TORQ_TERMINALS_URL = "https://torqlogistics.com/transloading-services/"
@@ -368,26 +293,15 @@ CANADIAN_TERMINALS: list[dict[str, Any]] = [
 
 RAIL_OUT_FIELDS = ",".join(
     [
-        "OBJECTID",
-        "FRAARCID",
         "COUNTRY",
         "STATEAB",
         "RROWNER1",
         "RROWNER2",
         "RROWNER3",
-        "TRKRGHTS1",
-        "TRKRGHTS2",
-        "TRKRGHTS3",
-        "DIVISION",
         "SUBDIV",
         "BRANCH",
         "YARDNAME",
-        "PASSNGR",
-        "STRACNET",
-        "TRACKS",
         "NET",
-        "MILES",
-        "KM",
     ]
 )
 
@@ -453,7 +367,7 @@ def query_arcgis_geojson(
 
 
 def round_coord(value: Any) -> float:
-    return round(float(value), 4)
+    return round(float(value), 3)
 
 
 def rounded_geometry(geometry: dict[str, Any]) -> dict[str, Any] | None:
@@ -512,25 +426,17 @@ def normalize_rail_feature(feature: dict[str, Any]) -> dict[str, Any] | None:
     props = feature.get("properties") or {}
     category = railway_category(props)
     owners = [props.get(key) for key in ("RROWNER1", "RROWNER2", "RROWNER3") if props.get(key)]
-    trackage = [props.get(key) for key in ("TRKRGHTS1", "TRKRGHTS2", "TRKRGHTS3") if props.get(key)]
     name = props.get("SUBDIV") or props.get("BRANCH") or props.get("YARDNAME") or railway_category_label(category)
     return {
         "type": "Feature",
         "properties": {
             "feature_kind": "rail_line",
             "category": category,
-            "category_label": railway_category_label(category),
             "name": name,
             "owner": ", ".join(dict.fromkeys(str(v) for v in owners)),
-            "trackage_rights": ", ".join(dict.fromkeys(str(v) for v in trackage)),
             "country": props.get("COUNTRY"),
             "state": props.get("STATEAB"),
-            "division": props.get("DIVISION"),
-            "subdivision": props.get("SUBDIV"),
-            "tracks": props.get("TRACKS"),
-            "km": round(float(props.get("KM") or 0), 2) if props.get("KM") not in (None, "") else None,
             "source": "BTS/FRA North American Rail Network Lines",
-            "source_url": NARN_LINES_URL,
         },
         "geometry": geometry,
     }
@@ -673,8 +579,8 @@ def build_layer(
             "rail_where": rail_where,
             "crude_terminal_where": crude_terminal_where,
             "product_terminal_where": product_terminal_where,
-            "scope": "All Canada plus selected U.S. states connected to Canadian/Bakken crude and refined-product rail supply chains.",
-            "rail_detail": "BTS/FRA main network and major industrial leads to control browser and GitHub payload size.",
+            "scope": "All Canada and all U.S. rail lines plus all U.S. EIA crude and petroleum-product terminal points.",
+            "rail_detail": "BTS/FRA main network and industrial leads, with compact per-feature properties to stay under GitHub file limits.",
             "sources": [
                 {
                     "name": "BTS/FRA North American Rail Network Lines",
