@@ -72,6 +72,13 @@ MANITOBA_DIR = RAW_DIR / "manitoba"
 MANITOBA_PRODUCTION_ZIP = MANITOBA_DIR / "wmp_2023_2026_excel.zip"
 MANITOBA_PRODUCTION_REPORT_URL = "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip"
 MANITOBA_DEFAULT_START_PERIOD = "2024-01"
+MONTANA_DIR = RAW_DIR / "montana"
+MONTANA_PRODUCTION_ZIP = MONTANA_DIR / "MT_Historical_Production.zip"
+MONTANA_WELL_LIST_ZIP = MONTANA_DIR / "MT_CompleteWellList.zip"
+MONTANA_PRODUCTION_URL = "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip"
+MONTANA_WELL_LIST_URL = "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip"
+MONTANA_DEFAULT_START_PERIOD = "2024-01"
+MONTANA_ACTIVE_START_PERIOD = MONTANA_DEFAULT_START_PERIOD
 M3_TO_BBL = 6.28981077
 ON_DEMAND_RECORD_SOURCES = {
     "petrinex_ab_conventional_vol",
@@ -81,11 +88,13 @@ ON_DEMAND_RECORD_SOURCES = {
     "bcer_well_production",
     "ndic_well_production",
     "manitoba_well_production",
+    "montana_bogc_well_production",
 }
 PRODUCTION_GEOJSON_EXCLUDED_SOURCES = {
     "ndic_well_production",
     "petrinex_sk_well_production",
     "manitoba_well_production",
+    "montana_bogc_well_production",
 }
 PETRINEX_AB_EARLIEST_PUBLIC_PERIOD = "2022-01"
 
@@ -252,6 +261,60 @@ SOURCE_MANIFEST = [
         "grain": "monthly well crude oil production",
         "download": False,
     },
+    {
+        "source_id": "montana_bogc_well_production",
+        "agency": "Montana Board of Oil and Gas Conservation",
+        "name": "Montana Historical Well Production",
+        "url": MONTANA_PRODUCTION_URL,
+        "raw_file": "montana/MT_Historical_Production.zip",
+        "grain": "monthly well oil/condensate production; ETL filters Bakken and Three Forks rows",
+        "download": False,
+    },
+    {
+        "source_id": "montana_bogc_well_list",
+        "agency": "Montana Board of Oil and Gas Conservation",
+        "name": "Montana Complete Well List",
+        "url": MONTANA_WELL_LIST_URL,
+        "raw_file": "montana/MT_CompleteWellList.zip",
+        "grain": "well reference and lat/long",
+        "download": False,
+    },
+    {
+        "source_id": "railway_narn_lines",
+        "agency": "Bureau of Transportation Statistics / Federal Railroad Administration",
+        "name": "North American Rail Network Lines",
+        "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
+        "raw_file": "public/data/railways.geojson",
+        "grain": "rail line segments",
+        "download": False,
+    },
+    {
+        "source_id": "eia_crude_rail_terminals",
+        "agency": "U.S. Energy Information Administration",
+        "name": "Crude Oil Rail Terminals",
+        "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+        "raw_file": "public/data/railways.geojson",
+        "grain": "crude-by-rail terminal points",
+        "download": False,
+    },
+    {
+        "source_id": "eia_petroleum_product_terminals",
+        "agency": "U.S. Energy Information Administration",
+        "name": "Petroleum Product Terminals",
+        "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
+        "raw_file": "public/data/railways.geojson",
+        "grain": "petroleum/refined-product terminal points",
+        "download": False,
+    },
+    {
+        "source_id": "canadian_petroleum_rail_terminals",
+        "agency": "Public operator/regulator pages",
+        "name": "Curated Canadian Petroleum Rail Terminals",
+        "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+        "raw_file": "public/data/railways.geojson",
+        "grain": "Canadian crude, diluent, transload, and refined-product terminal points",
+        "download": False,
+    },
 ]
 
 
@@ -295,6 +358,7 @@ PROVINCE_COORDS = {
     "British Columbia": (54.0, -125.0),
     "Manitoba": (53.7609, -98.8139),
     "North Dakota": (47.5515, -101.0020),
+    "Montana": (46.8797, -110.3626),
     "Northwest Territories": (64.8255, -124.8457),
     "Western Canada": (55.4, -111.5),
 }
@@ -657,6 +721,38 @@ def ensure_manitoba_cache(force: bool = False, refresh: bool = False) -> list[di
         }
     )
     return [item]
+
+
+def ensure_montana_cache(force: bool = False, refresh: bool = False) -> list[dict[str, Any]]:
+    status: list[dict[str, Any]] = []
+    for source_id, name, url, target, grain in [
+        (
+            "montana_bogc_well_production",
+            "Montana Historical Well Production",
+            MONTANA_PRODUCTION_URL,
+            MONTANA_PRODUCTION_ZIP,
+            "monthly well oil/condensate production",
+        ),
+        (
+            "montana_bogc_well_list",
+            "Montana Complete Well List",
+            MONTANA_WELL_LIST_URL,
+            MONTANA_WELL_LIST_ZIP,
+            "well reference and lat/long",
+        ),
+    ]:
+        item = download_url(url, target, force=force if refresh else False)
+        item.update(
+            {
+                "source_id": source_id,
+                "agency": "Montana Board of Oil and Gas Conservation",
+                "name": name,
+                "raw_file": str(target.relative_to(RAW_DIR)),
+                "grain": grain,
+            }
+        )
+        status.append(item)
+    return status
 
 
 def download_bcer_well_surface_points(force: bool = False) -> dict[str, Any]:
@@ -3117,6 +3213,191 @@ def append_manitoba_well_production(add_asset: Any, add_record: Any, start_perio
     log("  Manitoba crude oil wells: " f"{added_records:,} monthly UWI records across {len(asset_ids):,} wells from {rows_read:,} workbook rows.")
 
 
+def _montana_report_date(value: Any) -> dt.date | None:
+    text = clean_text(value)
+    if not text:
+        return None
+    for fmt in ("%m/%d/%Y", "%Y-%m-%d"):
+        try:
+            return dt.datetime.strptime(text, fmt).date()
+        except ValueError:
+            pass
+    return as_date(text)
+
+
+def _montana_bakken_formation(value: Any) -> bool:
+    text = clean_text(value).lower()
+    return "bakken" in text or "three forks" in text
+
+
+def read_montana_well_info(target_apis: set[str]) -> dict[str, dict[str, Any]]:
+    if not MONTANA_WELL_LIST_ZIP.exists() or not target_apis:
+        return {}
+    info: dict[str, dict[str, Any]] = {}
+    with _zipfile.ZipFile(MONTANA_WELL_LIST_ZIP) as zf:
+        member = next((name for name in zf.namelist() if name.lower().endswith(".tab")), None)
+        if not member:
+            return {}
+        with zf.open(member) as fh:
+            reader = csv.DictReader(io.TextIOWrapper(fh, encoding="utf-8", errors="replace"), delimiter="\t")
+            for row in reader:
+                api = clean_text(row.get("API_WellNo"))
+                if api not in target_apis:
+                    continue
+                lat = as_float(row.get("Lat"))
+                lon = as_float(row.get("Long"))
+                if lat is not None and not (44.0 <= lat <= 50.0):
+                    lat = None
+                if lon is not None and not (-117.5 <= lon <= -103.5):
+                    lon = None
+                info[api] = {
+                    "well_name": clean_text(row.get("Well_Nm")),
+                    "status": clean_text(row.get("Status")),
+                    "type": clean_text(row.get("Type")),
+                    "field": clean_text(row.get("Prod_Field")) or clean_text(row.get("Reg_Field")),
+                    "county": clean_text(row.get("County")),
+                    "lat": lat,
+                    "lon": lon,
+                    "township": clean_text(row.get("Wh_Twpn")),
+                    "township_dir": clean_text(row.get("Wh_Twpd")),
+                    "range": clean_text(row.get("Wh_RngN")),
+                    "range_dir": clean_text(row.get("Wh_RngD")),
+                    "section": clean_text(row.get("Wh_Sec")),
+                    "quarter": clean_text(row.get("Wh_Qtr")),
+                }
+    log(f"  Montana well list matched {len(info):,} Bakken/Three Forks wells")
+    return info
+
+
+def append_montana_bakken_well_production(add_asset: Any, add_record: Any, start_period: str | None = None) -> None:
+    if not MONTANA_PRODUCTION_ZIP.exists():
+        log("  Montana BOGC production cache is empty - skipping Montana Bakken crude layer.")
+        return
+    start_parts = parse_period(start_period or MONTANA_ACTIVE_START_PERIOD)
+    start_month = dt.date(start_parts[0], start_parts[1], 1) if start_parts else CUTOFF
+    sites: dict[tuple[str, str], dict[str, Any]] = {}
+    target_apis: set[str] = set()
+    rows_read = 0
+    positive_rows = 0
+    try:
+        with _zipfile.ZipFile(MONTANA_PRODUCTION_ZIP) as zf:
+            member = next((name for name in zf.namelist() if name == "MT_HistoricalWellProduction.tab"), None)
+            if not member:
+                log("  Montana production ZIP contains no MT_HistoricalWellProduction.tab.")
+                return
+            with zf.open(member) as fh:
+                reader = csv.DictReader(io.TextIOWrapper(fh, encoding="utf-8", errors="replace"), delimiter="\t")
+                for row in reader:
+                    rows_read += 1
+                    date_value = _montana_report_date(row.get("Rpt_Date"))
+                    if not date_value or date_value < start_month or month_end(date_value) < CUTOFF:
+                        continue
+                    if not _montana_bakken_formation(row.get("Formation")):
+                        continue
+                    oil_bbl = as_float(row.get("BBLS_OIL_COND"))
+                    if oil_bbl is None or oil_bbl <= 0:
+                        continue
+                    api = clean_text(row.get("API_WellNo"))
+                    if not api:
+                        continue
+                    positive_rows += 1
+                    report_month = month_end(date_value)
+                    key = (report_month.isoformat(), api)
+                    site = sites.setdefault(
+                        key,
+                        {
+                            "date": report_month,
+                            "api": api,
+                            "operator": clean_text(row.get("CoName")) or "Unknown operator",
+                            "formation": clean_text(row.get("Formation")),
+                            "formation_code": clean_text(row.get("ST_FMTN_CD")),
+                            "oil_bbl": 0.0,
+                            "days_prod": 0.0,
+                        },
+                    )
+                    site["oil_bbl"] += oil_bbl
+                    days_prod = as_float(row.get("DAYS_PROD"))
+                    if days_prod:
+                        site["days_prod"] += days_prod
+                    target_apis.add(api)
+    except Exception as exc:  # noqa: BLE001
+        log(f"  warning: could not read Montana BOGC production ZIP: {exc}")
+        return
+    if not sites:
+        log("  Montana Bakken crude layer found no positive Bakken/Three Forks oil rows in the selected period.")
+        return
+    well_info = read_montana_well_info(target_apis)
+    asset_ids: dict[str, str] = {}
+    added_records = 0
+    missing_location = 0
+    for site in sites.values():
+        api = site["api"]
+        info = well_info.get(api, {})
+        days = calendar.monthrange(site["date"].year, site["date"].month)[1]
+        volume_bbl_d = site["oil_bbl"] / days
+        if api not in asset_ids:
+            lat = info.get("lat")
+            lon = info.get("lon")
+            has_location = lat is not None and lon is not None
+            well_name = info.get("well_name") or api
+            location_text = " ".join(
+                part
+                for part in [
+                    f"Sec {info.get('section')}" if info.get("section") else "",
+                    f"T{info.get('township')}{info.get('township_dir')}" if info.get("township") else "",
+                    f"R{info.get('range')}{info.get('range_dir')}" if info.get("range") else "",
+                    info.get("quarter") or "",
+                ]
+                if part
+            )
+            note_bits = [
+                "Montana BOGC historical well production BBLS_OIL_COND rows filtered to Bakken and Three Forks formations.",
+                f"API: {api}.",
+                f"Formation: {site['formation']}.",
+            ]
+            if info.get("field"):
+                note_bits.append(f"Field: {info['field']}.")
+            if info.get("county"):
+                note_bits.append(f"County: {info['county']}.")
+            if location_text:
+                note_bits.append(f"Location: {location_text}.")
+            asset_ids[api] = add_asset(
+                display_name=f"{well_name} ({api})",
+                source_id="montana_bogc_well_production",
+                production_system="conventional",
+                company=site["operator"],
+                province="Montana",
+                asset_kind="well",
+                latitude=lat,
+                longitude=lon,
+                coordinate_method="montana_bogc_well_list_lat_long" if has_location else "",
+                location_basis="montana_bogc_complete_well_list",
+                geometry_kind="well_point" if has_location else "",
+                geometry_source="Montana BOGC Complete Well List" if has_location else "",
+                notes=" ".join(note_bits),
+                asset_id_override=f"montana_bogc_well_production:conventional:well:{slug(api)}",
+            )
+        if info.get("lat") is None or info.get("lon") is None:
+            missing_location += 1
+        add_record(
+            site["date"],
+            asset_ids[api],
+            "Conventional crude oil",
+            volume_bbl_d,
+            f"Montana BOGC Historical Well Production {month_period(site['date'])}",
+            api,
+            "montana_bogc_well_production",
+            scenario="actual",
+        )
+        added_records += 1
+    log(
+        "  Montana Bakken/Three Forks crude oil wells: "
+        f"{added_records:,} well-month records across {len(asset_ids):,} wells from "
+        f"{positive_rows:,} positive oil/condensate rows ({rows_read:,} production rows scanned); "
+        f"{missing_location:,} well-month records missing BOGC well-list coordinates."
+    )
+
+
 def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], list[dict[str, Any]], dict[str, Any]]:
     if not workbook_path.exists():
         raise FileNotFoundError(f"Workbook not found: {workbook_path}")
@@ -3469,6 +3750,7 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
     append_ndic_well_production(add_asset, add_record)
     append_petrinex_sk_well_production(add_asset, add_record)
     append_manitoba_well_production(add_asset, add_record)
+    append_montana_bakken_well_production(add_asset, add_record)
 
     # AER ST3-style workbook conventional crude series.
     if False and "Conventional Oil" in wb.sheetnames:
@@ -4369,11 +4651,23 @@ def main() -> int:
     )
     parser.add_argument("--skip-nd", action="store_true", help="Skip North Dakota cache/download and parsing.")
     parser.add_argument("--skip-mb", action="store_true", help="Skip Manitoba production cache/download and parsing.")
+    parser.add_argument(
+        "--mt-start",
+        default=None,
+        help=(
+            "Optional YYYY-MM start period for Montana BOGC Bakken/Three Forks well production. "
+            f"Default is {MONTANA_DEFAULT_START_PERIOD}; pass a later period to shrink GitHub Pages output."
+        ),
+    )
+    parser.add_argument("--skip-mt", action="store_true", help="Skip Montana BOGC cache/download and parsing.")
     args = parser.parse_args()
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     PUBLIC_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    global MONTANA_ACTIVE_START_PERIOD
+    MONTANA_ACTIVE_START_PERIOD = args.mt_start if args.mt_start is not None else MONTANA_DEFAULT_START_PERIOD
 
     latest_actual = read_workbook_latest_actual(args.workbook)
     download_status = download_sources(force=args.force_download) if args.download or args.force_download else []
@@ -4412,6 +4706,8 @@ def main() -> int:
         )
     if not args.skip_mb:
         download_status.extend(ensure_manitoba_cache(force=args.force_download, refresh=args.download or args.force_download))
+    if not args.skip_mt:
+        download_status.extend(ensure_montana_cache(force=args.force_download, refresh=args.download or args.force_download))
     try:
         from build_scheme_geojson import main as build_scheme_geojson
 

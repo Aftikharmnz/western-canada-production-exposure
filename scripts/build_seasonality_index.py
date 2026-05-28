@@ -5,7 +5,7 @@ Pre-aggregates all production records into a compact seasonality lookup:
 
 Sources:
   1. public/data/monthly_production.json  -- base records (oil sands, upgraders, NGL)
-  2. public/data/monthly/on_demand_*.json -- AB/SK Petrinex, BC BCER, NDIC, Manitoba wells
+  2. public/data/monthly/on_demand_*.json -- AB/SK Petrinex, BC BCER, NDIC, Manitoba, Montana wells
 
 Output: public/data/asset_seasonality.json
 """
@@ -88,10 +88,11 @@ bc = sum(1 for k in index if "bcer" in k)
 nd = sum(1 for k in index if "ndic" in k)
 sk = sum(1 for k in index if "petrinex_sk" in k)
 mb = sum(1 for k in index if "manitoba" in k)
+mt = sum(1 for k in index if "montana_bogc" in k)
 conv = sum(1 for k in index if "conventional" in k)
 print(
-    "  In-situ: {:,}  Mined/upgrader: {:,}  BC BCER: {:,}  NDIC: {:,}  SK: {:,}  MB: {:,}  Conventional-tagged: {:,}".format(
-        insitu, mined, bc, nd, sk, mb, conv
+    "  In-situ: {:,}  Mined/upgrader: {:,}  BC BCER: {:,}  NDIC: {:,}  SK: {:,}  MB: {:,}  MT: {:,}  Conventional-tagged: {:,}".format(
+        insitu, mined, bc, nd, sk, mb, mt, conv
     )
 )
 

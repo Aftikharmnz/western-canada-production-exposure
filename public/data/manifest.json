@@ -3,26 +3,26 @@
   "workbook_modified": "2026-05-19T23:33:04.938338",
   "latest_actual_date": "2026-01-31",
   "cutoff_date": "2015-01-01",
-  "generated_at": "2026-05-27T20:40:45+00:00",
-  "record_count": 3547834,
+  "generated_at": "2026-05-28T03:04:12+00:00",
+  "record_count": 3580973,
   "base_record_count": 37263,
-  "on_demand_record_count": 3510571,
-  "asset_count": 124214,
-  "mapped_asset_count": 124204,
+  "on_demand_record_count": 3543710,
+  "asset_count": 125563,
+  "mapped_asset_count": 125553,
   "asset_geometry_feature_count": 129,
   "location_quality_asset_count": {
     "aggregate": 21,
     "exact": 10379,
     "high": 62,
     "low": 91427,
-    "medium": 22315,
+    "medium": 23664,
     "unmapped": 10
   },
   "location_quality_latest_actual_kbbl_d": {
     "exact": 1375.2253,
     "high": 3583.485,
     "low": 1781.388,
-    "medium": 1396.3257,
+    "medium": 1455.6329,
     "unmapped": 22.361
   },
   "periods": [
@@ -420,34 +420,34 @@
     "2023-10-31": 5842.6935,
     "2023-11-30": 6596.1317,
     "2023-12-31": 6667.6494,
-    "2024-01-31": 7664.9501,
-    "2024-02-29": 7977.2507,
-    "2024-03-31": 8055.4435,
-    "2024-04-30": 7870.3957,
-    "2024-05-31": 7230.6919,
-    "2024-06-30": 7613.0223,
-    "2024-07-31": 7901.3376,
-    "2024-08-31": 8083.8947,
-    "2024-09-30": 7676.8945,
-    "2024-10-31": 8037.7431,
-    "2024-11-30": 8294.7048,
-    "2024-12-31": 8353.8686,
-    "2025-01-31": 8312.6386,
-    "2025-02-28": 7991.9908,
-    "2025-03-31": 8288.8825,
-    "2025-04-30": 7868.8095,
-    "2025-05-31": 7137.3417,
-    "2025-06-30": 7858.0237,
-    "2025-07-31": 8347.9193,
-    "2025-08-31": 8245.3491,
-    "2025-09-30": 8188.1023,
-    "2025-10-31": 8190.4265,
-    "2025-11-30": 8593.5894,
-    "2025-12-31": 8448.2109,
-    "2026-01-31": 8158.785,
-    "2026-02-28": 3582.3205,
-    "2026-03-31": 3603.7059,
-    "2026-04-30": 504.9571,
+    "2024-01-31": 7705.626,
+    "2024-02-29": 8023.1185,
+    "2024-03-31": 8105.96,
+    "2024-04-30": 7922.5331,
+    "2024-05-31": 7283.215,
+    "2024-06-30": 7665.119,
+    "2024-07-31": 7951.4295,
+    "2024-08-31": 8140.2552,
+    "2024-09-30": 7732.9936,
+    "2024-10-31": 8097.3567,
+    "2024-11-30": 8358.8305,
+    "2024-12-31": 8413.1654,
+    "2025-01-31": 8370.9911,
+    "2025-02-28": 8047.041,
+    "2025-03-31": 8346.9165,
+    "2025-04-30": 7925.5439,
+    "2025-05-31": 7199.2353,
+    "2025-06-30": 7919.8736,
+    "2025-07-31": 8411.8795,
+    "2025-08-31": 8306.1417,
+    "2025-09-30": 8251.9442,
+    "2025-10-31": 8258.1483,
+    "2025-11-30": 8657.8502,
+    "2025-12-31": 8510.8221,
+    "2026-01-31": 8218.0922,
+    "2026-02-28": 3644.0751,
+    "2026-03-31": 3665.2304,
+    "2026-04-30": 504.9585,
     "2026-05-31": 17.0,
     "2026-06-30": 17.0,
     "2026-07-31": 65.0,
@@ -9492,6 +9492,14 @@
         "kbbl_d": 38.02
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 40.6759
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -9716,6 +9724,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 39.0617
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 45.8678
       },
       {
         "source_id": "ndic_well_production",
@@ -9944,6 +9960,14 @@
         "kbbl_d": 39.959
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 50.5165
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -10168,6 +10192,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 38.925
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 52.1374
       },
       {
         "source_id": "ndic_well_production",
@@ -10396,6 +10428,14 @@
         "kbbl_d": 37.1968
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 52.5231
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -10612,6 +10652,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 36.9819
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 52.0967
       },
       {
         "source_id": "ndic_well_production",
@@ -10838,6 +10886,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 38.5368
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 50.0919
       },
       {
         "source_id": "ndic_well_production",
@@ -11074,6 +11130,14 @@
         "kbbl_d": 39.7653
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 56.3605
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -11298,6 +11362,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 40.8837
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 56.0992
       },
       {
         "source_id": "ndic_well_production",
@@ -11526,6 +11598,14 @@
         "kbbl_d": 41.637
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 59.6136
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -11750,6 +11830,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 41.7781
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 64.1257
       },
       {
         "source_id": "ndic_well_production",
@@ -11978,6 +12066,14 @@
         "kbbl_d": 42.4984
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 59.2968
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -12202,6 +12298,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 40.6007
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 58.3524
       },
       {
         "source_id": "ndic_well_production",
@@ -12430,6 +12534,14 @@
         "kbbl_d": 39.7046
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 55.0502
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -12654,6 +12766,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 42.6442
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 58.034
       },
       {
         "source_id": "ndic_well_production",
@@ -12890,6 +13010,14 @@
         "kbbl_d": 42.0902
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 56.7344
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -13114,6 +13242,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 39.7916
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 61.8936
       },
       {
         "source_id": "ndic_well_production",
@@ -13350,6 +13486,14 @@
         "kbbl_d": 39.0093
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 61.8498
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -13574,6 +13718,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 39.3925
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 63.9601
       },
       {
         "source_id": "ndic_well_production",
@@ -13802,6 +13954,14 @@
         "kbbl_d": 39.7792
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 60.7926
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -14026,6 +14186,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 41.4435
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 63.8419
       },
       {
         "source_id": "ndic_well_production",
@@ -14254,6 +14422,14 @@
         "kbbl_d": 41.0024
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 67.7218
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -14478,6 +14654,14 @@
         "location_confidence": "low",
         "legend_key": "conventional",
         "kbbl_d": 41.1953
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 64.2608
       },
       {
         "source_id": "ndic_well_production",
@@ -14706,6 +14890,14 @@
         "kbbl_d": 39.1976
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 62.6112
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -14932,6 +15124,14 @@
         "kbbl_d": 37.4852
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 59.3072
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -15142,6 +15342,14 @@
         "kbbl_d": 37.5715
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 61.7546
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -15216,6 +15424,14 @@
         "kbbl_d": 37.1202
       },
       {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 61.5245
+      },
+      {
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -15240,6 +15456,14 @@
         "location_confidence": "low",
         "legend_key": "synthetic",
         "kbbl_d": 65.0
+      },
+      {
+        "source_id": "montana_bogc_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 0.0014
       },
       {
         "source_id": "petrinex_sk_well_production",
@@ -15435,6 +15659,17 @@
       "record_count": 111426,
       "asset_count": 4618,
       "sum_kbbl_d_observations": 1073.2719
+    },
+    {
+      "source_id": "montana_bogc_well_production",
+      "source_name": "Montana Historical Well Production",
+      "stream": "Conventional crude oil",
+      "scenario": "actual",
+      "first_date": "2024-01-31",
+      "last_date": "2026-04-30",
+      "record_count": 33139,
+      "asset_count": 1349,
+      "sum_kbbl_d_observations": 1557.0956
     },
     {
       "source_id": "ndic_well_production",
@@ -16081,6 +16316,60 @@
       "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
       "raw_file": "manitoba/wmp_2023_2026_excel.zip",
       "grain": "monthly well crude oil production",
+      "download": false
+    },
+    {
+      "source_id": "montana_bogc_well_production",
+      "agency": "Montana Board of Oil and Gas Conservation",
+      "name": "Montana Historical Well Production",
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
+      "raw_file": "montana/MT_Historical_Production.zip",
+      "grain": "monthly well oil/condensate production; ETL filters Bakken and Three Forks rows",
+      "download": false
+    },
+    {
+      "source_id": "montana_bogc_well_list",
+      "agency": "Montana Board of Oil and Gas Conservation",
+      "name": "Montana Complete Well List",
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
+      "raw_file": "montana/MT_CompleteWellList.zip",
+      "grain": "well reference and lat/long",
+      "download": false
+    },
+    {
+      "source_id": "railway_narn_lines",
+      "agency": "Bureau of Transportation Statistics / Federal Railroad Administration",
+      "name": "North American Rail Network Lines",
+      "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
+      "raw_file": "public/data/railways.geojson",
+      "grain": "rail line segments",
+      "download": false
+    },
+    {
+      "source_id": "eia_crude_rail_terminals",
+      "agency": "U.S. Energy Information Administration",
+      "name": "Crude Oil Rail Terminals",
+      "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+      "raw_file": "public/data/railways.geojson",
+      "grain": "crude-by-rail terminal points",
+      "download": false
+    },
+    {
+      "source_id": "eia_petroleum_product_terminals",
+      "agency": "U.S. Energy Information Administration",
+      "name": "Petroleum Product Terminals",
+      "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
+      "raw_file": "public/data/railways.geojson",
+      "grain": "petroleum/refined-product terminal points",
+      "download": false
+    },
+    {
+      "source_id": "canadian_petroleum_rail_terminals",
+      "agency": "Public operator/regulator pages",
+      "name": "Curated Canadian Petroleum Rail Terminals",
+      "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "raw_file": "public/data/railways.geojson",
+      "grain": "Canadian crude, diluent, transload, and refined-product terminal points",
       "download": false
     }
   ],
@@ -17431,6 +17720,28 @@
       "name": "Manitoba Monthly Well Production Reports",
       "raw_file": "manitoba\\wmp_2023_2026_excel.zip",
       "grain": "monthly well crude oil production"
+    },
+    {
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
+      "local_path": "data\\raw\\montana\\MT_Historical_Production.zip",
+      "status": "cached",
+      "error": null,
+      "source_id": "montana_bogc_well_production",
+      "agency": "Montana Board of Oil and Gas Conservation",
+      "name": "Montana Historical Well Production",
+      "raw_file": "montana\\MT_Historical_Production.zip",
+      "grain": "monthly well oil/condensate production"
+    },
+    {
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
+      "local_path": "data\\raw\\montana\\MT_CompleteWellList.zip",
+      "status": "cached",
+      "error": null,
+      "source_id": "montana_bogc_well_list",
+      "agency": "Montana Board of Oil and Gas Conservation",
+      "name": "Montana Complete Well List",
+      "raw_file": "montana\\MT_CompleteWellList.zip",
+      "grain": "well reference and lat/long"
     }
   ],
   "outputs": {

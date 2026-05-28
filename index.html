@@ -292,7 +292,7 @@
                 <tr><td><i class="doc-dot" style="background:#008b8b"></i></td><td>In-situ Bitumen</td><td>Bitumen extracted underground without mining, using thermal methods such as SAGD (Steam-Assisted Gravity Drainage) or CSS (Cyclic Steam Stimulation). Steam is injected to reduce viscosity; emulsified bitumen flows to a production well. Dominant method in the Athabasca oil sands.</td></tr>
                 <tr><td><i class="doc-dot" style="background:#d29b18"></i></td><td>Mined Bitumen</td><td>Bitumen recovered by open-pit surface mining. Ore is excavated, mixed with hot water (Clark Hot Water Extraction), and the bitumen froth is upgraded or diluted for pipeline transport. Confined to deposits shallow enough for economic mining (generally &lt;75 m depth).</td></tr>
                 <tr><td><i class="doc-dot" style="background:#2980b9"></i></td><td>Synthetic Crude Oil (SCO)</td><td>Upgraded bitumen that has been processed in an upgrader (hydrocracking or coking) to produce a lighter, pipelineable crude that trades similarly to conventional light crude. Produced at integrated mining + upgrading facilities (e.g., Syncrude, Suncor Base Plant).</td></tr>
-                <tr><td><i class="doc-dot" style="background:#4f8f45"></i></td><td>Conventional Crude</td><td>Light and medium crude oil produced from conventional reservoirs in Alberta, Saskatchewan, British Columbia, Manitoba, and North Dakota. Canadian well/facility volumes are sourced from Petrinex, BCER, and Manitoba public files; North Dakota well volumes come from NDIC monthly production reports.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#4f8f45"></i></td><td>Conventional Crude</td><td>Light and medium crude oil produced from conventional reservoirs in Alberta, Saskatchewan, British Columbia, Manitoba, North Dakota, and Montana. Canadian well/facility volumes are sourced from Petrinex, BCER, and Manitoba public files; North Dakota well volumes come from NDIC monthly production reports; Montana Bakken/Three Forks well volumes come from Montana BOGC.</td></tr>
                 <tr><td><i class="doc-dot" style="background:#c2720a"></i></td><td>Heavy Crude (Conv.)</td><td>Conventional heavy crude oil (typically &lt;22° API) from Alberta and Saskatchewan. Not bitumen — produced from conventional reservoirs but with higher viscosity and density than light crude.</td></tr>
                 <tr><td><i class="doc-dot" style="background:#6374a6"></i></td><td>Condensate</td><td>Ultra-light hydrocarbon liquid (60–80° API) that condenses out of natural gas at surface conditions. Used heavily as a bitumen diluent (forming dilbit) for pipeline transport. Produced at gas wells and gas plants.</td></tr>
                 <tr><td><i class="doc-dot" style="background:#7c3aed"></i></td><td>Pentanes Plus (C5+)</td><td>The heaviest NGL fraction — pentane and heavier hydrocarbons that are liquid at atmospheric conditions. Blended into diluent streams or sold as a light naphtha feedstock. Reported separately from condensate in Petrinex.</td></tr>
@@ -308,7 +308,7 @@
             <h2>Volume Terminology &amp; NGL Streams</h2>
 
             <h3>Units</h3>
-            <p>All dashboard volumes are shown in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB/SK, BCER, and Manitoba monthly liquids are reported in cubic metres and converted with 6.2898 bbl per cubic metre divided by calendar days in the production month. NDIC monthly crude barrels are divided by calendar days. The historical AER ST39/ST53 oil-sands rows are currently workbook-normalized bbl/d series, with current-month ST39 synthetic crude reconciled against the cached official AER ST39 XLS when the local R/readxl extractor is available.</p>
+            <p>All dashboard volumes are shown in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB/SK, BCER, and Manitoba monthly liquids are reported in cubic metres and converted with 6.2898 bbl per cubic metre divided by calendar days in the production month. NDIC and Montana BOGC monthly crude barrels are divided by calendar days. The historical AER ST39/ST53 oil-sands rows are currently workbook-normalized bbl/d series, with current-month ST39 synthetic crude reconciled against the cached official AER ST39 XLS when the local R/readxl extractor is available.</p>
 
             <h3>Activity Codes (Petrinex)</h3>
             <p>Petrinex tracks what happens to a product at a facility using activity codes. The two most relevant for NGL volumes are:</p>
@@ -494,6 +494,12 @@
                   <td>Province of Manitoba monthly well production workbook</td>
                   <td>Monthly, Manitoba wells; default well-level history starts at 2024-01</td>
                   <td>Crude oil, OIL rows only</td>
+                </tr>
+                <tr>
+                  <td><strong>Montana BOGC</strong></td>
+                  <td>Montana Board of Oil and Gas Conservation Historical Well Production plus Complete Well List</td>
+                  <td>Monthly, Montana Bakken/Three Forks wells; default well-level history starts at 2024-01</td>
+                  <td>Oil/condensate barrels, Bakken and Three Forks rows only</td>
                 </tr>
                 <tr>
                   <td><strong>Statistics Canada</strong></td>

@@ -154,6 +154,24 @@
     "download": false
   },
   {
+    "source_id": "montana_bogc_well_production",
+    "agency": "Montana Board of Oil and Gas Conservation",
+    "name": "Montana Historical Well Production",
+    "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
+    "raw_file": "montana/MT_Historical_Production.zip",
+    "grain": "monthly well oil/condensate production; ETL filters Bakken and Three Forks rows",
+    "download": false
+  },
+  {
+    "source_id": "montana_bogc_well_list",
+    "agency": "Montana Board of Oil and Gas Conservation",
+    "name": "Montana Complete Well List",
+    "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
+    "raw_file": "montana/MT_CompleteWellList.zip",
+    "grain": "well reference and lat/long",
+    "download": false
+  },
+  {
     "source_id": "railway_narn_lines",
     "agency": "Bureau of Transportation Statistics / Federal Railroad Administration",
     "name": "North American Rail Network Lines",

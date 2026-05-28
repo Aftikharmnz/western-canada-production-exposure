@@ -96,6 +96,7 @@ const SOURCE_SHORT = {
   petrinex_sk_well_production:   "Petrinex SK",
   bcer_well_production:          "BCER wells",
   ndic_well_production:          "NDIC wells",
+  montana_bogc_well_production:  "Montana BOGC",
   manitoba_well_production:      "Manitoba wells",
   petrinex_bc_facility_ids: "Petrinex BC ref",
   petrinex_bc_formation_codes: "Petrinex BC ref",
