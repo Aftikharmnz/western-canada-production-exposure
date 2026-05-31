@@ -248,6 +248,16 @@ const state = {
   bcFireError: null,
   bcFireLayer: null,
   fireMenuOpen: false,
+  fireImpactSettings: {
+    windArrow: true,
+    downwindCorridor: true,
+    exposedProduction: true,
+  },
+  hoverFireImpactLayer: null,
+  hoverFireImpactAbort: null,
+  hoverFireImpactToken: null,
+  hoverFireTooltipLayer: null,
+  hoverFireBaseTooltipHtml: "",
   // Formation overlay state
   formationEnabled: false,
   formationLayer: null,
@@ -1207,6 +1217,7 @@ function applyMarkerLegendVisibility() {
 }
 
 function renderMap(aggregated) {
+  clearHoverFireImpact();
   const { byAsset } = aggregated || aggregateForDate();
   const points = [...byAsset.values()].filter(
     ({ asset, kbbl: v }) => asset.latitude != null && asset.longitude != null && v > 0
@@ -2254,6 +2265,30 @@ const ALBERTA_MUTUAL_AID_URL =
   "&returnGeometry=true" +
   "&f=geojson";
 
+const ECCC_PROGNOS_URL =
+  "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items";
+const OPEN_METEO_FORECAST_URL =
+  "https://api.open-meteo.com/v1/forecast";
+
+function liveUrl(url) {
+  const joiner = url.includes("?") ? "&" : "?";
+  return `${url}${joiner}_=${Date.now()}`;
+}
+
+async function fetchJsonLive(url, options = {}) {
+  const response = await fetch(liveUrl(url), {
+    mode: "cors",
+    cache: "no-store",
+    ...options,
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+function isoNoMillis(date) {
+  return date.toISOString().replace(/\.\d{3}Z$/, "Z");
+}
+
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const d2r = Math.PI / 180;
@@ -2392,9 +2427,7 @@ async function fetchWildfires() {
   updateFireToggleUI();
   updateWildfireStatus("Fetching active fire hotspots from NRCan CWFIS…");
   try {
-    const response = await fetch(CWFIS_URL, { mode: "cors" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const raw = await response.json();
+    const raw = await fetchJsonLive(CWFIS_URL);
 
     // The WFS geometry is in a projected CRS (not WGS84).
     // Swap each feature's geometry to a proper WGS84 Point using
@@ -2484,6 +2517,27 @@ const FIRE_DEFAULT_KEYS = new Set([
   "bc-fire-fon",
 ]);
 
+const FIRE_CONTEXT_ITEMS = [
+  {
+    key: "windArrow",
+    label: "Wind arrow on hover",
+    detail: "Live ECCC RDPS wind at the hovered fire",
+    color: "#0f172a",
+  },
+  {
+    key: "downwindCorridor",
+    label: "Downwind corridor on hover",
+    detail: "Draw only for the hovered fire",
+    color: "#b45309",
+  },
+  {
+    key: "exposedProduction",
+    label: "Exposed production on hover",
+    detail: "Highlight assets inside the hovered corridor",
+    color: "#d97706",
+  },
+];
+
 function fireFilterItems() {
   return FIRE_MENU_ITEMS.filter((item) => !item.section);
 }
@@ -2539,6 +2593,19 @@ function buildFireMenu() {
         </span>
       </label>`;
   }
+  html += `<div class="fire-menu-section">Hover impact</div>`;
+  for (const item of FIRE_CONTEXT_ITEMS) {
+    const checked = state.fireImpactSettings?.[item.key] !== false;
+    html += `
+      <label class="fire-option fire-context-option" title="${escapeHtml(item.detail)}">
+        <input type="checkbox" data-fire-context-key="${escapeHtml(item.key)}" ${checked ? "checked" : ""} />
+        <span class="fire-dot-swatch fire-context-swatch" style="background:${item.color}"></span>
+        <span class="fire-option-text">
+          <strong>${escapeHtml(item.label)}</strong>
+          <em>${escapeHtml(item.detail)}</em>
+        </span>
+      </label>`;
+  }
   options.innerHTML = html;
 }
 
@@ -2571,11 +2638,23 @@ function ensureSelectedFireSources() {
 }
 
 function handleFireMenuChange(event) {
+  const contextInput = event.target.closest("input[data-fire-context-key]");
+  if (contextInput) {
+    const key = contextInput.dataset.fireContextKey;
+    if (key && Object.prototype.hasOwnProperty.call(state.fireImpactSettings, key)) {
+      state.fireImpactSettings[key] = contextInput.checked;
+      clearHoverFireImpact();
+      buildFireMenu();
+    }
+    return;
+  }
+
   const input = event.target.closest("input[data-fire-key]");
   if (!input) return;
   const key = input.dataset.fireKey;
   if (input.checked) state.hiddenLegendKeys.delete(key);
   else state.hiddenLegendKeys.add(key);
+  clearHoverFireImpact();
   state.wildfireEnabled = fireSelectedCount() > 0;
   ensureSelectedFireSources();
   refreshFireLayers();
@@ -2595,6 +2674,7 @@ function handleFireMenuClick(event) {
       else state.hiddenLegendKeys.add(item.key);
     }
   }
+  clearHoverFireImpact();
   state.wildfireEnabled = fireSelectedCount() > 0;
   ensureSelectedFireSources();
   buildFireMenu();
@@ -2619,6 +2699,483 @@ function refreshFireDependentPanels() {
   renderDetails(aggregated);
 }
 
+function fireImpactActive() {
+  const settings = state.fireImpactSettings || {};
+  return Boolean(settings.windArrow || settings.downwindCorridor || settings.exposedProduction);
+}
+
+function clearHoverFireImpact() {
+  if (state.hoverFireImpactAbort) {
+    state.hoverFireImpactAbort.abort();
+    state.hoverFireImpactAbort = null;
+  }
+  if (state.hoverFireImpactLayer && state.map) {
+    state.map.removeLayer(state.hoverFireImpactLayer);
+  }
+  if (state.hoverFireTooltipLayer && state.hoverFireBaseTooltipHtml) {
+    try {
+      state.hoverFireTooltipLayer.setTooltipContent(state.hoverFireBaseTooltipHtml);
+    } catch (_) {
+      // Layer may have been removed during a map refresh.
+    }
+  }
+  state.hoverFireImpactLayer = null;
+  state.hoverFireImpactToken = null;
+  state.hoverFireTooltipLayer = null;
+  state.hoverFireBaseTooltipHtml = "";
+}
+
+function normalizeBearing(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return ((n % 360) + 360) % 360;
+}
+
+function compassDirection(degrees) {
+  const bearing = normalizeBearing(degrees);
+  if (bearing == null) return "--";
+  const labels = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  return labels[Math.round(bearing / 45) % 8];
+}
+
+function angularDifference(a, b) {
+  const diff = Math.abs(normalizeBearing(a) - normalizeBearing(b));
+  return Math.min(diff, 360 - diff);
+}
+
+function bearingDegrees(lat1, lon1, lat2, lon2) {
+  const d2r = Math.PI / 180;
+  const y = Math.sin((lon2 - lon1) * d2r) * Math.cos(lat2 * d2r);
+  const x =
+    Math.cos(lat1 * d2r) * Math.sin(lat2 * d2r) -
+    Math.sin(lat1 * d2r) * Math.cos(lat2 * d2r) * Math.cos((lon2 - lon1) * d2r);
+  return normalizeBearing(Math.atan2(y, x) * 180 / Math.PI);
+}
+
+function destinationPoint(lat, lon, bearing, distanceKm) {
+  const R = 6371;
+  const d2r = Math.PI / 180;
+  const r2d = 180 / Math.PI;
+  const brng = bearing * d2r;
+  const phi1 = lat * d2r;
+  const lambda1 = lon * d2r;
+  const delta = distanceKm / R;
+  const phi2 = Math.asin(
+    Math.sin(phi1) * Math.cos(delta) +
+    Math.cos(phi1) * Math.sin(delta) * Math.cos(brng)
+  );
+  const lambda2 = lambda1 + Math.atan2(
+    Math.sin(brng) * Math.sin(delta) * Math.cos(phi1),
+    Math.cos(delta) - Math.sin(phi1) * Math.sin(phi2)
+  );
+  return { lat: phi2 * r2d, lon: ((lambda2 * r2d + 540) % 360) - 180 };
+}
+
+function fireSizeHa(feature) {
+  const p = feature?.properties || {};
+  const value = Number(p.AREA_ESTIMATE ?? p.CURRENT_SIZE ?? p.Hectares);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function fireDisplayName(feature) {
+  const p = feature?.properties || {};
+  if (p.LABEL) return String(p.LABEL);
+  if (p.INCIDENT_NAME && p.INCIDENT_NAME !== p.FIRE_NUMBER) {
+    return `${p.FIRE_NUMBER || "BC fire"} - ${p.INCIDENT_NAME}`;
+  }
+  if (p.FIRE_NUMBER) return String(p.FIRE_NUMBER);
+  return "Fire hotspot";
+}
+
+function corridorLengthKm(feature, weather) {
+  const speed = Number(weather?.speedKmh) || 0;
+  const size = fireSizeHa(feature);
+  const p = feature?.properties || {};
+  const status = String(p.FIRE_STATUS || "").toLowerCase();
+  let length = 55 + speed * 2.6;
+  if (size > 0) length += Math.min(55, Math.log10(size + 10) * 14);
+  if (status.includes("out of control")) length += 24;
+  if (status.includes("under control")) length -= 18;
+  if (p.FIRE_OF_NOTE_IND === "Y") length += 18;
+  const score = fireScore(feature);
+  if (score != null) length += Math.min(35, score * 0.45);
+  return Math.max(45, Math.min(220, length));
+}
+
+function corridorHalfAngle(weather) {
+  const speed = Number(weather?.speedKmh) || 0;
+  if (speed >= 35) return 20;
+  if (speed >= 20) return 24;
+  if (speed >= 10) return 29;
+  return 34;
+}
+
+function corridorLatLngs(center, bearing, lengthKm, halfAngleDeg) {
+  const distances = [
+    Math.max(6, lengthKm * 0.12),
+    lengthKm * 0.35,
+    lengthKm * 0.68,
+    lengthKm,
+  ];
+  const spread = Math.tan(halfAngleDeg * Math.PI / 180);
+  const left = [];
+  const right = [];
+  for (const distance of distances) {
+    const mid = destinationPoint(center.lat, center.lon, bearing, distance);
+    const halfWidth = Math.min(60, Math.max(4, distance * spread));
+    const l = destinationPoint(mid.lat, mid.lon, bearing - 90, halfWidth);
+    const r = destinationPoint(mid.lat, mid.lon, bearing + 90, halfWidth);
+    left.push([l.lat, l.lon]);
+    right.push([r.lat, r.lon]);
+  }
+  return [[center.lat, center.lon], ...left, ...right.reverse(), [center.lat, center.lon]];
+}
+
+function ecccWindUrl(center, variable, radiusDeg, now = new Date()) {
+  const from = new Date(now.getTime() - 60 * 60 * 1000);
+  const to = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+  const params = new URLSearchParams({
+    f: "json",
+    bbox: [
+      (center.lon - radiusDeg).toFixed(4),
+      (center.lat - radiusDeg).toFixed(4),
+      (center.lon + radiusDeg).toFixed(4),
+      (center.lat + radiusDeg).toFixed(4),
+    ].join(","),
+    variable,
+    datetime: `${isoNoMillis(from)}/${isoNoMillis(to)}`,
+    limit: "700",
+  });
+  return `${ECCC_PROGNOS_URL}?${params.toString()}`;
+}
+
+function weatherRecords(features, variable, center) {
+  return (features || [])
+    .map((feature) => {
+      const p = feature.properties || {};
+      if (p.variable !== variable) return null;
+      const value = Number(p.forecast_value);
+      const coords = feature.geometry?.coordinates || [];
+      const lon = Number(coords[0]);
+      const lat = Number(coords[1]);
+      const forecastMs = Date.parse(p.forecast_datetime);
+      const referenceMs = Date.parse(p.reference_datetime);
+      if (
+        !Number.isFinite(value) ||
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon) ||
+        !Number.isFinite(forecastMs) ||
+        !Number.isFinite(referenceMs)
+      ) return null;
+      return {
+        value,
+        unit: p.unit || "",
+        stationId: p.prognos_station_id || p.ade_id || "",
+        stationName: p.ade_id || p.prognos_station_id || "ECCC station",
+        lat,
+        lon,
+        distanceKm: haversineKm(center.lat, center.lon, lat, lon),
+        forecastMs,
+        referenceMs,
+      };
+    })
+    .filter(Boolean);
+}
+
+function selectWindPair(dirFeatures, speedFeatures, center, now = new Date()) {
+  const dirs = weatherRecords(dirFeatures, "WindDir", center);
+  const speeds = weatherRecords(speedFeatures, "WindSpeed", center);
+  if (!dirs.length || !speeds.length) return null;
+
+  const speedExact = new Map();
+  for (const speed of speeds) {
+    speedExact.set(`${speed.stationId}|${speed.forecastMs}|${speed.referenceMs}`, speed);
+  }
+
+  const nowMs = now.getTime();
+  let best = null;
+  for (const dir of dirs) {
+    let speed = speedExact.get(`${dir.stationId}|${dir.forecastMs}|${dir.referenceMs}`);
+    if (!speed) {
+      speed = speeds
+        .filter((item) => item.stationId === dir.stationId)
+        .sort((a, b) =>
+          Math.abs(a.forecastMs - dir.forecastMs) - Math.abs(b.forecastMs - dir.forecastMs) ||
+          Math.abs(a.referenceMs - dir.referenceMs) - Math.abs(b.referenceMs - dir.referenceMs)
+        )[0];
+    }
+    if (!speed) continue;
+
+    const forecastDeltaH = Math.abs(dir.forecastMs - nowMs) / 36e5;
+    const refAgeH = Math.max(0, (nowMs - Math.max(dir.referenceMs, speed.referenceMs)) / 36e5);
+    if (forecastDeltaH > 4 || refAgeH > 18) continue;
+    const distanceKm = Math.min(dir.distanceKm, speed.distanceKm);
+    const score =
+      forecastDeltaH * 80 +
+      refAgeH * 4 +
+      distanceKm * 1.15 +
+      Math.abs(dir.referenceMs - speed.referenceMs) / 36e5 * 4;
+
+    const candidate = { dir, speed, score, forecastDeltaH, refAgeH, distanceKm };
+    if (!best || candidate.score < best.score) best = candidate;
+  }
+
+  if (!best) return null;
+  return {
+    directionDeg: normalizeBearing(best.dir.value),
+    speedKmh: Number(best.speed.value),
+    stationName: best.dir.stationName,
+    stationDistanceKm: Math.round(best.distanceKm),
+    validTime: new Date(best.dir.forecastMs),
+    referenceTime: new Date(Math.max(best.dir.referenceMs, best.speed.referenceMs)),
+    source: "ECCC RDPS live forecast",
+  };
+}
+
+async function fetchLiveFireWind(center, signal) {
+  const now = new Date();
+  try {
+    for (const radius of [1.25, 2.5, 4]) {
+      const [dirRaw, speedRaw] = await Promise.all([
+        fetchJsonLive(ecccWindUrl(center, "WindDir", radius, now), { signal }),
+        fetchJsonLive(ecccWindUrl(center, "WindSpeed", radius, now), { signal }),
+      ]);
+      const pair = selectWindPair(dirRaw.features, speedRaw.features, center, now);
+      if (pair) return pair;
+    }
+  } catch (err) {
+    if (err?.name === "AbortError") throw err;
+  }
+  return fetchOpenMeteoWind(center, signal);
+}
+
+async function fetchOpenMeteoWind(center, signal) {
+  const params = new URLSearchParams({
+    latitude: center.lat.toFixed(5),
+    longitude: center.lon.toFixed(5),
+    current: "wind_speed_10m,wind_direction_10m,wind_gusts_10m,relative_humidity_2m,precipitation",
+    wind_speed_unit: "kmh",
+    timezone: "UTC",
+    forecast_days: "1",
+  });
+  const raw = await fetchJsonLive(`${OPEN_METEO_FORECAST_URL}?${params.toString()}`, { signal });
+  const current = raw.current || {};
+  const direction = normalizeBearing(current.wind_direction_10m);
+  const speed = Number(current.wind_speed_10m);
+  const validTime = current.time ? new Date(`${current.time.replace(" ", "T")}Z`) : null;
+  const ageH = validTime instanceof Date && !Number.isNaN(validTime.getTime())
+    ? Math.abs(Date.now() - validTime.getTime()) / 36e5
+    : Infinity;
+  if (direction == null || !Number.isFinite(speed) || ageH > 4) return null;
+  return {
+    directionDeg: direction,
+    speedKmh: speed,
+    gustKmh: Number(current.wind_gusts_10m),
+    humidityPct: Number(current.relative_humidity_2m),
+    precipitationMm: Number(current.precipitation),
+    stationName: "model grid",
+    stationDistanceKm: 0,
+    validTime,
+    referenceTime: validTime,
+    source: "Open-Meteo live model fallback",
+  };
+}
+
+function exposedProductionForFire(feature, center, downwindBearing, lengthKm, halfAngleDeg) {
+  const { byAsset } = aggregateForDate();
+  const items = [];
+  let totalKbbl = 0;
+
+  for (const point of byAsset.values()) {
+    const { asset, kbbl: value } = point;
+    if (!asset || asset.is_rollup || asset.latitude == null || asset.longitude == null || !Number.isFinite(value) || value <= 0) {
+      continue;
+    }
+    if (!legendVisible(pointLegendKey(point))) continue;
+    const distanceKm = haversineKm(center.lat, center.lon, asset.latitude, asset.longitude);
+    if (distanceKm > lengthKm) continue;
+    const bearing = bearingDegrees(center.lat, center.lon, asset.latitude, asset.longitude);
+    const angle = angularDifference(downwindBearing, bearing);
+    const direct = geometryContainsPoint(feature, asset.latitude, asset.longitude) || distanceKm <= 8;
+    if (!direct && angle > halfAngleDeg) continue;
+    totalKbbl += value;
+    items.push({ asset, kbbl: value, distanceKm, angle, direct });
+  }
+
+  items.sort((a, b) => b.kbbl - a.kbbl);
+  return { items, totalKbbl };
+}
+
+function formatDateTime(value) {
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return "--";
+  return value.toLocaleString("en-CA", {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function fireImpactTooltipHtml(baseHtml, stateName, weather, exposure, errorMessage) {
+  if (stateName === "loading") {
+    return `${baseHtml}<div class="fire-impact-block loading"><strong>Hover impact</strong><span>Fetching live ECCC wind...</span></div>`;
+  }
+  if (stateName === "unavailable") {
+    return `${baseHtml}<div class="fire-impact-block muted"><strong>Hover impact</strong><span>${escapeHtml(errorMessage || "Live wind is unavailable for this fire location.")}</span></div>`;
+  }
+
+  const downwind = normalizeBearing(weather.directionDeg + 180);
+  const windFrom = `${compassDirection(weather.directionDeg)} ${Math.round(weather.directionDeg)} deg`;
+  const blowingTo = `${compassDirection(downwind)} ${Math.round(downwind)} deg`;
+  const exposedCount = exposure?.items?.length || 0;
+  const top = (exposure?.items || [])
+    .slice(0, 3)
+    .map((item) => item.asset.display_name)
+    .filter(Boolean)
+    .join(", ");
+  const topHtml = top ? `<span>Top exposed: ${escapeHtml(top)}</span>` : "";
+  const gustHtml = Number.isFinite(weather.gustKmh)
+    ? `<span>Gust: ${formatNumber(weather.gustKmh, 0)} km/h</span>`
+    : "";
+  const humidityHtml = Number.isFinite(weather.humidityPct) || Number.isFinite(weather.precipitationMm)
+    ? `<span>RH: ${Number.isFinite(weather.humidityPct) ? formatNumber(weather.humidityPct, 0) + "%" : "--"}; precip: ${Number.isFinite(weather.precipitationMm) ? formatNumber(weather.precipitationMm, 1) + " mm" : "--"}</span>`
+    : "";
+
+  return `${baseHtml}<div class="fire-impact-block">` +
+    `<strong>Hover impact</strong>` +
+    `<span>Wind from ${escapeHtml(windFrom)} at ${formatNumber(weather.speedKmh, 0)} km/h; blowing ${escapeHtml(blowingTo)}</span>` +
+    gustHtml +
+    humidityHtml +
+    `<span>In corridor: ${kbbl(exposure?.totalKbbl || 0)} across ${formatNumber(exposedCount)} asset${exposedCount === 1 ? "" : "s"}</span>` +
+    topHtml +
+    `<em>${escapeHtml(weather.source)}; valid ${escapeHtml(formatDateTime(weather.validTime))}; station ${escapeHtml(weather.stationName)} (${formatNumber(weather.stationDistanceKm)} km)</em>` +
+  `</div>`;
+}
+
+function renderHoverFireImpact(feature, center, weather, exposure, lengthKm, halfAngleDeg) {
+  if (!state.map || !window.L) return;
+  if (state.hoverFireImpactLayer) state.map.removeLayer(state.hoverFireImpactLayer);
+
+  const settings = state.fireImpactSettings || {};
+  const group = L.layerGroup();
+  const focusRadius = Math.max(13, Math.min(28, 10 + Math.log10(fireSizeHa(feature) + 10) * 4));
+  const downwind = weather ? normalizeBearing(weather.directionDeg + 180) : null;
+
+  if (weather && settings.downwindCorridor && downwind != null) {
+    L.polygon(corridorLatLngs(center, downwind, lengthKm, halfAngleDeg), {
+      className: "fire-impact-corridor",
+      color: "#92400e",
+      weight: 1.8,
+      opacity: 0.52,
+      fillColor: "#d97706",
+      fillOpacity: 0.13,
+      interactive: false,
+    }).addTo(group);
+  }
+
+  if (weather && settings.exposedProduction && exposure?.items?.length) {
+    for (const item of exposure.items.slice(0, 45)) {
+      const radius = Math.max(8, Math.min(30, 6 + Math.sqrt(item.kbbl) * 1.65));
+      L.circleMarker([item.asset.latitude, item.asset.longitude], {
+        className: "fire-impact-asset-ring",
+        radius,
+        color: item.direct ? "#b91c1c" : "#b45309",
+        weight: item.direct ? 2.5 : 2,
+        fillColor: item.direct ? "#fee2e2" : "#fef3c7",
+        fillOpacity: 0.12,
+        opacity: item.direct ? 0.92 : 0.78,
+        dashArray: item.direct ? null : "5 4",
+        interactive: false,
+      }).addTo(group);
+    }
+  }
+
+  if (weather && settings.windArrow && downwind != null) {
+    const arrowDistance = Math.min(34, Math.max(16, lengthKm * 0.18));
+    const arrowPoint = destinationPoint(center.lat, center.lon, downwind, arrowDistance);
+    L.marker([arrowPoint.lat, arrowPoint.lon], {
+      interactive: false,
+      icon: L.divIcon({
+        className: "wind-arrow-marker",
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+        html: `<svg viewBox="0 0 32 32" aria-hidden="true" style="transform:rotate(${downwind}deg)"><path d="M16 3 L24 14 H19 V29 H13 V14 H8 Z"></path></svg>`,
+      }),
+    }).addTo(group);
+  }
+
+  L.circleMarker([center.lat, center.lon], {
+    className: "fire-impact-focus",
+    radius: focusRadius,
+    color: "#111827",
+    weight: 2.2,
+    fillOpacity: 0,
+    opacity: 0.82,
+    interactive: false,
+  }).addTo(group);
+
+  state.hoverFireImpactLayer = group;
+  group.addTo(state.map);
+  if (state.albertaFireLayer) state.albertaFireLayer.bringToFront();
+  if (state.bcFireLayer) state.bcFireLayer.bringToFront();
+  if (state.fireLayer) state.fireLayer.bringToFront();
+}
+
+async function handleFireImpactHover(feature, layer, baseTooltipHtml) {
+  if (!fireImpactActive()) return;
+  const center = geojsonCentroid(feature);
+  if (!center) return;
+
+  clearHoverFireImpact();
+  const token = Symbol("fire-impact-hover");
+  const abort = new AbortController();
+  state.hoverFireImpactToken = token;
+  state.hoverFireImpactAbort = abort;
+  state.hoverFireTooltipLayer = layer;
+  state.hoverFireBaseTooltipHtml = baseTooltipHtml;
+
+  layer.setTooltipContent(fireImpactTooltipHtml(baseTooltipHtml, "loading"));
+  renderHoverFireImpact(feature, center, null, null, 0, 0);
+
+  try {
+    const weather = await fetchLiveFireWind(center, abort.signal);
+    if (state.hoverFireImpactToken !== token) return;
+    if (!weather) {
+      layer.setTooltipContent(fireImpactTooltipHtml(
+        baseTooltipHtml,
+        "unavailable",
+        null,
+        null,
+        "No current ECCC RDPS wind was found near this fire."
+      ));
+      renderHoverFireImpact(feature, center, null, null, 0, 0);
+      return;
+    }
+    const downwind = normalizeBearing(weather.directionDeg + 180);
+    const lengthKm = corridorLengthKm(feature, weather);
+    const halfAngleDeg = corridorHalfAngle(weather);
+    const exposure = exposedProductionForFire(feature, center, downwind, lengthKm, halfAngleDeg);
+    renderHoverFireImpact(feature, center, weather, exposure, lengthKm, halfAngleDeg);
+    layer.setTooltipContent(fireImpactTooltipHtml(baseTooltipHtml, "ready", weather, exposure));
+  } catch (err) {
+    if (err?.name === "AbortError") return;
+    if (state.hoverFireImpactToken !== token) return;
+    layer.setTooltipContent(fireImpactTooltipHtml(
+      baseTooltipHtml,
+      "unavailable",
+      null,
+      null,
+      `Live wind unavailable (${err.message || err}).`
+    ));
+    renderHoverFireImpact(feature, center, null, null, 0, 0);
+  }
+}
+
+function bindFireImpactHover(feature, layer, baseTooltipHtml) {
+  layer.on("mouseover", () => handleFireImpactHover(feature, layer, baseTooltipHtml));
+  layer.on("mouseout", () => clearHoverFireImpact());
+}
+
 async function fetchAlbertaFires() {
   if (state.albertaFireLoading) return;
   state.albertaFireLoading = true;
@@ -2626,9 +3183,9 @@ async function fetchAlbertaFires() {
   try {
     // Fetch provincial, mutual aid, and municipal fires in parallel
     const [provResp, maResp, munResp] = await Promise.all([
-      fetch(ALBERTA_FIRES_URL,       { mode: "cors" }),
-      fetch(ALBERTA_MUTUAL_AID_URL,  { mode: "cors" }),
-      fetch(ALBERTA_MUNICIPAL_URL,   { mode: "cors" }),
+      fetch(liveUrl(ALBERTA_FIRES_URL),       { mode: "cors", cache: "no-store" }),
+      fetch(liveUrl(ALBERTA_MUTUAL_AID_URL),  { mode: "cors", cache: "no-store" }),
+      fetch(liveUrl(ALBERTA_MUNICIPAL_URL),   { mode: "cors", cache: "no-store" }),
     ]);
     if (!provResp.ok) throw new Error(`HTTP ${provResp.status} (provincial)`);
     if (!maResp.ok)   throw new Error(`HTTP ${maResp.status} (mutual aid)`);
@@ -2749,7 +3306,7 @@ function renderAlbertaFireLayer() {
       const respArea  = p.RESP_AREA      ? `📍 ${escapeHtml(p.RESP_AREA)}<br>`            : "";
       const cause     = p.GENERAL_CAUSE  ? `Cause: ${escapeHtml(p.GENERAL_CAUSE)}<br>`    : "";
       const respType  = p.RESPONSE_TYPE  ? `Response: ${escapeHtml(p.RESPONSE_TYPE)}<br>` : "";
-      layer.bindTooltip(
+      const tooltipHtml =
         `<strong>${escapeHtml(label)}</strong><br>` +
         maBadge +
         munBadge +
@@ -2760,9 +3317,12 @@ function renderAlbertaFireLayer() {
         cause +
         respType +
         `Started: ${startStr}<br>` +
-        `<em>Alberta Wildfire (official)</em>`,
+        `<em>Alberta Wildfire (official)</em>`;
+      layer.bindTooltip(
+        tooltipHtml,
         { opacity: 0.96, className: "alberta-fire-tip" }
       );
+      bindFireImpactHover(feature, layer, tooltipHtml);
     },
   }).addTo(state.map);
 
@@ -2779,9 +3339,7 @@ async function fetchBCFires() {
   state.bcFireLoading = true;
   state.bcFireError = null;
   try {
-    const response = await fetch(BC_FIRES_URL, { mode: "cors" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const raw = await response.json();
+    const raw = await fetchJsonLive(BC_FIRES_URL);
     // Geometry is already valid WGS84 — use as-is, but fall back to
     // LATITUDE/LONGITUDE props if geometry is null for any feature.
     const features = (raw.features || []).map(f => {
@@ -2860,7 +3418,7 @@ function renderBCFireLayer() {
         ? `<span style="color:#7e22ce;font-weight:700">★ Fire of Note</span><br>`
         : "";
       const desc = p.GEOGRAPHIC_DESCRIPTION ? `📍 ${escapeHtml(p.GEOGRAPHIC_DESCRIPTION)}<br>` : "";
-      layer.bindTooltip(
+      const tooltipHtml =
         `<strong>${name}</strong><br>` +
         fonBadge +
         carryoverNote +
@@ -2868,9 +3426,12 @@ function renderBCFireLayer() {
         `Size: ${haStr}<br>` +
         desc +
         `Started: ${ignStr}<br>` +
-        `<em>BC Wildfire Service (official)</em>`,
+        `<em>BC Wildfire Service (official)</em>`;
+      layer.bindTooltip(
+        tooltipHtml,
         { opacity: 0.96, className: "bc-fire-tip" }
       );
+      bindFireImpactHover(feature, layer, tooltipHtml);
     },
   }).addTo(state.map);
 
@@ -2946,6 +3507,7 @@ function toggleWildfires() {
 }
 
 function clearFireLayers() {
+  clearHoverFireImpact();
   if (state.fireLayer        && state.map) { state.map.removeLayer(state.fireLayer);        state.fireLayer        = null; }
   if (state.albertaFireLayer && state.map) { state.map.removeLayer(state.albertaFireLayer); state.albertaFireLayer = null; }
   if (state.bcFireLayer      && state.map) { state.map.removeLayer(state.bcFireLayer);      state.bcFireLayer      = null; }
@@ -3072,12 +3634,17 @@ function renderFireLayer() {
       const fwi = score != null ? `FWI ${score.toFixed(1)} – ${sev.label}` : sev.label;
       const fuel = p.fuel && p.fuel !== "-1" ? ` · ${escapeHtml(String(p.fuel))}` : "";
       const date = p.rep_date ? p.rep_date.slice(0, 10) : "";
+      const tooltipHtml =
+        `<strong>Fire hotspot</strong> (${escapeHtml(p.agency || "?")})<br>` +
+        `${escapeHtml(fwi)}${fuel}<br>` +
+        `${escapeHtml(p.sensor || "")}${date ? " - " + date : ""}`;
       layer.bindTooltip(
         `<strong>Fire hotspot</strong> (${escapeHtml(p.agency || "?")})<br>` +
         `${escapeHtml(fwi)}${fuel}<br>` +
         `${escapeHtml(p.sensor || "")}${date ? " · " + date : ""}`,
         { opacity: 0.95, className: "fire-hotspot-tip" }
       );
+      bindFireImpactHover(feature, layer, tooltipHtml);
     },
   }).addTo(state.map);
 }

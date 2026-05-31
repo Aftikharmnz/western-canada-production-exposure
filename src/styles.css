@@ -963,6 +963,67 @@ select {
   overflow-wrap: break-word;
 }
 
+.fire-impact-block {
+  display: grid;
+  gap: 3px;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(148, 163, 184, 0.45);
+  color: #334155;
+}
+
+.fire-impact-block strong {
+  margin: 0;
+  color: #111827;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fire-impact-block span,
+.fire-impact-block em {
+  display: block;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.fire-impact-block em {
+  color: #64748b;
+  font-style: normal;
+}
+
+.fire-impact-block.loading,
+.fire-impact-block.muted {
+  color: #64748b;
+}
+
+.fire-impact-corridor {
+  mix-blend-mode: multiply;
+}
+
+.fire-impact-focus,
+.fire-impact-asset-ring {
+  pointer-events: none;
+}
+
+.wind-arrow-marker {
+  pointer-events: none;
+}
+
+.wind-arrow-marker svg {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.35));
+  transform-origin: 50% 50%;
+}
+
+.wind-arrow-marker path {
+  fill: #111827;
+  stroke: #ffffff;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
 /* AER scheme footprint toggle */
 .formation-toggle-btn {
   height: 30px;
@@ -1696,6 +1757,35 @@ select {
   cursor: wait;
 }
 
+.formation-toggle-btn,
+.refinery-toggle-btn,
+.pipeline-toggle-btn,
+.market-pipeline-toggle-btn,
+.railway-toggle-btn,
+.fire-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.formation-toggle-btn::after,
+.refinery-toggle-btn::after,
+.pipeline-toggle-btn::after,
+.market-pipeline-toggle-btn::after,
+.railway-toggle-btn::after,
+.fire-toggle-btn::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-top: -3px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.72;
+  flex: 0 0 auto;
+}
+
 .pipeline-control,
 .market-pipeline-control,
 .railway-control {
@@ -2034,6 +2124,10 @@ select {
 
 .refinery-dot-swatch {
   background: #b4532a;
+}
+
+.fire-context-swatch {
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.10);
 }
 
 .formation-option-text,
