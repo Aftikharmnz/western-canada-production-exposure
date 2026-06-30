@@ -182,6 +182,8 @@ const DEFAULT_REFINERY_GROUP_KEYS = [
   "canada-eastern",
   "us-padd-ii",
   "us-padd-v",
+  "mexico",
+  "europe",
 ];
 
 const POINT_LEGEND_KEYS = new Set([
@@ -292,6 +294,8 @@ const state = {
   rubberBandActive: false,
   selectMode: false,
   setSelectMode: null,
+  selectModeKind: "assets", // "assets" | "refineries"
+  selectMenuOpen: false,
   hiddenLegendKeys: new Set(DEFAULT_HIDDEN_LEGEND_KEYS),
   distanceMode: false,
   distancePoints: [],
@@ -509,6 +513,16 @@ async function loadData() {
 
   const initialRecords = recordsForDate(state.selectedDate);
   [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
+}
+
+async function fetchOptionalJson(path) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) return null;
+    return response.json();
+  } catch (_err) {
+    return null;
+  }
 }
 
 function expandAssetRecords(raw) {
@@ -1390,6 +1404,7 @@ function renderMetrics(aggregated) {
       els.fireExposureRow.hidden = true;
     }
   }
+
 }
 
 // ============================================================
@@ -1465,14 +1480,11 @@ function renderTopAssets(aggregated) {
     const isSelected = asset.asset_id === state.selectedAssetId;
     const quality = locationConfidenceMeta(asset);
 
-    const riskBadge = "";
-
     return `<div class="top-asset-row${isSelected ? " selected" : ""}" data-id="${escapeHtml(String(asset.asset_id))}">
       <span class="top-rank">${i + 1}</span>
       <i class="top-swatch" style="background:${color}"></i>
       <span class="top-name">${escapeHtml(asset.display_name)}</span>
       <span class="quality-pill ${quality.className}">${escapeHtml(quality.short)}</span>
-      ${riskBadge}
       <strong class="top-vol">${kbbl(vol)}</strong>
     </div>`;
   }).join("");
@@ -1962,13 +1974,21 @@ function refineryUnitRowsHtml(units, limit = 10) {
   return shown + extra;
 }
 
-function refineryUnitSummaryHtml(summary) {
-  const rows = Array.isArray(summary) ? summary : [];
+function refineryUnitSummaryHtml(summary, limit = 99) {
+  const rows = Array.isArray(summary) ? [...summary] : [];
   if (!rows.length) return "";
+  // Sort by count desc (then name) so the most significant unit types lead; show
+  // up to `limit` and indicate any remainder. (Previously sliced to 8 with the raw
+  // alphabetical order, which hid late-alphabet units like Vacuum Distillation.)
+  rows.sort((a, b) => (b.count || 0) - (a.count || 0) ||
+    String(a.group || "").localeCompare(String(b.group || "")));
+  const shown = rows.slice(0, limit);
+  const extra = rows.length - shown.length;
   return `<div class="refinery-unit-summary">` +
-    rows.slice(0, 8).map((item) =>
+    shown.map((item) =>
       `<span>${escapeHtml(item.group || "Unit")} <strong>${formatNumber(item.count || 0)}</strong></span>`
     ).join("") +
+    (extra > 0 ? `<span class="rus-more">+${extra} more</span>` : "") +
   `</div>`;
 }
 
@@ -1990,7 +2010,7 @@ function refineryTooltipDetailedHtml(properties) {
       `${units.length ? `<span>${formatNumber(units.length)} units</span>` : ""}` +
     `</div>` +
     `${sector ? `<div class="rt-sub">${escapeHtml(sector)}</div>` : ""}` +
-    `${units.length ? refineryUnitSummaryHtml(p.refinery_unit_summary) : ""}` +
+    `${units.length ? refineryUnitSummaryHtml(p.refinery_unit_summary, 12) : ""}` +
     `<div class="refinery-units">${refineryCapacityRowsHtml(plantCapacities, 5)}</div>` +
     `${units.length ? `<div class="refinery-units detailed">${refineryUnitRowsHtml(units, 5)}</div>` : ""}` +
   `</div>`;
@@ -5000,21 +5020,58 @@ function initRubberBand() {
   let selectMode = false;
   let startX, startY, box, active = false;
 
+  const SELECT_MODE_LABELS = { assets: "Assets", refineries: "Refineries" };
+  function selectBtnLabel(on) {
+    const kind = SELECT_MODE_LABELS[state.selectModeKind] || "Assets";
+    return on ? `\u25A3 Select: ${kind}` : '\u25A3 Select <span class="select-caret">\u25BE</span>';
+  }
   function setSelectMode(on) {
     selectMode = on;
     if (btn) {
       btn.classList.toggle("active", on);
-      btn.title = on ? "Click to exit select mode (or press Esc)" : "Click to select multiple assets";
+      btn.innerHTML = selectBtnLabel(on);
+      btn.title = on
+        ? `Drag a box on the map to select ${SELECT_MODE_LABELS[state.selectModeKind] || "assets"} (Esc to exit)`
+        : "Pick what to select by dragging a box on the map";
     }
     mapEl.style.cursor = on ? "crosshair" : "";
+  }
+  function setSelectMenuOpen(open) {
+    state.selectMenuOpen = open;
+    const menu = document.getElementById("selectMenu");
+    if (menu) menu.hidden = !open;
+    if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  function activateSelectKind(kind) {
+    state.selectModeKind = kind === "refineries" ? "refineries" : "assets";
+    setSelectMenuOpen(false);
+    setSelectMode(true);
   }
 
   // Expose so distance tool can deactivate select mode
   state.setSelectMode = setSelectMode;
 
   if (btn) {
-    btn.addEventListener("click", () => setSelectMode(!selectMode));
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (selectMode) { setSelectMode(false); return; }
+      setSelectMenuOpen(!state.selectMenuOpen);
+    });
   }
+  const selectMenuEl = document.getElementById("selectMenu");
+  if (selectMenuEl) {
+    selectMenuEl.addEventListener("click", (e) => {
+      const opt = e.target.closest("[data-select-mode]");
+      if (!opt) return;
+      e.stopPropagation();
+      activateSelectKind(opt.dataset.selectMode);
+    });
+  }
+  document.addEventListener("click", (e) => {
+    if (!state.selectMenuOpen) return;
+    if (e.target.closest("#selectControl")) return;
+    setSelectMenuOpen(false);
+  });
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && selectMode) setSelectMode(false);
@@ -5077,16 +5134,30 @@ function initRubberBand() {
     // Ignore tiny drags (accidental clicks)
     if (bRight - bLeft < 6 || bBottom - bTop < 6) return;
 
+    const inBox = (lat, lng) => {
+      if (lat == null || lng == null) return false;
+      const pt = state.map.latLngToContainerPoint([lat, lng]);
+      return pt.x >= bLeft && pt.x <= bRight && pt.y >= bTop && pt.y <= bBottom;
+    };
+
+    if (state.selectModeKind === "refineries") {
+      // Only currently-visible (filtered) refineries inside the box.
+      const refFeatures = refineryVisibleFeatures().filter((ft) => {
+        const c = ft.geometry && ft.geometry.coordinates;
+        return c && inBox(c[1], c[0]);
+      });
+      showRefineryPanel(refFeatures);
+      setSelectMode(false);
+      return;
+    }
+
     const { byAsset } = aggregateForDate();
     const hits = [];
     for (const point of byAsset.values()) {
       const { asset } = point;
       if (asset.latitude == null) continue;
       if (!legendVisible(pointLegendKey(point))) continue;
-      const pt = state.map.latLngToContainerPoint([asset.latitude, asset.longitude]);
-      if (pt.x >= bLeft && pt.x <= bRight && pt.y >= bTop && pt.y <= bBottom) {
-        hits.push(asset.asset_id);
-      }
+      if (inBox(asset.latitude, asset.longitude)) hits.push(asset.asset_id);
     }
 
     if (hits.length > 0) {
@@ -5358,4 +5429,532 @@ function drawSeasonalityChart(data, assetCount) {
       curMonths.length ? `<span><i style="background:${SEA_COLORS.yCur};border-radius:50%"></i>${currentYear} (known months)</span>` : "",
     ].filter(Boolean).join("");
   }
+}
+
+// ============================================================
+// REFINERY CAPACITY & REFINED-PRODUCTS MODEL
+// ------------------------------------------------------------
+// Estimates refined-product output for a box-selected region from each
+// plant's crude (CDU) capacity and process-unit configuration.
+// Yield slates are grounded in published refining references:
+//  - W.L. Leffler, "Petroleum Refining in Nontechnical Language" (4th/2020),
+//    Table 20-1 "Refinery Yields" (medium sour crude) -> the configuration
+//    slates used below (Simple/Complex/Very-Complex).
+//  - R.E. Maples, "Petroleum Refinery Process Economics" (2000), Table 4-2,
+//    U.S. product slate as % of crude charge (sanity benchmark).
+//  - M.A. Fahim et al., "Fundamentals of Petroleum Refining" -- per-unit
+//    yields used to classify configuration (FCC ~55 vol% gasoline from gas
+//    oil; delayed coker ~30 wt% coke; visbreaking; catalytic reforming).
+// Products are expressed as % of crude charge; the "gain" line is volumetric
+// expansion from cracking/H2 addition, "fuel & loss" is internal consumption.
+// ============================================================
+
+const BBL_TO_GAL = 42;             // US gallons per barrel
+const BBL_TO_L   = 158.987294928;  // litres per barrel
+
+// Leffler Table 20-1 -- % of crude charge, medium sour crude (WTS / Arab Light)
+const REFINERY_YIELD_SLATES = {
+  topping:  { label: "Topping / Hydroskimming", gasoline: 30, jet: 10, distillate: 20, resid: 35, lpg: 0, coke: 0,  sco: 0,  fuelLoss: 8,  gain: 3  },
+  cracking: { label: "Cracking (FCC / hydrocracker)", gasoline: 50, jet: 10, distillate: 25, resid: 10, lpg: 3, coke: 0,  sco: 0,  fuelLoss: 12, gain: 10 },
+  coking:   { label: "Coking / Deep conversion", gasoline: 60, jet: 10, distillate: 25, resid: 0,  lpg: 4, coke: 3,  sco: 0,  fuelLoss: 13, gain: 15 },
+  splitter: { label: "Condensate splitter", gasoline: 58, jet: 14, distillate: 22, resid: 2,  lpg: 6, coke: 0,  sco: 0,  fuelLoss: 2,  gain: 4  },
+  upgrader: { label: "Bitumen upgrader (SCO)", gasoline: 0, jet: 0, distillate: 6, resid: 0,  lpg: 2, coke: 12, sco: 80, fuelLoss: 0,  gain: 0  },
+};
+const CONFIG_LABEL = { topping: "Hydroskimming", cracking: "Cracking", coking: "Deep conversion", splitter: "Cond. splitter", upgrader: "Upgrader" };
+
+const REFINED_PRODUCTS = [
+  { key: "gasoline",   label: "Motor gasoline",      short: "Gasoline", color: "#16a34a" },
+  { key: "distillate", label: "Diesel / distillate", short: "Diesel",   color: "#2563eb" },
+  { key: "jet",        label: "Jet / kerosene",      short: "Jet",      color: "#0891b2" },
+  { key: "resid",      label: "Residual fuel oil",   short: "Resid",    color: "#92400e" },
+  { key: "lpg",        label: "LPG",                 short: "LPG",      color: "#d97706" },
+  { key: "coke",       label: "Petroleum coke",      short: "Coke",     color: "#475569" },
+  { key: "sco",        label: "Synthetic crude (SCO)", short: "SCO",     color: "#7c3aed" },
+];
+
+const PROCESS_UNITS = [
+  { key: "crude",        label: "Crude distillation (CDU)" },
+  { key: "fcc",          label: "Cat cracking (FCC)" },
+  { key: "hcu",          label: "Hydrocracking" },
+  { key: "coker",        label: "Coking" },
+  { key: "reformer",     label: "Catalytic reforming" },
+  { key: "hydrotreater", label: "Hydrotreating" },
+  { key: "alky",         label: "Alkylation" },
+];
+
+function refineryUnitCapacities(props) {
+  const cap = { crude: Number(props.crud_capacity_kbbl_d) || 0, fcc: 0, hcu: 0, coker: 0, reformer: 0, hydrotreater: 0, alky: 0, visbreaker: 0 };
+  for (const u of props.refinery_units || []) {
+    if (u.capacity_uom !== "BBL/d") continue;
+    const c = Number(u.capacity_kbbl_d) || 0;
+    if (!c) continue;
+    const g = (u.unit_type_group || "").toLowerCase();
+    const sh = (u.unit_type_short || "").toLowerCase();
+    if (g.includes("cat cracker") || g.includes("fccu") || sh === "fcc") cap.fcc += c;
+    else if (g.includes("hydrocrack") || sh === "hck") cap.hcu += c;
+    else if (g.includes("visbreak")) cap.visbreaker += c;
+    else if (g.includes("coking") || sh.includes("cok")) cap.coker += c;
+    else if (g.includes("reform")) cap.reformer += c;
+    else if (g.includes("hydrotreat")) cap.hydrotreater += c;
+    else if (g.includes("alky")) cap.alky += c;
+  }
+  return cap;
+}
+
+function refineryThroughputUnits(props) {
+  let cdu = 0, vac = 0, dru = 0, coker = 0;
+  for (const u of props.refinery_units || []) {
+    if (u.capacity_uom !== "BBL/d") continue;
+    const c = Number(u.capacity_kbbl_d) || 0;
+    if (!c) continue;
+    const sh = (u.unit_type_short || "").toLowerCase();
+    const t = `${sh} ${(u.unit_type_desc || "").toLowerCase()}`;
+    if (sh === "cdu" || t.includes("atmospheric distill") || (t.includes("crude") && t.includes("distill"))) cdu += c;
+    else if (t.includes("vacuum")) vac += c;
+    else if (t.includes("diluent recovery") || /\bdru\b/.test(t)) dru += c;
+    else if (t.includes("cok") && !t.includes("calciner")) coker += c;
+  }
+  return { cdu, vac, dru, coker };
+}
+
+// Effective crude/feed charge: reported crude capacity, else CDU units (recovers an
+// IIR rollup gap), else a bitumen-throughput proxy for upgraders (no CDU).
+function effectiveCrudeCharge(props) {
+  const plant = Number(props.crud_capacity_kbbl_d) || 0;
+  if (plant > 0) return { charge: plant, basis: "crude" };
+  const u = refineryThroughputUnits(props);
+  if (u.cdu > 0) return { charge: u.cdu, basis: "cdu" };
+  const proxy = Math.max(u.vac, u.coker, u.dru * 0.7); // DRU stream is ~30% diluent
+  if (proxy > 0) return { charge: proxy, basis: "upgrader" };
+  return { charge: 0, basis: "none" };
+}
+
+function refineryConfig(props, cap, charge, basis) {
+  const name = `${props.plant_name || ""} ${props.plant_sectors || ""}`.toLowerCase();
+  if (basis === "upgrader" || name.includes("upgrader") || name.includes("oil sands")) return "upgrader";
+  if (name.includes("condensate") || name.includes("splitter") || name.includes("fractionat")) return "splitter";
+  if (charge <= 0) return "topping";
+  const coking = cap.coker + cap.visbreaker;
+  const cracking = cap.fcc + cap.hcu;
+  if (coking / charge >= 0.05) return "coking";
+  if (cracking / charge >= 0.05) return "cracking";
+  return "topping";
+}
+
+// Nelson Complexity Index (Kaiser/Gary/Handwerk, "Petroleum Refining: Technology,
+// Economics, and Markets" 2019, Table 7.1 -- OGJ 1998-2019 complexity factors).
+// CI = 1 (atmospheric distillation, the normalizer) + Sum( CF_unit x cap_unit / crude ).
+// Keyed on unit_type_short because IIR populates unit_type_group only for the major
+// conversion units, leaving vacuum distillation, isomerization, several hydrotreaters,
+// asphalt and lubes with a null group (their short code / capacity are still present).
+function nelsonCF(u) {
+  const t = `${u.unit_type_short || ""} ${u.unit_type_group || ""} ${u.unit_type_desc || ""}`.toLowerCase();
+  // utilities / fractionation / non-refining -> no standard complexity factor
+  if (t.includes("calciner") || t.includes("splitter") || t.includes("sulfur") ||
+      t.includes("amine") || t.includes("lights ends") || t.includes("diluent recovery")) return 0;
+  if (t.includes("vacuum")) return 2;                                   // vacuum distillation
+  if (t.includes("cat crack") || /\bfcc\b/.test(t)) return 6;          // catalytic cracking
+  if (t.includes("cok")) return 6;                                      // delayed / fluid coking
+  if (t.includes("hydrocrack") || /\bhck\b/.test(t)) return 6;         // hydrocracking
+  if (t.includes("isomeriz")) return 15;                               // isomerization
+  if (t.includes("alky")) return 10;                                   // alkylation
+  if (t.includes("polymeriz") || t.includes("dimeriz")) return 10;     // poly/dimerization
+  if (t.includes("aromatic") || t.includes("benzene") || t.includes("hydrodealkyl")) return 15;
+  if (t.includes("asphalt")) return 1.5;                              // asphalt
+  if (t.includes("lube")) return 10;                                  // lubes
+  if (t.includes("residual hydrotreat")) return 3;                    // resid hydrorefining
+  if (t.includes("hydrotreat") || t.includes("hydrorefin")) return 2; // hydrotreating
+  if (/\breform/.test(t)) return 5;                                   // catalytic reforming
+  return 0;
+}
+
+// Hydrogen plant capacity in MMcfd (from plant_capacities). The OGJ/Nelson convention
+// (Kaiser/Gary/Handwerk Table 7.6 worked example) treats the MMcfd figure numerically
+// as Mbpd-equivalent in the ratio, with complexity factor 1.
+function refineryHydrogenMMcfd(props) {
+  let h = 0;
+  for (const c of props.plant_capacities || []) {
+    const pd = (c.product_desc || "").toLowerCase();
+    if (!pd.includes("hydrogen") || pd.includes("green")) continue;
+    const cap = c.design_capacity || c.actual_capacity || 0;
+    const u = (c.uom || "").toLowerCase();
+    if (u.includes("k cubic")) h += cap / 1000;          // k cubic ft/day -> MMcfd
+    else if (u.includes("mmscfd") || u.includes("mmcfd")) h += cap;
+  }
+  return h;
+}
+
+
+function refineryComplexity(props) {
+  const crude = effectiveCrudeCharge(props).charge;
+  if (crude <= 0) return 0;
+  let weighted = 0;
+  for (const u of props.refinery_units || []) {
+    if (u.capacity_uom !== "BBL/d") continue;
+    const c = Number(u.capacity_kbbl_d) || 0;
+    if (!c) continue;
+    const sh = (u.unit_type_short || "").toLowerCase();
+    if (sh === "cdu" || sh.includes("crude")) continue; // ADU is the normalizer (counted as 1)
+    weighted += nelsonCF(u) * c;
+  }
+  weighted += 1 * refineryHydrogenMMcfd(props); // hydrogen plant, CF 1, MMcfd ~ Mbpd
+  return 1 + weighted / crude;
+}
+
+function estimateRefineryProducts(props) {
+  const cap = refineryUnitCapacities(props);
+  const { charge, basis } = effectiveCrudeCharge(props);
+  const cls = refineryConfig(props, cap, charge, basis);
+  const slate = REFINERY_YIELD_SLATES[cls];
+  const products = {};
+  for (const p of REFINED_PRODUCTS) products[p.key] = charge * (slate[p.key] || 0) / 100;
+  return { cap, cls, basis, slate, crude: charge, products,
+    fuelLoss: charge * (slate.fuelLoss || 0) / 100, gain: charge * (slate.gain || 0) / 100 };
+}
+
+// Volume formatting in the user-selected unit (bbl/d default).
+function refVolFmt(kbbl_d, unit) {
+  const bbl = (kbbl_d || 0) * 1000;
+  let v = bbl, suffix = "bbl/d";
+  if (unit === "gal") { v = bbl * BBL_TO_GAL; suffix = "gal/d"; }
+  else if (unit === "l") { v = bbl * BBL_TO_L; suffix = "L/d"; }
+  let str;
+  if (v >= 1e9) str = (v / 1e9).toFixed(2) + "B";
+  else if (v >= 1e6) str = (v / 1e6).toFixed(2) + "M";
+  else if (v >= 1e3) str = (v / 1e3).toFixed(1) + "k";
+  else str = Math.round(v).toLocaleString("en-CA");
+  return { str, suffix, raw: v };
+}
+
+function showRefineryPanel(features) {
+  const existing = document.getElementById("refineryPanel");
+  if (existing) existing.remove();
+
+  const panel = document.createElement("div");
+  panel.id = "refineryPanel";
+
+  if (!features || !features.length) {
+    panel.innerHTML = `
+      <div class="ref-header">
+        <div><strong class="ref-title">No refineries in selection</strong>
+        <span class="ref-sub">Turn on the Refineries layer and drag the box over visible plants.</span></div>
+        <button id="closeRefinery" class="ref-close" title="Close">&#x2715;</button>
+      </div>`;
+    document.getElementById("map").appendChild(panel);
+    document.getElementById("closeRefinery").addEventListener("click", () => panel.remove());
+    return;
+  }
+
+  // ---- Aggregate ----
+  const rows = features.map((ft) => {
+    const p = ft.properties;
+    const est = estimateRefineryProducts(p);
+    return {
+      name: p.plant_name || "Unknown",
+      owner: p.parent_company || p.owner_name || p.operator_name || "Unknown",
+      padd: p.country_padd || p.trading_region_name || "",
+      country: p.country_name || "",
+      state: p.state_name || "",
+      status: p.plant_status_desc || "",
+      ci: refineryComplexity(p),
+      ...est,
+    };
+  });
+
+  const totalCrude = rows.reduce((a, r) => a + r.crude, 0) || 0;
+  const unitTotals = {};
+  for (const u of PROCESS_UNITS) unitTotals[u.key] = rows.reduce((a, r) => a + (r.cap[u.key] || 0), 0);
+  const productTotals = {};
+  for (const pr of REFINED_PRODUCTS) productTotals[pr.key] = rows.reduce((a, r) => a + r.products[pr.key], 0);
+  const totalFuelLoss = rows.reduce((a, r) => a + r.fuelLoss, 0);
+  const totalGain = rows.reduce((a, r) => a + r.gain, 0);
+  const totalLiquidProducts = REFINED_PRODUCTS.filter(p => p.key !== "coke" && p.key !== "sco").reduce((a, p) => a + productTotals[p.key], 0);
+  // Only show product rows/columns that are non-zero across the selection (e.g. SCO
+  // appears only when upgraders are included).
+  const activeProducts = REFINED_PRODUCTS.filter(p => productTotals[p.key] > 0.05);
+  const shownProducts = activeProducts.length ? activeProducts : REFINED_PRODUCTS;
+  const regionCI = totalCrude ? rows.reduce((a, r) => a + r.ci * r.crude, 0) / totalCrude : 0;
+
+  // Owner aggregation
+  const ownerMap = new Map();
+  for (const r of rows) {
+    const o = ownerMap.get(r.owner) || { owner: r.owner, crude: 0, count: 0, ciw: 0, products: {} };
+    o.crude += r.crude; o.count += 1; o.ciw += r.ci * r.crude;
+    for (const pr of REFINED_PRODUCTS) o.products[pr.key] = (o.products[pr.key] || 0) + r.products[pr.key];
+    ownerMap.set(r.owner, o);
+  }
+  const owners = [...ownerMap.values()].sort((a, b) => b.crude - a.crude);
+
+  // Region descriptor + trader metrics
+  const paddSet = [...new Set(rows.map(r => r.padd).filter(Boolean))];
+  const countrySet = [...new Set(rows.map(r => r.country).filter(Boolean))];
+  const conversionCap = unitTotals.fcc + unitTotals.hcu + unitTotals.coker;
+  const conversionRatio = totalCrude ? conversionCap / totalCrude : 0;       // Nelson-style conversion proxy
+  const cokingRatio = totalCrude ? unitTotals.coker / totalCrude : 0;
+  const hhi = owners.reduce((a, o) => { const sh = totalCrude ? o.crude / totalCrude : 0; return a + sh * sh; }, 0);
+  const top3Share = totalCrude ? owners.slice(0, 3).reduce((a, o) => a + o.crude, 0) / totalCrude : 0;
+  const configCounts = rows.reduce((a, r) => { a[r.cls] = (a[r.cls] || 0) + 1; return a; }, {});
+
+  const regionStr = (countrySet.length ? countrySet.join(", ") : "Selection")
+    + (paddSet.length ? ` · ${paddSet.join(", ")}` : "");
+
+  panel.innerHTML = `
+    <div class="ref-header">
+      <div>
+        <strong class="ref-title">Refining capacity &mdash; ${rows.length} plant${rows.length > 1 ? "s" : ""}</strong>
+        <span class="ref-sub">${escapeHtml(regionStr)} · ${Math.round(totalCrude).toLocaleString("en-CA")} kbbl/d crude · ${owners.length} owner${owners.length > 1 ? "s" : ""} · avg Nelson CI ${regionCI.toFixed(1)}</span>
+      </div>
+      <button id="closeRefinery" class="ref-close" title="Close">&#x2715;</button>
+    </div>
+    <div class="ref-controls">
+      <div class="ref-tabs" id="refTabs">
+        <button class="ref-tab active" data-ref-tab="products">Finished products</button>
+        <button class="ref-tab" data-ref-tab="units">Process units</button>
+        <button class="ref-tab" data-ref-tab="owners">Owners</button>
+        <button class="ref-tab" data-ref-tab="plants">Refineries</button>
+        <button class="ref-tab" data-ref-tab="method">Method</button>
+      </div>
+      <div class="ref-units" id="refUnits" title="Display volume unit">
+        <button class="ref-unit active" data-ref-unit="bbl">bbl/d</button>
+        <button class="ref-unit" data-ref-unit="gal">gal/d</button>
+        <button class="ref-unit" data-ref-unit="l">L/d</button>
+      </div>
+    </div>
+    <div class="ref-body" id="refBody"></div>
+    <div class="ref-footer">
+      <span class="ref-note">Modeled output (nameplate, medium-crude slates). Method: Leffler Table&nbsp;20-1; benchmarked to Maples & Fahim.</span>
+      <button class="ref-csv" id="refCsv">Export CSV</button>
+    </div>
+  `;
+  document.getElementById("map").appendChild(panel);
+  document.getElementById("closeRefinery").addEventListener("click", () => panel.remove());
+
+  const view = { tab: "products", unit: "bbl" };
+
+  function bar(pct, color) {
+    const w = Math.max(0, Math.min(100, pct));
+    return `<span class="ref-bar"><span class="ref-bar-fill" style="width:${w}%;background:${color}"></span></span>`;
+  }
+
+  function renderProducts() {
+    const u = view.unit;
+    const maxV = Math.max(...shownProducts.map(p => productTotals[p.key]), 1);
+    let rowsHtml = shownProducts.map(p => {
+      const f = refVolFmt(productTotals[p.key], u);
+      const pctCrude = totalCrude ? (productTotals[p.key] / totalCrude * 100) : 0;
+      return `<tr>
+        <td><i class="ref-swatch" style="background:${p.color}"></i>${escapeHtml(p.label)}</td>
+        <td class="num"><strong>${f.str}</strong> <span class="ref-u">${f.suffix}</span></td>
+        <td class="num">${pctCrude.toFixed(1)}%</td>
+        <td class="barcell">${bar(productTotals[p.key] / maxV * 100, p.color)}</td>
+      </tr>`;
+    }).join("");
+    const liq = refVolFmt(totalLiquidProducts, u);
+    const fl = refVolFmt(totalFuelLoss, u);
+    const gn = refVolFmt(totalGain, u);
+    return `
+      <p class="ref-section-note">Estimated salable output if the selected region runs at nameplate crude capacity (${Math.round(totalCrude).toLocaleString("en-CA")} kbbl/d charge).</p>
+      <table class="ref-table">
+        <thead><tr><th>Refined product</th><th class="num">Output</th><th class="num">% of crude</th><th></th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot>
+          <tr><td>Total liquid products</td><td class="num"><strong>${liq.str}</strong> <span class="ref-u">${liq.suffix}</span></td><td class="num"></td><td></td></tr>
+          <tr class="memo"><td>Refinery fuel &amp; loss</td><td class="num">${fl.str} <span class="ref-u">${fl.suffix}</span></td><td class="num">${totalCrude ? (totalFuelLoss/totalCrude*100).toFixed(1) : 0}%</td><td></td></tr>
+          <tr class="memo"><td>Processing gain</td><td class="num">+${gn.str} <span class="ref-u">${gn.suffix}</span></td><td class="num">+${totalCrude ? (totalGain/totalCrude*100).toFixed(1) : 0}%</td><td></td></tr>
+        </tbody>
+      </table>`;
+  }
+
+  function renderUnits() {
+    const u = view.unit;
+    const maxV = Math.max(...PROCESS_UNITS.map(x => unitTotals[x.key]), 1);
+    let rowsHtml = PROCESS_UNITS.map(x => {
+      const f = refVolFmt(unitTotals[x.key], u);
+      const pctCrude = totalCrude && x.key !== "crude" ? (unitTotals[x.key] / totalCrude * 100) : (x.key === "crude" ? 100 : 0);
+      return `<tr>
+        <td>${escapeHtml(x.label)}</td>
+        <td class="num"><strong>${f.str}</strong> <span class="ref-u">${f.suffix}</span></td>
+        <td class="num">${unitTotals[x.key] ? pctCrude.toFixed(0) + "%" : "&mdash;"}</td>
+        <td class="barcell">${bar(unitTotals[x.key] / maxV * 100, "#b4532a")}</td>
+      </tr>`;
+    }).join("");
+    return `
+      <p class="ref-section-note">Installed process-unit capacity across the selection. Downstream % is relative to crude charge (a conversion-depth proxy).</p>
+      <table class="ref-table">
+        <thead><tr><th>Process unit</th><th class="num">Capacity</th><th class="num">vs crude</th><th></th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>`;
+  }
+
+  function renderOwners() {
+    const u = view.unit;
+    const prodHead = shownProducts.map(p => `<th class="num" title="${escapeHtml(p.label)}">${p.short}</th>`).join("");
+    let rowsHtml = owners.map(o => {
+      const f = refVolFmt(o.crude, u);
+      const share = totalCrude ? (o.crude / totalCrude * 100) : 0;
+      const prodCells = shownProducts.map(p => `<td class="num">${refVolFmt(o.products[p.key], u).str}</td>`).join("");
+      const avgCI = o.crude ? (o.ciw / o.crude) : 0;
+      return `<tr>
+        <td>${escapeHtml(o.owner)}</td>
+        <td class="num">${o.count}</td>
+        <td class="num"><strong>${f.str}</strong> <span class="ref-u">${f.suffix}</span></td>
+        <td class="num">${avgCI.toFixed(1)}</td>
+        <td class="num">${share.toFixed(1)}%</td>
+        ${prodCells}
+      </tr>`;
+    }).join("");
+    return `
+      <p class="ref-section-note">Modeled output by parent company (owner basis), volumes in ${refVolFmt(0,u).suffix}. Concentration: top-3 owners ${(top3Share*100).toFixed(0)}%, HHI ${Math.round(hhi*10000)}.</p>
+      <table class="ref-table">
+        <thead><tr><th>Owner (parent)</th><th class="num">Plants</th><th class="num">Crude cap</th><th class="num" title="Nelson Complexity Index (capacity-weighted)">CI</th><th class="num">Share</th>${prodHead}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>`;
+  }
+
+  function renderPlants() {
+    const u = view.unit;
+    const sorted = [...rows].sort((a, b) => b.crude - a.crude);
+    const prodHead = shownProducts.map(p => `<th class="num" title="${escapeHtml(p.label)}">${p.short}</th>`).join("");
+    let rowsHtml = sorted.map(r => {
+      const f = refVolFmt(r.crude, u);
+      const prodCells = shownProducts.map(p => `<td class="num">${refVolFmt(r.products[p.key], u).str}</td>`).join("");
+      return `<tr>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.owner)}</td>
+        <td class="num"><strong>${f.str}</strong></td>
+        <td class="num">${r.ci.toFixed(1)}</td>
+        <td><span class="ref-cfg ${r.cls}">${CONFIG_LABEL[r.cls]}</span></td>
+        ${prodCells}
+      </tr>`;
+    }).join("");
+    return `
+      <p class="ref-section-note">Contributing refineries (refinery basis), largest crude capacity first. Volumes in ${refVolFmt(0,u).suffix}.</p>
+      <table class="ref-table">
+        <thead><tr><th>Refinery</th><th>Owner</th><th class="num">Crude</th><th class="num" title="Nelson Complexity Index">CI</th><th>Config</th>${prodHead}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>`;
+  }
+
+  function renderMethod() {
+    const order = ["topping", "cracking", "coking"];
+    const slateRows = [...REFINED_PRODUCTS.map(p => ({ k: p.key, label: p.label })),
+      { k: "fuelLoss", label: "Refinery fuel & loss", memo: true },
+      { k: "gain", label: "Processing gain", memo: true }];
+    const headCells = order.map(k => `<th class="num">${CONFIG_LABEL[k]}</th>`).join("");
+    const slateBody = slateRows.map(r => {
+      const cells = order.map(k => {
+        const v = REFINERY_YIELD_SLATES[k][r.k];
+        return `<td class="num">${r.k === "gain" ? "(" + v + ")" : v}</td>`;
+      }).join("");
+      return `<tr${r.memo ? ' class="memo-row"' : ""}><td>${escapeHtml(r.label)}</td>${cells}</tr>`;
+    }).join("");
+
+    const split = order.filter(k => (configCounts[k] || 0) > 0)
+      .map(k => `${configCounts[k]} ${CONFIG_LABEL[k].toLowerCase()}`).join(" · ");
+
+    return `
+      <p class="ref-section-note"><strong>How the numbers are built.</strong> For each selected plant: (1) read its crude (CDU) capacity and process units; (2) classify its configuration; (3) apply the matching yield slate to its crude charge; (4) sum across the selection. Output<sub>product</sub> = crude charge × yield% ÷ 100.</p>
+
+      <p class="ref-method-h">1 · Configuration classifier (capacity vs crude charge)</p>
+      <table class="ref-table ref-method-table">
+        <thead><tr><th>Configuration</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td><span class="ref-cfg coking">Deep conversion</span></td><td>Coking (or visbreaking) capacity ≥ 5% of crude</td></tr>
+          <tr><td><span class="ref-cfg cracking">Cracking</span></td><td>FCC or hydrocracker capacity ≥ 5% of crude (and not deep-conversion)</td></tr>
+          <tr><td><span class="ref-cfg topping">Hydroskimming</span></td><td>Neither — crude distillation, reforming, hydrotreating only</td></tr>
+        </tbody>
+      </table>
+      <p class="ref-method-mini">This selection: ${split || "—"}.</p>
+
+      <p class="ref-method-h">2 · Yield slates — % of crude charge (medium sour crude)</p>
+      <table class="ref-table ref-method-table">
+        <thead><tr><th>Product</th>${headCells}</tr></thead>
+        <tbody>${slateBody}</tbody>
+      </table>
+      <p class="ref-method-mini">Gasoline/jet/diesel/resid/LPG/coke are salable output. "Processing gain" is volumetric expansion from cracking & H₂ addition; "refinery fuel & loss" is internal consumption — both memo items, not products.</p>
+
+      <p class="ref-method-h">3 · Unit conversions</p>
+      <table class="ref-table ref-method-table">
+        <thead><tr><th>From</th><th class="num">Factor</th></tr></thead>
+        <tbody>
+          <tr><td>1 barrel → US gallons</td><td class="num">× ${BBL_TO_GAL}</td></tr>
+          <tr><td>1 barrel → litres</td><td class="num">× ${BBL_TO_L}</td></tr>
+          <tr><td>kbbl/d → bbl/d</td><td class="num">× 1,000</td></tr>
+        </tbody>
+      </table>
+
+      <p class="ref-method-h">4 · Nelson Complexity Index (this selection: ${regionCI.toFixed(1)})</p>
+      <p class="ref-method-mini">Capital-intensity / sophistication measure. Each unit's capacity is weighted by its cost factor (relative to crude distillation) and divided by crude charge: <strong>CI = 1 + &Sigma;(CF<sub>unit</sub> &times; capacity<sub>unit</sub> &divide; crude)</strong>. Crude-only ≈ 1; complex coking refineries ≈ 9&ndash;14. Owner/region values are capacity-weighted.</p>
+      <table class="ref-table ref-method-table">
+        <thead><tr><th>Process unit</th><th class="num">Complexity factor</th></tr></thead>
+        <tbody>
+          <tr><td>Atmospheric distillation (base)</td><td class="num">1</td></tr>
+          <tr><td>Catalytic cracking (FCC)</td><td class="num">6</td></tr>
+          <tr><td>Hydrocracking</td><td class="num">6</td></tr>
+          <tr><td>Delayed / fluid coking</td><td class="num">6</td></tr>
+          <tr><td>Catalytic reforming</td><td class="num">5</td></tr>
+          <tr><td>Alkylation</td><td class="num">10</td></tr>
+          <tr><td>Aromatics / petrochemical</td><td class="num">15</td></tr>
+          <tr><td>Thermal cracking / visbreaking</td><td class="num">2.75</td></tr>
+          <tr><td>Hydrotreating</td><td class="num">2</td></tr>
+        </tbody>
+      </table>
+      <p class="ref-method-mini">Standard Nelson calculation: each unit's capacity weighted by its complexity factor, divided by crude charge (incl. vacuum distillation, isomerization, reforming, hydrotreating, and hydrogen plants — hydrogen MMcfd treated as Mbpd-equivalent per OGJ convention). Utility units (sulfur, amine, splitters) carry no standard Nelson factor and are excluded. Uncalibrated, so it runs somewhat below proprietary published figures.</p>
+
+      <p class="ref-method-h">5 · Sources</p>
+      <ul class="ref-method-cites">
+        <li><strong>Leffler, <em>Petroleum Refining in Nontechnical Language</em> (2020), Table 20-1</strong> — configuration yield slates above (primary).</li>
+        <li><strong>Maples, <em>Petroleum Refinery Process Economics</em> (2000), Table 4-2</strong> — U.S. product slate benchmark (gasoline ≈ 55–57%, jet ≈ 11%, distillate ≈ 23–24%, resid ≈ 6%).</li>
+        <li><strong>Fahim et&nbsp;al., <em>Fundamentals of Petroleum Refining</em></strong> — per-unit yields behind the classifier (FCC ≈ 55 vol% gasoline; delayed coker ≈ 30 wt% coke; visbreaking; reforming).</li>
+        <li><strong>Kaiser, de&nbsp;Klerk, Gary &amp; Handwerk, <em>Petroleum Refining: Technology, Economics, and Markets</em> (2019), Table 7.1</strong> — Nelson complexity factors (OGJ 1998&ndash;2019).</li>
+      </ul>
+      <p class="ref-method-mini">Modeled output is <strong>nameplate</strong> (assumes full crude utilization) and assumes a medium sour crude diet; heavier/lighter crude shifts the slate. Petroleum coke is on the table's volumetric basis (commonly quoted in short tons), so treat it as an order-of-magnitude figure.</p>
+    `;
+  }
+
+  function render() {
+    const body = document.getElementById("refBody");
+    if (!body) return;
+    body.innerHTML = view.tab === "units" ? renderUnits()
+      : view.tab === "owners" ? renderOwners()
+      : view.tab === "plants" ? renderPlants()
+      : view.tab === "method" ? renderMethod()
+      : renderProducts();
+  }
+
+  panel.querySelector("#refTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ref-tab]"); if (!b) return;
+    view.tab = b.dataset.refTab;
+    panel.querySelectorAll(".ref-tab").forEach(t => t.classList.toggle("active", t === b));
+    render();
+  });
+  panel.querySelector("#refUnits").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ref-unit]"); if (!b) return;
+    view.unit = b.dataset.refUnit;
+    panel.querySelectorAll(".ref-unit").forEach(t => t.classList.toggle("active", t === b));
+    render();
+  });
+  panel.querySelector("#refCsv").addEventListener("click", () => {
+    const lines = [["Refinery","Owner","PADD","Country","Status","Config","Nelson_CI","Crude_kbbl_d","Gasoline_kbbl_d","Distillate_kbbl_d","Jet_kbbl_d","Resid_kbbl_d","LPG_kbbl_d","Coke_kbbl_d","SCO_kbbl_d"].join(",")];
+    for (const r of rows) {
+      lines.push([
+        '"' + r.name.replace(/"/g, '""') + '"',
+        '"' + r.owner.replace(/"/g, '""') + '"',
+        '"' + (r.padd || "") + '"', '"' + (r.country || "") + '"', '"' + (r.status || "") + '"',
+        CONFIG_LABEL[r.cls],
+        r.ci.toFixed(2),
+        r.crude.toFixed(1),
+        r.products.gasoline.toFixed(1), r.products.distillate.toFixed(1), r.products.jet.toFixed(1),
+        r.products.resid.toFixed(1), r.products.lpg.toFixed(1), r.products.coke.toFixed(1), r.products.sco.toFixed(1),
+      ].join(","));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "refinery_selection.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  render();
 }
