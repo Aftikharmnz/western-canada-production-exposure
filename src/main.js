@@ -6260,6 +6260,32 @@ function powerHaloTooltip(s) {
     `<div class="pt-route">${rows}</div></div>`;
 }
 
+// Snap each halo to the app's own asset marker coordinates (matched by
+// display name), so the ring sits exactly around the site's circle on the
+// map. The JSON's baked lat/lon is only a fallback for non-production sites
+// (e.g. Strathcona Refinery).
+let _powerAssetLookup = null;
+function powerAssetLookup() {
+  if (_powerAssetLookup) return _powerAssetLookup;
+  _powerAssetLookup = new Map();
+  for (const asset of state.assets || []) {
+    const name = String(asset.display_name || "").trim().toLowerCase();
+    const lat = Number(asset.latitude), lon = Number(asset.longitude);
+    if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    if (!_powerAssetLookup.has(name)) _powerAssetLookup.set(name, [lat, lon]);
+  }
+  return _powerAssetLookup;
+}
+
+function powerHaloLatLng(s) {
+  const lookup = powerAssetLookup();
+  for (const name of s.asset_names || []) {
+    const hit = lookup.get(String(name).trim().toLowerCase());
+    if (hit) return hit;
+  }
+  return [s.lat, s.lon];
+}
+
 function renderPowerLayer() {
   if (!state.map || !window.L) return;
   if (state.powerLayer) {
@@ -6269,13 +6295,14 @@ function renderPowerLayer() {
   if (!state.powerEnabled || !state.powerData?.site_cogen?.length) return;
   const markers = state.powerData.site_cogen.map((s) => {
     const color = powerStatusColor(s.utilization);
-    const halo = L.circleMarker([s.lat, s.lon], {
+    const halo = L.circleMarker(powerHaloLatLng(s), {
       radius: 15,
       color,
       weight: 2,
       dashArray: "5 4",
       fill: false,
       opacity: 0.9,
+      interactive: true,
     });
     halo.bindTooltip(powerHaloTooltip(s), { sticky: true, opacity: 0.96, className: "pipeline-tip railway-tip" });
     return halo;

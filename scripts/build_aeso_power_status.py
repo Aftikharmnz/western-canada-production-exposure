@@ -32,31 +32,49 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "public" / "data" / "aeso_power_status.json"
 CSD_URL = "http://ets.aeso.ca/ets_web/ip/Market/Reports/CSDReportServlet?contentType=csv"
 
-# AESO asset code -> production-site link (coordinates from the app's own
-# asset registry; cogen output is a power-status proxy for the site).
-SITE_COGEN_LINKS: dict[str, dict] = {
-    "SCR1": {"site": "Suncor Base Plant", "operator": "Suncor", "lat": 56.9464, "lon": -111.2969},
-    "SCR5": {"site": "Suncor Base Plant (Poplar Creek)", "operator": "Suncor / TransAlta", "lat": 56.9390, "lon": -111.3200},
-    "SCR6": {"site": "Firebag SAGD", "operator": "Suncor", "lat": 57.2308, "lon": -110.8666},
-    "FH1":  {"site": "Fort Hills Mine", "operator": "Suncor", "lat": 57.4246, "lon": -111.5231},
-    "MKRC": {"site": "MacKay River SAGD (Suncor)", "operator": "Suncor", "lat": 57.0500, "lon": -111.9200},
-    "CNR5": {"site": "CNRL Horizon Mine/Upgrader", "operator": "CNRL", "lat": 57.3503, "lon": -111.8130},
-    "SCL1": {"site": "Syncrude Mildred Lake", "operator": "Syncrude JV", "lat": 57.0564, "lon": -111.7109},
-    "MKR1": {"site": "Muskeg River Mine", "operator": "Heartland (ex-ATCO) / AOSP", "lat": 57.2375, "lon": -111.5221, "atco": True},
-    "IOR3": {"site": "Kearl Mine", "operator": "Imperial Oil", "lat": 57.3567, "lon": -111.0995},
-    "IOR1": {"site": "Cold Lake (Mahkeses)", "operator": "Imperial Oil", "lat": 54.6619, "lon": -110.4221},
-    "IOR2": {"site": "Cold Lake (Nabiye)", "operator": "Imperial Oil", "lat": 54.7000, "lon": -110.3600},
-    "IOR4": {"site": "Strathcona Refinery", "operator": "Imperial Oil", "lat": 53.4920, "lon": -113.3600},
-    "CL01": {"site": "Christina Lake SAGD (Cenovus)", "operator": "Cenovus", "lat": 55.5560, "lon": -110.8159},
-    "EC04": {"site": "Foster Creek SAGD", "operator": "Cenovus", "lat": 55.0804, "lon": -110.6417},
-    "MEG1": {"site": "Christina Lake SAGD (MEG)", "operator": "MEG Energy", "lat": 55.6681, "lon": -110.7497},
-    "NX01": {"site": "Long Lake Upgrader", "operator": "CNOOC/Nexen", "lat": 56.4117, "lon": -110.9376},
-    "NX02": {"site": "Long Lake SAGD", "operator": "CNOOC/Nexen", "lat": 56.3625, "lon": -110.9607},
-    "PR1":  {"site": "Primrose / Wolf Lake", "operator": "CNRL", "lat": 54.7931, "lon": -110.6100},
-    "PEC1": {"site": "Lindbergh SAGD", "operator": "Strathcona Resources", "lat": 54.0558, "lon": -110.5836},
-    "APS1": {"site": "Scotford Upgrader (H2/cogen)", "operator": "Air Products / Shell Scotford", "lat": 53.7942, "lon": -113.1088},
-    "ALS1": {"site": "Scotford (Air Liquide)", "operator": "Air Liquide / Shell Scotford", "lat": 53.8010, "lon": -113.0950},
-}
+# Production-site links. Each site may aggregate several AESO cogen units
+# (e.g. Suncor Base Plant + Poplar Creek). `asset_names` are display names in
+# the app's assets.json — the front end snaps the halo to that asset marker's
+# exact coordinates so the ring sits around the site's circle on the map;
+# lat/lon here are fallbacks only.
+SITE_COGEN_SITES: list[dict] = [
+    {"codes": ["SCR1", "SCR5"], "site": "Suncor Base Plant", "operator": "Suncor",
+     "asset_names": ["Suncor Base Plant Upgrader"], "lat": 56.9464, "lon": -111.2969},
+    {"codes": ["SCR6"], "site": "Firebag SAGD", "operator": "Suncor",
+     "asset_names": ["Firebag"], "lat": 57.2308, "lon": -110.8666},
+    {"codes": ["FH1"], "site": "Fort Hills Mine", "operator": "Suncor",
+     "asset_names": ["Fort Hills Mine"], "lat": 57.4246, "lon": -111.5231},
+    {"codes": ["MKRC"], "site": "MacKay River SAGD", "operator": "Suncor (cogen)",
+     "asset_names": ["MacKay River"], "lat": 56.8291, "lon": -112.1825},
+    {"codes": ["CNR5"], "site": "CNRL Horizon", "operator": "CNRL",
+     "asset_names": ["CNRL Horizon", "Horizon Upgrader"], "lat": 57.3503, "lon": -111.8130},
+    {"codes": ["SCL1"], "site": "Syncrude Mildred Lake", "operator": "Syncrude JV",
+     "asset_names": ["Syncrude Mildred Lake Upgrader", "Syncrude Mildred Lake"], "lat": 57.0627, "lon": -111.5383},
+    {"codes": ["MKR1"], "site": "Muskeg River Mine", "operator": "Heartland (ex-ATCO) / AOSP",
+     "asset_names": ["Muskeg River Mine"], "lat": 57.2375, "lon": -111.5221, "atco": True},
+    {"codes": ["IOR3"], "site": "Kearl Mine", "operator": "Imperial Oil",
+     "asset_names": ["Kearl Mine"], "lat": 57.3567, "lon": -111.0995},
+    {"codes": ["IOR1", "IOR2"], "site": "Cold Lake (Imperial)", "operator": "Imperial Oil",
+     "asset_names": ["Cold Lake"], "lat": 54.6619, "lon": -110.4221},
+    {"codes": ["IOR4"], "site": "Strathcona Refinery", "operator": "Imperial Oil",
+     "asset_names": [], "lat": 53.4920, "lon": -113.3600},
+    {"codes": ["CL01"], "site": "Christina Lake SAGD (Cenovus)", "operator": "Cenovus",
+     "asset_names": ["Christina Lake"], "lat": 55.5560, "lon": -110.8159},
+    {"codes": ["EC04"], "site": "Foster Creek SAGD", "operator": "Cenovus",
+     "asset_names": ["Foster Creek"], "lat": 55.0804, "lon": -110.6417},
+    {"codes": ["MEG1"], "site": "Christina Lake SAGD (MEG)", "operator": "MEG Energy",
+     "asset_names": ["Christina Lake (MEG)"], "lat": 55.6681, "lon": -110.7497},
+    {"codes": ["NX01"], "site": "Long Lake Upgrader", "operator": "CNOOC/Nexen",
+     "asset_names": ["Long Lake Upgrader"], "lat": 56.4117, "lon": -110.9376},
+    {"codes": ["NX02"], "site": "Long Lake SAGD", "operator": "CNOOC/Nexen",
+     "asset_names": ["Long Lake"], "lat": 56.3625, "lon": -110.9607},
+    {"codes": ["PR1"], "site": "Primrose / Wolf Lake", "operator": "CNRL",
+     "asset_names": ["Primrose and Wolf Lake"], "lat": 54.7931, "lon": -110.6100},
+    {"codes": ["PEC1"], "site": "Lindbergh SAGD", "operator": "Strathcona Resources",
+     "asset_names": ["Lindbergh"], "lat": 54.0558, "lon": -110.5836},
+    {"codes": ["APS1", "ALS1"], "site": "Shell Scotford complex", "operator": "Shell / Air Products / Air Liquide",
+     "asset_names": ["Scotford Upgrader"], "lat": 53.7942, "lon": -113.1088},
+]
 
 # ATCO-heritage merchant fleet (operated by Heartland Generation since 2019).
 ATCO_FLEET_CODES = {
@@ -127,22 +145,24 @@ def build() -> dict:
     by_code = {a["code"]: a for a in parsed["assets"]}
 
     site_cogen = []
-    for code, link in SITE_COGEN_LINKS.items():
-        a = by_code.get(code)
-        if not a:
+    for entry in SITE_COGEN_SITES:
+        units = [by_code[c] for c in entry["codes"] if c in by_code]
+        if not units:
             continue
-        mc, tng = a["mc_mw"], a["tng_mw"]
+        mc = sum(u["mc_mw"] for u in units)
+        tng = sum(u["tng_mw"] for u in units)
         site_cogen.append({
-            "aeso_code": code,
-            "aeso_name": a["name"],
-            "site": link["site"],
-            "operator": link["operator"],
-            "lat": link["lat"],
-            "lon": link["lon"],
+            "aeso_code": "+".join(u["code"] for u in units),
+            "aeso_name": " + ".join(u["name"] for u in units),
+            "site": entry["site"],
+            "operator": entry["operator"],
+            "asset_names": entry.get("asset_names") or [],
+            "lat": entry["lat"],
+            "lon": entry["lon"],
             "mc_mw": mc,
             "tng_mw": tng,
             "utilization": round(tng / mc, 3) if mc else None,
-            "atco_heritage": bool(link.get("atco")),
+            "atco_heritage": bool(entry.get("atco")),
         })
     site_cogen.sort(key=lambda x: -x["tng_mw"])
 
