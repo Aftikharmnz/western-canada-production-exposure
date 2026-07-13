@@ -4337,6 +4337,37 @@ def build_data_quality_report(records: list[dict[str, Any]], assets: dict[str, A
             source_stream_warnings.append(warning)
             date_warnings[latest_date].append(warning)
 
+    # Trailing coverage gaps: the check above only compares a source-stream's own
+    # last two months, so a source that simply stops reporting (e.g. Petrinex AB
+    # after its final cached month) raised no warning while other sources kept the
+    # later months looking like clean actual months at a fraction of the volume.
+    # Flag every actual month that falls after a recently-ended source-stream.
+    all_actual_dates = sorted({date for (_sid, _stream, date) in totals})
+    for (source_id, stream), items in by_source_stream.items():
+        source_dates = sorted(date for date, _total in items)
+        if not source_dates:
+            continue
+        last_date = source_dates[-1]
+        last_dt = dt.datetime.strptime(last_date, "%Y-%m-%d")
+        for date in all_actual_dates:
+            if date <= last_date:
+                continue
+            gap_days = (dt.datetime.strptime(date, "%Y-%m-%d") - last_dt).days
+            if gap_days > 190:
+                continue
+            warning = {
+                "severity": "high",
+                "source_id": source_id,
+                "stream": stream,
+                "date": date,
+                "message": (
+                    f"{source_id} has no {stream} data for {date}; last reported month is "
+                    f"{last_date}. Totals for this month are partial."
+                ),
+            }
+            source_stream_warnings.append(warning)
+            date_warnings[date].append(warning)
+
     unmapped_by_date: dict[str, float] = defaultdict(float)
     low_conf_by_date: dict[str, float] = defaultdict(float)
     for record in records:

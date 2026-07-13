@@ -176,6 +176,39 @@ const RAILWAY_CATEGORY_META = {
 
 const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "product-terminal"];
 
+// Rail line colour = owning railroad (first listed NARN owner, RROWNER1).
+// Class I systems get distinct colours; passenger/commuter and regional/short
+// lines are grouped. KCS/KCSM are shown as CPKC post-merger.
+const RAIL_OWNER_META = [
+  { key: "cn",        label: "CN",                     color: "#d62828", codes: ["CN", "BCR", "BCOL", "GTW", "IC", "WC", "EJE"] },
+  { key: "cpkc",      label: "CPKC",                   color: "#e8a013", codes: ["CPKC", "CP", "CPRS", "KCS", "KCSM", "SOO", "DME"] },
+  { key: "bnsf",      label: "BNSF",                   color: "#16803c", codes: ["BNSF"] },
+  { key: "up",        label: "Union Pacific",          color: "#6d4c9f", codes: ["UP"] },
+  { key: "csx",       label: "CSX",                    color: "#1d6ceb", codes: ["CSXT", "CSX"] },
+  { key: "ns",        label: "Norfolk Southern",       color: "#1f2937", codes: ["NS"] },
+  { key: "passenger", label: "Passenger / commuter",   color: "#9aa5b1", codes: [] },
+  { key: "other",     label: "Regional & short line",  color: "#7b8794", codes: [] },
+];
+const RAIL_OWNER_BY_CODE = new Map(
+  RAIL_OWNER_META.flatMap((m) => m.codes.map((code) => [code, m]))
+);
+const PASSENGER_RAIL_OWNERS = new Set([
+  "AMTK", "VIA", "GO", "EXO", "AMT", "MBTA", "NJT", "MNCW", "LI", "SCAX",
+  "NIRC", "MARC", "VRE", "UTA", "TRE", "DART", "ACEX", "NCTD", "SDNX",
+  "SFRTA", "WES", "CTRL", "MTS",
+]);
+const RAIL_OWNER_FALLBACK = RAIL_OWNER_META.find((m) => m.key === "other");
+const RAIL_OWNER_PASSENGER = RAIL_OWNER_META.find((m) => m.key === "passenger");
+
+function railLineOwnerMeta(props) {
+  const raw = String(props?.owner || "").trim();
+  if (!raw) return RAIL_OWNER_FALLBACK;
+  const code = raw.split(",")[0].trim().toUpperCase();
+  if (RAIL_OWNER_BY_CODE.has(code)) return RAIL_OWNER_BY_CODE.get(code);
+  if (PASSENGER_RAIL_OWNERS.has(code)) return RAIL_OWNER_PASSENGER;
+  return RAIL_OWNER_FALLBACK;
+}
+
 const DEFAULT_REFINERY_GROUP_KEYS = [
   "canada-western",
   "canada-central",
@@ -1131,6 +1164,38 @@ function selectedDateSummaryRows(date = state.selectedDate) {
   );
 }
 
+// Sources that stopped reporting before this date while other sources continue.
+// The ETL's stored date_warnings only compare each source-stream's own last two
+// months, so a source that simply drops out (e.g. Petrinex AB after its final
+// cached month) produced no warning at all — months after the drop silently
+// looked like clean "actual" months at half the volume. This recovers that case
+// client-side from manifest.source_coverage.
+function missingSourcesForDate(date = state.selectedDate) {
+  if (!date) return [];
+  const rows = state.manifest?.date_filter_totals?.[date] || [];
+  if (!rows.length) return [];
+  if (!rows.some((row) => row.scenario === "actual")) return [];
+  const present = new Set(rows.map((row) => row.source_id));
+  const missing = new Map();
+  for (const item of state.manifest?.source_coverage || []) {
+    if (item.scenario !== "actual") continue;
+    if (!item.last_date || !item.first_date) continue;
+    if (present.has(item.source_id)) continue;
+    if (!state.selectedSources.has(item.source_id)) continue;
+    if (!state.selectedStreams.has(item.stream)) continue;
+    if (item.first_date > date || item.last_date >= date) continue;
+    // Only flag sources that ended recently (a trailing data gap), not ones
+    // whose history legitimately ends years earlier.
+    const gapDays = (new Date(date) - new Date(item.last_date)) / 86400000;
+    if (gapDays > 190) continue;
+    const prev = missing.get(item.source_id);
+    if (!prev || item.last_date > prev.last_date) {
+      missing.set(item.source_id, { source_id: item.source_id, last_date: item.last_date });
+    }
+  }
+  return [...missing.values()].sort((a, b) => a.source_id.localeCompare(b.source_id));
+}
+
 function scenarioLabelForDate(date = state.selectedDate) {
   if (state.dateRecordLoading.has(date)) return "loading";
   if (state.dateRecordErrors.has(date)) return "partial load";
@@ -1138,6 +1203,7 @@ function scenarioLabelForDate(date = state.selectedDate) {
   const scenarios = new Set(rows.map((row) => row.scenario).filter(Boolean));
   const warnings = state.manifest?.data_quality?.date_warnings?.[date] || [];
   if (warnings.some((w) => w.severity === "high")) return "data warning";
+  if (missingSourcesForDate(date).length) return "partial coverage";
   if (scenarios.has("actual") && scenarios.has("forecast")) return "mixed";
   if (scenarios.has("forecast")) return "forecast";
   if (scenarios.has("actual")) return "actual";
@@ -1147,6 +1213,7 @@ function scenarioLabelForDate(date = state.selectedDate) {
 function renderCoverageNotice(date = state.selectedDate) {
   if (!els.coverageNotice) return;
   const warnings = state.manifest?.data_quality?.date_warnings?.[date] || [];
+  const missingSources = missingSourcesForDate(date);
   const rows = selectedDateSummaryRows(date);
   const low = rows
     .filter((row) => row.location_confidence === "low")
@@ -1158,6 +1225,12 @@ function renderCoverageNotice(date = state.selectedDate) {
   const messages = [];
   if (warnings.length) {
     messages.push(...warnings.slice(0, 2).map((w) => w.message));
+  }
+  if (missingSources.length) {
+    const names = missingSources
+      .map((m) => `${SOURCE_SHORT[m.source_id] || m.source_id} (last ${m.last_date.slice(0, 7)})`)
+      .join(", ");
+    messages.push(`Partial month: no data yet from ${names}. Totals understate actual production.`);
   }
   if (low > 0) {
     messages.push(`${kbbl(low)} uses approximate DLS/manual coordinates; use caution for exact fire impact.`);
@@ -1173,8 +1246,9 @@ function renderCoverageNotice(date = state.selectedDate) {
     els.coverageNotice.innerHTML = "";
     return;
   }
-  const title = warnings.length ? "Data quality warning" : `Coverage note · ${sources.size || 0} source${sources.size === 1 ? "" : "s"}`;
-  els.coverageNotice.className = `coverage-notice${warnings.length ? "" : " info"}`;
+  const isWarning = warnings.length > 0 || missingSources.length > 0;
+  const title = isWarning ? "Data quality warning" : `Coverage note · ${sources.size || 0} source${sources.size === 1 ? "" : "s"}`;
+  els.coverageNotice.className = `coverage-notice${isWarning ? "" : " info"}`;
   els.coverageNotice.innerHTML = `<strong>${escapeHtml(title)}</strong>${messages.map(escapeHtml).join("<br>")}`;
   els.coverageNotice.hidden = false;
 }
@@ -4217,11 +4291,11 @@ function railwaySelectedCount() {
 
 function railwayStyle(feature) {
   const category = feature.properties?.category || "rail-main";
-  const meta = RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["rail-main"];
+  const owner = railLineOwnerMeta(feature.properties);
   return {
-    color: meta.color,
+    color: owner.color,
     weight: category === "rail-main" ? 1.05 : 0.75,
-    opacity: category === "rail-main" ? 0.72 : 0.46,
+    opacity: category === "rail-main" ? 0.78 : 0.5,
     lineCap: "round",
     lineJoin: "round",
   };
@@ -4365,6 +4439,26 @@ function buildRailwayMenu() {
     const category = feature.properties?.category;
     if (category) counts[category] = (counts[category] || 0) + 1;
   }
+  const ownerCounts = new Map();
+  for (const feature of railwayFeatures()) {
+    if (feature.properties?.feature_kind !== "rail_line") continue;
+    const meta = railLineOwnerMeta(feature.properties);
+    ownerCounts.set(meta.key, (ownerCounts.get(meta.key) || 0) + 1);
+  }
+  const ownerLegend = railwayFeatures().length
+    ? `
+      <div class="railway-owner-legend">
+        <strong>Line colour = owning railroad</strong>
+        ${RAIL_OWNER_META.map((meta) => {
+          const count = ownerCounts.get(meta.key);
+          return `
+            <span class="railway-owner-item">
+              <span class="railway-swatch" style="background:${meta.color}"></span>
+              ${escapeHtml(meta.label)}${count ? ` · ${formatNumber(count, 0)}` : ""}
+            </span>`;
+        }).join("")}
+      </div>`
+    : "";
   options.innerHTML = Object.entries(RAILWAY_CATEGORY_META)
     .map(([key, meta]) => {
       const checked = state.selectedRailwayCategories.has(key);
@@ -4382,7 +4476,7 @@ function buildRailwayMenu() {
           </span>
         </label>`;
     })
-    .join("");
+    .join("") + ownerLegend;
 }
 
 function handleRailwayMenuChange(event) {
@@ -5221,6 +5315,51 @@ function computeSeasonality(assetIds) {
   return { ym, years, currentYear };
 }
 
+const SELECTION_GROUP_DIMS = [
+  { key: "producer", label: "Producer" },
+  { key: "system",   label: "Liquid type" },
+  { key: "stream",   label: "Product stream" },
+  { key: "province", label: "Province" },
+  { key: "source",   label: "Data source" },
+  { key: "kind",     label: "Asset kind" },
+];
+
+function prettyAssetKind(k) {
+  return String(k || "unknown").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Group a box-selected set of assets by a chosen dimension, summing current-date
+// production (kbbl/d). Returns groups sorted by volume desc.
+function computeSelectionBreakdown(assetIds, dim) {
+  const { byAsset } = aggregateForDate();
+  const groups = new Map();
+  const get = (key, label, color) => {
+    let g = groups.get(key);
+    if (!g) { g = { key, label, color, kbbl: 0, count: 0 }; groups.set(key, g); }
+    return g;
+  };
+  for (const id of assetIds) {
+    const pt = byAsset.get(id);
+    if (!pt) continue;
+    const a = pt.asset;
+    if (dim === "stream") {
+      for (const [stream, v] of pt.streams.entries()) {
+        const g = get(stream, STREAM_DESCRIPTIONS[stream] || stream, streamColor(stream));
+        g.kbbl += v; g.count += 1;
+      }
+      continue;
+    }
+    let key, label, color = "#60717a";
+    if (dim === "producer") { key = a.company || "Unknown"; label = key; color = systemMeta(a.production_system).color; }
+    else if (dim === "system") { key = a.production_system || "unknown"; label = systemMeta(key).label; color = systemMeta(key).color; }
+    else if (dim === "province") { key = a.province || "Unknown"; label = key; }
+    else if (dim === "source") { key = a.source_id || "unknown"; label = SOURCE_SHORT[key] || key; }
+    else { key = a.asset_kind || "unknown"; label = prettyAssetKind(key); }
+    const g = get(key, label, color); g.kbbl += pt.kbbl; g.count += 1;
+  }
+  return [...groups.values()].sort((x, y) => y.kbbl - x.kbbl);
+}
+
 async function showSeasonalityPanel(assetIds) {
   const existing = document.getElementById("seasonalityPanel");
   if (existing) existing.remove();
@@ -5263,16 +5402,31 @@ async function showSeasonalityPanel(assetIds) {
 
   const panel = document.createElement("div");
   panel.id = "seasonalityPanel";
+  const dims = SELECTION_GROUP_DIMS;
   panel.innerHTML = `
     <div class="sea-header">
       <div>
         <strong class="sea-title">${escapeHtml(titleStr)}</strong>
-        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · range plus recent years</span>
+        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} selected</span>
       </div>
       <button id="closeSeasonality" class="sea-close" title="Close">&#x2715;</button>
     </div>
-    <canvas id="seasonalityCanvas" width="580" height="240"></canvas>
-    <div class="sea-legend" id="seaLegend"></div>
+    <div class="sea-controls">
+      <div class="sea-tabs" id="seaTabs">
+        <button class="sea-tab active" data-sea-tab="trend">Seasonality</button>
+        <button class="sea-tab" data-sea-tab="breakdown">Breakdown</button>
+      </div>
+      <label class="sea-groupby" id="seaGroupWrap" hidden>Group by
+        <select id="seaGroupSel">
+          ${dims.map((dd) => `<option value="${dd.key}">${escapeHtml(dd.label)}</option>`).join("")}
+        </select>
+      </label>
+    </div>
+    <div id="seaTrend">
+      <canvas id="seasonalityCanvas" width="580" height="240"></canvas>
+      <div class="sea-legend" id="seaLegend"></div>
+    </div>
+    <div id="seaBreakdown" class="sea-breakdown" hidden></div>
   `;
   document.getElementById("map").appendChild(panel);
 
@@ -5281,13 +5435,52 @@ async function showSeasonalityPanel(assetIds) {
     state.selectedAssets = [];
   });
 
-  if (!data) {
-    panel.querySelector("canvas").insertAdjacentHTML("afterend",
-      '<p style="padding:12px;color:#6b7280">No production data for selected assets.</p>');
-    return;
+  const trendEl = panel.querySelector("#seaTrend");
+  const bdEl = panel.querySelector("#seaBreakdown");
+  const groupWrap = panel.querySelector("#seaGroupWrap");
+  const view = { tab: "trend", dim: dims[0].key };
+
+  function renderBreakdown() {
+    const groups = computeSelectionBreakdown(assetIds, view.dim);
+    const dimLabel = dims.find((dd) => dd.key === view.dim).label;
+    if (!groups.length) {
+      bdEl.innerHTML = '<p class="sea-empty">No production at the selected date for this selection.</p>';
+      return;
+    }
+    const total = groups.reduce((a, g) => a + g.kbbl, 0) || 1;
+    const maxV = groups[0].kbbl || 1;
+    const rows = groups.map((g, i) => `<tr>
+      <td class="sea-rank">${i + 1}</td>
+      <td><i class="sea-swatch" style="background:${g.color}"></i>${escapeHtml(g.label)}</td>
+      <td class="num"><strong>${kbbl(g.kbbl)}</strong></td>
+      <td class="num">${(g.kbbl / total * 100).toFixed(1)}%</td>
+      <td class="num">${g.count.toLocaleString("en-CA")}</td>
+      <td class="barcell"><span class="sea-bar"><span class="sea-bar-fill" style="width:${Math.max(2, g.kbbl / maxV * 100)}%;background:${g.color}"></span></span></td>
+    </tr>`).join("");
+    bdEl.innerHTML = `
+      <p class="sea-section-note">${groups.length} ${escapeHtml(dimLabel.toLowerCase())} group${groups.length > 1 ? "s" : ""} · ${kbbl(total)} total at ${escapeHtml(state.selectedDate || "selected date")}.</p>
+      <div class="sea-table-scroll"><table class="sea-table">
+        <thead><tr><th>#</th><th>${escapeHtml(dimLabel)}</th><th class="num">kbbl/d</th><th class="num">Share</th><th class="num">Assets</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
   }
 
-  drawSeasonalityChart(data, assetIds.length);
+  panel.querySelector("#seaTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sea-tab]"); if (!b) return;
+    view.tab = b.dataset.seaTab;
+    panel.querySelectorAll(".sea-tab").forEach((t) => t.classList.toggle("active", t === b));
+    const isBd = view.tab === "breakdown";
+    trendEl.hidden = isBd; bdEl.hidden = !isBd; groupWrap.hidden = !isBd;
+    if (isBd) renderBreakdown();
+  });
+  panel.querySelector("#seaGroupSel").addEventListener("change", (e) => { view.dim = e.target.value; renderBreakdown(); });
+
+  if (!data) {
+    trendEl.insertAdjacentHTML("beforeend",
+      '<p style="padding:10px 12px;color:#6b7280;font-size:12px">No monthly history for this selection — use the Breakdown tab for current-date splits.</p>');
+  } else {
+    drawSeasonalityChart(data, assetIds.length);
+  }
 }
 
 function drawSeasonalityChart(data, assetCount) {
@@ -5482,21 +5675,36 @@ const PROCESS_UNITS = [
   { key: "alky",         label: "Alkylation" },
 ];
 
+// IIR keeps decommissioned units (Closed/Mothballed/Removed/Shuttered) in the
+// unit list — ~4% of listed BBL/d capacity. Counting them silently inflates
+// unit totals, Nelson CI, and can flip a plant's configuration class.
+function refineryUnitActive(u) {
+  const g = String(u.unit_status_group || "").toLowerCase();
+  if (g) return g === "commissioned";
+  const s = String(u.unit_status_desc || "").toLowerCase();
+  return !s || s === "operational";
+}
+
 function refineryUnitCapacities(props) {
   const cap = { crude: Number(props.crud_capacity_kbbl_d) || 0, fcc: 0, hcu: 0, coker: 0, reformer: 0, hydrotreater: 0, alky: 0, visbreaker: 0 };
   for (const u of props.refinery_units || []) {
     if (u.capacity_uom !== "BBL/d") continue;
+    if (!refineryUnitActive(u)) continue;
     const c = Number(u.capacity_kbbl_d) || 0;
     if (!c) continue;
     const g = (u.unit_type_group || "").toLowerCase();
     const sh = (u.unit_type_short || "").toLowerCase();
-    if (g.includes("cat cracker") || g.includes("fccu") || sh === "fcc") cap.fcc += c;
-    else if (g.includes("hydrocrack") || sh === "hck") cap.hcu += c;
-    else if (g.includes("visbreak")) cap.visbreaker += c;
+    const t = `${sh} ${(u.unit_type_desc || "").toLowerCase()}`;
+    // Hydrotreaters first: IIR leaves unit_type_group null for many of them
+    // (reformer-feed, VGO/HGO, naphtha, lube, resid HT), and their names can
+    // contain FCC/reformer tokens ("FCCU Gasoline Hydrotreater").
+    if (g.includes("hydrotreat") || t.includes("hydrotreat") || t.includes("hydrorefin")) cap.hydrotreater += c;
+    else if (g.includes("cat cracker") || g.includes("fccu") || sh === "fcc") cap.fcc += c;
+    else if (g.includes("hydrocrack") || sh === "hck" || t.includes("hydrocrack")) cap.hcu += c;
+    else if (g.includes("visbreak") || t.includes("visbreak")) cap.visbreaker += c;
     else if (g.includes("coking") || sh.includes("cok")) cap.coker += c;
-    else if (g.includes("reform")) cap.reformer += c;
-    else if (g.includes("hydrotreat")) cap.hydrotreater += c;
-    else if (g.includes("alky")) cap.alky += c;
+    else if (g.includes("reform") || t.includes("reform")) cap.reformer += c;
+    else if (g.includes("alky") || t.includes("alky")) cap.alky += c;
   }
   return cap;
 }
@@ -5505,6 +5713,7 @@ function refineryThroughputUnits(props) {
   let cdu = 0, vac = 0, dru = 0, coker = 0;
   for (const u of props.refinery_units || []) {
     if (u.capacity_uom !== "BBL/d") continue;
+    if (!refineryUnitActive(u)) continue;
     const c = Number(u.capacity_kbbl_d) || 0;
     if (!c) continue;
     const sh = (u.unit_type_short || "").toLowerCase();
@@ -5517,21 +5726,41 @@ function refineryThroughputUnits(props) {
   return { cdu, vac, dru, coker };
 }
 
+function refineryIsOilSands(props) {
+  const name = `${props.plant_name || ""} ${props.plant_sectors || ""}`.toLowerCase();
+  if (name.includes("upgrader") || name.includes("oil sands")) return true;
+  const prov = String(props.state_name || "").toLowerCase();
+  return prov === "alberta" || prov === "saskatchewan";
+}
+
 // Effective crude/feed charge: reported crude capacity, else CDU units (recovers an
-// IIR rollup gap), else a bitumen-throughput proxy for upgraders (no CDU).
+// IIR rollup gap), else a throughput proxy for plants with no CDU rows:
+//  - oil-sands upgraders: bitumen charge from vacuum/coker/DRU capacity;
+//  - conventional no-CDU plants (e.g. CITGO Corpus Christi West): coker capacity
+//    is ~30% of crude at a deep-conversion plant (Leffler), so coker/0.30 recovers
+//    a nameplate-scale charge instead of treating the plant as an SCO upgrader.
 function effectiveCrudeCharge(props) {
   const plant = Number(props.crud_capacity_kbbl_d) || 0;
   if (plant > 0) return { charge: plant, basis: "crude" };
   const u = refineryThroughputUnits(props);
   if (u.cdu > 0) return { charge: u.cdu, basis: "cdu" };
-  const proxy = Math.max(u.vac, u.coker, u.dru * 0.7); // DRU stream is ~30% diluent
-  if (proxy > 0) return { charge: proxy, basis: "upgrader" };
+  if (refineryIsOilSands(props)) {
+    const proxy = Math.max(u.vac, u.coker, u.dru * 0.7); // DRU stream is ~30% diluent
+    if (proxy > 0) return { charge: proxy, basis: "upgrader" };
+  } else {
+    const proxy = Math.max(u.vac, u.coker / 0.30);
+    if (proxy > 0) return { charge: proxy, basis: "units" };
+  }
   return { charge: 0, basis: "none" };
 }
 
 function refineryConfig(props, cap, charge, basis) {
   const name = `${props.plant_name || ""} ${props.plant_sectors || ""}`.toLowerCase();
-  if (basis === "upgrader" || name.includes("upgrader") || name.includes("oil sands")) return "upgrader";
+  // Only oil-sands plants take the SCO upgrader slate; a conventional refinery
+  // with missing CDU rows must not fall through to an 80% SCO yield.
+  if (basis === "upgrader" || name.includes("upgrader") || name.includes("oil sands")) {
+    if (refineryIsOilSands(props)) return "upgrader";
+  }
   if (name.includes("condensate") || name.includes("splitter") || name.includes("fractionat")) return "splitter";
   if (charge <= 0) return "topping";
   const coking = cap.coker + cap.visbreaker;
@@ -5553,6 +5782,7 @@ function nelsonCF(u) {
   if (t.includes("calciner") || t.includes("splitter") || t.includes("sulfur") ||
       t.includes("amine") || t.includes("lights ends") || t.includes("diluent recovery")) return 0;
   if (t.includes("vacuum")) return 2;                                   // vacuum distillation
+  if (t.includes("visbreak") || t.includes("thermal crack")) return 2.75; // thermal cracking / visbreaking
   if (t.includes("cat crack") || /\bfcc\b/.test(t)) return 6;          // catalytic cracking
   if (t.includes("cok")) return 6;                                      // delayed / fluid coking
   if (t.includes("hydrocrack") || /\bhck\b/.test(t)) return 6;         // hydrocracking
@@ -5591,6 +5821,7 @@ function refineryComplexity(props) {
   let weighted = 0;
   for (const u of props.refinery_units || []) {
     if (u.capacity_uom !== "BBL/d") continue;
+    if (!refineryUnitActive(u)) continue;
     const c = Number(u.capacity_kbbl_d) || 0;
     if (!c) continue;
     const sh = (u.unit_type_short || "").toLowerCase();

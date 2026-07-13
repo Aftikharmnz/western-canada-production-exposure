@@ -101,6 +101,18 @@ relative comparison rather than as an exact published value.
 
 ## Data handling (IIR quirks)
 
+- **Decommissioned units are excluded.** IIR keeps Closed/Mothballed/Removed/
+  Shuttered units in the unit list (~4% of listed BBL/d capacity). The model
+  counts only commissioned/operational units for unit totals, configuration
+  classification, and Nelson CI — otherwise a closed coker could flip a plant
+  into deep conversion and inflate CI.
+- **Conventional plants with no CDU rows are not upgraders.** The SCO upgrader
+  slate applies only to oil-sands plants (name/sector match, or Alberta/
+  Saskatchewan). A conventional refinery missing both plant-level crude capacity
+  and CDU unit rows (e.g. CITGO Corpus Christi West) recovers its charge from
+  coker capacity ÷ 0.30 (coking is ~30% of crude at a deep-conversion plant)
+  and classifies normally, instead of silently taking an 80% SCO yield.
+
 - **Effective crude charge.** Some plants leave the plant-level crude-capacity field
   blank even though they have crude (CDU) units (e.g. Preemraff, Wilhelmshaven,
   condensate splitters). The model recovers the charge from CDU unit capacity, then

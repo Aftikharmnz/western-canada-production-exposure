@@ -87,10 +87,10 @@ ROUTES: list[dict[str, Any]] = [
     {
         "route_id": "enbridge-us-downstream",
         "route_name": "Enbridge U.S. downstream laterals",
-        "operator": "Enbridge",
+        "operator": "Enbridge (incl. Seaway JV with Enterprise)",
         "commodity": "Crude oil / liquids",
         "flow_role": "U.S. refinery and terminal laterals connected to Enbridge crude markets",
-        "direction": "Midwest, Midcontinent, Ontario border, and Gulf-area laterals",
+        "direction": "Midwest, Midcontinent, Ontario border, Cushing, and Gulf Coast laterals",
         "color": "#93c5fd",
         "display_order": 19,
         "default_visible": False,
@@ -105,7 +105,16 @@ ROUTES: list[dict[str, Any]] = [
                     "'Midcontinent (Ozark)', 'Mustang', 'Nanticoke', 'Tinsley', 'Toledo', 'Tulsa', "
                     "'Southern Access', 'Spearhead')"
                 ),
-            }
+            },
+            {
+                # Seaway (Enbridge/Enterprise 50-50 JV): Cushing -> Gulf Coast, a
+                # primary Canadian heavy route to Gulf refining/export markets.
+                # EIA does not carry Flanagan South under any name, so Seaway plus
+                # Spearhead/Southern Access represent the Enbridge Gulf path.
+                "source": "EIA",
+                "url": EIA_CRUDE_URL,
+                "where": "Opername = 'ENTERPRISE PRODUCTS PARTNERS' AND Pipename = 'Seaway'",
+            },
         ],
     },
     {
@@ -120,6 +129,28 @@ ROUTES: list[dict[str, Any]] = [
         "default_visible": True,
         "parts": [
             {"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'TransMountain'"},
+            {
+                # Puget Sound pipeline (Sumas -> Laurel -> Ferndale/Cherry Point and
+                # Laurel -> Burlington -> Anacortes/March Point). EIA does not expose
+                # this line under any Trans Mountain name (verified against the EIA
+                # crude trunk FeatureServer), so without this part the route stopped
+                # at the border while the Anacortes/Ferndale hubs floated unconnected.
+                # Route-level approximate corridor, not survey geometry.
+                "source": "Curated (Trans Mountain Puget Sound corridor, approximate)",
+                "url": TM_PUGET_URL,
+                "manual_lines": [
+                    [
+                        [-122.265, 49.002], [-122.34, 48.95], [-122.42, 48.88],
+                        [-122.47, 48.85], [-122.46, 48.75], [-122.40, 48.64],
+                        [-122.35, 48.54], [-122.33, 48.47], [-122.43, 48.46],
+                        [-122.50, 48.47], [-122.56, 48.49],
+                    ],
+                    [
+                        [-122.47, 48.85], [-122.58, 48.84], [-122.70, 48.83],
+                        [-122.755, 48.79],
+                    ],
+                ],
+            },
         ],
     },
     {
@@ -241,10 +272,37 @@ ROUTES: list[dict[str, Any]] = [
                 "licences": ["64941", "179", "1386", "64954", "80010"],
             },
             {
+                # CER carries the federally regulated Aurora border segment.
+                "source": "CER",
+                "url": CER_PIPELINES_URL,
+                "where": "PipelineID = 'Aurora'",
+            },
+            {
                 "source": "EIA",
                 "url": EIA_CRUDE_URL,
                 "where": "Opername = 'PHILLIPS 66 PIPELINE' AND Pipename = 'Glacier Pipeline'",
             },
+        ],
+    },
+    {
+        "route_id": "milk-river",
+        "route_name": "Milk River",
+        "operator": "Plains Midstream",
+        "commodity": "Crude oil",
+        "flow_role": "Southern Alberta cross-border crude link",
+        "direction": "Milk River AB to the Montana border (Front Range/Glacier connections)",
+        "color": "#a16207",
+        "display_order": 73,
+        "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
+        "parts": [
+            {
+                # CER PipelineID carries a literal trailing CR/LF in the service
+                # data ("MilkRiver\r\n"), so match on the prefix.
+                "source": "CER",
+                "url": CER_PIPELINES_URL,
+                "where": "PipelineID LIKE 'MilkRiver%'",
+            }
         ],
     },
     {
@@ -320,6 +378,9 @@ MARKET_HUBS = [
     ("Wood River", "Midwest refinery market", -90.20, 38.86),
     ("Cushing", "U.S. crude hub", -96.77, 35.99),
     ("Steele City", "Pipeline interconnect", -97.02, 40.04),
+    ("Flanagan", "Enbridge Midwest interconnect", -88.86, 40.88),
+    ("Nederland / Port Arthur", "Gulf Coast crude hub / refinery market", -93.99, 29.97),
+    ("Houston", "Gulf Coast refinery / export market", -95.26, 29.72),
 ]
 
 
@@ -444,6 +505,13 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
     warnings: list[str] = []
 
     for part in route.get("parts", []):
+        if part.get("manual_lines"):
+            manual = [line for line in part["manual_lines"] if isinstance(line, list) and len(line) >= 2]
+            lines.extend(manual)
+            if manual:
+                sources.append(f"{part['source']} ({len(manual)} curated segment{'s' if len(manual) != 1 else ''})")
+            continue
+
         if part.get("local_geojson"):
             path = Path(part["local_geojson"])
             try:
@@ -538,7 +606,8 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
                 "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
                 "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available; coarse EIA chords that duplicate Canadian CER linework are filtered out.",
-                "Route-level manual connectors are intentionally excluded to avoid straight-line artifacts over water or across border gaps.",
+                "The Trans Mountain Puget Sound leg (Sumas to Ferndale/Cherry Point and Anacortes/March Point) is a curated approximate corridor: EIA does not expose the line under any Trans Mountain name, and without it the route stopped at the border while the Washington refinery hubs floated unconnected.",
+                "Other route-level manual connectors are intentionally excluded to avoid straight-line artifacts over water or across border gaps.",
                 "CAPP's 2023 Pipeline and Refinery Map is used as route/hub reference, not as coordinate geometry.",
                 "Analytical context only; not for construction, excavation, or ground disturbance.",
             ],
