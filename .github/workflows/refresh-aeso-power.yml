@@ -1,0 +1,40 @@
+name: Refresh AESO power status
+
+on:
+  schedule:
+    # Every 30 minutes. GitHub cron is best-effort; runs may lag a few minutes.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-aeso-power
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch AESO CSD and rebuild snapshot
+        run: python scripts/build_aeso_power_status.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/aeso_power_status.json
+          if git diff --cached --quiet; then
+            echo "No change in AESO snapshot."
+            exit 0
+          fi
+          git commit -m "Auto-refresh AESO power status [skip ci]"
+          git pull --rebase origin main
+          git push origin main

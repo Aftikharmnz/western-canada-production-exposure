@@ -6189,3 +6189,186 @@ function showRefineryPanel(features) {
 
   render();
 }
+
+// ============================================================
+// AESO / ATCO POWER STATUS OVERLAY  (auto-refreshed snapshot)
+// ------------------------------------------------------------
+// Data: public/data/aeso_power_status.json, rebuilt every 30 min by the
+// refresh-aeso-power GitHub Actions workflow from the public AESO Current
+// Supply Demand report. Site cogeneration output (TNG vs MC) is a
+// power-status proxy for the linked production site — dashed halos on the
+// map — plus a panel with grid metrics and the ATCO-heritage fleet.
+// ============================================================
+
+const POWER_DATA_PATH = "public/data/aeso_power_status.json";
+
+Object.assign(state, {
+  powerEnabled: false,
+  powerData: null,
+  powerLoading: false,
+  powerError: null,
+  powerLayer: null,
+});
+
+function powerStatusColor(u) {
+  if (u === null || u === undefined) return "#6b7280";
+  if (u >= 0.7) return "#16a34a";   // running strong
+  if (u >= 0.3) return "#d97706";   // reduced
+  if (u > 0)    return "#dc2626";   // barely running
+  return "#dc2626";                 // offline
+}
+
+function powerStatusLabel(u) {
+  if (u === null || u === undefined) return "no data";
+  if (u >= 0.7) return "running";
+  if (u >= 0.3) return "reduced";
+  if (u > 0)    return "low";
+  return "offline";
+}
+
+async function fetchPowerData() {
+  if (state.powerLoading) return false;
+  state.powerLoading = true;
+  state.powerError = null;
+  updatePowerToggleUI();
+  try {
+    // Cache-bust so the 30-minute snapshots come through GitHub Pages caching.
+    const response = await fetch(`${POWER_DATA_PATH}?t=${Math.floor(Date.now() / 60000)}`);
+    if (!response.ok) throw new Error(`Power status: HTTP ${response.status}`);
+    state.powerData = await response.json();
+  } catch (err) {
+    state.powerError = err.message || String(err);
+  }
+  state.powerLoading = false;
+  updatePowerToggleUI();
+  return !state.powerError;
+}
+
+function powerHaloTooltip(s) {
+  const u = s.utilization;
+  const rows = [
+    ["Status", `${powerStatusLabel(u)}${u !== null && u !== undefined ? ` · ${(u * 100).toFixed(0)}% of capability` : ""}`],
+    ["Cogen output", `${s.tng_mw} MW of ${s.mc_mw} MW`],
+    ["AESO asset", `${s.aeso_name} (${s.aeso_code})`],
+    ["Operator", s.operator],
+    s.atco_heritage ? ["Fleet", "ATCO-heritage (Heartland)"] : null,
+  ].filter(Boolean)
+    .map(([l, v]) => `<span class="pt-route-label">${escapeHtml(l)}</span><span class="pt-route-val">${escapeHtml(String(v))}</span>`)
+    .join("");
+  return `<div><strong>${escapeHtml(s.site)}</strong>` +
+    `<div class="pt-sub">Site cogeneration — power-status proxy, not metered site load</div>` +
+    `<div class="pt-route">${rows}</div></div>`;
+}
+
+function renderPowerLayer() {
+  if (!state.map || !window.L) return;
+  if (state.powerLayer) {
+    state.map.removeLayer(state.powerLayer);
+    state.powerLayer = null;
+  }
+  if (!state.powerEnabled || !state.powerData?.site_cogen?.length) return;
+  const markers = state.powerData.site_cogen.map((s) => {
+    const color = powerStatusColor(s.utilization);
+    const halo = L.circleMarker([s.lat, s.lon], {
+      radius: 15,
+      color,
+      weight: 2,
+      dashArray: "5 4",
+      fill: false,
+      opacity: 0.9,
+    });
+    halo.bindTooltip(powerHaloTooltip(s), { sticky: true, opacity: 0.96, className: "pipeline-tip railway-tip" });
+    return halo;
+  });
+  state.powerLayer = L.layerGroup(markers).addTo(state.map);
+}
+
+function renderPowerPanel() {
+  const existing = document.getElementById("powerPanel");
+  if (existing) existing.remove();
+  if (!state.powerEnabled || !state.powerData) return;
+  const d = state.powerData;
+  const sys = d.system || {};
+  const fmtMW = (v) => (v === null || v === undefined ? "–" : `${Math.round(v).toLocaleString("en-CA")} MW`);
+  const cogenRows = (d.site_cogen || []).map((s) => `
+    <tr>
+      <td><i class="pw-dot" style="background:${powerStatusColor(s.utilization)}"></i>${escapeHtml(s.site)}</td>
+      <td class="num">${s.tng_mw}</td>
+      <td class="num">${s.mc_mw}</td>
+      <td class="num">${s.utilization === null ? "–" : (s.utilization * 100).toFixed(0) + "%"}</td>
+    </tr>`).join("");
+  const atcoRows = (d.atco_fleet || []).map((a) => `
+    <tr>
+      <td><i class="pw-dot" style="background:${powerStatusColor(a.utilization)}"></i>${escapeHtml(a.name)}</td>
+      <td>${escapeHtml(a.fuel || "")}</td>
+      <td class="num">${a.tng_mw}</td>
+      <td class="num">${a.mc_mw}</td>
+    </tr>`).join("");
+  const panel = document.createElement("div");
+  panel.id = "powerPanel";
+  panel.innerHTML = `
+    <div class="pw-header">
+      <div>
+        <strong>Alberta grid & site power</strong>
+        <span class="pw-sub">AESO ${escapeHtml(d.aeso_last_update || "")} · auto-refreshed every 30 min</span>
+      </div>
+      <button id="powerPanelClose" class="ref-close" title="Close">&#x2715;</button>
+    </div>
+    <div class="pw-stats">
+      <span><em>Alberta load</em>${fmtMW(sys.alberta_internal_load_mw)}</span>
+      <span><em>Generation</em>${fmtMW(sys.total_net_generation_mw)}</span>
+      <span><em>Interchange</em>${fmtMW(sys.net_actual_interchange_mw)}</span>
+    </div>
+    <div class="pw-body">
+      <p class="pw-note">Oil-sands / refining site cogeneration (map halos) — output vs capability:</p>
+      <table class="pw-table"><thead><tr><th>Site</th><th class="num">TNG</th><th class="num">MC</th><th class="num">Util</th></tr></thead>
+        <tbody>${cogenRows}</tbody></table>
+      <p class="pw-note">ATCO-heritage fleet (Heartland Generation):</p>
+      <table class="pw-table"><thead><tr><th>Unit</th><th>Fuel</th><th class="num">TNG</th><th class="num">MC</th></tr></thead>
+        <tbody>${atcoRows}</tbody></table>
+      <p class="pw-foot">Cogen output is a public power-status proxy for each site, not metered consumption. Source: AESO Current Supply Demand.</p>
+    </div>`;
+  document.getElementById("map").appendChild(panel);
+  document.getElementById("powerPanelClose").addEventListener("click", () => {
+    state.powerEnabled = false;
+    panel.remove();
+    renderPowerLayer();
+    updatePowerToggleUI();
+  });
+}
+
+function updatePowerToggleUI() {
+  const btn = document.getElementById("powerToggle");
+  if (!btn) return;
+  if (state.powerLoading) {
+    btn.textContent = "Loading...";
+    btn.className = "railway-toggle-btn loading";
+  } else if (state.powerEnabled) {
+    btn.textContent = "Power (on)";
+    btn.className = "railway-toggle-btn active";
+  } else {
+    btn.textContent = "Power";
+    btn.className = "railway-toggle-btn";
+    if (state.powerError) btn.title = `Power status unavailable: ${state.powerError}`;
+  }
+}
+
+(function initPowerToggle() {
+  const btn = document.getElementById("powerToggle");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    if (state.powerEnabled) {
+      state.powerEnabled = false;
+      renderPowerLayer();
+      renderPowerPanel();
+      updatePowerToggleUI();
+      return;
+    }
+    const ok = await fetchPowerData();
+    if (!ok) return;
+    state.powerEnabled = true;
+    renderPowerLayer();
+    renderPowerPanel();
+    updatePowerToggleUI();
+  });
+})();

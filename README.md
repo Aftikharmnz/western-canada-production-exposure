@@ -49,7 +49,21 @@ public monthly API period verified by this ETL; older `2017-01` through
 & 'C:\Users\aftik\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\run_etl.py --petrinex-start 2022-01
 ```
 
+## AESO / ATCO Power Status (auto-refreshed)
+
+The map's **Power** button overlays dashed status halos on oil-sands and refining
+sites from their AESO-reported cogeneration output (TNG vs max capability), plus a
+panel with Alberta grid metrics and the ATCO-heritage (Heartland) fleet.
+
+`public/data/aeso_power_status.json` is rebuilt automatically every 30 minutes by
+`.github/workflows/refresh-aeso-power.yml`, which runs
+`scripts/build_aeso_power_status.py` against the public AESO Current Supply Demand
+report and commits the snapshot — no manual refresh needed. Run the script locally
+to refresh on demand. Cogen output is a public power-status proxy for each site,
+not metered facility consumption.
+
 ## Run The App
+
 
 ```powershell
 & 'C:\Users\aftik\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m http.server 5173
