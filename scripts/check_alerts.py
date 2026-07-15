@@ -318,9 +318,8 @@ def main() -> int:
         print("warning: assets.json missing/empty — fire check skipped", file=sys.stderr)
 
     state["last_check"] = now_utc()
-    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8")
 
+    send_failed = False
     if alerts:
         for a in alerts:
             print(f"ALERT [{a['kind']}] {a['title']}\n  {a['detail']}", file=sys.stderr)
@@ -328,9 +327,18 @@ def main() -> int:
             print(send_email(alerts, cfg), file=sys.stderr)
         except Exception as exc:  # noqa: BLE001
             print(f"error: email send failed: {exc}", file=sys.stderr)
-            return 1
+            send_failed = True
     else:
         print("no alerts this run", file=sys.stderr)
+
+    if send_failed:
+        # Do NOT persist state: the transitions remain un-acknowledged, so the
+        # next run re-detects them and retries the email instead of losing it.
+        print("state not persisted; alerts will retry next run", file=sys.stderr)
+        return 1
+
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8")
     return 0
 
 
