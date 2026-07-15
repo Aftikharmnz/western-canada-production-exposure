@@ -3,17 +3,17 @@
   "Suncor Base Plant": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Syncrude Mildred Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Firebag SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Cold Lake (Imperial)": {
    "status": "normal",
@@ -23,57 +23,57 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "CNRL Horizon": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "MacKay River SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Long Lake SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Fort Hills Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Foster Creek SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Kearl Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Long Lake Upgrader": {
    "status": "normal",
@@ -83,12 +83,12 @@
   "Strathcona Refinery": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   },
   "Lindbergh SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 5
+   "runs_above": 6
   }
  },
  "fires": {
@@ -109,5 +109,5 @@
   }
  },
  "fires_baselined": true,
- "last_check": "2026-07-15 16:24 UTC"
+ "last_check": "2026-07-15 17:47 UTC"
 }
