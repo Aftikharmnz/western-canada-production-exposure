@@ -297,6 +297,23 @@ def send_email(alerts, cfg) -> str:
 
 def main() -> int:
     cfg = load_json(CONFIG_PATH, {})
+
+    if os.environ.get("ALERT_TEST", "").lower() == "true":
+        print("TEST MODE: sending a delivery-check email", file=sys.stderr)
+        test_alert = [{
+            "kind": "test",
+            "title": "Test alert — email delivery check",
+            "detail": (f"This is a test of the alert pipeline sent at {now_utc()}. "
+                       "If you are reading this, Resend credentials and the recipient "
+                       "list are working. No real event occurred."),
+        }]
+        try:
+            print(send_email(test_alert, cfg), file=sys.stderr)
+            return 0
+        except Exception as exc:  # noqa: BLE001
+            print(f"error: test email failed: {exc}", file=sys.stderr)
+            return 1
+
     power_cfg = cfg.get("power", {"down_threshold": 0.20, "recover_threshold": 0.50, "confirm_runs": 2})
     fire_cfg = cfg.get("fire", {"radius_km": 10})
     state = load_json(STATE_PATH, {})

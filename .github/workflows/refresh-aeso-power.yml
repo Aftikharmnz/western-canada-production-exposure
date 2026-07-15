@@ -4,7 +4,12 @@ on:
   schedule:
     # Every 30 minutes. GitHub cron is best-effort; runs may lag a few minutes.
     - cron: "*/30 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: "Send a test alert email (delivery check)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -32,6 +37,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           ALERT_EMAILS: ${{ secrets.ALERT_EMAILS }}
           ALERT_FROM: ${{ secrets.ALERT_FROM }}
+          ALERT_TEST: ${{ inputs.test_email }}
         run: python scripts/check_alerts.py
 
       - name: Commit and push if changed
