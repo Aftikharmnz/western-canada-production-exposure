@@ -1,0 +1,12 @@
+{
+  "power": {
+    "down_threshold": 0.20,
+    "recover_threshold": 0.50,
+    "confirm_runs": 2
+  },
+  "fire": {
+    "radius_km": 10,
+    "sources": ["alberta_wildfire", "bc_wildfire"]
+  },
+  "app_url": "https://aftikharmnz.github.io/western-canada-production-exposure/"
+}

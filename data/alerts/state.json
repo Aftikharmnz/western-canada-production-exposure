@@ -1,0 +1,113 @@
+{
+ "power_sites": {
+  "Suncor Base Plant": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Syncrude Mildred Lake": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Firebag SAGD": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Cold Lake (Imperial)": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Shell Scotford complex": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "CNRL Horizon": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "MacKay River SAGD": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Long Lake SAGD": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Fort Hills Mine": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Muskeg River Mine": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Christina Lake SAGD (MEG)": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Primrose / Wolf Lake": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Christina Lake SAGD (Cenovus)": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Foster Creek SAGD": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Kearl Mine": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Long Lake Upgrader": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 0
+  },
+  "Strathcona Refinery": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  },
+  "Lindbergh SAGD": {
+   "status": "normal",
+   "runs_below": 0,
+   "runs_above": 1
+  }
+ },
+ "fires": {
+  "AB-RWF036": {
+   "status": "Under Control",
+   "asset": "05-09-034-08W5 - HIGHWOOD ASSET MANAGEMENT LTD.",
+   "dist_km": 5.3
+  },
+  "BC-G90714": {
+   "status": "Being Held",
+   "asset": "WA 13440 - WILDBOY HOLDINGS HZ HELMET A- 016-J/094-P-11",
+   "dist_km": 2.4
+  },
+  "BC-G80488": {
+   "status": "Under Control",
+   "asset": "WA 27343 - PETRONAS HZ CARIBOU A- 080-G/094-G-07",
+   "dist_km": 0.1
+  }
+ },
+ "fires_baselined": true,
+ "last_check": "2026-07-15 04:27 UTC"
+}

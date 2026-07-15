@@ -62,7 +62,27 @@ report and commits the snapshot — no manual refresh needed. Run the script loc
 to refresh on demand. Cogen output is a public power-status proxy for each site,
 not metered facility consumption.
 
+## Email Alerts (power drops & fires near assets)
+
+`scripts/check_alerts.py` runs in the same 30-minute workflow and emails a
+recipient list when something changes:
+
+- **Power down** — a monitored site's cogen output falls below **20%** of
+  capability for 2 consecutive checks (~1 h); a **recovery** email is sent when
+  it climbs back above **50%**. Thresholds: `data/alerts/config.json`.
+- **Fires** — a new active wildfire within **10 km** of any mapped asset, using
+  Government of Alberta (Alberta Wildfire) and Government of B.C. (BC Wildfire
+  Service) feeds only (no satellite hotspot data). Escalation email if it goes
+  Out of Control; close-out email when contained.
+
+Alerts fire on transitions only (state in `data/alerts/state.json`, committed by
+the bot); the first run baselines existing conditions without emailing. To enable
+sending, add repo **Actions secrets**: `RESEND_API_KEY` (from resend.com) and
+`ALERT_EMAILS` (comma-separated recipients); optional `ALERT_FROM`. Without
+secrets the workflow still runs and logs alerts without sending.
+
 ## Run The App
+
 
 
 ```powershell
