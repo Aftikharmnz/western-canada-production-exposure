@@ -18,6 +18,33 @@ const DATA_PATHS = {
   pipelineIndex: "public/data/aer_pipeline_index.json",
 };
 
+const DEFAULT_BASEMAP_KEY = "topographic";
+const BASEMAP_META = {
+  dark: {
+    label: "Dark",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    referenceUrl: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+    options: {
+      maxZoom: 13,
+      attribution: "Tiles &copy; Esri &mdash; Sources: Esri, HERE, Garmin, &copy; OpenStreetMap contributors, GIS User Community",
+    },
+    referenceOptions: {
+      maxZoom: 13,
+      attribution: "",
+      className: "basemap-label-layer",
+      pane: "basemapLabels",
+    },
+  },
+  topographic: {
+    label: "Topo",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    options: {
+      maxZoom: 13,
+      attribution: "Tiles: Esri World Topographic Map",
+    },
+  },
+};
+
 // ============================================================
 // PRODUCTION SYSTEM METADATA  (map marker colour + label)
 // ============================================================
@@ -201,6 +228,22 @@ const RAIL_OWNER_META = [
   { key: "passenger", label: "Passenger / commuter",   color: "#9aa5b1", codes: [] },
   { key: "other",     label: "Regional & short line",  color: "#7b8794", codes: [] },
 ];
+const RAIL_OWNER_DARK_COLORS = {
+  cn: "#ff5a5f",
+  cpkc: "#ffc43d",
+  bnsf: "#4ade80",
+  up: "#c084fc",
+  csx: "#38bdf8",
+  ns: "#f8fafc",
+  passenger: "#d1d5db",
+  other: "#a8b8c8",
+};
+const RAIL_TERMINAL_DARK_COLORS = {
+  "crude-rail-terminal": "#fb923c",
+  "crude-terminal": "#fb7185",
+  "product-terminal": "#2dd4bf",
+  "inactive-terminal": "#cbd5e1",
+};
 const RAIL_OWNER_BY_CODE = new Map(
   RAIL_OWNER_META.flatMap((m) => m.codes.map((code) => [code, m]))
 );
@@ -277,6 +320,8 @@ const state = {
   company: "All",
   search: "",
   map: null,
+  basemapKey: DEFAULT_BASEMAP_KEY,
+  basemapLayer: null,
   markerLayer: null,
   assetMarkerLayersByLegendKey: new Map(),
   fallbackReady: false,
@@ -403,6 +448,7 @@ const els = {
   distanceToggle:   document.querySelector("#distanceToggle"),
   distanceStatus:   document.querySelector("#distanceStatus"),
   mapLegend:        document.querySelector("#mapLegend"),
+  basemapSwitch:    document.querySelector("#basemapSwitch"),
   map:              document.querySelector("#map"),
   mapFallback:      document.querySelector("#mapFallback"),
 };
@@ -977,6 +1023,7 @@ function initMap() {
   if (!window.L) {
     els.map.hidden = true;
     els.mapFallback.hidden = false;
+    if (els.basemapSwitch) els.basemapSwitch.hidden = true;
     state.fallbackReady = true;
     return;
   }
@@ -987,14 +1034,52 @@ function initMap() {
   }).setView([55.7, -112.0], 5);
 
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
-  L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-    { maxZoom: 13, attribution: "Tiles: Esri World Topographic Map" }
-  ).addTo(state.map);
+  const basemapLabelsPane = state.map.createPane("basemapLabels");
+  basemapLabelsPane.style.zIndex = "625";
+  basemapLabelsPane.style.pointerEvents = "none";
+  initBasemapSwitch();
   state.markerLayer = L.layerGroup().addTo(state.map);
   initRubberBand();
   initDistanceTool();
   state.map.on("moveend zoomend", schedulePipelineTileRefresh);
+}
+
+function updateBasemapUI() {
+  if (!els.basemapSwitch) return;
+  els.basemapSwitch.querySelectorAll("button[data-basemap]").forEach((button) => {
+    const selected = button.dataset.basemap === state.basemapKey;
+    button.setAttribute("aria-pressed", selected ? "true" : "false");
+  });
+  const mapStage = els.map?.closest(".map-stage");
+  if (mapStage) mapStage.dataset.basemap = state.basemapKey;
+}
+
+function setBasemap(key) {
+  if (!state.map || !window.L || !BASEMAP_META[key]) return;
+  if (state.basemapLayer) state.map.removeLayer(state.basemapLayer);
+  state.basemapKey = key;
+  const meta = BASEMAP_META[key];
+  const layers = [L.tileLayer(meta.url, meta.options)];
+  if (meta.referenceUrl) {
+    layers.push(L.tileLayer(meta.referenceUrl, meta.referenceOptions || {}));
+  }
+  state.basemapLayer = layers.length === 1 ? layers[0] : L.layerGroup(layers);
+  state.basemapLayer.addTo(state.map);
+  if (typeof state.basemapLayer.bringToBack === "function") state.basemapLayer.bringToBack();
+  updateBasemapUI();
+  refreshRailwayStyles();
+  if (state.railwayData) buildRailwayMenu();
+}
+
+function initBasemapSwitch() {
+  if (!els.basemapSwitch) return;
+  els.basemapSwitch.hidden = false;
+  els.basemapSwitch.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-basemap]");
+    if (!button || !els.basemapSwitch.contains(button)) return;
+    setBasemap(button.dataset.basemap);
+  });
+  setBasemap(state.basemapKey);
 }
 
 function initDistanceTool() {
@@ -4357,28 +4442,58 @@ function railwaySelectedCount() {
   return state.selectedRailwayCategories.size;
 }
 
+function railwayOwnerColor(owner) {
+  if (state.basemapKey === "dark") {
+    return RAIL_OWNER_DARK_COLORS[owner.key] || RAIL_OWNER_DARK_COLORS.other;
+  }
+  return owner.color;
+}
+
+function railwayCategoryColor(category) {
+  if (state.basemapKey === "dark" && RAIL_TERMINAL_DARK_COLORS[category]) {
+    return RAIL_TERMINAL_DARK_COLORS[category];
+  }
+  return (RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["product-terminal"]).color;
+}
+
 function railwayStyle(feature) {
   const category = feature.properties?.category || "rail-main";
   const owner = railLineOwnerMeta(feature.properties);
+  const dark = state.basemapKey === "dark";
   return {
-    color: owner.color,
-    weight: category === "rail-main" ? 1.05 : 0.75,
-    opacity: category === "rail-main" ? 0.78 : 0.5,
+    color: railwayOwnerColor(owner),
+    weight: category === "rail-main" ? (dark ? 1.65 : 1.05) : (dark ? 1.05 : 0.75),
+    opacity: category === "rail-main" ? (dark ? 0.94 : 0.78) : (dark ? 0.72 : 0.5),
     lineCap: "round",
     lineJoin: "round",
   };
 }
 
-function railwayTerminalMarker(feature, latlng) {
+function railwayTerminalStyle(feature) {
   const category = feature.properties?.category || "product-terminal";
-  const meta = RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["product-terminal"];
-  return L.circleMarker(latlng, {
+  return {
     radius: category === "crude-rail-terminal" || category === "crude-terminal" ? 4.4 : 3.7,
     color: "#ffffff",
     weight: 1.15,
-    fillColor: meta.color,
+    fillColor: railwayCategoryColor(category),
     fillOpacity: 0.9,
     opacity: 0.95,
+  };
+}
+
+function railwayTerminalMarker(feature, latlng) {
+  return L.circleMarker(latlng, railwayTerminalStyle(feature));
+}
+
+function refreshRailwayStyles() {
+  if (!state.railwayLayer) return;
+  state.railwayLayer.eachLayer((layer) => {
+    const feature = layer.feature;
+    if (!feature || typeof layer.setStyle !== "function") return;
+    const isLine = feature.properties?.feature_kind === "rail_line"
+      || feature.geometry?.type === "LineString"
+      || feature.geometry?.type === "MultiLineString";
+    layer.setStyle(isLine ? railwayStyle(feature) : railwayTerminalStyle(feature));
   });
 }
 
@@ -4533,7 +4648,7 @@ function buildRailwayMenu() {
           const count = ownerCounts.get(meta.key);
           return `
             <span class="railway-owner-item">
-              <span class="railway-swatch" style="background:${meta.color}"></span>
+              <span class="railway-swatch" style="background:${railwayOwnerColor(meta)}"></span>
               ${escapeHtml(meta.label)}${count ? ` · ${formatNumber(count, 0)}` : ""}
             </span>`;
         }).join("")}
@@ -4543,8 +4658,8 @@ function buildRailwayMenu() {
     .map(([key, meta]) => {
       const checked = state.selectedRailwayCategories.has(key);
       const swatch = meta.kind === "point"
-        ? `<span class="railway-dot-swatch" style="background:${meta.color}"></span>`
-        : `<span class="railway-swatch" style="background:${meta.color}"></span>`;
+        ? `<span class="railway-dot-swatch" style="background:${railwayCategoryColor(key)}"></span>`
+        : `<span class="railway-swatch" style="background:${railwayCategoryColor(key)}"></span>`;
       const count = counts[key] ? ` · ${formatNumber(counts[key], 0)}` : "";
       return `
         <label class="railway-option" title="${escapeHtml(meta.detail)}">

@@ -346,6 +346,63 @@ select {
     #dfe7df;
 }
 
+.map-stage[data-basemap="dark"],
+.map-stage[data-basemap="dark"] .leaflet-container {
+  background: #18212b;
+}
+
+.basemap-switch {
+  position: absolute;
+  right: 10px;
+  bottom: 84px;
+  z-index: 920;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(20, 26, 29, 0.18);
+}
+
+.basemap-switch-label {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.basemap-switch button {
+  height: 26px;
+  min-width: 46px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #445155;
+  font-size: 11px;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.basemap-switch button:hover {
+  background: #edf2f1;
+  color: #172326;
+}
+
+.basemap-switch button[aria-pressed="true"] {
+  background: #172326;
+  color: #ffffff;
+}
+
+.basemap-switch button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
 /* Local Leaflet containment fallback in case the CDN stylesheet is blocked or slow. */
 .leaflet-container {
   position: relative;
@@ -433,6 +490,19 @@ select {
   filter: saturate(0.86) contrast(0.98);
 }
 
+.map-stage[data-basemap="dark"] .leaflet-tile {
+  filter: saturate(0.7) contrast(1.08) brightness(0.86);
+}
+
+.map-stage[data-basemap="dark"] .basemap-label-layer .leaflet-tile {
+  filter: contrast(1.08) brightness(1.16);
+}
+
+.basemap-label-layer,
+.basemap-label-layer .leaflet-tile {
+  pointer-events: none;
+}
+
 .leaflet-control-container .leaflet-top,
 .leaflet-control-container .leaflet-bottom {
   position: absolute;
@@ -496,6 +566,15 @@ select {
 .map .leaflet-control-attribution {
   font-size: 10px;
   background: rgba(255, 255, 255, 0.72);
+}
+
+.map-stage[data-basemap="dark"] .leaflet-control-attribution {
+  color: #e5e7eb;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.map-stage[data-basemap="dark"] .leaflet-control-attribution a {
+  color: #93c5fd;
 }
 
 .map-legend {

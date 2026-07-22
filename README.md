@@ -2,6 +2,8 @@
 
 Local ETL and map dashboard for Western Canada crude production exposure work.
 
+The map opens with the detailed Esri topographic background. Use the **Map: Dark / Topo** switch above the lower-right zoom buttons to select a low-detail dark background for the current session. Dark mode keeps a separate province, city, town, and smaller-place reference-label layer and applies a brighter railway-owner palette, so infrastructure remains prominent without losing geographic context.
+
 ## Run The ETL
 
 ```powershell

@@ -7,7 +7,7 @@
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <link rel="stylesheet" href="src/styles.css?v=20260713c" />
+    <link rel="stylesheet" href="src/styles.css?v=20260722d" />
   </head>
   <body>
     <div id="app" class="app-shell">
@@ -193,6 +193,11 @@
         <section class="map-stage" aria-label="Production map">
           <div id="map" class="map"></div>
           <div id="mapFallback" class="map-fallback" hidden></div>
+          <div id="basemapSwitch" class="basemap-switch" role="group" aria-label="Background map">
+            <span class="basemap-switch-label">Map</span>
+            <button type="button" data-basemap="dark" aria-pressed="false" title="Low-detail dark map with province, city, and place labels">Dark</button>
+            <button type="button" data-basemap="topographic" aria-pressed="true" title="Detailed Esri topographic map">Topo</button>
+          </div>
           <div id="wildfireStatus" class="wildfire-status" hidden></div>
           <div id="pipelineStatus" class="pipeline-status" hidden></div>
           <div id="distanceStatus" class="distance-status" hidden></div>
@@ -426,6 +431,7 @@
           <section class="docs-section" id="tab-pipelines" hidden>
             <h2>Pipeline Layers</h2>
             <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude, diluent, HGL, and refined-product systems. <strong>Rail &amp; Terminals</strong> adds main rail corridors, major industrial leads, crude-by-rail points, and bulk crude/refined-product terminals. A terminal marker does not imply rail service; each Canadian point identifies its available public transport modes.</p>
+            <p>The map opens in <strong>Topo</strong> mode. Use the <strong>Map: Dark / Topo</strong> switch above the lower-right zoom buttons to change the background for the current session. Dark mode keeps province, city, town, and smaller-place labels while muting most other basemap detail, and it uses brighter railway colours so infrastructure routes remain legible.</p>
 
             <h3>AER feeder layer</h3>
             <p>Line segments represent AER feeder pipeline records where geometry is available. Feeder line categories are pre-split into static map tiles and load only after zooming in to reduce first-load latency. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
@@ -610,6 +616,6 @@
         freshness.textContent = "Still loading data... check the browser console for the failed public/data request.";
       }, 8000);
     </script>
-    <script src="src/main.js?v=20260713c"></script>
+    <script src="src/main.js?v=20260722d"></script>
   </body>
 </html>
