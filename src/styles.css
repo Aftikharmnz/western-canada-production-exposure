@@ -23,6 +23,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   width: 100%;
@@ -1452,7 +1456,6 @@ select {
 .leaflet-tooltip.distance-snap-label::before {
   display: none;
 }
-}
 
 /* ─── FIRE RISK SECTION (detail panel) ─── */
 .fire-risk-section {
@@ -2238,6 +2241,8 @@ select {
 .dot.rail-main        { background: #111827; border-radius: 2px; }
 .dot.rail-industrial  { background: #6b7280; border-radius: 2px; }
 .dot.crude-rail-terminal { background: #111827; }
+.dot.crude-terminal   { background: #9a5546; }
+.dot.inactive-terminal { background: #94a3b8; }
 .dot.product-terminal { background: #0f766e; }
 
 /* ─── DEDICATED PIPELINE LEGEND PANEL ─── */
@@ -2746,9 +2751,6 @@ select {
 /* ============================================================
    DOCS PANEL OVERLAY
    ============================================================ */
-/* Ensure hidden attribute is respected even when display:flex is set */
-.docs-panel[hidden] { display: none !important; }
-
 .docs-panel {
   position: fixed;
   inset: 0;

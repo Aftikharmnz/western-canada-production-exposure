@@ -123,7 +123,14 @@ def read_polygon_shapes(zip_file: ZipFile, name: str) -> list[dict]:
                 continue
             if ring[0] != ring[-1]:
                 ring.append(ring[0])
-            rings.append(simplify_ring(ring))
+            simplified = simplify_ring(ring)
+            # Coordinate thinning can collapse tiny/sliver parts to fewer than
+            # four positions (including the closing coordinate). GeoJSON polygon
+            # rings with fewer than four positions are invalid and can make the
+            # browser silently skip or mis-render the entire approval feature.
+            if len(simplified) < 4 or simplified[0] != simplified[-1]:
+                continue
+            rings.append(simplified)
         if not rings:
             shapes.append({"type": None, "coordinates": []})
         elif len(rings) == 1:

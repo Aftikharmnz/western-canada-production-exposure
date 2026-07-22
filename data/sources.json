@@ -177,7 +177,7 @@
     "name": "North American Rail Network Lines",
     "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
     "raw_file": "public/data/railways.geojson",
-    "grain": "rail line segments",
+    "grain": "Canada/U.S. main-network and major-industrial rail segments, grouped for browser rendering",
     "download": false
   },
   {
@@ -195,16 +195,16 @@
     "name": "Petroleum Product Terminals",
     "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
     "raw_file": "public/data/railways.geojson",
-    "grain": "petroleum/refined-product terminal points",
+    "grain": "public EIA petroleum/refined-product terminal GIS snapshot points (service data edit 2020)",
     "download": false
   },
   {
-    "source_id": "canadian_petroleum_rail_terminals",
+    "source_id": "canadian_petroleum_terminals",
     "agency": "Public operator/regulator pages",
-    "name": "Curated Canadian Petroleum Rail Terminals",
+    "name": "Reviewed Canadian Petroleum Terminals",
     "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
     "raw_file": "public/data/railways.geojson",
-    "grain": "Canadian crude, diluent, transload, and refined-product terminal points",
+    "grain": "reviewed Canadian crude storage/marine/rail, diluent/transload, specialty, and refined-product terminal points",
     "download": false
   }
 ]

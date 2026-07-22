@@ -27,14 +27,23 @@ NARN_LINES_URL = "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/servi
 EIA_CRUDE_RAIL_TERMINALS_URL = "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0"
 EIA_PRODUCT_TERMINALS_URL = "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0"
 
-# Full Canadian and U.S. rail network context. The line filter keeps the BTS/FRA
-# main network and industrial leads; terminal layers include all U.S. EIA points.
+# Canadian and U.S. main-network context. The line filter keeps BTS/FRA main
+# routes and major industrial leads; terminal layers include all EIA points.
 DEFAULT_BBOX = (-170.0, 24.0, -52.0, 72.0)
 DEFAULT_RAIL_WHERE = "COUNTRY IN ('CA', 'US') AND NET IN ('M', 'I')"
 DEFAULT_CRUDE_TERMINAL_WHERE = "1=1"
 DEFAULT_PRODUCT_TERMINAL_WHERE = "1=1"
 
 SUNCOR_TERMINALS_URL = "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+TRANS_MOUNTAIN_TERMINALS_URL = "https://www.transmountain.com/terminals"
+NPRI_FACILITIES_URL = "https://maps-cartes.ec.gc.ca/arcgis/rest/services/STB_DGST/NPRI/MapServer/0"
+ENBRIDGE_STORAGE_URL = "https://www.oilsandsmagazine.com/projects/crude-oil-storage-terminals"
+IMPERIAL_TERMINALS_URL = "https://www.imperialoil.ca/en-ca/company/operations/pipelines-and-distribution"
+SHELL_TERMINALS_URL = "https://www.shell.ca/en_ca/about-us/what-we-do.html"
+IRVING_FACILITIES_URL = "https://www.irvingoil.com/en-CA/discover-irving/irving-oil-facilities"
+VALERO_CANADA_URL = "https://www.energievalero.ca/en-ca"
+HF_SINCLAIR_MISSISSAUGA_URL = "https://www.hfsinclair.com/operations/facilities/canada/mississauga-on/default.aspx"
+PEMBINA_ERT_DECOMMISSION_URL = "https://www.pembina.com/media-centre/news/details/c397a7cf-2903-455a-bf6d-fcf5bc685b90"
 TORQ_TERMINALS_URL = "https://torqlogistics.com/transloading-services/"
 GIBSON_OPERATIONS_URL = "https://www.gibsonenergy.com/operations/"
 USDG_DRU_URL = "https://usdg.com/terminal/dru/"
@@ -69,56 +78,40 @@ CANADIAN_TERMINALS: list[dict[str, Any]] = [
         "source_url": GIBSON_OPERATIONS_URL,
     },
     {
-        "name": "Keyera Alberta Diluent Terminal",
-        "operator": "Keyera",
-        "category": "crude-rail-terminal",
-        "city": "Fort Saskatchewan",
-        "state": "Alberta",
-        "coordinates": [-113.101, 53.716],
-        "commodity": "Diluent / condensate",
-        "facility_type": "Diluent storage and rail-offload terminal",
-        "rail_connection": "Rail offload services",
-        "source": "Keyera oil sands services agreement",
-        "source_url": KEYERA_ADT_URL,
-    },
-    {
-        "name": "Keyera Edmonton Terminal",
-        "operator": "Keyera",
+        "name": "Keyera Edmonton Terminal / Alberta Diluent & Crude Terminals (ADT/ACT)",
+        "operator": "Keyera / Pembina JV",
         "category": "crude-rail-terminal",
         "city": "Edmonton",
         "state": "Alberta",
         "coordinates": [-113.333, 53.562],
-        "commodity": "Diluent / condensate",
-        "facility_type": "Diluent storage and rail-offload terminal",
-        "rail_connection": "Rail offload services",
-        "source": "Keyera oil sands services agreement",
+        "commodity": "Crude oil / diluent / condensate",
+        "facility_type": "Co-located diluent rail-offload and crude rail-loading terminals",
+        "rail_connection": "CN-served rail offload/loading services",
+        "source": "Keyera oil sands services agreement and Alberta Crude Terminal public references",
         "source_url": KEYERA_ADT_URL,
+        "status": "Verification needed",
+        "last_verified": "2026-07-22",
+        "modes": "Rail / pipeline",
+        "location_confidence": "Approximate public-location centroid",
+        "facility_scope": "Combined terminal complex",
     },
     {
         "name": "Edmonton Rail Terminal (ERT)",
         "operator": "Pembina / Imperial Oil JV",
-        "category": "crude-rail-terminal",
+        "category": "inactive-terminal",
         "city": "Edmonton (Strathcona County)",
         "state": "Alberta",
         "coordinates": [-113.354, 53.494],
         "commodity": "Crude oil / dilbit",
         "facility_type": "Crude-by-rail loading terminal (largest in Canada, ~210 kbbl/d nameplate)",
         "rail_connection": "CN and CPKC connections adjacent to the Imperial Strathcona refinery",
-        "source": "Pembina/Imperial Edmonton Rail Terminal public references",
-        "source_url": "https://www.pembina.com/",
-    },
-    {
-        "name": "Alberta Crude Terminal (KACT)",
-        "operator": "Pembina / Keyera JV",
-        "category": "crude-rail-terminal",
-        "city": "Edmonton",
-        "state": "Alberta",
-        "coordinates": [-113.340, 53.570],
-        "commodity": "Crude oil",
-        "facility_type": "Crude-by-rail loading terminal (~40 kbbl/d)",
-        "rail_connection": "CN-served, adjacent to the Keyera Edmonton Terminal",
-        "source": "Keyera/Pembina Alberta Crude Terminal public references",
-        "source_url": KEYERA_ADT_URL,
+        "source": "Pembina disposition/decommissioning disclosure",
+        "source_url": PEMBINA_ERT_DECOMMISSION_URL,
+        "status": "Decommissioned Q2 2024",
+        "last_verified": "2026-07-22",
+        "modes": "Rail / pipeline",
+        "location_confidence": "Approximate public-location centroid",
+        "facility_scope": "Former primary crude-by-rail terminal",
     },
     {
         "name": "Bruderheim Rail Terminal",
@@ -256,7 +249,7 @@ CANADIAN_TERMINALS: list[dict[str, Any]] = [
         "category": "product-terminal",
         "city": "Saskatoon",
         "state": "Saskatchewan",
-        "coordinates": [-106.664, 52.111],
+        "coordinates": [-106.7058, 52.1146],
         "commodity": "Refined products",
         "facility_type": "Refined-product terminal",
         "rail_connection": "Product terminal in Suncor Saskatoon pipeline and terminal system",
@@ -295,7 +288,7 @@ CANADIAN_TERMINALS: list[dict[str, Any]] = [
         "category": "product-terminal",
         "city": "Thunder Bay",
         "state": "Ontario",
-        "coordinates": [-89.220, 48.385],
+        "coordinates": [-89.2456, 48.3710],
         "commodity": "Gasoline / diesel",
         "facility_type": "Refined-product terminal",
         "rail_connection": "Receives/distributes product via marine, rail cars, and trucks",
@@ -316,6 +309,336 @@ CANADIAN_TERMINALS: list[dict[str, Any]] = [
         "source_url": GIBSON_OPERATIONS_URL,
     },
 ]
+
+
+def _terminal_record(
+    *,
+    name: str,
+    operator: str,
+    category: str,
+    city: str,
+    state: str,
+    coordinates: list[float],
+    commodity: str,
+    facility_type: str,
+    modes: str,
+    source: str,
+    source_url: str,
+    location_confidence: str,
+    facility_scope: str = "Primary terminal",
+    status: str = "Operational",
+    coordinate_source_url: str | None = None,
+) -> dict[str, Any]:
+    """Create a consistently sourced Canadian terminal record."""
+    return {
+        "name": name,
+        "operator": operator,
+        "category": category,
+        "country": "CA",
+        "city": city,
+        "state": state,
+        "coordinates": coordinates,
+        "commodity": commodity,
+        "facility_type": facility_type,
+        "modes": modes,
+        "source": source,
+        "source_url": source_url,
+        "coordinate_source_url": coordinate_source_url,
+        "status": status,
+        "last_verified": "2026-07-22",
+        "location_confidence": location_confidence,
+        "facility_scope": facility_scope,
+    }
+
+
+# Suncor's current operator page lists fourteen Canadian terminal locations.
+# These are the eight not already represented in the base curated list above.
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=name,
+        operator="Suncor",
+        category="product-terminal",
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity="Gasoline / diesel / jet fuel / renewable fuel blends",
+        facility_type="Refined-product distribution terminal",
+        modes=modes,
+        source="Suncor terminal network; NPRI facility coordinates where available",
+        source_url=SUNCOR_TERMINALS_URL,
+        coordinate_source_url=NPRI_FACILITIES_URL,
+        location_confidence="NPRI facility coordinates",
+    )
+    for name, city, state, coordinates, modes in [
+        ("Suncor London Products Terminal", "London", "Ontario", [-81.1658, 43.0212], "Pipeline / truck"),
+        ("Suncor Metro Depot Products Terminal", "Toronto", "Ontario", [-79.4779, 43.7668], "Pipeline / truck"),
+        ("Suncor Oakville South Products Terminal", "Oakville", "Ontario", [-79.73, 43.3901], "Marine / pipeline / truck"),
+        ("Suncor Ottawa Products Terminal", "Ottawa / Nepean", "Ontario", [-75.719, 45.3266], "Pipeline / truck"),
+        ("Suncor Montreal East Products Terminal", "Montreal", "Quebec", [-73.50813, 45.61264], "Marine / pipeline / truck"),
+        ("Suncor Kamloops Products Terminal", "Kamloops", "British Columbia", [-120.4315, 50.7113], "Rail / truck"),
+        ("Suncor Nanaimo Products Terminal", "Nanaimo", "British Columbia", [-123.94973, 49.18639], "Marine / truck"),
+        ("Suncor Rimouski Products Terminal", "Rimouski", "Quebec", [-68.51001, 48.47524], "Marine / truck"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=name,
+        operator="Trans Mountain",
+        category="crude-terminal",
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity=commodity,
+        facility_type=facility_type,
+        modes=modes,
+        source="Trans Mountain terminal network",
+        source_url=TRANS_MOUNTAIN_TERMINALS_URL,
+        location_confidence=confidence,
+        facility_scope=scope,
+    )
+    for name, city, state, coordinates, commodity, facility_type, modes, confidence, scope in [
+        ("Trans Mountain Edmonton Terminal", "Edmonton", "Alberta", [-113.366203, 53.544399], "Crude oil / refined petroleum products", "Pipeline receipt, storage, and dispatch terminal", "Pipeline", "Operator-published facility coordinates", "Primary pipeline terminal"),
+        ("Trans Mountain Kamloops Terminal", "Kamloops", "British Columbia", [-120.414497, 50.6619], "Crude oil / refined petroleum products", "Pipeline terminal and pump station", "Pipeline", "Operator-published facility coordinates", "Pipeline terminal"),
+        ("Trans Mountain Burnaby Terminal", "Burnaby", "British Columbia", [-122.930191, 49.269508], "Crude oil / refined petroleum products", "Pipeline storage and distribution terminal", "Pipeline / truck", "Operator-published facility coordinates", "Primary pipeline terminal"),
+        ("Trans Mountain Westridge Marine Terminal", "Burnaby", "British Columbia", [-122.955002, 49.288101], "Crude oil", "Marine export terminal", "Pipeline / marine", "Operator-published facility coordinates", "Primary marine terminal"),
+        ("Trans Mountain Sumas Terminal", "Sumas", "British Columbia", [-122.2, 49.0], "Crude oil / refined petroleum products", "Pipeline terminal and pump station", "Pipeline", "Approximate operator-map location", "Pipeline terminal"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=f"Enbridge {city} Terminal",
+        operator="Enbridge",
+        category="crude-terminal",
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity="Crude oil / petroleum liquids",
+        facility_type="Pipeline storage and transfer terminal",
+        modes="Pipeline",
+        source="NPRI facility coordinates and public crude-storage infrastructure references",
+        source_url=ENBRIDGE_STORAGE_URL,
+        coordinate_source_url=NPRI_FACILITIES_URL,
+        location_confidence="NPRI facility coordinates",
+        facility_scope="Primary pipeline terminal",
+    )
+    for city, state, coordinates in [
+        ("Hardisty", "Alberta", [-111.2061, 52.5881]),
+        ("Kerrobert", "Saskatchewan", [-109.03138, 51.86884]),
+        ("Cromer", "Manitoba", [-101.081, 49.7333]),
+        ("Regina", "Saskatchewan", [-104.5977, 50.4769]),
+        ("Sarnia", "Ontario", [-82.3525, 42.9405]),
+        ("Westover", "Ontario", [-80.091, 43.3285]),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=name,
+        operator="Gibson Energy",
+        category="crude-terminal",
+        city=city,
+        state="Alberta",
+        coordinates=coordinates,
+        commodity="Crude oil / petroleum liquids",
+        facility_type="Crude storage and pipeline terminal",
+        modes="Pipeline",
+        source="Gibson Energy operations",
+        source_url=GIBSON_OPERATIONS_URL,
+        coordinate_source_url=NPRI_FACILITIES_URL,
+        location_confidence="NPRI facility coordinates",
+        facility_scope="Primary crude storage terminal",
+    )
+    for name, city, coordinates in [
+        ("Gibson Hardisty Terminal", "Hardisty", [-111.2735, 52.6399]),
+        ("Gibson Edmonton South Terminal", "Edmonton", [-113.37163, 53.55167]),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=f"Imperial {name} Products Terminal",
+        operator="Imperial Oil",
+        category="product-terminal",
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity="Gasoline / diesel / aviation fuel / petroleum products",
+        facility_type="Refined-product distribution terminal",
+        modes=modes,
+        source="Imperial Oil distribution network; NPRI facility coordinates",
+        source_url=IMPERIAL_TERMINALS_URL,
+        coordinate_source_url=NPRI_FACILITIES_URL,
+        location_confidence="NPRI facility coordinates",
+    )
+    for name, city, state, coordinates, modes in [
+        ("Calgary", "Calgary", "Alberta", [-113.97668, 50.9636], "Pipeline / rail / truck"),
+        ("Edmonton", "Edmonton", "Alberta", [-113.40201, 53.53004], "Pipeline / rail / truck"),
+        ("Lougheed", "Burnaby", "British Columbia", [-122.92663, 49.25621], "Pipeline / truck"),
+        ("Nanaimo", "Nanaimo", "British Columbia", [-123.9501, 49.19235], "Marine / truck"),
+        ("Regina", "Regina", "Saskatchewan", [-104.58882, 50.47261], "Pipeline / rail / truck"),
+        ("Winnipeg", "East St. Paul / Winnipeg", "Manitoba", [-97.0464, 49.98149], "Pipeline / rail / truck"),
+        ("Gretna", "Gretna", "Manitoba", [-97.5614, 49.009], "Pipeline / truck"),
+        ("Finch", "Toronto", "Ontario", [-79.485, 43.7662], "Pipeline / truck"),
+        ("Nanticoke", "Nanticoke", "Ontario", [-80.048, 42.8351], "Pipeline / marine / truck"),
+        ("Sault Ste. Marie", "Sault Ste. Marie", "Ontario", [-84.2875, 46.518], "Marine / rail / truck"),
+        ("Sept-Iles", "Sept-Iles", "Quebec", [-66.373193, 50.197081], "Marine / truck"),
+        ("Dartmouth", "Dartmouth", "Nova Scotia", [-63.5384, 44.6408], "Marine / truck"),
+        ("Sydney", "Sydney", "Nova Scotia", [-60.202378, 46.148429], "Marine / truck"),
+        ("Corner Brook", "Corner Brook", "Newfoundland and Labrador", [-58.0137, 48.9642], "Marine / truck"),
+        ("Hay River", "Hay River", "Northwest Territories", [-115.7775, 60.8244], "Rail / marine / truck"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=f"Shell {name} Products Terminal",
+        operator="Shell Canada",
+        category="product-terminal",
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity="Gasoline / diesel / aviation fuel / petroleum products",
+        facility_type="Refined-product distribution terminal",
+        modes=modes,
+        source="Shell Canada distribution network; NPRI facility coordinates",
+        source_url=SHELL_TERMINALS_URL,
+        coordinate_source_url=NPRI_FACILITIES_URL,
+        location_confidence="NPRI facility coordinates",
+    )
+    for name, city, state, coordinates, modes in [
+        ("Calgary", "Calgary", "Alberta", [-113.9789, 50.96227], "Pipeline / truck"),
+        ("Burmount", "Burnaby", "British Columbia", [-122.928, 49.2607], "Pipeline / truck"),
+        ("Shellburn", "Burnaby", "British Columbia", [-122.9684, 49.2846], "Marine / pipeline / truck"),
+        ("Bare Point", "Chemainus", "British Columbia", [-123.7061, 48.9284], "Marine / truck"),
+        ("Winnipeg", "Winnipeg", "Manitoba", [-97.08396, 49.88881], "Rail / truck"),
+        ("Hamilton", "Hamilton", "Ontario", [-79.8474, 43.2693], "Marine / pipeline / truck"),
+        ("Keele", "Toronto", "Ontario", [-79.4895, 43.7688], "Pipeline / truck"),
+        ("Kingston", "Kingston", "Ontario", [-76.5444, 44.276], "Marine / truck"),
+        ("Ottawa", "Ottawa", "Ontario", [-75.718, 45.338], "Pipeline / rail / truck"),
+        ("Sarnia", "Sarnia", "Ontario", [-82.4565, 42.9055], "Pipeline / marine / truck"),
+        ("Sault Ste. Marie", "Sault Ste. Marie", "Ontario", [-84.2776, 46.5227], "Marine / rail / truck"),
+        ("Montreal East", "Montreal", "Quebec", [-73.52141, 45.62445], "Marine / pipeline / truck"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=name,
+        operator="Irving Oil",
+        category=category,
+        city=city,
+        state=state,
+        coordinates=coordinates,
+        commodity=commodity,
+        facility_type=facility_type,
+        modes=modes,
+        source="Irving Oil current facilities",
+        source_url=IRVING_FACILITIES_URL,
+        location_confidence="Public facility coordinates",
+        facility_scope=scope,
+    )
+    for name, category, city, state, coordinates, commodity, facility_type, modes, scope in [
+        ("Irving Halifax Harbour Terminal", "product-terminal", "Dartmouth", "Nova Scotia", [-63.5449, 44.64659], "Refined petroleum products", "Marine product terminal", "Marine / truck", "Primary marine terminal"),
+        ("Irving Canaport / East Saint John Terminal", "crude-terminal", "Saint John", "New Brunswick", [-66.0359, 45.2785], "Crude oil / gasoline / distillate / LPG", "Deepwater crude receipt and mixed petroleum terminal", "Marine / pipeline / rail", "Primary crude and marine terminal"),
+        ("Irving Charlottetown Terminal", "product-terminal", "Charlottetown", "Prince Edward Island", [-63.1127, 46.2426], "Refined petroleum products", "Marine product terminal", "Marine / truck", "Primary marine terminal"),
+        ("Irving St. John's Terminal", "product-terminal", "St. John's", "Newfoundland and Labrador", [-52.6985, 47.5622], "Refined petroleum products", "Marine product terminal", "Marine / truck", "Primary marine terminal"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.extend(
+    _terminal_record(
+        name=name,
+        operator="Valero Energy",
+        category="product-terminal",
+        city=city,
+        state="Quebec",
+        coordinates=coordinates,
+        commodity="Gasoline / diesel / jet fuel / petroleum products",
+        facility_type=facility_type,
+        modes=modes,
+        source="Valero Energy Canada assets",
+        source_url=VALERO_CANADA_URL,
+        location_confidence=confidence,
+        facility_scope=scope,
+    )
+    for name, city, coordinates, facility_type, modes, confidence, scope in [
+        ("Valero Montreal East Terminal", "Montreal", [-73.526, 45.634], "Bulk storage and distribution terminal", "Marine / pipeline / rail / truck", "Approximate public facility location", "Primary product terminal"),
+        ("Valero Gaspe Terminal", "Gaspe", [-64.447903, 48.82562], "Marine product terminal", "Marine / truck", "Public facility coordinates", "Primary marine terminal"),
+        ("Valero Levis / Jean-Gaulin Marine Terminal", "Levis", [-71.193509, 46.758386], "Refinery-adjacent marine and product terminal", "Marine / pipeline / truck", "Public facility coordinates", "Refinery-adjacent terminal"),
+    ]
+)
+
+
+CANADIAN_TERMINALS.append(
+    _terminal_record(
+        name="HF Sinclair Mississauga Lubricants Centre",
+        operator="HF Sinclair / Petro-Canada Lubricants",
+        category="product-terminal",
+        city="Mississauga",
+        state="Ontario",
+        coordinates=[-79.6101, 43.5012],
+        commodity="Base oils / specialty lubricants / waxes",
+        facility_type="Specialty-lubricants refinery and marine terminal",
+        modes="Marine / pipeline / truck",
+        source="HF Sinclair Mississauga facility",
+        source_url=HF_SINCLAIR_MISSISSAUGA_URL,
+        location_confidence="Public facility coordinates",
+        facility_scope="Specialty refined-products facility",
+    )
+)
+
+
+# Bring legacy curated records up to the same explicit provenance schema. Older
+# one-off sources are marked for re-verification rather than implied to be a
+# complete, currently operating national registry.
+LEGACY_TERMINAL_MODES = {
+    "Hardisty Rail Terminal / DRU": "Rail / pipeline",
+    "Gibson Edmonton Terminal": "Rail / pipeline",
+    "Bruderheim Rail Terminal": "Rail",
+    "Torq Unity Terminal": "Rail / truck",
+    "Torq Lloydminster Big Gully Terminal": "Rail / truck",
+    "Torq Kerrobert Terminal": "Rail / truck",
+    "Torq Instow Terminal": "Rail / truck",
+    "Torq Tilley Terminal": "Rail / truck",
+    "Torq Whitecourt Terminal": "Rail / truck",
+    "Torq Buick Terminal": "Rail / truck",
+    "Suncor Burrard Products Terminal": "Pipeline / marine / rail / truck",
+    "Suncor Edmonton Terminal": "Pipeline / truck",
+    "Suncor Saskatoon Terminal": "Pipeline / truck",
+    "Suncor Milden Tank Farm": "Pipeline",
+    "Suncor Terrace Products Terminal": "Rail / truck",
+    "Suncor Thunder Bay Products Terminal": "Marine / rail / truck",
+    "Gibson Moose Jaw Facility": "Pipeline / rail / truck",
+}
+
+for terminal in CANADIAN_TERMINALS:
+    terminal.setdefault("country", "CA")
+    terminal.setdefault(
+        "status",
+        "Verification needed" if terminal["name"] == "Bruderheim Rail Terminal" else "Operational",
+    )
+    terminal.setdefault("last_verified", "2026-07-22")
+    terminal.setdefault(
+        "modes",
+        LEGACY_TERMINAL_MODES.get(
+            terminal["name"],
+            "Rail / pipeline" if terminal["category"] == "crude-rail-terminal" else "Modes vary by site",
+        ),
+    )
+    terminal.setdefault("location_confidence", "Approximate public-location centroid")
+    terminal.setdefault(
+        "facility_scope",
+        "Rail terminal" if terminal["category"] == "crude-rail-terminal" else "Primary or operator-listed terminal",
+    )
 
 RAIL_OUT_FIELDS = ",".join(
     [
@@ -351,20 +674,9 @@ def query_arcgis_geojson(
     *,
     where: str = "1=1",
     out_fields: str = "*",
-    bbox: tuple[float, float, float, float] = DEFAULT_BBOX,
+    bbox: tuple[float, float, float, float] | None = DEFAULT_BBOX,
     page_size: int = 2000,
 ) -> list[dict[str, Any]]:
-    min_lon, min_lat, max_lon, max_lat = bbox
-    geometry = json.dumps(
-        {
-            "xmin": min_lon,
-            "ymin": min_lat,
-            "xmax": max_lon,
-            "ymax": max_lat,
-            "spatialReference": {"wkid": 4326},
-        },
-        separators=(",", ":"),
-    )
     features: list[dict[str, Any]] = []
     offset = 0
     while True:
@@ -372,15 +684,30 @@ def query_arcgis_geojson(
             "where": where,
             "outFields": out_fields,
             "returnGeometry": "true",
-            "geometry": geometry,
-            "geometryType": "esriGeometryEnvelope",
-            "inSR": "4326",
             "outSR": "4326",
-            "spatialRel": "esriSpatialRelIntersects",
             "f": "geojson",
             "resultRecordCount": str(page_size),
             "resultOffset": str(offset),
         }
+        if bbox is not None:
+            min_lon, min_lat, max_lon, max_lat = bbox
+            params.update(
+                {
+                    "geometry": json.dumps(
+                        {
+                            "xmin": min_lon,
+                            "ymin": min_lat,
+                            "xmax": max_lon,
+                            "ymax": max_lat,
+                            "spatialReference": {"wkid": 4326},
+                        },
+                        separators=(",", ":"),
+                    ),
+                    "geometryType": "esriGeometryEnvelope",
+                    "inSR": "4326",
+                    "spatialRel": "esriSpatialRelIntersects",
+                }
+            )
         data = request_json(f"{service_url}/query?{urllib.parse.urlencode(params)}")
         page = data.get("features") or []
         features.extend(page)
@@ -396,11 +723,15 @@ def round_coord(value: Any) -> float:
     return round(float(value), 3)
 
 
+def round_point_coord(value: Any) -> float:
+    return round(float(value), 5)
+
+
 def rounded_geometry(geometry: dict[str, Any]) -> dict[str, Any] | None:
     geom_type = geometry.get("type")
     coords = geometry.get("coordinates")
     if geom_type == "Point" and isinstance(coords, list) and len(coords) >= 2:
-        return {"type": "Point", "coordinates": [round_coord(coords[0]), round_coord(coords[1])]}
+        return {"type": "Point", "coordinates": [round_point_coord(coords[0]), round_point_coord(coords[1])]}
     if geom_type == "LineString" and isinstance(coords, list):
         return {"type": "LineString", "coordinates": [[round_coord(x), round_coord(y)] for x, y, *_ in coords]}
     if geom_type == "MultiLineString" and isinstance(coords, list):
@@ -468,6 +799,52 @@ def normalize_rail_feature(feature: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def aggregate_rail_features(features: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group NARN segments into a much smaller set of Leaflet path layers.
+
+    NARN is segmented at topology/attribute breaks. Rendering every source row as
+    its own Leaflet layer is expensive, even though adjacent rows share the same
+    visual category and owner. Grouping preserves those styling fields while the
+    ``segment_count`` property keeps the source-row cardinality auditable.
+    """
+    groups: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for feature in features:
+        props = feature.get("properties") or {}
+        key = (
+            str(props.get("category") or "rail-other"),
+            str(props.get("country") or ""),
+            str(props.get("owner") or "Unspecified owner"),
+        )
+        group = groups.setdefault(
+            key,
+            {
+                "type": "Feature",
+                "properties": {
+                    "feature_kind": "rail_line",
+                    "category": key[0],
+                    "name": f"{key[2]} — {railway_category_label(key[0])}",
+                    "owner": key[2],
+                    "country": key[1],
+                    "segment_count": 0,
+                    "source": "BTS/FRA North American Rail Network Lines",
+                },
+                "geometry": {"type": "MultiLineString", "coordinates": []},
+            },
+        )
+        geometry = feature.get("geometry") or {}
+        if geometry.get("type") == "LineString":
+            group["geometry"]["coordinates"].append(geometry.get("coordinates") or [])
+        elif geometry.get("type") == "MultiLineString":
+            group["geometry"]["coordinates"].extend(geometry.get("coordinates") or [])
+        group["properties"]["segment_count"] += 1
+
+    return [
+        feature
+        for feature in groups.values()
+        if feature["geometry"]["coordinates"]
+    ]
+
+
 def normalize_crude_terminal(feature: dict[str, Any]) -> dict[str, Any] | None:
     geometry = rounded_geometry(feature.get("geometry") or {})
     if not geometry:
@@ -480,6 +857,7 @@ def normalize_crude_terminal(feature: dict[str, Any]) -> dict[str, Any] | None:
             "feature_kind": "terminal",
             "category": "crude-rail-terminal",
             "category_label": "Crude-by-rail terminals",
+            "country": "US",
             "name": name,
             "city": first_value(props, ["CITY", "City"]),
             "state": first_value(props, ["STATE", "State"]),
@@ -507,6 +885,7 @@ def normalize_product_terminal(feature: dict[str, Any]) -> dict[str, Any] | None
             "feature_kind": "terminal",
             "category": "product-terminal",
             "category_label": "Petroleum product terminals",
+            "country": "US",
             "name": name,
             "city": first_value(props, ["CITY", "City"]),
             "state": first_value(props, ["STATE", "State", "State_Name"]),
@@ -524,23 +903,33 @@ def normalize_product_terminal(feature: dict[str, Any]) -> dict[str, Any] | None
 
 def canadian_terminal_features() -> list[dict[str, Any]]:
     features: list[dict[str, Any]] = []
+    category_labels = {
+        "crude-rail-terminal": "Canadian crude / multi-product rail terminals",
+        "crude-terminal": "Canadian crude storage / pipeline / marine terminals",
+        "product-terminal": "Canadian petroleum product terminals",
+        "inactive-terminal": "Inactive / decommissioned terminals",
+    }
     for terminal in CANADIAN_TERMINALS:
         props = {
             "feature_kind": "terminal",
             "category": terminal["category"],
-            "category_label": "Canadian crude / products rail terminals"
-            if terminal["category"] == "crude-rail-terminal"
-            else "Canadian petroleum product terminals",
+            "category_label": category_labels.get(terminal["category"], "Canadian petroleum terminal"),
             "name": terminal["name"],
+            "country": terminal.get("country"),
             "city": terminal.get("city"),
             "state": terminal.get("state"),
             "operator": terminal.get("operator"),
             "facility_type": terminal.get("facility_type"),
             "rail_connection": terminal.get("rail_connection"),
+            "modes": terminal.get("modes"),
             "commodity": terminal.get("commodity"),
+            "status": terminal.get("status"),
+            "last_verified": terminal.get("last_verified"),
+            "facility_scope": terminal.get("facility_scope"),
             "source": terminal.get("source"),
             "source_url": terminal.get("source_url"),
-            "location_confidence": "approximate public-location centroid",
+            "coordinate_source_url": terminal.get("coordinate_source_url"),
+            "location_confidence": terminal.get("location_confidence"),
         }
         features.append(
             {
@@ -548,7 +937,10 @@ def canadian_terminal_features() -> list[dict[str, Any]]:
                 "properties": compact_props(props),
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [round_coord(terminal["coordinates"][0]), round_coord(terminal["coordinates"][1])],
+                    "coordinates": [
+                        round_point_coord(terminal["coordinates"][0]),
+                        round_point_coord(terminal["coordinates"][1]),
+                    ],
                 },
             }
         )
@@ -570,17 +962,19 @@ def build_layer(
     lines = [feature for feature in (normalize_rail_feature(f) for f in raw_lines) if feature]
     for feature in lines:
         feature["properties"] = compact_props(feature["properties"])
-    print(f"  {len(lines):,} rail line segments")
+    raw_rail_segment_count = len(lines)
+    lines = aggregate_rail_features(lines)
+    print(f"  {raw_rail_segment_count:,} rail line segments grouped into {len(lines):,} render features")
 
     print("Fetching EIA crude-by-rail terminals...")
-    raw_crude = query_arcgis_geojson(EIA_CRUDE_RAIL_TERMINALS_URL, where=crude_terminal_where, bbox=bbox)
+    raw_crude = query_arcgis_geojson(EIA_CRUDE_RAIL_TERMINALS_URL, where=crude_terminal_where, bbox=None)
     crude = [feature for feature in (normalize_crude_terminal(f) for f in raw_crude) if feature]
     for feature in crude:
         feature["properties"] = compact_props(feature["properties"])
     print(f"  {len(crude):,} crude rail terminals")
 
     print("Fetching EIA petroleum product terminals...")
-    raw_products = query_arcgis_geojson(EIA_PRODUCT_TERMINALS_URL, where=product_terminal_where, bbox=bbox)
+    raw_products = query_arcgis_geojson(EIA_PRODUCT_TERMINALS_URL, where=product_terminal_where, bbox=None)
     products = [feature for feature in (normalize_product_terminal(f) for f in raw_products) if feature]
     for feature in products:
         feature["properties"] = compact_props(feature["properties"])
@@ -599,34 +993,41 @@ def build_layer(
     )
     return {
         "type": "FeatureCollection",
-        "name": "Railways and petroleum rail terminals",
+        "name": "Railways and petroleum terminals",
         "metadata": {
             "bbox": list(bbox),
             "rail_where": rail_where,
             "crude_terminal_where": crude_terminal_where,
             "product_terminal_where": product_terminal_where,
-            "scope": "All Canada and all U.S. rail lines plus all U.S. EIA crude and petroleum-product terminal points.",
-            "rail_detail": "BTS/FRA main network and industrial leads, with compact per-feature properties to stay under GitHub file limits.",
+            "scope": "Canada/U.S. BTS/FRA main rail network and major industrial leads, all EIA terminal service points, and a curated Canadian terminal set. Minor tracks, yards, sidings, and private spurs are not represented as complete coverage.",
+            "rail_detail": "BTS/FRA NET=M main network and NET=I major industrial leads, grouped by category, country, and owner for browser performance.",
+            "raw_rail_segment_count": raw_rail_segment_count,
+            "grouped_rail_feature_count": len(lines),
+            "curated_canadian_terminal_count": len(canadian),
+            "curated_canadian_terminal_categories": {
+                category: sum(feature["properties"].get("category") == category for feature in canadian)
+                for category in ("product-terminal", "crude-terminal", "crude-rail-terminal", "inactive-terminal")
+            },
             "sources": [
                 {
                     "name": "BTS/FRA North American Rail Network Lines",
                     "url": NARN_LINES_URL,
-                    "coverage": "North America rail linework clipped to the app rail overlay extent",
+                    "coverage": "Canada/U.S. main network and major industrial leads clipped to the requested rail extent; not every local track, siding, yard, or private spur",
                 },
                 {
                     "name": "EIA Crude Oil Rail Terminals",
                     "url": EIA_CRUDE_RAIL_TERMINALS_URL,
-                    "coverage": "Crude oil rail loading/unloading terminals inside the app rail overlay extent",
+                    "coverage": "All points returned by the EIA service, without the rail-line bounding-box filter",
                 },
                 {
                     "name": "EIA Petroleum Product Terminals",
                     "url": EIA_PRODUCT_TERMINALS_URL,
-                    "coverage": "Bulk refined-product/petroleum terminals inside the app rail overlay extent",
+                    "coverage": "All points returned by the EIA service, without the rail-line bounding-box filter",
                 },
                 {
-                    "name": "Curated Canadian petroleum rail terminals",
+                    "name": "Reviewed Canadian petroleum terminals",
                     "url": "See per-feature source_url values",
-                    "coverage": "Canadian crude, diluent, transload, and refined-product terminals identified from public operator/regulator pages",
+                    "coverage": "Curated high-confidence Canadian crude, diluent, transload, and refined-product terminals from public operator/regulator pages; not a complete national registry",
                 },
             ],
         },

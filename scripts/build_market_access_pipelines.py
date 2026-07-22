@@ -2,9 +2,11 @@
 Build the app-ready Major Market Access Pipelines GeoJSON.
 
 The layer is route-level, not survey-grade. Canadian linework is pulled from the
-public CER pipeline systems FeatureServer when available. U.S. continuations use
-EIA Energy Atlas FeatureServers and selected county GIS where it fills a specific
-gap, then each named pipeline is emitted as one map feature.
+public CER pipeline systems FeatureServer when available. U.S. continuations and
+hidden national reference networks use EIA Energy Atlas FeatureServers. Selected
+provincially regulated Canadian product pipelines are approximate corridors based
+on operator-published route descriptions. Each route or reference network is
+emitted as one map feature.
 
 Run:
     python scripts/build_market_access_pipelines.py
@@ -32,6 +34,9 @@ EIA_PRODUCTS_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/se
 EIA_HGL_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0"
 CAPP_MAP_URL = "https://www.capp.ca/wp-content/uploads/2024/03/CAPP-2023-Pipeline-and-Refinery-Map-36x22-wall-size.pdf"
 TM_PUGET_URL = "https://www.transmountain.com/news/2019/trans-mountains-puget-sound-pipeline-shipping-products-to-washington-state-refineries-since-1954"
+IMPERIAL_SARNIA_PRODUCTS_URL = "https://www.imperialoil.ca/en-ca/company/waterdown-to-finch"
+SUN_CANADIAN_URL = "https://sun-canadian.com/about-us/"
+VALERO_SAINT_LAURENT_URL = "https://www.energievalero.ca/en-ca/operations/pipelinesaint-laurent/route"
 AER_FEEDER_PIPELINES = ROOT / "public" / "data" / "aer_feeder_pipelines.geojson"
 
 
@@ -332,6 +337,121 @@ ROUTES: list[dict[str, Any]] = [
         "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'TransNorthern'"}],
     },
     {
+        "route_id": "imperial-sarnia-products",
+        "route_name": "Imperial Sarnia Products Pipeline",
+        "operator": "Imperial Oil",
+        "commodity": "Refined petroleum products",
+        "flow_role": "Southern Ontario gasoline, diesel, and jet-fuel distribution",
+        "direction": "Sarnia via London and Waterdown to Hamilton and Finch/Toronto",
+        "color": "#be123c",
+        "display_order": 91,
+        "default_visible": False,
+        "menu_section": "Canadian Refined-Product Pipelines",
+        "geometry_confidence": (
+            "curated approximate corridor from the operator-published route description; "
+            "not survey-grade and not suitable for locating"
+        ),
+        "coverage_scope": "Operator-described intercity route and terminal branches; approximate display corridor.",
+        "parts": [
+            {
+                "source": "Curated (Imperial Sarnia Products Pipeline corridor, approximate)",
+                "url": IMPERIAL_SARNIA_PRODUCTS_URL,
+                "manual_lines": [
+                    [
+                        [-82.40, 42.95],
+                        [-82.10, 43.00],
+                        [-81.73, 42.98],
+                        [-81.25, 42.98],
+                        [-80.78, 43.14],
+                        [-80.32, 43.25],
+                        [-79.93, 43.34],
+                        [-79.70, 43.48],
+                        [-79.48, 43.66],
+                        [-79.35, 43.79],
+                    ],
+                    [
+                        [-79.93, 43.34],
+                        [-79.87, 43.28],
+                        [-79.81, 43.25],
+                    ],
+                ],
+            }
+        ],
+    },
+    {
+        "route_id": "sun-canadian",
+        "route_name": "Sun-Canadian Pipe Line",
+        "operator": "Sun-Canadian Pipe Line",
+        "commodity": "Refined petroleum products",
+        "flow_role": "Southern Ontario refinery-to-market product distribution",
+        "direction": "Sarnia-area refineries to London, Hamilton, and the Toronto area",
+        "color": "#ea580c",
+        "display_order": 92,
+        "default_visible": False,
+        "menu_section": "Canadian Refined-Product Pipelines",
+        "geometry_confidence": (
+            "curated approximate corridor from the operator-published system description; "
+            "not survey-grade and not suitable for locating"
+        ),
+        "coverage_scope": "Operator-described intercity system; approximate display corridor.",
+        "parts": [
+            {
+                "source": "Curated (Sun-Canadian system corridor, approximate)",
+                "url": SUN_CANADIAN_URL,
+                "manual_lines": [
+                    [
+                        [-82.39, 42.95],
+                        [-82.05, 42.91],
+                        [-81.65, 42.91],
+                        [-81.25, 42.98],
+                        [-80.82, 43.10],
+                        [-80.42, 43.18],
+                        [-80.08, 43.23],
+                        [-79.86, 43.26],
+                        [-79.63, 43.46],
+                        [-79.43, 43.65],
+                    ]
+                ],
+            }
+        ],
+    },
+    {
+        "route_id": "valero-pipeline-saint-laurent",
+        "route_name": "Valero Pipeline Saint-Laurent",
+        "operator": "Energie Valero",
+        "commodity": "Refined petroleum products",
+        "flow_role": "Quebec refinery-to-terminal product distribution",
+        "direction": "Jean-Gaulin refinery at Levis via the Drummondville corridor to Montreal-East",
+        "color": "#a855f7",
+        "display_order": 93,
+        "default_visible": False,
+        "menu_section": "Canadian Refined-Product Pipelines",
+        "geometry_confidence": (
+            "curated approximate corridor from the operator-published 250 km route description; "
+            "not survey-grade and not suitable for locating"
+        ),
+        "coverage_scope": "Operator-described Levis-to-Montreal-East route; approximate display corridor.",
+        "parts": [
+            {
+                "source": "Curated (Valero Pipeline Saint-Laurent corridor, approximate)",
+                "url": VALERO_SAINT_LAURENT_URL,
+                "manual_lines": [
+                    [
+                        [-71.20, 46.75],
+                        [-71.50, 46.60],
+                        [-71.86, 46.45],
+                        [-72.18, 46.28],
+                        [-72.49, 46.02],
+                        [-72.58, 45.88],
+                        [-72.91, 45.72],
+                        [-73.20, 45.62],
+                        [-73.52, 45.64],
+                    ]
+                ],
+            }
+        ],
+    },
+    {
         "route_id": "other-cer-liquids",
         "route_name": "Other CER liquid systems",
         "operator": "Various",
@@ -347,6 +467,78 @@ ROUTES: list[dict[str, Any]] = [
                 "source": "CER",
                 "url": CER_PIPELINES_URL,
                 "where": "PipelineID IN ('Genesis', 'Montreal', 'NormanWells')",
+            }
+        ],
+    },
+    {
+        "route_id": "us-crude-trunk-reference",
+        "route_name": "U.S. crude-oil trunk pipeline reference",
+        "operator": "Various",
+        "commodity": "Crude oil",
+        "flow_role": "National context for U.S. crude-oil trunk and selected intrastate corridors",
+        "direction": "Various U.S. corridors",
+        "color": "#475569",
+        "display_order": 200,
+        "default_visible": False,
+        "menu_section": "U.S. National Reference Networks",
+        "geometry_confidence": (
+            "official EIA public GIS linework, route-level display; coverage represents major/trunk "
+            "and selected intrastate pipelines, not every pipe"
+        ),
+        "coverage_scope": "EIA crude-oil trunk pipeline layer; not a complete inventory of every pipe.",
+        "parts": [
+            {
+                "source": "EIA Energy Atlas crude-oil trunk pipeline reference layer",
+                "url": EIA_CRUDE_URL,
+                "where": "1=1",
+            }
+        ],
+    },
+    {
+        "route_id": "us-products-reference",
+        "route_name": "U.S. petroleum-products pipeline reference",
+        "operator": "Various",
+        "commodity": "Refined petroleum products",
+        "flow_role": "National context for U.S. product trunk and selected intrastate corridors",
+        "direction": "Various U.S. corridors",
+        "color": "#f59e0b",
+        "display_order": 201,
+        "default_visible": False,
+        "menu_section": "U.S. National Reference Networks",
+        "geometry_confidence": (
+            "official EIA public GIS linework, route-level display; coverage represents major/trunk "
+            "and selected intrastate pipelines, not every pipe"
+        ),
+        "coverage_scope": "EIA petroleum-products pipeline layer; not a complete inventory of every pipe.",
+        "parts": [
+            {
+                "source": "EIA Energy Atlas petroleum-products pipeline reference layer",
+                "url": EIA_PRODUCTS_URL,
+                "where": "1=1",
+            }
+        ],
+    },
+    {
+        "route_id": "us-hgl-reference",
+        "route_name": "U.S. hydrocarbon-gas-liquids pipeline reference",
+        "operator": "Various",
+        "commodity": "Hydrocarbon gas liquids",
+        "flow_role": "National context for U.S. HGL trunk and selected intrastate corridors",
+        "direction": "Various U.S. corridors",
+        "color": "#14b8a6",
+        "display_order": 202,
+        "default_visible": False,
+        "menu_section": "U.S. National Reference Networks",
+        "geometry_confidence": (
+            "official EIA public GIS linework, route-level display; coverage represents major/trunk "
+            "and selected intrastate pipelines, not every pipe"
+        ),
+        "coverage_scope": "EIA HGL pipeline layer; not a complete inventory of every pipe.",
+        "parts": [
+            {
+                "source": "EIA Energy Atlas HGL pipeline reference layer",
+                "url": EIA_HGL_URL,
+                "where": "1=1",
             }
         ],
     },
@@ -565,7 +757,14 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "menu_section": route.get("menu_section", "Core Market Access Pipelines"),
         "source_summary": "; ".join(sources),
         "source_urls": sorted({source_reference(part) for part in route.get("parts", [])}),
-        "geometry_confidence": "public GIS linework, route-level display",
+        "geometry_confidence": route.get(
+            "geometry_confidence",
+            "public GIS linework, route-level display",
+        ),
+        "coverage_scope": route.get(
+            "coverage_scope",
+            "Named route selected for market-access context; not a complete pipeline inventory.",
+        ),
     }
     return {"type": "Feature", "properties": properties, "geometry": geometry_from_lines(lines)}, warnings
 
@@ -600,14 +799,19 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
         "type": "FeatureCollection",
         "metadata": {
             "name": "Major Market Access Pipelines",
-            "description": "Named Western Canada crude, condensate/diluent, and connected market-access routes plus hub points.",
+            "description": (
+                "Named Canadian crude, condensate/diluent, and refined-product market-access routes, "
+                "selected connected U.S. routes, hidden U.S. national reference networks, and hub points."
+            ),
             "generated_with": "scripts/build_market_access_pipelines.py",
             "source_notes": [
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
                 "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
                 "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available; coarse EIA chords that duplicate Canadian CER linework are filtered out.",
+                "Three hidden U.S. reference features aggregate the EIA crude-oil trunk, petroleum-products, and HGL public layers. Those layers provide major/trunk and selected intrastate context, not every pipe, connector, gathering line, or plant line.",
+                "Imperial's Sarnia Products Pipeline, Sun-Canadian Pipe Line, and Valero's Pipeline Saint-Laurent are hidden by default and rendered as curated approximate corridors from current operator route descriptions because these provincially regulated systems are not in the federal CER layer.",
                 "The Trans Mountain Puget Sound leg (Sumas to Ferndale/Cherry Point and Anacortes/March Point) is a curated approximate corridor: EIA does not expose the line under any Trans Mountain name, and without it the route stopped at the border while the Washington refinery hubs floated unconnected.",
-                "Other route-level manual connectors are intentionally excluded to avoid straight-line artifacts over water or across border gaps.",
+                "Other route-level manual connectors are intentionally excluded to avoid unsupported straight-line artifacts over water or across border gaps.",
                 "CAPP's 2023 Pipeline and Refinery Map is used as route/hub reference, not as coordinate geometry.",
                 "Analytical context only; not for construction, excavation, or ground disturbance.",
             ],
@@ -619,6 +823,9 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
                 "aer_feeder_pipelines": AER_FEEDER_PIPELINES.relative_to(ROOT).as_posix(),
                 "capp_reference_map": CAPP_MAP_URL,
                 "trans_mountain_puget_reference": TM_PUGET_URL,
+                "imperial_sarnia_products_reference": IMPERIAL_SARNIA_PRODUCTS_URL,
+                "sun_canadian_reference": SUN_CANADIAN_URL,
+                "valero_saint_laurent_reference": VALERO_SAINT_LAURENT_URL,
             },
             "warnings": warnings,
         },

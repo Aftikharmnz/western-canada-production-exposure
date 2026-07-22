@@ -150,31 +150,43 @@ const DEFAULT_HIDDEN_LEGEND_KEYS = [
 const RAILWAY_CATEGORY_META = {
   "rail-main": {
     label: "Main rail network",
-    detail: "BTS/FRA NARN mainline network across Canada and connected U.S. corridors",
+    detail: "BTS/FRA NARN main network across Canada and the United States",
     color: "#111827",
     kind: "line",
   },
   "rail-industrial": {
-    label: "Industrial rail leads",
+    label: "Major industrial rail leads",
     detail: "Major industrial and terminal access tracks from BTS/FRA NARN",
     color: "#6b7280",
     kind: "line",
   },
   "crude-rail-terminal": {
     label: "Crude rail terminals",
-    detail: "EIA crude oil rail loading and unloading terminals",
+    detail: "EIA U.S. crude-by-rail points plus reviewed Canadian rail/transload facilities",
     color: "#111827",
+    kind: "point",
+  },
+  "crude-terminal": {
+    label: "Crude storage / marine terminals",
+    detail: "Reviewed Canadian pipeline, storage, and marine crude terminals; not necessarily rail-served",
+    color: "#9a5546",
     kind: "point",
   },
   "product-terminal": {
     label: "Refined-product terminals",
-    detail: "EIA bulk petroleum/refined-product terminals in connected U.S. regions",
+    detail: "EIA U.S. bulk-terminal snapshot plus reviewed Canadian operator/NPRI facilities; transport mode varies",
     color: "#0f766e",
+    kind: "point",
+  },
+  "inactive-terminal": {
+    label: "Inactive / decommissioned terminals",
+    detail: "Former facilities retained for historical context and hidden by default",
+    color: "#94a3b8",
     kind: "point",
   },
 };
 
-const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "product-terminal"];
+const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "crude-terminal", "product-terminal"];
 
 // Rail line colour = owning railroad (first listed NARN owner, RROWNER1).
 // Class I systems get distinct colours; passenger/commuter and regional/short
@@ -213,7 +225,10 @@ const DEFAULT_REFINERY_GROUP_KEYS = [
   "canada-western",
   "canada-central",
   "canada-eastern",
+  "us-padd-i",
   "us-padd-ii",
+  "us-padd-iii",
+  "us-padd-iv",
   "us-padd-v",
   "mexico",
   "europe",
@@ -334,6 +349,7 @@ const state = {
   distancePoints: [],
   distanceLayer: null,
   facilityLayer: null,
+  optionalDataWarnings: [],
 };
 
 // ============================================================
@@ -425,6 +441,23 @@ function escapeHtml(value) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
 }
 
+function safeHttpUrl(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(String(value), window.location.href);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+  } catch (_error) {
+    return "";
+  }
+}
+
+function safeCssColor(value, fallback = "#334155") {
+  const candidate = String(value || "").trim();
+  if (!candidate) return fallback;
+  if (window.CSS?.supports?.("color", candidate)) return candidate;
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(candidate) ? candidate : fallback;
+}
+
 function systemMeta(system) {
   return SYSTEM_META[system] || { label: system || "Unknown", color: "#60717a", className: "conventional" };
 }
@@ -490,23 +523,29 @@ function locationQualityText(asset) {
 // ============================================================
 
 async function loadData() {
-  const appDataPaths = [
+  const requiredDataPaths = [
     DATA_PATHS.manifest,
     DATA_PATHS.assets,
     DATA_PATHS.production,
-    DATA_PATHS.schemeApprovals,
-    DATA_PATHS.st102Facilities,
-    DATA_PATHS.assetGeometries,
-    DATA_PATHS.refineries,
   ];
-  const [manifest, assets, records, schemeApprovals, st102Facilities, assetGeometries, refineries] = await Promise.all(
-    appDataPaths.map((path) =>
+  const optionalData = [
+    [DATA_PATHS.schemeApprovals, "AER scheme approvals"],
+    [DATA_PATHS.st102Facilities, "AER ST102 facilities"],
+    [DATA_PATHS.assetGeometries, "asset footprints"],
+    [DATA_PATHS.refineries, "refineries"],
+  ];
+  state.optionalDataWarnings = [];
+  const [requiredResults, optionalResults] = await Promise.all([
+    Promise.all(requiredDataPaths.map((path) =>
       fetch(path).then((r) => {
         if (!r.ok) throw new Error(`Could not load ${path}`);
         return r.json();
       })
-    )
-  );
+    )),
+    Promise.all(optionalData.map(([path, label]) => fetchOptionalFeatureCollection(path, label))),
+  ]);
+  const [manifest, assets, records] = requiredResults;
+  const [schemeApprovals, st102Facilities, assetGeometries, refineries] = optionalResults;
   const assetRows = expandAssetRecords(assets);
   state.manifest = manifest;
   state.assets = assetRows;
@@ -549,12 +588,21 @@ async function loadData() {
 }
 
 async function fetchOptionalJson(path) {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+async function fetchOptionalFeatureCollection(path, label) {
   try {
-    const response = await fetch(path);
-    if (!response.ok) return null;
-    return response.json();
-  } catch (_err) {
-    return null;
+    const data = await fetchOptionalJson(path);
+    if (!data || data.type !== "FeatureCollection" || !Array.isArray(data.features)) {
+      throw new Error("invalid FeatureCollection schema");
+    }
+    return data;
+  } catch (error) {
+    state.optionalDataWarnings.push(`${label}: ${error.message || error}`);
+    return { type: "FeatureCollection", features: [] };
   }
 }
 
@@ -660,7 +708,12 @@ function requestDateRecords(date) {
 
 function initControls() {
   const sourceCount = new Set((state.manifest.source_coverage || []).map((item) => item.source_id)).size;
-  els.freshness.textContent = `ETL: ${new Date(state.manifest.generated_at).toLocaleString("en-CA")} · default: ${dateLabel(state.manifest.default_date || state.manifest.latest_actual_date)} · ${formatNumber(state.manifest.record_count)} records · ${sourceCount || "--"} sources`;
+  const overlayWarningCount = state.optionalDataWarnings.length;
+  const overlayWarningText = overlayWarningCount
+    ? ` · ⚠ ${overlayWarningCount} optional overlay${overlayWarningCount === 1 ? "" : "s"} unavailable`
+    : "";
+  els.freshness.textContent = `ETL: ${new Date(state.manifest.generated_at).toLocaleString("en-CA")} · default: ${dateLabel(state.manifest.default_date || state.manifest.latest_actual_date)} · ${formatNumber(state.manifest.record_count)} records · ${sourceCount || "--"} sources${overlayWarningText}`;
+  els.freshness.title = state.optionalDataWarnings.join("\n");
 
   if (els.dateSelect) {
     els.dateSelect.innerHTML = state.dates
@@ -893,8 +946,9 @@ function initLegendControls() {
       refreshPipelineLayers();
       handledFast = true;
     }
-    if (POINT_LEGEND_KEYS.has(key) && state.map && state.markerLayer) {
-      applyMarkerLegendVisibility();
+    if (POINT_LEGEND_KEYS.has(key)) {
+      state.timelineCache = null;
+      scheduleRender();
       handledFast = true;
     }
 
@@ -1065,7 +1119,7 @@ function handleDistanceClick(latlng) {
 
   if (snapped) {
     L.tooltip({ permanent: true, direction: "top", className: "distance-snap-label", offset: [0, -10] })
-      .setContent(snapped.label)
+      .setContent(escapeHtml(snapped.label))
       .setLatLng(point)
       .addTo(state.distanceLayer);
   }
@@ -1128,7 +1182,6 @@ function filteredRecords(date = state.selectedDate) {
 function aggregateForDate(date = state.selectedDate) {
   const records = filteredRecords(date);
   const byAsset = new Map();
-  const sourceTotals = new Map();
   for (const record of records) {
     const asset = state.assetById.get(record.asset_id);
     if (!asset) continue;
@@ -1149,7 +1202,17 @@ function aggregateForDate(date = state.selectedDate) {
     existing.scenarios.add(record.scenario);
     existing.records.push(record);
     byAsset.set(record.asset_id, existing);
-    sourceTotals.set(record.source_id, (sourceTotals.get(record.source_id) || 0) + record.volume_kbbl_d);
+  }
+
+  const sourceTotals = new Map();
+  for (const [assetId, point] of byAsset) {
+    if (!legendVisible(pointLegendKey(point))) {
+      byAsset.delete(assetId);
+      continue;
+    }
+    for (const record of point.records) {
+      sourceTotals.set(record.source_id, (sourceTotals.get(record.source_id) || 0) + record.volume_kbbl_d);
+    }
   }
   return { byAsset, sourceTotals };
 }
@@ -1625,9 +1688,9 @@ function renderFireRisk(asset) {
     ? `${risk.distanceKm.toLocaleString()} km to nearest fire`
     : "No active fires within 200 km";
 
-  // Estimate at-risk production from all streams for this asset at selected date
-  const atRiskVol = recordsForDate(state.selectedDate)
-    .filter((r) => r.asset_id === asset.asset_id && r.date === state.selectedDate && state.selectedStreams.has(r.stream))
+  // Match the active date, source, stream, location-confidence, and search filters.
+  const atRiskVol = filteredRecords(state.selectedDate)
+    .filter((r) => r.asset_id === asset.asset_id)
     .reduce((s, r) => s + r.volume_kbbl_d, 0);
   els.fireVolAtRisk.textContent = risk.level !== "none"
     ? `${kbbl(atRiskVol)} potentially at risk`
@@ -3868,7 +3931,7 @@ function initializeMarketPipelineSelection() {
 
 function marketPipelineStyle(feature) {
   return {
-    color: feature.properties?.color || '#334155',
+    color: safeCssColor(feature.properties?.color),
     weight: 1.55,
     opacity: 0.72,
     lineCap: 'round',
@@ -3945,8 +4008,9 @@ function tariffMoney(value, currency, unit) {
 }
 
 function tariffSourceLink(label, url) {
-  if (!url) return escapeHtml(label || '');
-  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || 'Source')}</a>`;
+  const safeUrl = safeHttpUrl(url);
+  if (!safeUrl) return escapeHtml(label || '');
+  return `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || 'Source')}</a>`;
 }
 
 function tariffCostItemText(item) {
@@ -4097,29 +4161,29 @@ function renderMarketPipelineLayers() {
   if (!state.marketPipelineEnabled || !state.marketPipelineData?.features?.length) return;
 
   const lineFeatures = selectedMarketPipelineFeatures();
-  if (!lineFeatures.length) return;
-
-  state.marketPipelineLineLayer = L.geoJSON({ type: 'FeatureCollection', features: lineFeatures }, {
-    style: marketPipelineStyle,
-    onEachFeature(feature, layer) {
-      const p = feature.properties || {};
-      const source = p.source_summary || 'public GIS';
-      const confidence = p.geometry_confidence || 'route-level linework';
-      layer.bindTooltip(
-        `<div>` +
-        `<strong>${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
-        `<div class="pt-sub">${escapeHtml(p.operator || '')}${p.commodity ? ' · ' + escapeHtml(p.commodity) : ''}</div>` +
-        `<div class="pt-sub">${escapeHtml(p.flow_role || '')}</div>` +
-        `<div class="pt-route">` +
-        `<span class="pt-route-label">Source</span><span class="pt-route-val">${escapeHtml(source)}</span>` +
-        `<span class="pt-route-label">Direction</span><span class="pt-route-val">${escapeHtml(p.direction || '—')}</span>` +
-        `</div>` +
-        `<div class="pt-sub" style="margin-top:4px">${escapeHtml(source)} · ${escapeHtml(confidence)}</div>` +
-        `</div>`,
-        { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
-      );
-    },
-  }).addTo(state.map);
+  if (lineFeatures.length) {
+    state.marketPipelineLineLayer = L.geoJSON({ type: 'FeatureCollection', features: lineFeatures }, {
+      style: marketPipelineStyle,
+      onEachFeature(feature, layer) {
+        const p = feature.properties || {};
+        const source = p.source_summary || 'public GIS';
+        const confidence = p.geometry_confidence || 'route-level linework';
+        layer.bindTooltip(
+          `<div>` +
+          `<strong>${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
+          `<div class="pt-sub">${escapeHtml(p.operator || '')}${p.commodity ? ' · ' + escapeHtml(p.commodity) : ''}</div>` +
+          `<div class="pt-sub">${escapeHtml(p.flow_role || '')}</div>` +
+          `<div class="pt-route">` +
+          `<span class="pt-route-label">Source</span><span class="pt-route-val">${escapeHtml(source)}</span>` +
+          `<span class="pt-route-label">Direction</span><span class="pt-route-val">${escapeHtml(p.direction || '—')}</span>` +
+          `</div>` +
+          `<div class="pt-sub" style="margin-top:4px">${escapeHtml(source)} · ${escapeHtml(confidence)}</div>` +
+          `</div>`,
+          { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
+        );
+      },
+    }).addTo(state.map);
+  }
 
   if (state.marketHubsEnabled) {
     state.marketHubLayer = L.geoJSON(
@@ -4155,7 +4219,7 @@ function renderMarketPipelineLayers() {
     ).addTo(state.map);
   }
 
-  state.marketPipelineLineLayer.bringToBack();
+  if (state.marketPipelineLineLayer) state.marketPipelineLineLayer.bringToBack();
   bringPipelineLayersToBack();
   if (state.formationLayer) state.formationLayer.bringToBack();
 }
@@ -4163,7 +4227,7 @@ function renderMarketPipelineLayers() {
 async function toggleMarketPipelines() {
   const ok = await fetchMarketPipelineData();
   if (!ok) return;
-  state.marketPipelineEnabled = true;
+  state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0 || state.marketHubsEnabled;
   setMarketPipelineMenuOpen(!state.marketPipelineMenuOpen);
   renderMarketPipelineLayers();
   updateMarketPipelineToggleUI();
@@ -4178,9 +4242,11 @@ function updateMarketPipelineToggleUI() {
     btn.textContent = 'Loading...';
     btn.className = 'market-pipeline-toggle-btn loading';
     btn.setAttribute('aria-expanded', 'false');
-  } else if (state.marketPipelineEnabled && selectedCount) {
-    btn.textContent = `Market Pipes (${selectedCount})`;
-    btn.title = `${selectedCount.toLocaleString('en-CA')} of ${totalCount.toLocaleString('en-CA')} market-access routes selected`;
+  } else if (state.marketPipelineEnabled && (selectedCount || state.marketHubsEnabled)) {
+    btn.textContent = selectedCount ? `Market Pipes (${selectedCount})` : 'Market Hubs';
+    btn.title = selectedCount
+      ? `${selectedCount.toLocaleString('en-CA')} of ${totalCount.toLocaleString('en-CA')} market-access routes selected${state.marketHubsEnabled ? '; market hubs enabled' : ''}`
+      : 'Market hubs enabled; no market-access routes selected';
     btn.className = 'market-pipeline-toggle-btn active';
     btn.setAttribute('aria-expanded', state.marketPipelineMenuOpen ? 'true' : 'false');
   } else {
@@ -4211,11 +4277,11 @@ function buildMarketPipelineMenu() {
       html += `<div class="market-pipeline-menu-section">${escapeHtml(section)}</div>`;
     }
     const checked = state.selectedMarketPipelineIds.has(p.route_id);
-    const color = p.color || '#334155';
+    const color = safeCssColor(p.color);
     html += `
       <label class="market-pipeline-option" title="${escapeHtml(p.flow_role || p.route_name)}">
         <input type="checkbox" data-market-pipeline-id="${escapeHtml(p.route_id)}" ${checked ? 'checked' : ''} />
-        <span class="market-pipeline-swatch" style="background:${color}"></span>
+        <span class="market-pipeline-swatch" style="background:${escapeHtml(color)}"></span>
         <span class="market-pipeline-option-text">
           <strong>${escapeHtml(p.route_name || p.route_id)}</strong>
           <em>${escapeHtml(p.commodity || '')}</em>
@@ -4233,7 +4299,7 @@ function handleMarketPipelineMenuChange(event) {
     const id = pipelineInput.dataset.marketPipelineId;
     if (pipelineInput.checked) state.selectedMarketPipelineIds.add(id);
     else state.selectedMarketPipelineIds.delete(id);
-    state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0;
+    state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0 || state.marketHubsEnabled;
     refreshMarketPipelineLayers();
     updateMarketPipelineToggleUI();
     return;
@@ -4241,7 +4307,9 @@ function handleMarketPipelineMenuChange(event) {
 
   if (event.target.id === 'marketHubToggle') {
     state.marketHubsEnabled = event.target.checked;
+    state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0 || state.marketHubsEnabled;
     refreshMarketPipelineLayers();
+    updateMarketPipelineToggleUI();
   }
 }
 
@@ -4262,7 +4330,7 @@ function handleMarketPipelineMenuClick(event) {
       }
     }
   }
-  state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0;
+  state.marketPipelineEnabled = state.selectedMarketPipelineIds.size > 0 || state.marketHubsEnabled;
   buildMarketPipelineMenu();
   refreshMarketPipelineLayers();
   updateMarketPipelineToggleUI();
@@ -4305,7 +4373,7 @@ function railwayTerminalMarker(feature, latlng) {
   const category = feature.properties?.category || "product-terminal";
   const meta = RAILWAY_CATEGORY_META[category] || RAILWAY_CATEGORY_META["product-terminal"];
   return L.circleMarker(latlng, {
-    radius: category === "crude-rail-terminal" ? 4.4 : 3.7,
+    radius: category === "crude-rail-terminal" || category === "crude-terminal" ? 4.4 : 3.7,
     color: "#ffffff",
     weight: 1.15,
     fillColor: meta.color,
@@ -4319,14 +4387,19 @@ function railwayTooltipHtml(p) {
   const title = p.name || meta.label || "Railway feature";
   const rows = [
     ["Type", p.category_label || meta.label],
+    ["Status", p.status],
     ["Owner", p.owner || p.operator],
+    ["Source segments", p.segment_count ? formatNumber(p.segment_count, 0) : ""],
     ["Trackage rights", p.trackage_rights],
-    ["Rail", p.rail_connection],
+    ["Transport", p.modes || p.rail_connection],
     ["Subdivision", p.subdivision],
     ["Division", p.division],
     ["Location", [p.city, p.state || p.country].filter(Boolean).join(", ")],
     ["Commodity", p.commodity],
     ["Facility", p.facility_type],
+    ["Scope", p.facility_scope],
+    ["Location quality", p.location_confidence],
+    ["Verified", p.last_verified],
     ["Source", p.source],
   ]
     .filter(([, value]) => value)
@@ -4412,13 +4485,13 @@ function updateRailwayToggleUI() {
     btn.className = "railway-toggle-btn loading";
     btn.setAttribute("aria-expanded", "false");
   } else if (state.railwayEnabled && selectedCount) {
-    btn.textContent = `Railways (${selectedCount})`;
+    btn.textContent = `Rail & Terminals (${selectedCount})`;
     btn.title = `${selectedCount.toLocaleString("en-CA")} railway categories selected`;
     btn.className = "railway-toggle-btn active";
     btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
   } else {
-    btn.textContent = "Railways";
-    btn.title = "Rail lines plus crude-by-rail and refined-product terminal overlays";
+    btn.textContent = "Rail & Terminals";
+    btn.title = "Rail context plus crude and refined-product terminal overlays";
     btn.className = "railway-toggle-btn";
     btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
   }
@@ -4437,13 +4510,20 @@ function buildRailwayMenu() {
   const counts = {};
   for (const feature of railwayFeatures()) {
     const category = feature.properties?.category;
-    if (category) counts[category] = (counts[category] || 0) + 1;
+    if (!category) continue;
+    const increment = feature.properties?.feature_kind === "rail_line"
+      ? Number(feature.properties?.segment_count) || 1
+      : 1;
+    counts[category] = (counts[category] || 0) + increment;
   }
   const ownerCounts = new Map();
   for (const feature of railwayFeatures()) {
     if (feature.properties?.feature_kind !== "rail_line") continue;
     const meta = railLineOwnerMeta(feature.properties);
-    ownerCounts.set(meta.key, (ownerCounts.get(meta.key) || 0) + 1);
+    ownerCounts.set(
+      meta.key,
+      (ownerCounts.get(meta.key) || 0) + (Number(feature.properties?.segment_count) || 1),
+    );
   }
   const ownerLegend = railwayFeatures().length
     ? `
@@ -5064,7 +5144,7 @@ async function boot() {
     initControls();
     initMap();
     // Default map state: official AB/BC fires, selected AER pipeline liquids,
-    // and Canada + PADD II/V refinery regions.
+    // and all configured refinery regions, including every U.S. PADD.
     state.wildfireEnabled = fireSelectedCount() > 0;
     state.refineryEnabled = refinerySelectedCount() > 0;
     state.pipelineEnabled = pipelineSelectedCount() > 0;
@@ -5727,10 +5807,12 @@ function refineryThroughputUnits(props) {
 }
 
 function refineryIsOilSands(props) {
-  const name = `${props.plant_name || ""} ${props.plant_sectors || ""}`.toLowerCase();
-  if (name.includes("upgrader") || name.includes("oil sands")) return true;
-  const prov = String(props.state_name || "").toLowerCase();
-  return prov === "alberta" || prov === "saskatchewan";
+  const descriptor = [
+    props.plant_name,
+    Array.isArray(props.plant_sectors) ? props.plant_sectors.join(" ") : props.plant_sectors,
+    props.plant_type,
+  ].filter(Boolean).join(" ").toLowerCase();
+  return /\bupgrader\b|oil[\s-]*sands|synthetic crude|\bhorizon\b|mildred lake|\bsyncrude\b|long lake|scotford upgrader|sturgeon refinery/.test(descriptor);
 }
 
 // Effective crude/feed charge: reported crude capacity, else CDU units (recovers an

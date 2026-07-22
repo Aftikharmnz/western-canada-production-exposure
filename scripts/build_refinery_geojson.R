@@ -182,8 +182,12 @@ geojson <- list(
   name = "gold_plants_refineries",
   generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   source = list(
-    plants = normalizePath(input_path, winslash = "/", mustWork = FALSE),
-    units = normalizePath(units_path, winslash = "/", mustWork = FALSE)
+    plants = "IIR gold plants analytical extract",
+    units = "IIR gold units analytical extract"
+  ),
+  coverage_note = paste(
+    "Rich plant and unit detail; not a canonical EIA U.S. refinery roster.",
+    "Use EIA Refinery Capacity Report counts/status/capacity for national completeness checks."
   ),
   features = features
 )
