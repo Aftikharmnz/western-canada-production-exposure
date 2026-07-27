@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: refresh-aeso-power
@@ -22,9 +23,9 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -41,14 +42,23 @@ jobs:
         run: python scripts/check_alerts.py
 
       - name: Commit and push if changed
+        id: publish
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/aeso_power_status.json data/alerts/state.json
           if git diff --cached --quiet; then
             echo "No change in AESO snapshot."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "Auto-refresh AESO power status"
           git pull --rebase origin main
           git push origin main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Redeploy Pages after a data refresh
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main

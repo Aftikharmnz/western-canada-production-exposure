@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Check out the published branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build the public artifact
         shell: bash
@@ -34,7 +34,15 @@ jobs:
 
           mkdir -p _site
           cp index.html .nojekyll _site/
-          cp -R src public _site/
+          cp -R src _site/
+          mkdir -p _site/public
+          cp -R public/data _site/public/
+
+          # These large source exports are not referenced by the browser app.
+          rm -f \
+            _site/public/data/aer_feeder_pipelines.geojson \
+            _site/public/data/aer_pipeline_installations.geojson \
+            _site/public/data/production_assets.geojson
 
           if ! grep -Fqi "staticrypt" _site/index.html; then
             echo "Refusing to deploy: index.html is not a StatiCrypt wrapper." >&2
@@ -52,13 +60,13 @@ jobs:
           fi
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload the protected site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
