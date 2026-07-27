@@ -1,0 +1,64 @@
+name: Deploy protected site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out the published branch
+        uses: actions/checkout@v4
+
+      - name: Build the public artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p _site
+          cp index.html .nojekyll _site/
+          cp -R src public _site/
+
+          if ! grep -Fqi "staticrypt" _site/index.html; then
+            echo "Refusing to deploy: index.html is not a StatiCrypt wrapper." >&2
+            exit 1
+          fi
+
+          if grep -Fq "src/main.js" _site/index.html; then
+            echo "Refusing to deploy: index.html contains the plaintext app entry point." >&2
+            exit 1
+          fi
+
+          if [[ -e _site/index.src.html ]]; then
+            echo "Refusing to deploy: plaintext index.src.html is in the public artifact." >&2
+            exit 1
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the protected site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

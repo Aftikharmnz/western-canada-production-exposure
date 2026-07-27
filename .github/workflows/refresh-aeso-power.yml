@@ -49,6 +49,6 @@ jobs:
             echo "No change in AESO snapshot."
             exit 0
           fi
-          git commit -m "Auto-refresh AESO power status [skip ci]"
+          git commit -m "Auto-refresh AESO power status"
           git pull --rebase origin main
           git push origin main

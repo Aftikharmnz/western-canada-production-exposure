@@ -25,3 +25,10 @@ Thumbs.db
 .edge-profile*/
 
 data/pipeline/
+
+# Site password — never commit. .staticrypt.json (salt only) IS committed on purpose.
+.env
+sitepw.txt
+*.password
+node_modules/
+HANDOFF_STATICRYPT.md

@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Western Canada Production Exposure</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="src/styles.css?v=20260722d" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>Western Canada Production Exposure</h1>
+            <p id="freshness">Loading local production store...</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <label class="search-control">
+            <span>Search</span>
+            <input id="searchInput" type="search" placeholder="Asset, company, province, stream" />
+          </label>
+          <div id="selectControl" class="select-control">
+            <button id="selectModeBtn" class="select-mode-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Pick what to select by dragging a box on the map">&#9638; Select <span class="select-caret">&#9662;</span></button>
+            <div id="selectMenu" class="select-menu" hidden>
+              <button type="button" class="select-menu-option" data-select-mode="assets">
+                <strong>Assets &mdash; production</strong>
+                <em>Box-select assets to chart production seasonality</em>
+              </button>
+              <button type="button" class="select-menu-option" data-select-mode="refineries">
+                <strong>Refineries &mdash; capacity &amp; products</strong>
+                <em>Box-select visible refineries to model capacity, owners &amp; refined-product output</em>
+              </button>
+            </div>
+          </div>
+          <div id="formationControl" class="formation-control">
+            <button id="formationToggle" class="formation-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">AER Sites</button>
+            <div id="formationMenu" class="formation-menu" hidden>
+              <div class="formation-menu-header">
+                <strong>AER Sites</strong>
+                <span>Choose overlays</span>
+              </div>
+              <div class="formation-menu-actions">
+                <button type="button" data-formation-action="core">Core</button>
+                <button type="button" data-formation-action="all">All</button>
+                <button type="button" data-formation-action="none">None</button>
+              </div>
+              <div id="formationOptions" class="formation-options"></div>
+            </div>
+          </div>
+          <div id="refineryControl" class="refinery-control">
+            <button id="refineryToggle" class="refinery-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Refineries</button>
+            <div id="refineryMenu" class="refinery-menu" hidden>
+              <div class="refinery-menu-header">
+                <strong>Refineries</strong>
+                <span>Choose regions</span>
+              </div>
+              <div class="refinery-menu-actions">
+                <button type="button" data-refinery-action="defaults">Core</button>
+                <button type="button" data-refinery-action="all">All</button>
+                <button type="button" data-refinery-action="none">None</button>
+              </div>
+              <div id="refineryOptions" class="refinery-options"></div>
+            </div>
+          </div>
+          <div id="pipelineControl" class="pipeline-control">
+            <button id="pipelineToggle" class="pipeline-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Pipelines</button>
+            <div id="pipelineMenu" class="pipeline-menu" hidden>
+              <div class="pipeline-menu-header">
+                <strong>AER Feeder Pipelines</strong>
+                <span>Choose categories</span>
+              </div>
+              <div class="pipeline-menu-actions">
+                <button type="button" data-pipeline-action="core">Core</button>
+                <button type="button" data-pipeline-action="all">All</button>
+                <button type="button" data-pipeline-action="none">None</button>
+              </div>
+              <div id="pipelineOptions" class="pipeline-options"></div>
+            </div>
+          </div>
+          <div id="marketPipelineControl" class="market-pipeline-control">
+            <button id="marketPipelineToggle" class="market-pipeline-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Market Pipes</button>
+            <div id="marketPipelineMenu" class="market-pipeline-menu" hidden>
+              <div class="market-pipeline-menu-header">
+                <strong>Market Pipes</strong>
+                <span>Choose routes to show</span>
+              </div>
+              <div class="market-pipeline-menu-actions">
+                <button type="button" data-market-action="defaults">Core</button>
+                <button type="button" data-market-action="all">All</button>
+                <button type="button" data-market-action="none">None</button>
+              </div>
+              <div id="marketPipelineOptions" class="market-pipeline-options"></div>
+              <label class="market-pipeline-option hub-option">
+                <input id="marketHubToggle" type="checkbox" checked />
+                <span class="market-pipeline-hub-dot"></span>
+                <span class="market-pipeline-option-text">
+                  <strong>Market hubs</strong>
+                  <em>Terminals, refineries, and route nodes</em>
+                </span>
+              </label>
+            </div>
+          </div>
+          <button id="powerToggle" class="railway-toggle-btn" type="button" title="AESO grid + oil sands site cogeneration status (auto-refreshed)">Power</button>
+          <div id="railwayControl" class="railway-control">
+            <button id="railwayToggle" class="railway-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Rail &amp; Terminals</button>
+            <div id="railwayMenu" class="railway-menu" hidden>
+              <div class="railway-menu-header">
+                <strong>Rail &amp; Petroleum Terminals</strong>
+                <span>Choose rail layers</span>
+              </div>
+              <div class="railway-menu-actions">
+                <button type="button" data-railway-action="defaults">Core</button>
+                <button type="button" data-railway-action="all">All</button>
+                <button type="button" data-railway-action="none">None</button>
+              </div>
+              <div id="railwayOptions" class="railway-options"></div>
+            </div>
+          </div>
+          <div id="fireControl" class="fire-control">
+            <button id="wildfireToggle" class="fire-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false">Fires</button>
+            <div id="fireMenu" class="fire-menu" hidden>
+              <div class="fire-menu-header">
+                <strong>Fires</strong>
+                <span>Sources and hover impact</span>
+              </div>
+              <div class="fire-menu-actions">
+                <button type="button" data-fire-action="defaults">Core</button>
+                <button type="button" data-fire-action="all">All</button>
+                <button type="button" data-fire-action="none">None</button>
+              </div>
+              <div id="fireOptions" class="fire-options"></div>
+            </div>
+          </div>
+          <button id="distanceToggle" class="distance-mode-btn" type="button">Distance</button>
+          <button id="docsBtn" class="docs-btn" type="button">&#9432; Docs</button>
+          <button id="etlButton" class="primary-action" type="button">Run ETL</button>
+        </div>
+      </header>
+      <main class="workspace">
+        <aside class="filter-rail" aria-label="Production filters">
+          <section class="filter-section">
+            <h2>Date</h2>
+            <div class="date-readout">
+              <strong id="selectedDate">--</strong>
+              <span id="dateScenario">--</span>
+            </div>
+            <select id="dateSelect" class="date-select" aria-label="Select production date"></select>
+            <div id="coverageNotice" class="coverage-notice" hidden></div>
+          </section>
+          <section class="filter-section">
+            <h2>Sources</h2>
+            <div id="sourceFilters" class="toggle-list"></div>
+          </section>
+          <section class="filter-section">
+            <h2>Streams</h2>
+            <div id="streamFilters" class="toggle-list"></div>
+          </section>
+          <section class="filter-section">
+            <h2>Location Quality</h2>
+            <div id="locationQualityFilters" class="toggle-list"></div>
+          </section>
+          <section class="filter-section metrics">
+            <h2>Exposure</h2>
+            <div class="metric-row">
+              <span>Total shown</span>
+              <strong id="totalShown">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Mapped points</span>
+              <strong id="mappedCount">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Unmapped volume</span>
+              <strong id="unmappedVolume">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>Largest asset</span>
+              <strong id="largestPoint">--</strong>
+            </div>
+            <div class="metric-row fire-exposure-row" id="fireExposureRow" hidden>
+              <span>At fire risk</span>
+              <strong id="fireExposure">--</strong>
+            </div>
+            <div class="exp-subsection" id="provinceBreakdown"></div>
+            <div class="exp-subsection" id="systemBreakdown"></div>
+          </section>
+        </aside>
+        <section class="map-stage" aria-label="Production map">
+          <div id="map" class="map"></div>
+          <div id="mapFallback" class="map-fallback" hidden></div>
+          <div id="basemapSwitch" class="basemap-switch" role="group" aria-label="Background map">
+            <span class="basemap-switch-label">Map</span>
+            <button type="button" data-basemap="dark" aria-pressed="false" title="Low-detail dark map with province, city, and place labels">Dark</button>
+            <button type="button" data-basemap="topographic" aria-pressed="true" title="Detailed Esri topographic map">Topo</button>
+          </div>
+          <div id="wildfireStatus" class="wildfire-status" hidden></div>
+          <div id="pipelineStatus" class="pipeline-status" hidden></div>
+          <div id="distanceStatus" class="distance-status" hidden></div>
+          <div id="mapLegend" class="map-legend" aria-label="Map legend filters">
+            <div class="map-legend-header">Legend</div>
+            <button type="button" class="legend-item" data-legend-key="in-situ" aria-pressed="true"><i class="dot in-situ"></i><span>In-situ Bitumen</span></button>
+            <button type="button" class="legend-item" data-legend-key="mined" aria-pressed="true"><i class="dot mined"></i><span>Mined Bitumen</span></button>
+            <button type="button" class="legend-item" data-legend-key="synthetic" aria-pressed="true"><i class="dot synthetic"></i><span>Synthetic Crude</span></button>
+            <button type="button" class="legend-item" data-legend-key="conventional" aria-pressed="true"><i class="dot conventional"></i><span>Conventional</span></button>
+            <button type="button" class="legend-item" data-legend-key="pentanes-plus" aria-pressed="true"><i class="dot pentanes-plus"></i><span>Pentanes Plus</span></button>
+            <button type="button" class="legend-item" data-legend-key="condensate" aria-pressed="true"><i class="dot condensate"></i><span>Condensate</span></button>
+            <button type="button" class="legend-item" data-legend-key="gas-plant" aria-pressed="true"><i class="dot gas-plant"></i><span>Gas Plant</span></button>
+            <button type="button" class="legend-item" data-legend-key="integrated-plant" aria-pressed="true"><i class="dot integrated-plant"></i><span>Integrated Plant</span></button>
+            <button type="button" class="legend-item" data-legend-key="spec-plant" aria-pressed="true"><i class="dot spec-plant"></i><span>Spec Plant</span></button>
+          </div>
+          <div id="etlPanel" class="etl-panel" hidden>
+            <button id="closeEtl" type="button" aria-label="Close ETL panel">x</button>
+            <h2>Local refresh command</h2>
+            <p>Run this from the project folder after updating the workbook or refreshing raw sources.</p>
+            <code id="etlCommand"></code>
+            <p style="margin-top:12px;font-size:12px;">Add --download to also re-fetch cached public source files where public endpoints are configured.</p>
+          </div>
+        </section>
+        <aside class="detail-panel" aria-label="Selected production detail">
+          <section>
+            <p class="panel-label">Selected Location</p>
+            <h2 id="detailTitle">Western Canada</h2>
+            <p id="detailSubtitle">Click a marker to inspect asset-level exposure.</p>
+          </section>
+          <section class="detail-kpis">
+            <div>
+              <span>Shown volume</span>
+              <strong id="detailVolume">--</strong>
+            </div>
+            <div>
+              <span>Source</span>
+              <strong id="detailSource">--</strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong id="detailStatus">--</strong>
+            </div>
+            <div>
+              <span>Location</span>
+              <strong id="detailLocationQuality">--</strong>
+            </div>
+          </section>
+          <section id="fireRiskSection" class="fire-risk-section" hidden>
+            <div class="section-heading">
+              <h2>Wildfire Risk</h2>
+              <span id="fireRiskBadge" class="risk-badge">--</span>
+            </div>
+            <div class="metric-row">
+              <span>Nearest fire</span>
+              <strong id="fireDistDisplay">--</strong>
+            </div>
+            <div class="metric-row">
+              <span>At-risk output</span>
+              <strong id="fireVolAtRisk">--</strong>
+            </div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Top Assets</h2>
+              <span id="topAssetsLabel">By production, current date</span>
+            </div>
+            <div id="topAssetsList" class="top-assets-list"></div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Stream Breakdown</h2>
+              <span id="sourceMixLabel">At selected date</span>
+            </div>
+            <div id="streamBreakdown" class="breakdown"></div>
+          </section>
+          <section>
+            <div class="section-heading">
+              <h2>Source Mix</h2>
+              <span>All visible assets</span>
+            </div>
+            <div id="sourceBreakdown" class="breakdown"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+    <!-- ===================== DOCUMENTATION PANEL ===================== -->
+    <div id="docsPanel" class="docs-panel" hidden>
+      <div class="docs-inner">
+        <div class="docs-header">
+          <h1>Western Canada Production Exposure — Documentation</h1>
+          <button id="closeDocs" class="docs-close" type="button" aria-label="Close documentation">&times;</button>
+        </div>
+        <nav class="docs-tabs" role="tablist">
+          <button class="docs-tab active" data-tab="systems" role="tab">Production Systems</button>
+          <button class="docs-tab" data-tab="volumes" role="tab">Volume &amp; Streams</button>
+          <button class="docs-tab" data-tab="wildfire" role="tab">Wildfire</button>
+          <button class="docs-tab" data-tab="approvals" role="tab">AER Approvals</button>
+          <button class="docs-tab" data-tab="pipelines" role="tab">Pipelines</button>
+          <button class="docs-tab" data-tab="sources" role="tab">Data Sources</button>
+        </nav>
+        <div class="docs-body">
+
+          <!-- ── PRODUCTION SYSTEMS ── -->
+          <section class="docs-section" id="tab-systems">
+            <h2>Production Systems &amp; Map Markers</h2>
+            <p>Each dot on the map represents a production facility or project. Dot colour indicates the <em>production system</em> — the type of hydrocarbon produced or the facility classification. Dot size scales with production volume at the selected date.</p>
+            <table class="docs-table">
+              <thead><tr><th>Colour</th><th>System</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><i class="doc-dot" style="background:#008b8b"></i></td><td>In-situ Bitumen</td><td>Bitumen extracted underground without mining, using thermal methods such as SAGD (Steam-Assisted Gravity Drainage) or CSS (Cyclic Steam Stimulation). Steam is injected to reduce viscosity; emulsified bitumen flows to a production well. Dominant method in the Athabasca oil sands.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#d29b18"></i></td><td>Mined Bitumen</td><td>Bitumen recovered by open-pit surface mining. Ore is excavated, mixed with hot water (Clark Hot Water Extraction), and the bitumen froth is upgraded or diluted for pipeline transport. Confined to deposits shallow enough for economic mining (generally &lt;75 m depth).</td></tr>
+                <tr><td><i class="doc-dot" style="background:#2980b9"></i></td><td>Synthetic Crude Oil (SCO)</td><td>Upgraded bitumen that has been processed in an upgrader (hydrocracking or coking) to produce a lighter, pipelineable crude that trades similarly to conventional light crude. Produced at integrated mining + upgrading facilities (e.g., Syncrude, Suncor Base Plant).</td></tr>
+                <tr><td><i class="doc-dot" style="background:#4f8f45"></i></td><td>Conventional Crude</td><td>Light and medium crude oil produced from conventional reservoirs in Alberta, Saskatchewan, British Columbia, Manitoba, North Dakota, and Montana. Canadian well/facility volumes are sourced from Petrinex, BCER, and Manitoba public files; North Dakota well volumes come from NDIC monthly production reports; Montana Bakken/Three Forks well volumes come from Montana BOGC.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#c2720a"></i></td><td>Heavy Crude (Conv.)</td><td>Conventional heavy crude oil (typically &lt;22° API) from Alberta and Saskatchewan. Not bitumen — produced from conventional reservoirs but with higher viscosity and density than light crude.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#6374a6"></i></td><td>Condensate</td><td>Ultra-light hydrocarbon liquid (60–80° API) that condenses out of natural gas at surface conditions. Used heavily as a bitumen diluent (forming dilbit) for pipeline transport. Produced at gas wells and gas plants.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#7c3aed"></i></td><td>Pentanes Plus (C5+)</td><td>The heaviest NGL fraction — pentane and heavier hydrocarbons that are liquid at atmospheric conditions. Blended into diluent streams or sold as a light naphtha feedstock. Reported separately from condensate in Petrinex.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#e07b39"></i></td><td>Gas Plant</td><td>A gas processing plant that extracts NGLs (propane and butane) from raw natural gas. Produces <em>mix-grade</em> (MX) propane and butane only — no on-site fractionation to sales-grade product. See Volume &amp; Streams tab for details.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#7c3aed"></i></td><td>Integrated Plant</td><td>A gas processing plant with on-site fractionation capability. Reports both MX (raw extract) and SP (sales-grade) volumes. The facility extracts NGLs from gas and separates them into spec-grade products in the same complex.</td></tr>
+                <tr><td><i class="doc-dot" style="background:#c9a227"></i></td><td>Spec Plant (Fractionator)</td><td>A standalone fractionation plant. Receives raw NGL mix from pipeline or truck and fractionates it into individual products: propane spec (C3-SP) and butane spec (C4-SP). Reports SP activity only — no raw gas processing.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- ── VOLUME & STREAMS ── -->
+          <section class="docs-section" id="tab-volumes" hidden>
+            <h2>Volume Terminology &amp; NGL Streams</h2>
+
+            <h3>Units</h3>
+            <p>All dashboard volumes are shown in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB/SK, BCER, and Manitoba monthly liquids are reported in cubic metres and converted with 6.2898 bbl per cubic metre divided by calendar days in the production month. NDIC and Montana BOGC monthly crude barrels are divided by calendar days. The historical AER ST39/ST53 oil-sands rows are currently workbook-normalized bbl/d series, with current-month ST39 synthetic crude reconciled against the cached official AER ST39 XLS when the local R/readxl extractor is available.</p>
+
+            <h3>Activity Codes (Petrinex)</h3>
+            <p>Petrinex tracks what happens to a product at a facility using activity codes. The two most relevant for NGL volumes are:</p>
+            <table class="docs-table">
+              <thead><tr><th>Code</th><th>Name</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PROD</strong></td><td>Production</td><td>Raw production at the wellhead. Used for oil and gas production volumes.</td></tr>
+                <tr><td><strong>PROC</strong></td><td>Processing</td><td>Volume of NGL extracted from raw natural gas at a gas processing plant. This is the primary activity used for propane and butane volumes on this map — it captures the volume produced at the gas plant.</td></tr>
+                <tr><td><strong>FRAC</strong></td><td>Fractionation</td><td>Volume of NGL separated into individual product streams at a fractionation plant. Used by standalone fractionators and integrated plants for their spec-grade output.</td></tr>
+                <tr><td><strong>DISP</strong></td><td>Disposition</td><td>Sales or transfer volumes. Used for tracking downstream movement, not production.</td></tr>
+              </tbody>
+            </table>
+            <p class="docs-note">Important: propane and butane use <strong>PROC only</strong> in the current app. That is a plant extraction view, not a full market supply view. Pentanes Plus is intentionally different: it uses C5-SP PROC plus FRAC because that is the total definition requested for this app.</p>
+
+            <h3>Mix vs. Spec (MX vs. SP)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Grade</th><th>Code</th><th>What it is</th><th>Where it comes from</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Mix</strong></td><td>MX</td><td>Raw, unfractionated product extracted from natural gas at a gas processing plant. Contains impurities and may be mixed with other NGL components. Not yet at sales / pipeline specification.</td><td>Gas plants (orange dots) and integrated plants (purple dots) — PROC activity</td></tr>
+                <tr><td><strong>Spec</strong></td><td>SP</td><td>Sales-grade product meeting pipeline or end-user specifications. Produced after fractionation — the process of separating the mixed NGL stream by boiling point into individual components.</td><td>Spec plants (gold dots) and integrated plants (purple dots) — FRAC activity</td></tr>
+              </tbody>
+            </table>
+            <p>In plain language: raw gas comes out of the ground mixed with propane, butane, and heavier liquids. A gas plant separates these liquids from the gas stream (PROC), producing <em>propane mix</em> and <em>butane mix</em>. A fractionator then takes that mix and distills it into pure propane spec and butane spec for sale.</p>
+
+            <h3>NGL Stream Breakdown</h3>
+            <table class="docs-table">
+              <thead><tr><th>Stream</th><th>Product ID</th><th>Carbon</th><th>Grade</th><th>Source facility</th></tr></thead>
+              <tbody>
+                <tr><td>Propane mix</td><td>C3-MX</td><td>3 carbons (C3)</td><td>Mix</td><td>Gas plants, integrated plants</td></tr>
+                <tr><td>Propane spec</td><td>C3-SP</td><td>3 carbons (C3)</td><td>Spec</td><td>Spec plants, integrated plants</td></tr>
+                <tr><td>Butane mix</td><td>C4-MX</td><td>4 carbons (C4)</td><td>Mix</td><td>Gas plants, integrated plants</td></tr>
+                <tr><td>Butane spec</td><td>C4-SP</td><td>4 carbons (C4)</td><td>Spec</td><td>Spec plants, integrated plants</td></tr>
+              </tbody>
+            </table>
+            <p>Facility type is determined <em>consistently across all reporting months</em>: if a facility ever reports both MX and SP, it is classified as an integrated plant for all months. This prevents month-to-month colour changes for the same facility.</p>
+          </section>
+
+          <!-- ── WILDFIRE ── -->
+          <section class="docs-section" id="tab-wildfire" hidden>
+            <h2>Wildfire Layer</h2>
+
+            <h3>Fire Weather Index (FWI)</h3>
+            <p>The <strong>Fire Weather Index</strong> is a numeric rating of fire intensity potential developed by the Canadian Forest Service. It combines six sub-indices based on temperature, relative humidity, wind speed, and cumulative rainfall. FWI ranges from 0 to over 100; higher values indicate greater fire danger.</p>
+            <table class="docs-table">
+              <thead><tr><th>FWI Range</th><th>Rating</th></tr></thead>
+              <tbody>
+                <tr><td>0 – 8</td><td>Low</td></tr>
+                <tr><td>9 – 17</td><td>Moderate</td></tr>
+                <tr><td>18 – 29</td><td>High</td></tr>
+                <tr><td>30 – 47</td><td>Very High</td></tr>
+                <tr><td>48+</td><td>Extreme</td></tr>
+              </tbody>
+            </table>
+            <p>Fire hotspots on this map (red halos) are drawn when FWI exceeds the hotspot threshold in the CWFIS feed. The "At fire risk" exposure metric counts production volume within a buffer distance of active hotspots.</p>
+
+            <h3>Alberta Fire Status Codes (ABFP)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td>Out of Control</td><td><i class="doc-dot" style="background:#e53e3e"></i></td><td>The fire is spreading beyond defined control lines and available suppression resources are insufficient to contain the perimeter. Highest risk designation.</td></tr>
+                <tr><td>Being Held</td><td><i class="doc-dot" style="background:#f6ad55"></i></td><td>The fire is not currently expected to spread beyond its defined perimeter given available resources and weather conditions. Suppression is active and managing the boundary.</td></tr>
+                <tr><td>Under Control</td><td><i class="doc-dot" style="background:#68d391"></i></td><td>The fire perimeter is fully contained. The fire is no longer spreading; mop-up operations may continue to extinguish residual burning material.</td></tr>
+                <tr><td>Carryover</td><td><i class="doc-dot" style="background:#a0aec0"></i></td><td>A fire from a previous fire season that was not fully extinguished (smouldering underground) and has re-ignited or is still being monitored. Common in peatlands.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>BC Fire Designations (BCWS)</h3>
+            <table class="docs-table">
+              <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td>Out of Control</td><td>Same definition as AB — fire perimeter is expanding beyond control lines.</td></tr>
+                <tr><td>Being Held</td><td>Same as AB — fire is contained within current perimeter under active suppression.</td></tr>
+                <tr><td>Under Control</td><td>Same as AB — fire is fully contained.</td></tr>
+                <tr><td>Fire of Note</td><td>BC Wildfire Service designation for a fire that is large, visible, or threatening enough to warrant heightened public communication, regardless of its containment status. A Fire of Note may be any status level.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- ── AER APPROVALS ── -->
+          <section class="docs-section" id="tab-approvals" hidden>
+            <h2>AER Scheme Approvals</h2>
+            <p>The AER Sites layer shows oil sands scheme approvals issued by the Alberta Energy Regulator (AER) under the <em>Oil Sands Conservation Act</em>. Each polygon represents an approved project area, not necessarily the current active extraction footprint.</p>
+
+            <h3>In-situ Approval (teal polygon)</h3>
+            <p>Approval for a <strong>thermal in-situ</strong> oil sands recovery scheme. The operator has regulatory approval to extract bitumen using subsurface thermal methods within the designated area. Common methods include:</p>
+            <ul class="docs-list">
+              <li><strong>SAGD</strong> (Steam-Assisted Gravity Drainage): horizontal well pairs — steam injected in upper well, bitumen drains to lower producer well.</li>
+              <li><strong>CSS</strong> (Cyclic Steam Stimulation): single well alternates between steam injection, soak, and production phases.</li>
+              <li><strong>THAI / VAPEX</strong>: experimental combustion and vapour-based methods.</li>
+            </ul>
+
+            <h3>Mineable Approval (amber polygon)</h3>
+            <p>Approval for an <strong>open-pit surface mining</strong> oil sands scheme. The operator has AER approval to mine bitumen-bearing ore from the surface. Generally applies to deposits less than ~75 metres deep where in-situ methods are uneconomic. Mining produces large volumes of tailings that must be managed on-site.</p>
+
+            <h3>ST102 Facilities</h3>
+            <p>AER ST102 is the Facility List. In this app the ST102 markers are the subset of mapped oil-sands-related facility points from the AER Facility List Shapefile, useful for cross-referencing production volumes against physical facility locations and Petrinex facility IDs where available.</p>
+
+            <p class="docs-note">ℹ️ Scheme boundaries are regulatory approval polygons sourced from the AER open data portal. They may not exactly match the current operational footprint or the extent shown on satellite imagery.</p>
+          </section>
+
+          <!-- ── PIPELINES ── -->
+          <section class="docs-section" id="tab-pipelines" hidden>
+            <h2>Pipeline Layers</h2>
+            <p><strong>Pipelines</strong> shows AER Alberta feeder pipelines and pipeline installations from the local GeoJSON exports. <strong>Market Pipes</strong> opens a route picker for long-haul crude, diluent, HGL, and refined-product systems. <strong>Rail &amp; Terminals</strong> adds main rail corridors, major industrial leads, crude-by-rail points, and bulk crude/refined-product terminals. A terminal marker does not imply rail service; each Canadian point identifies its available public transport modes.</p>
+            <p>The map opens in <strong>Topo</strong> mode. Use the <strong>Map: Dark / Topo</strong> switch above the lower-right zoom buttons to change the background for the current session. Dark mode keeps province, city, town, and smaller-place labels while muting most other basemap detail, and it uses brighter railway colours so infrastructure routes remain legible.</p>
+
+            <h3>AER feeder layer</h3>
+            <p>Line segments represent AER feeder pipeline records where geometry is available. Feeder line categories are pre-split into static map tiles and load only after zooming in to reduce first-load latency. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
+
+            <h3>Commodity types</h3>
+            <table class="docs-table">
+              <thead><tr><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>Oil-Well Effluent</td><td>Field gathering or feeder infrastructure carrying produced fluids.</td></tr>
+                <tr><td>Crude Oil</td><td>AER crude oil pipeline segments inside Alberta.</td></tr>
+                <tr><td>HVP / LVP Products</td><td>High vapour pressure and low vapour pressure product pipeline segments.</td></tr>
+                <tr><td>Condensate / Diluents</td><td>Condensate and hydrocarbon diluent pipeline segments where tagged in the AER data.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Market access layer</h3>
+            <p>The market access layer keeps named routes readable by default: Enbridge Mainline/Lakehead, Trans Mountain/Puget Sound, Keystone, Express/Platte, Southern Lights, Cochin, Line 9, Wascana, Westspur, Enbridge Bakken/North Dakota, and optional downstream Enbridge/CER systems. It now also offers hidden U.S. EIA national reference networks for crude trunks, petroleum products, and HGLs, plus the Imperial Sarnia Products, Sun-Canadian, and Valero Pipeline Saint-Laurent Canadian refined-product corridors. The three Canadian product routes are approximate intercity corridors sourced from current operator descriptions. EIA's national layers show major/trunk and selected intrastate systems, not every pipe. Yellow hub markers identify key terminals, refineries, interconnects, and route nodes.</p>
+
+            <p>Market hub tooltips and click-to-pin hub popups include current public crude, condensate, heavy, and super-heavy tariff rows where published by the carrier. Each row keeps the official currency, fixed and variable toll components where the tariff publishes them, additive charges, included charges, conditional charges, loss allowances, all-in values where the adders are numerically defined, per-barrel conversions for cubic-metre tariffs, effective date, status, document name, and a PDF page link.</p>
+
+            <h3>Rail and terminal layer</h3>
+            <p>The rail and terminal layer is lazy-loaded from <code>public/data/railways.geojson</code>. Rail linework is BTS/FRA <code>NET=M</code> main routes and <code>NET=I</code> major industrial leads for Canada and the United States; it intentionally omits comprehensive yard, siding, minor-lead, and private-spur track. About 110,000 source segments are retained but grouped into roughly 1,300 browser render features. The app imports every valid point returned by EIA's crude-by-rail and petroleum-product terminal services. It adds 75 reviewed Canadian facilities from Suncor, Imperial, Shell, Trans Mountain, Enbridge, Irving, Valero, Gibson, Torq, Keyera, HF Sinclair, and other public operator/NPRI sources. That Canadian inventory is a high-confidence current tranche, not an exhaustive government registry.</p>
+
+            <p class="docs-note">EIA's public petroleum-product terminal GIS service is an older snapshot (service data edit: 2020), so complete service-point coverage is not the same as a current all-U.S. operator roster. The inactive terminal category is off by default; it retains the Edmonton Rail Terminal because Pembina reports that facility was decommissioned in Q2 2024.</p>
+
+            <p class="docs-note">Market access lines are analytical context only. They are approximate and must not be used for construction, ground disturbance, or exact underground pipeline location checks.</p>
+          </section>
+
+          <!-- ── DATA SOURCES ── -->
+          <section class="docs-section" id="tab-sources" hidden>
+            <h2>Data Sources</h2>
+            <p>All data is processed locally via the ETL pipeline (<code>python scripts/run_etl.py</code>) and stored in a SQLite database. The frontend reads pre-built JSON files from <code>public/data/</code>.</p>
+
+            <table class="docs-table">
+              <thead><tr><th>Source</th><th>Dataset</th><th>Coverage</th><th>Streams</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Refineries</strong></td>
+                  <td>IIR plant/unit analytical extract; checked against EIA 2026 refinery capacity counts</td>
+                  <td>Rich Canada/U.S./Mexico/Europe plant detail; all five U.S. PADDs selected by default, but the U.S. markers are not a canonical one-to-one EIA roster</td>
+                  <td>Crude capacity, processing units, ownership, status, and modelled refined-product outputs</td>
+                </tr>
+                <tr>
+                  <td><strong>AER ST53</strong></td>
+                  <td>Alberta Energy Regulator ST53, normalized from the analyst workbook in this build</td>
+                  <td>Monthly, Alberta oil sands projects</td>
+                  <td>In-situ bitumen</td>
+                </tr>
+                <tr>
+                  <td><strong>AER ST39</strong></td>
+                  <td>Alberta Energy Regulator ST39, workbook-normalized with current-month official synthetic overlay</td>
+                  <td>Monthly, Alberta mined oil sands and upgraders</td>
+                  <td>Mined bitumen gross, Synthetic crude oil</td>
+                </tr>
+                <tr>
+                  <td><strong>Petrinex AB</strong></td>
+                  <td>Petrinex Alberta monthly volumetric submissions (PROD/PROC activity)</td>
+                  <td>Monthly, Alberta upstream facilities</td>
+                  <td>Conventional crude, Pentanes plus, Condensate, Propane mix/spec, Butane mix/spec</td>
+                </tr>
+                <tr>
+                  <td><strong>Petrinex SK</strong></td>
+                  <td>Petrinex Saskatchewan monthly volumetric submissions plus well infrastructure reference files</td>
+                  <td>Monthly, Saskatchewan wells; default well-level history starts at 2024-01</td>
+                  <td>Conventional crude oil, OIL/PROD rows only</td>
+                </tr>
+                <tr>
+                  <td><strong>Petrinex BC</strong></td>
+                  <td>Petrinex BC facility reference data (formation codes, activity codes)</td>
+                  <td>Reference tables only in this build</td>
+                  <td>Facility, formation, and activity code reference. BC production comes from BCER well production data.</td>
+                </tr>
+                <tr>
+                  <td><strong>BCER</strong></td>
+                  <td>British Columbia Energy Regulator well production data</td>
+                  <td>Monthly, British Columbia wells</td>
+                  <td>Conventional crude oil and condensate</td>
+                </tr>
+                <tr>
+                  <td><strong>NDIC</strong></td>
+                  <td>North Dakota Industrial Commission Monthly Production Report, Oil sheet</td>
+                  <td>Monthly, North Dakota wells; default well-level history starts at 2024-01</td>
+                  <td>Crude oil only</td>
+                </tr>
+                <tr>
+                  <td><strong>Manitoba</strong></td>
+                  <td>Province of Manitoba monthly well production workbook</td>
+                  <td>Monthly, Manitoba wells; default well-level history starts at 2024-01</td>
+                  <td>Crude oil, OIL rows only</td>
+                </tr>
+                <tr>
+                  <td><strong>Montana BOGC</strong></td>
+                  <td>Montana Board of Oil and Gas Conservation Historical Well Production plus Complete Well List</td>
+                  <td>Monthly, Montana Bakken/Three Forks wells; default well-level history starts at 2024-01</td>
+                  <td>Oil/condensate barrels, Bakken and Three Forks rows only</td>
+                </tr>
+                <tr>
+                  <td><strong>Statistics Canada</strong></td>
+                  <td>Table 25-10-0063-01 — Crude oil and equivalent production, by type</td>
+                  <td>Monthly, national and provincial totals</td>
+                  <td>Not currently plotted as provincial production points; cached for context and reconciliation.</td>
+                </tr>
+                <tr>
+                  <td><strong>CWFIS (NRCan)</strong></td>
+                  <td>Canadian Wildland Fire Information System — active fire hotspots</td>
+                  <td>Near-real-time, Canada-wide satellite detections</td>
+                  <td>Fire hotspot positions (FWI-based)</td>
+                </tr>
+                <tr>
+                  <td><strong>ABFP</strong></td>
+                  <td>Alberta Wildfire open data — provincial active fire perimeters</td>
+                  <td>Current fire season, Alberta</td>
+                  <td>Fire polygons with OC / BH / UC / Carryover status</td>
+                </tr>
+                <tr>
+                  <td><strong>BC Wildfire Service</strong></td>
+                  <td>BCWS open data — BC provincial active fire perimeters</td>
+                  <td>Current fire season, British Columbia</td>
+                  <td>Fire polygons with status + Fires of Note designation</td>
+                </tr>
+                <tr>
+                  <td><strong>AER Pipelines</strong></td>
+                  <td>AER feeder pipeline and pipeline installation GeoJSON exports</td>
+                  <td>Alberta pipeline context</td>
+                  <td>Oil-well effluent, crude, HVP/LVP products, condensate, diluents, installations</td>
+                </tr>
+                <tr>
+                  <td><strong>Market Access Pipelines</strong></td>
+                  <td>CER liquid systems, EIA U.S. Energy Atlas linework, and three operator-sourced approximate Canadian product corridors</td>
+                  <td>Named Canadian/U.S. market routes plus optional U.S. national major/trunk reference networks</td>
+                  <td>Crude oil, refined products, diluent, and condensate/HGL systems</td>
+                </tr>
+                <tr>
+                  <td><strong>Rail &amp; Terminals</strong></td>
+                  <td>BTS/FRA North American Rail Network plus EIA crude rail and petroleum product terminal layers</td>
+                  <td>Canada/U.S. main and major-industrial rail; all valid EIA service points; reviewed Canadian terminal tranche</td>
+                  <td>Main rail network, major industrial leads, crude rail/storage/marine terminals, refined-product terminals</td>
+                </tr>
+                <tr>
+                  <td><strong>AER Scheme Approvals</strong></td>
+                  <td>AER oil sands scheme approval polygons (in-situ and mineable)</td>
+                  <td>All approved schemes, Alberta</td>
+                  <td>Approval polygons: in-situ (teal), mineable (amber)</td>
+                </tr>
+                <tr>
+                  <td><strong>AER ST102</strong></td>
+                  <td>AER ST102 Facility List Shapefile - facility locations with Petrinex facility IDs where available</td>
+                  <td>All approved oil sands facilities, Alberta</td>
+                  <td>Facility points for cross-reference</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>ETL Refresh</h3>
+            <p>Click <strong>Run ETL</strong> in the top bar to see the refresh command. Run <code>python scripts/run_etl.py</code> from the project root to rebuild the database from locally cached raw files and the workbook. Add <code>--download</code> to re-fetch public source files where configured.</p>
+            <p class="docs-note">Wildfire data (CWFIS, ABFP, BCWS) is fetched live in the browser when you use the Fires dropdown.</p>
+          </section>
+
+        </div><!-- .docs-body -->
+      </div><!-- .docs-inner -->
+    </div><!-- #docsPanel -->
+    <!-- ============================================================ -->
+
+    <script>
+      window.__PRODUCTION_APP_MODULE_LOADED__ = false;
+      window.setTimeout(() => {
+        const freshness = document.getElementById("freshness");
+        const map = document.getElementById("map");
+        if (!freshness || !freshness.textContent.includes("Loading local production store")) return;
+        if (!window.__PRODUCTION_APP_MODULE_LOADED__) {
+          freshness.textContent = "App script did not load. Open through http://127.0.0.1, not file://.";
+          if (map) {
+            map.innerHTML = `
+              <div class="load-error">
+                <h2>App did not start</h2>
+                <p>Run the local web server from the project folder, then open http://127.0.0.1:8765/index.html.</p>
+                <code>python -m http.server 8765 --bind 127.0.0.1</code>
+              </div>`;
+          }
+          return;
+        }
+        freshness.textContent = "Still loading data... check the browser console for the failed public/data request.";
+      }, 8000);
+    </script>
+    <script src="src/main.js?v=20260722d"></script>
+  </body>
+</html>
