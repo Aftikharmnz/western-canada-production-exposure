@@ -1042,6 +1042,7 @@ function initMap() {
   initRubberBand();
   initDistanceTool();
   state.map.on("moveend zoomend", schedulePipelineTileRefresh);
+  state.map.on("zoomend", refreshRailwayStyles);
 }
 
 function updateBasemapUI() {
@@ -4460,10 +4461,15 @@ function railwayStyle(feature) {
   const category = feature.properties?.category || "rail-main";
   const owner = railLineOwnerMeta(feature.properties);
   const dark = state.basemapKey === "dark";
+  const zoom = state.map?.getZoom?.() ?? 5;
+  const zoomBoost = zoom >= 9 ? 0.8 : zoom >= 7 ? 0.4 : 0;
+  const baseWeight = category === "rail-main"
+    ? (dark ? 3 : 2.4)
+    : (dark ? 2 : 1.6);
   return {
     color: railwayOwnerColor(owner),
-    weight: category === "rail-main" ? (dark ? 1.65 : 1.05) : (dark ? 1.05 : 0.75),
-    opacity: category === "rail-main" ? (dark ? 0.94 : 0.78) : (dark ? 0.72 : 0.5),
+    weight: baseWeight + zoomBoost,
+    opacity: category === "rail-main" ? (dark ? 0.98 : 0.94) : (dark ? 0.88 : 0.76),
     lineCap: "round",
     lineJoin: "round",
   };
