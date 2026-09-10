@@ -194,4 +194,7 @@ geojson <- list(
 
 dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 write_json(geojson, output_path, auto_unbox = TRUE, null = "null", pretty = FALSE)
+python_bin <- Sys.getenv("PYTHON", unset = "python")
+override_result <- system2(python_bin, c("scripts/apply_refinery_capacity_overrides.py", "--input", shQuote(output_path)))
+if (override_result != 0) stop("Refinery operator capacity reconciliation failed; output is not ready for publication")
 cat(sprintf("Wrote %s features to %s\n", length(features), output_path))

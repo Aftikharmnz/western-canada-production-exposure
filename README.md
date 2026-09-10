@@ -2,6 +2,26 @@
 
 Local ETL and map dashboard for Western Canada crude production exposure work.
 
+## September 2026 audit release
+
+See [production audit](docs/PRODUCTION_AUDIT.md), [infrastructure audit](docs/INFRASTRUCTURE_AUDIT_2026_09.md), [refinery methodology](docs/REFINERY_PRODUCTS_MODEL.md), and [application/API audit](docs/APP_AUDIT_2026_09.md) for source provenance, corrections and remaining coverage limits. The dashboard's **Data status** panel shows the latest actual month for each source. Later partial months remain selectable. A refresh date is not a common production reporting date.
+
+Gross stream sums can include the same material at multiple processing stages, including bitumen and synthetic crude, or raw and finished NGL streams. They measure selected asset activity, not net regional supply. Refinery products are explicitly labelled utilization scenarios; unavailable inputs remain unavailable.
+
+GitHub Pages deploys the encrypted `index.html` from `main` using `.github/workflows/deploy-pages.yml`. Edit `index.src.html`, rebuild the protected wrapper with `scripts/encrypt_site.sh`, and commit both files. The deployment artifact excludes plaintext HTML, local input files and source books. Data and JavaScript remain public assets under the existing static hosting design.
+
+Run offline checks before publishing:
+
+```powershell
+node --check src/main.js
+node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs
+python -m unittest discover -s scripts -p 'test_*.py'
+python scripts/validate_production_data.py
+python scripts/validate_infrastructure_layers.py
+```
+
+These checks require Python with `openpyxl`; official current AER XLS ingestion also requires R with `readxl`. `python scripts/audit_live_apis.py` checks the public browser endpoints without sending alerts. The existing Pages workflow runs the offline checks before deployment.
+
 The map opens with the detailed Esri topographic background. Use the **Map: Dark / Topo** switch above the lower-right zoom buttons to select a low-detail dark background for the current session. Dark mode keeps a separate province, city, town, and smaller-place reference-label layer and applies a brighter railway-owner palette, so infrastructure remains prominent without losing geographic context.
 
 ## Run The ETL
@@ -43,7 +63,7 @@ python scripts\build_railway_layer.py
 This writes `public/data/railways.geojson`. It covers Canadian and U.S. main rail and major industrial-lead linework from the BTS/FRA North American Rail Network—not every yard, siding, minor lead, or private spur. Source rail segments are grouped by category/country/owner so Leaflet renders roughly 1,300 paths instead of about 110,000 individual layers. The builder also imports every valid point returned by EIA's crude-by-rail and petroleum-product terminal services and adds 75 reviewed Canadian crude, product, pipeline, marine, and rail/transload facilities from current operator pages and NPRI coordinates. The Canadian set is a high-confidence curated inventory, not a government-maintained exhaustive national registry.
 
 By default the ETL caches Petrinex AB monthly volumetric API files from
-`2022-01` through the workbook's latest actual month. `2022-01` is the earliest
+`2022-01` through the latest completed month, subject to source availability. `2022-01` is the earliest
 public monthly API period verified by this ETL; older `2017-01` through
 `2021-12` volume URLs returned 404 in testing. To override the Petrinex window:
 
@@ -95,7 +115,7 @@ Then open `http://localhost:5173`.
 
 ## Notes
 
-- ST53/ST39 are the oil-sands source layers: ST53 in-situ schemes, ST39 mined bitumen, and ST39 Section 5 synthetic crude by upgrader. Historical ST53/ST39 rows are still normalized from the analyst workbook; current-month ST39 synthetic crude is reconciled from the cached official AER ST39 XLS when local R/readxl is available.
+- ST53/ST39 are the oil-sands source layers: ST53 in-situ/primary/EOR schemes, ST39 mined bitumen, and ST39 synthetic crude by upgrader. Current official XLS observations replace overlapping workbook records and forecasts. ST53 is m³/day; ST39 is m³/month. Earlier history retains its reviewed workbook actual/forecast boundary.
 - ST53/ST39 oil-sands assets are located from AER data first: Scheme Approval Spatial Data centroids for in-situ and mined project footprints, ST44 active schemes as the approval/name bridge, and ST102 facility points for upgrader/facility locations. Non-specific workbook buckets such as `Other`/`Assets` are kept in the database but excluded from map markers.
 - Petrinex AB OIL/PROD rows are converted from m3/month to bbl/d and mapped by operator plus DLS site using the current public well-to-facility link where available. Zero or negative site-months are not exported to the monthly conventional map layer.
 - Petrinex AB, Saskatchewan, BCER, NDIC, Manitoba, and Montana BOGC well-level history is exported as date-specific compact JSON under `public/data/monthly/`, so the browser loads the conventional layer only for the selected month instead of loading all well records up front. Monthly files use integer asset references into `assets.json` to keep GitHub Pages storage small.
@@ -116,4 +136,4 @@ Then open `http://localhost:5173`.
 - `data/processed/dls_centroids.csv` caches DLS-to-lat/lon conversions. The ETL uses the AGS ATS v4.1 web converter for the highest-volume Alberta DLS sites it has not seen before, then uses a clearly labelled approximate DLS centroid fallback for the rest.
 - Values are stored in `bbl/d` and also exported as `kbbl/d` for dashboard display. Petrinex AB/SK, BCER, and Manitoba monthly m3 volumes are converted using 6.28981077 bbl per m3 divided by calendar days in the production month. NDIC and Montana BOGC monthly crude barrels are divided by calendar days. Workbook-normalized ST39/ST53 rows are already bbl/d.
 - `public/data/manifest.json` includes source coverage, filter-aware date totals, and data-quality warnings so the app can flag partial source coverage instead of silently treating every month as equally complete. The ETL flags trailing coverage gaps (a source whose cache ends while other sources continue, e.g. Petrinex AB after its final cached month), and the app also derives the same warning client-side from `source_coverage`, so months like 2026-02+ show a partial-coverage warning instead of silently dropping from ~8,200 to ~3,600 kbbl/d.
-- If a public endpoint is unavailable during `--download`, the ETL logs the failure in `public/data/manifest.json` and still rebuilds the local store from the workbook seed.
+- If a public endpoint is unavailable during `--download`, the ETL preserves its last valid cache and records the failed refresh in `public/data/manifest.json`. Missing source periods remain missing; later dates show partial coverage. A workbook with an unknown actual/forecast cutoff fails validation rather than relabelling forecasts.

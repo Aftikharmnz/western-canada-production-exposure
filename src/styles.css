@@ -49,14 +49,15 @@ select {
 
 .app-shell {
   display: grid;
-  grid-template-rows: 54px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   width: 100vw;
   height: 100vh;
-  min-width: 1120px;
+  min-width: 0;
   overflow: hidden;
 }
 
 .topbar {
+  min-height: 64px;
   position: relative;
   display: flex;
   align-items: center;
@@ -109,7 +110,7 @@ select {
 .top-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -159,7 +160,7 @@ select {
 
 .workspace {
   display: grid;
-  grid-template-columns: 210px minmax(520px, 1fr) 270px;
+  grid-template-columns: 210px minmax(0, 1fr) 270px;
   min-height: 0;
 }
 
@@ -683,7 +684,7 @@ select {
   z-index: 600;
 }
 
-.etl-panel button {
+.etl-panel #closeEtl {
   position: absolute;
   right: 10px;
   top: 8px;
@@ -3313,3 +3314,66 @@ select {
   margin-right: 6px;
   vertical-align: middle;
 }
+
+/* Audit release: clear data provenance, keyboard access and responsive controls. */
+button:focus-visible, summary:focus-visible, a:focus-visible {
+  outline: 3px solid #008b8b;
+  outline-offset: 3px;
+}
+.brand { flex: 0 1 320px; }
+.brand h1 { line-height: 1.25; }
+.top-actions { flex: 1; }
+.mobile-filters-btn { display: none; }
+.etl-panel {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4000;
+  width: min(620px, calc(100vw - 32px));
+  max-height: 85dvh;
+  overflow: auto;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 42, .35), 0 20px 70px rgba(15, 23, 42, .25);
+}
+.etl-panel h2 { margin: 0 32px 14px 0; font-size: 20px; }
+.etl-panel p { font-size: 13px; line-height: 1.55; }
+.etl-panel details { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 14px; }
+.etl-panel summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.etl-panel code { overflow-wrap: anywhere; }
+.data-status-scroll { max-height: 36dvh; overflow: auto; }
+.data-status-scroll th { position: sticky; top: 0; background: #f5f8f8; }
+.data-status-warning, .pw-stale { padding: 10px; border-radius: 6px; background: #fff3db; color: #854d0e; }
+.pipeline-status { top: 54px; }
+#powerPanel, #refineryPanel, #seasonalityPanel { max-width: calc(100% - 24px); }
+.pw-body { overflow-x: auto; }
+.ref-close, .sea-close { min-width: 30px; min-height: 30px; }
+.ref-scenario-controls { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f5f8fa; border-bottom: 1px solid var(--line); font-size: 12px; flex-wrap: wrap; }
+.ref-scenario-controls input { width: 68px; padding: 5px 7px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; }
+.coverage-notice { line-height: 1.5; }
+@media (min-width: 901px) and (max-width: 1100px) {
+  .workspace { grid-template-columns: 185px minmax(0, 1fr) 225px; }
+  .brand { flex-basis: 245px; }
+  .search-control { grid-template-columns: auto 155px; }
+}
+@media (max-width: 900px) {
+  .topbar { display: block; }
+  .top-actions { display: flex; justify-content: flex-start; gap: 7px; }
+  .search-control { width: 100%; margin-bottom: 2px; }
+  .search-control input { min-height: 38px; }
+  .top-actions button { min-height: 36px; }
+  .mobile-filters-btn { display: inline-block; border: 1px solid var(--line-strong); background: white; border-radius: 6px; padding: 0 10px; font-size: 12px; }
+  .filter-rail { display: none; max-height: 65dvh; overflow-y: auto; }
+  .filter-rail.mobile-open { display: block; }
+  .map-stage { min-height: 440px; height: 68dvh; }
+  .map-legend { max-height: 210px; overflow-y: auto; }
+  .pipeline-menu, .market-pipeline-menu, .railway-menu, .formation-menu, .refinery-menu, .fire-menu, .select-menu {
+    position: fixed; top: 170px; left: 14px; right: 14px; width: auto; max-height: 55dvh; overflow-y: auto;
+  }
+  .detail-panel { padding-bottom: 24px; }
+  .ref-controls, .sea-controls, .ref-footer { flex-wrap: wrap; }
+  .ref-body { max-height: 45dvh; }
+}
+#refCoverage { padding: 0 14px; }
+.layer-source-note { margin: 10px 12px; color: #52636a; font-size: 11px; line-height: 1.5; }
+.timeline-bar.unloaded { background: transparent; border: 1px dashed #94a3b8; opacity: .7; }

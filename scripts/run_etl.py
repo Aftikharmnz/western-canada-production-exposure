@@ -17,9 +17,11 @@ import calendar
 import csv
 import datetime as dt
 import io
+import hashlib
 import json
 import math
 import re
+import shutil
 import sqlite3
 import struct
 import subprocess
@@ -43,7 +45,7 @@ PROCESSED_DIR = DATA_DIR / "processed"
 PUBLIC_DATA_DIR = ROOT / "public" / "data"
 REGISTRY_PATH = DATA_DIR / "asset_registry.csv"
 DLS_CACHE_PATH = PROCESSED_DIR / "dls_centroids.csv"
-ST44_PATH = RAW_DIR / "aer_st44_2025_q4.xlsx"
+ST44_PATH = RAW_DIR / "aer_st44_2026_q2.xlsx"
 ST102_SHP_PATH = RAW_DIR / "aer_st102_facility_list_shapefile.zip"
 SCHEME_GEOJSON_PATH = PUBLIC_DATA_DIR / "aer_scheme_approvals.geojson"
 ST102_OIL_SANDS_GEOJSON_PATH = PUBLIC_DATA_DIR / "aer_st102_oil_sands_facilities.geojson"
@@ -105,6 +107,7 @@ DEFAULT_WORKBOOK = Path(
 
 CUTOFF = dt.date(2015, 1, 1)
 RUN_DATE = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+ALLOW_LOCATION_DOWNLOADS = True
 
 SOURCE_MANIFEST = [
     {
@@ -127,8 +130,8 @@ SOURCE_MANIFEST = [
         "source_id": "aer_st44",
         "agency": "Alberta Energy Regulator",
         "name": "AER ST44 Active Oil Sands Schemes",
-        "url": "https://static.aer.ca/prd/documents/sts/ST44_2025-Q4.xlsx",
-        "raw_file": "aer_st44_2025_q4.xlsx",
+        "url": "https://static.aer.ca/prd/documents/sts/ST44_2026-Q2.xlsx",
+        "raw_file": "aer_st44_2026_q2.xlsx",
         "grain": "active scheme bridge",
     },
     {
@@ -384,14 +387,15 @@ def as_float(value: Any) -> float | None:
     if value is None or value == "":
         return None
     if isinstance(value, (int, float)):
-        if math.isnan(value):
+        if not math.isfinite(value):
             return None
         return float(value)
     text = str(value).replace(",", "").strip()
     if not text:
         return None
     try:
-        return float(text)
+        number = float(text)
+        return number if math.isfinite(number) else None
     except ValueError:
         return None
 
@@ -408,7 +412,7 @@ def as_date(value: Any) -> dt.date | None:
         return None
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y-%m"):
         try:
-            parsed = dt.datetime.strptime(text[: len(fmt)], fmt)
+            parsed = dt.datetime.strptime(text, fmt)
             return parsed.date()
         except ValueError:
             pass
@@ -492,21 +496,14 @@ def read_workbook_latest_actual(workbook_path: Path) -> dt.date:
                 return month_end(latest)
     except Exception as exc:  # noqa: BLE001
         log(f"  warning: could not read workbook latest actual date: {exc}")
-    cached_petrinex_months: list[dt.date] = []
-    for path in PETRINEX_AB_VOL_DIR.glob("Vol_????-??-AB.zip"):
-        match = re.search(r"Vol_(\d{4}-\d{2})-AB\.zip$", path.name)
-        if not match:
-            continue
-        period = parse_period(match.group(1))
-        if not period:
-            continue
-        cached_petrinex_months.append(month_end(dt.date(period[0], period[1], 1)))
-    if cached_petrinex_months:
-        # Use the latest common AB Petrinex month as the app default when the
-        # workbook summary cell is blank. This avoids defaulting to a partial
-        # forecast/current-day date where the location-specific layers are absent.
-        return max(cached_petrinex_months)
-    return month_end(dt.date.today().replace(day=1))
+    provenance_path = DATA_DIR / "workbook_provenance.json"
+    if provenance_path.exists() and workbook_path.exists():
+        provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+        if provenance.get("sha256") == hashlib.sha256(workbook_path.read_bytes()).hexdigest():
+            latest = as_date(provenance.get("latest_actual_date"))
+            if latest:
+                return month_end(latest)
+    raise ValueError("Workbook actual/forecast boundary is unavailable. Supply a cached Trading Dashboard D6 date or review data/workbook_provenance.json for this workbook checksum.")
 
 
 def petrinex_ab_vol_path(period: str) -> Path:
@@ -533,12 +530,18 @@ def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
             headers={"User-Agent": "western-canada-production-etl/1.0"},
         )
         with urllib.request.urlopen(req, timeout=120) as response:
-            target.write_bytes(response.read())
+            payload = response.read()
+        validate_download_payload(payload, target.suffix)
+        temporary = target.with_suffix(target.suffix + ".tmp")
+        temporary.write_bytes(payload)
+        temporary.replace(target)
         return {
             "url": url,
             "local_path": str(target.relative_to(ROOT)),
             "status": "downloaded",
             "error": None,
+            "retrieved_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "bytes": len(payload),
         }
     except Exception as exc:  # noqa: BLE001
         return {
@@ -546,7 +549,22 @@ def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
             "local_path": str(target.relative_to(ROOT)),
             "status": "failed",
             "error": str(exc),
+            "cached_fallback": target.exists(),
         }
+
+
+def validate_download_payload(payload: bytes, suffix: str) -> None:
+    """A successful HTTP response must not replace a valid cache with an error page."""
+    if not payload:
+        raise ValueError("Empty source response")
+    if payload.lstrip().lower().startswith((b"<!doctype html", b"<html")):
+        raise ValueError("Source returned HTML instead of the requested data file")
+    if suffix.lower() in {".zip", ".xlsx"}:
+        with _zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            if not archive.namelist():
+                raise ValueError("Empty source archive")
+    elif suffix.lower() == ".xls" and not payload.startswith(bytes.fromhex("d0cf11e0a1b11ae1")):
+        raise ValueError("Source is not a legacy Excel workbook")
 
 
 def ensure_petrinex_cache(
@@ -564,7 +582,8 @@ def ensure_petrinex_cache(
     """
 
     status: list[dict[str, Any]] = []
-    latest_period = month_period(latest_actual)
+    # Public volumes advance independently of the analyst workbook's forecast boundary.
+    latest_period = previous_month_period() if refresh else month_period(latest_actual)
     if start_period:
         periods = iter_month_periods(start_period, latest_period)
     else:
@@ -574,7 +593,7 @@ def ensure_petrinex_cache(
         if parse_period(period) is None:
             continue
         url = f"https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/{period}/CSV"
-        item = download_url(url, petrinex_ab_vol_path(period), force=force if refresh else False)
+        item = download_url(url, petrinex_ab_vol_path(period), force=force or (refresh and period >= recent_month_periods(latest_period, 3)[0]))
         item.update(
             {
                 "source_id": "petrinex_ab_conventional_vol",
@@ -602,7 +621,7 @@ def ensure_petrinex_cache(
         ),
     ]
     for source_id, name, url, target in infra_sources:
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or refresh)
         item.update(
             {
                 "source_id": source_id,
@@ -635,7 +654,7 @@ def ensure_petrinex_cache(
         ),
     ]
     for source_id, name, url, target in bc_refs:
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or refresh)
         item.update(
             {
                 "source_id": source_id,
@@ -663,7 +682,7 @@ def ensure_petrinex_sk_cache(
             continue
         url = f"https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/{period}/CSV"
         target = petrinex_sk_vol_path(period)
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or (refresh and period >= recent_month_periods(previous_month_period(), 3)[0]))
         item.update(
             {
                 "source_id": "petrinex_sk_well_production",
@@ -695,7 +714,7 @@ def ensure_petrinex_sk_cache(
             PETRINEX_SK_INFRA_DIR / "well_infrastructure_sk.zip",
         ),
     ]:
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or refresh)
         item.update(
             {
                 "source_id": source_id,
@@ -710,7 +729,7 @@ def ensure_petrinex_sk_cache(
 
 
 def ensure_manitoba_cache(force: bool = False, refresh: bool = False) -> list[dict[str, Any]]:
-    item = download_url(MANITOBA_PRODUCTION_REPORT_URL, MANITOBA_PRODUCTION_ZIP, force=force if refresh else False)
+    item = download_url(MANITOBA_PRODUCTION_REPORT_URL, MANITOBA_PRODUCTION_ZIP, force=force or refresh)
     item.update(
         {
             "source_id": "manitoba_well_production",
@@ -741,7 +760,7 @@ def ensure_montana_cache(force: bool = False, refresh: bool = False) -> list[dic
             "well reference and lat/long",
         ),
     ]:
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or refresh)
         item.update(
             {
                 "source_id": source_id,
@@ -850,7 +869,7 @@ def ensure_bcer_cache(force: bool = False, refresh: bool = False) -> list[dict[s
             "well reference",
         ),
     ]:
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or refresh)
         item.update(
             {
                 "source_id": source_id,
@@ -861,7 +880,7 @@ def ensure_bcer_cache(force: bool = False, refresh: bool = False) -> list[dict[s
             }
         )
         status.append(item)
-    status.append(download_bcer_well_surface_points(force=force if refresh else False))
+    status.append(download_bcer_well_surface_points(force=force or refresh))
     return status
 
 
@@ -925,7 +944,7 @@ def ensure_ndic_cache(
     for period in selected_periods:
         target = ndic_mpr_path(period)
         url = f"{NDIC_MPR_BASE_URL}/{target.name}"
-        item = download_url(url, target, force=force if refresh else False)
+        item = download_url(url, target, force=force or (refresh and period >= available_periods[max(0, len(available_periods) - 3)]))
         item.update(
             {
                 "source_id": "ndic_well_production",
@@ -952,6 +971,24 @@ def open_nested_petrinex_csv(zip_path: Path) -> csv.DictReader:
     else:
         csv_bytes = inner_bytes
     return csv.DictReader(io.StringIO(csv_bytes.decode("utf-8-sig")))
+
+
+def iter_petrinex_liquids_rows(zip_path: Path) -> Any:
+    """Filter raw CSV rows before allocating dictionaries for unrelated gas flows."""
+    reader = open_nested_petrinex_csv(zip_path)
+    fields = reader.fieldnames or []
+    activity_index, product_index = fields.index("ActivityID"), fields.index("ProductID")
+    allowed = {("PROD", "OIL"), ("PROD", "COND"), ("PROC", "C5-SP"), ("FRAC", "C5-SP"),
+               ("PROC", "C3-MX"), ("PROC", "C3-SP"), ("PROC", "C4-MX"), ("PROC", "C4-SP")}
+    for values in reader.reader:
+        if len(values) <= max(activity_index, product_index):
+            continue
+        if (values[activity_index], values[product_index]) in allowed:
+            yield dict(zip(fields, values))
+
+
+def is_bitumen_well(link: dict[str, str]) -> bool:
+    return clean_text(link.get("well_status_fluid")).upper() == "CR-BIT"
 
 
 def format_dls(lsd: Any, section: Any, township: Any, range_: Any, meridian: Any) -> str | None:
@@ -1107,7 +1144,7 @@ def resolve_dls_locations(
             continue
         coords = None
         method = "approx_dls_centroid"
-        if province == "Alberta" and official_used < official_limit:
+        if ALLOW_LOCATION_DOWNLOADS and province == "Alberta" and official_used < official_limit:
             try:
                 coords = converter.convert(dls)
                 if coords:
@@ -1139,9 +1176,7 @@ def download_sources(force: bool = False) -> list[dict[str, Any]]:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     results = []
     for source in SOURCE_MANIFEST:
-        target = RAW_DIR / source["raw_file"]
-        status = "skipped"
-        error = None
+        target = (ROOT if source["raw_file"].startswith("public/") else RAW_DIR) / source["raw_file"]
         if not source.get("download", True) or not str(source["url"]).lower().startswith(("http://", "https://")):
             results.append(
                 {
@@ -1152,29 +1187,9 @@ def download_sources(force: bool = False) -> list[dict[str, Any]]:
                 }
             )
             continue
-        if force or not target.exists():
-            status = "downloaded"
-            try:
-                log(f"Downloading {source['source_id']} -> {target}")
-                target.parent.mkdir(parents=True, exist_ok=True)
-                req = urllib.request.Request(
-                    source["url"],
-                    headers={"User-Agent": "western-canada-production-etl/1.0"},
-                )
-                with urllib.request.urlopen(req, timeout=90) as response:
-                    target.write_bytes(response.read())
-            except Exception as exc:  # noqa: BLE001 - cache failures should not block workbook import
-                status = "failed"
-                error = str(exc)
-                log(f"  warning: {source['source_id']} download failed: {error}")
-        results.append(
-            {
-                **source,
-                "local_path": str(target.relative_to(ROOT)),
-                "status": status,
-                "error": error,
-            }
-        )
+        # This function is only called for an explicit refresh; current-issue
+        # URLs are mutable even when their filenames remain unchanged.
+        results.append({**source, **download_url(source["url"], target, force=True)})
     return results
 
 
@@ -1287,6 +1302,13 @@ def registry_lookup(
 
 
 def source_name(source_id: str) -> str:
+    derived_names = {
+        "petrinex_ab_pentanes_plus_vol": "Petrinex Alberta Pentanes Plus Volumetrics",
+        "petrinex_ab_condensate_vol": "Petrinex Alberta Condensate Volumetrics",
+        "petrinex_ab_ngl_vol": "Petrinex Alberta NGL Volumetrics",
+    }
+    if source_id in derived_names:
+        return derived_names[source_id]
     for source in SOURCE_MANIFEST:
         if source["source_id"] == source_id:
             return source["name"]
@@ -1296,7 +1318,8 @@ def source_name(source_id: str) -> str:
 def rscript_path() -> Path | None:
     if DEFAULT_RSCRIPT.exists():
         return DEFAULT_RSCRIPT
-    return None
+    found = shutil.which("Rscript")
+    return Path(found) if found else None
 
 
 def extract_st39_current_synthetic() -> list[dict[str, Any]]:
@@ -1351,6 +1374,149 @@ def extract_st39_current_synthetic() -> list[dict[str, Any]]:
     except Exception as exc:  # noqa: BLE001
         log(f"  warning: official ST39 synthetic extract failed: {exc}")
         return []
+
+
+def extract_aer_current(source_id: str) -> list[dict[str, Any]]:
+    """Extract verified source units from the official current annual XLS issues."""
+    runner = rscript_path()
+    raw_path = RAW_DIR / f"{source_id}_current.xls"
+    if not runner or not raw_path.exists():
+        log(f"  warning: {source_id} direct import requires its XLS cache and R/readxl")
+        return []
+    output = PROCESSED_DIR / f"{source_id}_current_production.csv"
+    result = subprocess.run([str(runner), str(ROOT / "scripts/extract_aer_current.R"),
+                             source_id.removeprefix("aer_"), str(raw_path), str(output)],
+                            capture_output=True, text=True, timeout=90)
+    if result.returncode:
+        raise ValueError(f"{source_id} official extraction failed: {result.stderr.strip()}")
+    with output.open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    for row in rows:
+        value = as_float(row.get("value"))
+        if value is None or value < 0 or not parse_period(row.get("period", "")):
+            raise ValueError(f"Invalid {source_id} production row")
+        row["value"] = value
+    return rows
+
+
+def official_company(operator: str) -> str:
+    names = {
+        "Canadian Natural": "CNRL", "Imperial": "Imperial Oil", "Cenovus": "Cenovus",
+        "Suncor": "Suncor", "Syncrude": "Syncrude JV", "ConocoPhillips": "ConocoPhillips",
+        "CNOOC": "CNOOC/Nexen", "Connacher": "Connacher", "Strathcona": "Strathcona",
+        "Athabasca": "Athabasca", "Harvest": "Harvest", "PetroChina": "PetroChina",
+        "Greenfire": "Greenfire", "Baytex": "Baytex", "Headwater": "Headwater",
+        "Obsidian": "Obsidian", "Tamarack": "Tamarack", "MEG": "MEG Energy",
+    }
+    return next((name for prefix, name in names.items() if operator.startswith(prefix)), operator)
+
+
+def official_approval_location(approval: str, locations: dict[str, Any]) -> dict[str, Any]:
+    index = locations["scheme_index"]
+    selected = index["by_root"].get(approval_root(approval), [])
+    coords = combined_centroid(selected) if selected else None
+    if coords:
+        return {"latitude": coords[0], "longitude": coords[1],
+                "method": "aer_scheme_approval_centroid", "geometry_kind": "scheme_polygon",
+                "geometry_source": "AER Scheme Approval Spatial Data",
+                "geometry_features": [item["feature"] for item in selected if item.get("feature")],
+                "notes": f"AER approval {approval}; scheme footprint centroid, not a surveyed plant point."}
+    for row in locations["st44_rows"]:
+        if any(approval_root(a) == approval_root(approval) for a in row["approvals"]):
+            coords = st44_location_to_centroid(row["location"])
+            if coords:
+                return {"latitude": coords[0], "longitude": coords[1], "method": "aer_st44_dls_centroid",
+                        "geometry_kind": "dls_centroid", "geometry_source": "AER ST44 Active Oil Sands Schemes",
+                        "notes": f"AER approval {approval}; ST44 township location {row['location']}."}
+    return {}
+
+
+def overlay_official_aer_current(assets: dict[str, Asset], records: list[dict[str, Any]],
+                                add_asset: Any, add_record: Any, locations: dict[str, Any]) -> None:
+    mined_map = {
+        "ABOS0093231": ("CNRL", "Horizon"), "ABOS0077303": ("CNRL", "Muskeg River"),
+        "ABOS0098351": ("CNRL", "Jackpine"), "ABOS0104948": ("Suncor", "Fort Hills"),
+        "ABOS0101871": ("Imperial Oil", "Kearl"), "ABOS0077189": ("Suncor", "Suncor OSG"),
+        "ABOS0077533": ("Syncrude JV", "Syncrude Mildred Lake"), "ABOS0080249": ("Syncrude JV", "Syncrude Aurora"),
+    }
+    for source_id in ("aer_st53", "aer_st39"):
+        rows = extract_aer_current(source_id)
+        if not rows:
+            continue
+        if source_id == "aer_st39":
+            unexpected = [row for row in rows if row["value"] > 0 and not (
+                (row["stream"] == "Mined bitumen gross" and row["approval"] in mined_map)
+                or (row["stream"] == "Synthetic crude oil" and (row["approval"] in ST39_SYNTHETIC_APPROVAL_MAP
+                    or row["approval"] == "ABOS0098317")))]
+            if unexpected:
+                raise ValueError("New positive ST39 facility requires approval mapping before publication: "
+                                 + ", ".join(sorted({row["approval"] for row in unexpected})))
+            rows = [row for row in rows if (row["stream"] == "Mined bitumen gross" and row["approval"] in mined_map)
+                    or (row["stream"] == "Synthetic crude oil" and (row["approval"] in ST39_SYNTHETIC_APPROVAL_MAP
+                        or row["approval"] == "ABOS0098317"))]
+        periods = {row["period"] for row in rows}
+        footprint_by_asset: dict[str, dict[str, Any]] = defaultdict(dict)
+        # Official rows replace both workbook actuals and forecasts for covered periods.
+        # ST39 is Alberta-only: preserve the separately identified Saskatchewan upgrader.
+        records[:] = [r for r in records if not (r["source_id"] == source_id and r["period"] in periods
+                      and assets[r["asset_id"]].province == "Alberta")]
+        for row in rows:
+            company = official_company(row["operator"])
+            name = row["facility"] or f"{row['area']} {row['recovery']} — approval {row['approval']}"
+            system = "in_situ" if source_id == "aer_st53" else ("mined" if row["stream"] == "Mined bitumen gross" else "synthetic")
+            location = official_approval_location(row["approval"], locations) if system == "in_situ" else {}
+            existing = [a for a in assets.values() if a.source_id == source_id and a.production_system == system
+                        and a.company == company and normalize_match_text(a.display_name) == normalize_match_text(name)
+                        and not a.is_rollup]
+            if source_id == "aer_st39":
+                if system == "mined":
+                    company, token = mined_map[row["approval"]]
+                    existing = [a for a in assets.values() if a.source_id == source_id and a.production_system == system
+                                and normalize_match_text(token) in normalize_match_text(a.display_name) and not a.is_rollup]
+                    exact = [a for a in existing if normalize_match_text(a.display_name) == normalize_match_text(f"{token} Mine")]
+                    if exact:
+                        existing = exact
+                    name = existing[0].display_name if len(existing) == 1 else f"{token} Mine"
+                else:
+                    mapping = ST39_SYNTHETIC_APPROVAL_MAP.get(row["approval"], {"company": "CNOOC/Nexen", "display_name": "Long Lake Upgrader"})
+                    company, name = mapping["company"], mapping["display_name"]
+                    existing = [a for a in assets.values() if a.source_id == source_id and a.production_system == system and a.display_name == name]
+                location = resolve_oil_sands_asset_location(system, company, name, locations) or {}
+            asset_id = existing[0].asset_id if len(existing) == 1 else f"{source_id}:{system}:approval_{approval_root(row['approval'])}"
+            aid = add_asset(display_name=name, source_id=source_id, production_system=system, company=company,
+                            asset_kind="in_situ_scheme" if system == "in_situ" else ("mine" if system == "mined" else "upgrader"),
+                            latitude=location.get("latitude"), longitude=location.get("longitude"),
+                            coordinate_method=location.get("method"), geometry_kind=location.get("geometry_kind", ""),
+                            geometry_source=location.get("geometry_source", ""), geometry_features=location.get("geometry_features"),
+                            notes=f"Official AER {source_id.upper()} {row['approval']}. {location.get('notes', '')}",
+                            asset_id_override=asset_id)
+            for feature in location.get("geometry_features", []):
+                footprint_by_asset[aid][json.dumps(feature, sort_keys=True)] = feature
+            if location and len(existing) == 1:
+                a = assets[aid]
+                a.latitude, a.longitude = location.get("latitude"), location.get("longitude")
+                a.coordinate_method = location.get("method", a.coordinate_method)
+                a.geometry_kind = location.get("geometry_kind", a.geometry_kind)
+                a.geometry_source = location.get("geometry_source", a.geometry_source)
+                a.geometry_features = location.get("geometry_features", a.geometry_features)
+                a.location_confidence = coordinate_confidence(a.latitude, a.longitude, a.coordinate_method, geometry_kind=a.geometry_kind)
+            year, month = parse_period(row["period"])
+            value = row["value"] * M3_TO_BBL
+            if row["units"] == "m3/month":
+                value /= calendar.monthrange(year, month)[1]
+            elif row["units"] != "m3/d":
+                raise ValueError(f"Unsupported official units: {row['units']}")
+            add_record(dt.date(year, month, 1), aid, row["stream"], value, f"Official {source_id} current XLS", row["approval"], source_id, scenario="actual")
+        # A project may report multiple approval rows (e.g. Brintnell). Keep
+        # their combined footprint instead of whichever approval was read last.
+        for aid, by_geometry in footprint_by_asset.items():
+            features = list(by_geometry.values())
+            parts = [geometry_centroid_area(feature["geometry"]) for feature in features]
+            coords = combined_centroid([{"centroid": part[:2], "area": part[2]} for part in parts if part])
+            if coords:
+                assets[aid].latitude, assets[aid].longitude = coords
+                assets[aid].geometry_features = features
+        log(f"  Official {source_id}: {len(rows):,} records; {min(periods)} through {max(periods)}")
 
 
 def overlay_official_st39_current_synthetic(
@@ -1468,8 +1634,8 @@ def approval_numbers(value: str) -> list[str]:
 
 
 def approval_root(value: str) -> str:
-    match = re.match(r"(\d+)", clean_text(value).upper())
-    return match.group(1) if match else ""
+    match = re.match(r"(?:ABOS)?(\d+)", clean_text(value).upper())
+    return str(int(match.group(1))) if match else ""
 
 
 def read_dbf_bytes(data: bytes) -> list[dict[str, str]]:
@@ -2101,7 +2267,7 @@ def append_petrinex_ab_conventional(
         if month_end(date_value) < CUTOFF:
             continue
         log(f"  Parsing Petrinex AB conventional volume {period}")
-        reader = open_nested_petrinex_csv(path)
+        reader = iter_petrinex_liquids_rows(path)
         for row in reader:
             total_rows += 1
             province = row.get("ReportingFacilityProvinceState")
@@ -2230,8 +2396,14 @@ def append_petrinex_ab_conventional(
 
     well_links = read_well_facility_links(target_wells)
     sites: dict[tuple[str, str, str], dict[str, Any]] = {}
+    skipped_bitumen_well_rows = 0
     for item in raw_rows:
         link = well_links.get(item["well_id"], {})
+        # Primary and enhanced-recovery bitumen can report through ordinary
+        # batteries. Their CR-BIT wells belong to ST53, not conventional crude.
+        if is_bitumen_well(link):
+            skipped_bitumen_well_rows += 1
+            continue
         dls = link.get("dls") or item["facility_dls"]
         key = (month_end(item["date"]).isoformat(), item["operator"], dls)
         site = sites.setdefault(
@@ -2279,7 +2451,7 @@ def append_petrinex_ab_conventional(
         well_count = len(site["wells"])
         display = f"{site['dls']} - {site['operator']}"
         note_bits = [
-            "Petrinex AB OIL/PROD rows aggregated by operator and DLS site.",
+            "Petrinex AB OIL/PROD rows aggregated by operator and DLS site; known CR-BIT wells and oil-sands battery subtypes excluded.",
             f"Location basis: {site['location_basis']}; coordinate method: {cache_row.get('method', '')}.",
         ]
         if facility_count:
@@ -2315,7 +2487,7 @@ def append_petrinex_ab_conventional(
     log(
         "  Petrinex AB conventional: "
         f"{added:,} DLS/operator records from {len(raw_rows):,} OIL/PROD rows; "
-        f"excluded {skipped_oil_sands:,} oil-sands rows."
+        f"excluded {skipped_oil_sands:,} oil-sands battery rows and {skipped_bitumen_well_rows:,} CR-BIT well rows."
     )
 
     # ── Pentanes plus processing ────────────────────────────────────────────
@@ -3008,7 +3180,7 @@ def append_petrinex_sk_well_production(add_asset: Any, add_record: Any) -> None:
         if month_end(date_value) < CUTOFF:
             continue
         log(f"  Parsing Petrinex SK crude oil {period}")
-        reader = open_nested_petrinex_csv(path)
+        reader = iter_petrinex_liquids_rows(path)
         for row in reader:
             if row.get("ReportingFacilityProvinceState") != "SK":
                 continue
@@ -3130,7 +3302,9 @@ def append_manitoba_well_production(add_asset: Any, add_record: Any, start_perio
     for ws in wb.worksheets:
         rows = ws.iter_rows(values_only=True)
         try:
-            headers = [clean_text(value).upper() for value in next(rows)]
+            # The regulator changed WELL_NAME / FLUID_TYPE to spaced headers
+            # in its current workbook; accept both without dropping Manitoba.
+            headers = [re.sub(r"\s+", "_", clean_text(value).upper()) for value in next(rows)]
         except StopIteration:
             continue
         header_index = {name: idx for idx, name in enumerate(headers) if name}
@@ -3432,6 +3606,8 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
     ) -> str:
         key_source = source_id
         asset_id = asset_id_override or f"{key_source}:{slug(production_system)}:{slug(company)}:{slug(display_name)}"
+        if asset_id in assets:
+            return asset_id
         reg = registry_lookup(registry, production_system, company, display_name)
         lat = latitude if latitude is not None else (as_float(reg.get("latitude")) if reg else None)
         lon = longitude if longitude is not None else (as_float(reg.get("longitude")) if reg else None)
@@ -3675,8 +3851,8 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
     if "Mined Bitumen" in wb.sheetnames:
         ws = wb["Mined Bitumen"]
         sco_header_row = None
-        for row_idx in range(1, ws.max_row + 1):
-            value = clean_text(ws.cell(row_idx, 1).value)
+        for row_idx, row in enumerate(ws.iter_rows(min_col=1, max_col=1, values_only=True), start=1):
+            value = clean_text(row[0])
             if value.upper().startswith("SECTION 5") and "SYNTHETIC CRUDE OIL" in value.upper():
                 sco_header_row = row_idx + 1
                 break
@@ -3743,7 +3919,7 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
                         "aer_st39",
                     )
 
-    overlay_official_st39_current_synthetic(records, add_asset, add_record, oil_sands_locations)
+    overlay_official_aer_current(assets, records, add_asset, add_record, oil_sands_locations)
 
     append_petrinex_ab_conventional(assets, records, add_asset, add_record)
     append_bcer_well_production(add_asset, add_record)
@@ -3973,10 +4149,28 @@ def build_assets_and_records(workbook_path: Path) -> tuple[dict[str, Asset], lis
     elif SC63_PATH.exists():
         log(f"  StatCan 25100063 cached at {SC63_PATH} but disabled for location-specific Petrinex mapping.")
 
+    # Repeated workbook columns can represent component schemes with the same
+    # display identity. Aggregate contributions once and preserve their column
+    # provenance rather than exporting duplicate asset/month/stream records.
+    grouped_records: dict[tuple[str, str, str, str, str], dict[str, Any]] = {}
+    for record in records:
+        if record["source_id"] not in {"aer_st53", "aer_st39"}:
+            continue
+        key = tuple(record[k] for k in ("date", "asset_id", "source_id", "stream", "scenario"))
+        if key in grouped_records:
+            prior = grouped_records[key]
+            prior["volume_bbl_d"] += record["volume_bbl_d"]
+            prior["volume_kbbl_d"] += record["volume_kbbl_d"]
+            prior["workbook_column"] += "; " + record["workbook_column"]
+        else:
+            grouped_records[key] = record
+    records = [r for r in records if r["source_id"] not in {"aer_st53", "aer_st39"}] + list(grouped_records.values())
+    latest_observed = max((r["date"] for r in records if r["scenario"] == "actual"), default=latest_actual.isoformat())
     metadata = {
         "workbook_path": str(workbook_path),
         "workbook_modified": dt.datetime.fromtimestamp(workbook_path.stat().st_mtime).isoformat(),
-        "latest_actual_date": latest_actual.isoformat(),
+        "workbook_latest_actual_date": latest_actual.isoformat(),
+        "latest_actual_date": latest_observed,
         "cutoff_date": CUTOFF.isoformat(),
         "generated_at": RUN_DATE.isoformat(),
     }
@@ -4118,7 +4312,7 @@ def write_sqlite(assets: dict[str, Asset], records: list[dict[str, Any]], metada
 def write_json_file(path: Path, payload: Any, **json_kwargs: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = path.with_name(f"{path.name}.tmp")
-    with tmp_path.open("w", encoding="utf-8") as f:
+    with tmp_path.open("w", encoding="utf-8", newline="\n") as f:
         json.dump(payload, f, **json_kwargs)
     tmp_path.replace(path)
 
@@ -4200,7 +4394,14 @@ def derive_default_map_date(records: list[dict[str, Any]], latest_actual_date: s
         if record.get("scenario") != "actual":
             continue
         by_date_stream[date][stream] += float(record.get("volume_kbbl_d") or 0.0)
+    # All regularly present source/stream series must reach the opening month.
+    # Otherwise, for example, ND can mask missing Alberta conventional volumes.
+    coverage = build_source_coverage(records)
+    relevant = [c for c in coverage if c["scenario"] == "actual" and c["stream"] in minimums]
+    common_last = min((c["last_date"] for c in relevant), default=latest_actual_date)
     for date in sorted(by_date_stream, reverse=True):
+        if common_last and date > common_last:
+            continue
         totals = by_date_stream[date]
         if all(totals.get(stream, 0.0) >= minimum for stream, minimum in minimums.items()):
             return date
@@ -4322,7 +4523,7 @@ def build_data_quality_report(records: list[dict[str, Any]], assets: dict[str, A
             continue
         prev_date, prev_total = actual_dates[-2]
         latest_date, latest_total = actual_dates[-1]
-        if prev_total >= 100 and latest_total < prev_total * 0.55:
+        if prev_total >= 1 and latest_total < prev_total * 0.55:
             warning = {
                 "severity": "high",
                 "source_id": source_id,
@@ -4387,11 +4588,11 @@ def build_data_quality_report(records: list[dict[str, Any]], assets: dict[str, A
         "workbook_driven_sources": [
             {
                 "source_id": "aer_st53",
-                "message": "Production rows are currently normalized from the analyst workbook; official AER ST53 raw files are cached for reconciliation.",
+                "message": "Historical rows are normalized from the analyst workbook. The current AER ST53 issue replaces workbook rows for its covered periods using the published m3 per calendar day rates.",
             },
             {
                 "source_id": "aer_st39",
-                "message": "Historical mined/synthetic rows are workbook-normalized; current-month ST39 synthetic is overlaid from the cached official AER ST39 XLS when R/readxl is available.",
+                "message": "Historical rows are workbook-normalized. The current Alberta ST39 issue replaces mined and synthetic rows for covered periods using published monthly m3 volumes; Saskatchewan is outside ST39 coverage.",
             },
         ],
         "source_stream_warnings": source_stream_warnings,
@@ -4552,7 +4753,8 @@ def write_web_exports(
     date_filter_totals = build_date_filter_totals(records, assets)
     data_quality = build_data_quality_report(records, assets)
     manifest = {
-        **metadata,
+        **{key: value for key, value in metadata.items() if key != "workbook_path"},
+        "workbook_name": Path(metadata["workbook_path"]).name,
         "record_count": len(records),
         "base_record_count": len(base_records),
         "on_demand_record_count": sum(len(items) for items in on_demand_records.values()),
@@ -4636,6 +4838,7 @@ def main() -> int:
     parser.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK, help="Source workbook path.")
     parser.add_argument("--download", action="store_true", help="Refresh official raw-source files into data/raw.")
     parser.add_argument("--force-download", action="store_true", help="Re-download raw-source files even if cached.")
+    parser.add_argument("--offline", action="store_true", help="Rebuild from the raw cache without HTTP requests; retain the last source refresh audit.")
     parser.add_argument(
         "--petrinex-months",
         type=int,
@@ -4646,7 +4849,7 @@ def main() -> int:
         "--petrinex-start",
         default=None,
         help=(
-            "Optional YYYY-MM start period for Petrinex AB volume caching through workbook latest actual month. "
+            "Optional YYYY-MM start period for Petrinex AB volumes (through the latest completed month on refresh). "
             "Default is 2022-01, the earliest public monthly API period verified by this ETL."
         ),
     )
@@ -4697,12 +4900,15 @@ def main() -> int:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     PUBLIC_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    global MONTANA_ACTIVE_START_PERIOD
+    global MONTANA_ACTIVE_START_PERIOD, ALLOW_LOCATION_DOWNLOADS
+    ALLOW_LOCATION_DOWNLOADS = not args.offline
+    if args.offline and (args.download or args.force_download):
+        parser.error("--offline cannot be combined with --download or --force-download")
     MONTANA_ACTIVE_START_PERIOD = args.mt_start if args.mt_start is not None else MONTANA_DEFAULT_START_PERIOD
 
     latest_actual = read_workbook_latest_actual(args.workbook)
     download_status = download_sources(force=args.force_download) if args.download or args.force_download else []
-    if not args.skip_petrinex:
+    if not args.skip_petrinex and not args.offline:
         petrinex_start = args.petrinex_start or PETRINEX_AB_EARLIEST_PUBLIC_PERIOD
         download_status.extend(
             ensure_petrinex_cache(
@@ -4715,7 +4921,7 @@ def main() -> int:
         )
     if args.download or args.force_download:
         download_status.extend(ensure_bcer_cache(force=args.force_download, refresh=True))
-    if not args.skip_nd:
+    if not args.skip_nd and not args.offline:
         nd_start = args.nd_start if args.nd_start is not None else NDIC_DEFAULT_START_PERIOD
         download_status.extend(
             ensure_ndic_cache(
@@ -4725,7 +4931,7 @@ def main() -> int:
                 refresh=args.download or args.force_download,
             )
         )
-    if not args.skip_sk:
+    if not args.skip_sk and not args.offline:
         sk_start = args.sk_start if args.sk_start is not None else PETRINEX_SK_DEFAULT_START_PERIOD
         download_status.extend(
             ensure_petrinex_sk_cache(
@@ -4735,10 +4941,15 @@ def main() -> int:
                 refresh=args.download or args.force_download,
             )
         )
-    if not args.skip_mb:
+    if not args.skip_mb and not args.offline:
         download_status.extend(ensure_manitoba_cache(force=args.force_download, refresh=args.download or args.force_download))
-    if not args.skip_mt:
+    if not args.skip_mt and not args.offline:
         download_status.extend(ensure_montana_cache(force=args.force_download, refresh=args.download or args.force_download))
+    refresh_audit = PROCESSED_DIR / "source_refresh_status.json"
+    if args.offline and refresh_audit.exists():
+        download_status = json.loads(refresh_audit.read_text(encoding="utf-8"))
+    elif download_status:
+        write_json_file(refresh_audit, download_status, indent=2)
     try:
         from build_scheme_geojson import main as build_scheme_geojson
 
@@ -4748,6 +4959,8 @@ def main() -> int:
     assets, records, metadata = build_assets_and_records(args.workbook)
     db_path = write_sqlite(assets, records, metadata)
     write_web_exports(assets, records, metadata, download_status)
+    subprocess.run([sys.executable, str(ROOT / "scripts/build_seasonality_index.py")], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/validate_production_data.py")], cwd=ROOT, check=True)
     summary = validate_exports(db_path)
 
     log("ETL complete.")

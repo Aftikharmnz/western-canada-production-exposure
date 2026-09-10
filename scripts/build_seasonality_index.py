@@ -28,7 +28,8 @@ if isinstance(assets, dict) and "fields" in assets and "rows" in assets:
 else:
     asset_rows = assets
 asset_id_by_ref = {idx: a["asset_id"] for idx, a in enumerate(asset_rows)}
-mapped_ids = {a["asset_id"] for a in asset_rows if a.get("latitude") and a.get("longitude")}
+mapped_ids = {a["asset_id"] for a in asset_rows if a.get("latitude") is not None and a.get("longitude") is not None
+              and not a.get("is_rollup") and a.get("asset_kind") not in {"province", "province_refinery", "region", "company_rollup", "asset_bucket"}}
 print("  Mapped assets: {:,}".format(len(mapped_ids)))
 
 index = {}
@@ -37,7 +38,7 @@ index = {}
 def add_entry(aid, ym_str, vol):
     if not aid or aid not in mapped_ids:
         return
-    if not vol or vol <= 0:
+    if vol is None or vol < 0:
         return
     if not ym_str:
         return
@@ -50,7 +51,8 @@ print("Loading base records from monthly_production.json ...")
 with open(BASE_PROD_FILE) as f:
     base_records = json.load(f)
 for r in base_records:
-    add_entry(r.get("asset_id"), r.get("date", "")[:7], r.get("volume_kbbl_d"))
+    if r.get("scenario") == "actual":
+        add_entry(r.get("asset_id"), r.get("date", "")[:7], r.get("volume_kbbl_d"))
 print("  Base records: {:,}  ->  index assets so far: {:,}".format(len(base_records), len(index)))
 
 files = sorted(glob.glob(os.path.join(MONTHLY_DIR, "*.json")))
@@ -67,11 +69,14 @@ for i, fpath in enumerate(files):
     elif isinstance(payload, list):
         groups = []
         for r in payload:
-            add_entry(r.get("asset_id"), r.get("date", "")[:7], r.get("volume_kbbl_d"))
+            if r.get("scenario") == "actual":
+                add_entry(r.get("asset_id"), r.get("date", "")[:7], r.get("volume_kbbl_d"))
     else:
         groups = []
 
     for group in groups:
+        if group.get("scenario") != "actual":
+            continue
         ym_str = group.get("date", "")[:7]
         for row in group.get("rows", []):
             if len(row) >= 2:

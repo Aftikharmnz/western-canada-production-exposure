@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import math
+import html
 import os
 import smtplib
 import sys
@@ -59,7 +60,12 @@ def now_utc() -> str:
 def fetch_json(url: str) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": "western-canada-production-exposure/alerts"})
     with urllib.request.urlopen(req, timeout=60) as response:
-        return json.loads(response.read().decode("utf-8", errors="replace"))
+        data = json.loads(response.read().decode("utf-8", errors="replace"))
+    if (not isinstance(data, dict) or data.get("error") or data.get("exceededTransferLimit")
+            or (data.get("properties") or {}).get("exceededTransferLimit")
+            or not isinstance(data.get("features"), list)):
+        raise ValueError("Fire source returned an error, truncated response, or invalid schema")
+    return data
 
 
 def load_json(path: Path, default):
@@ -69,8 +75,39 @@ def load_json(path: Path, default):
         return default
 
 
-def fetch_fires() -> list[dict]:
+def valid_coordinates(lat, lon):
+    if lat is None or lon is None or isinstance(lat, bool) or isinstance(lon, bool):
+        return None
+    try:
+        lat, lon = float(lat), float(lon)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(lat) or not math.isfinite(lon) or not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return None
+    return lat, lon
+
+
+def normalize_fires(data, prefix, source, size_field):
+    rows = []
+    for feature in data["features"]:
+        a = feature.get("attributes") if isinstance(feature, dict) else None
+        if not isinstance(a, dict) or not a.get("FIRE_NUMBER") or not str(a.get("FIRE_STATUS") or "").strip():
+            raise ValueError("Fire record is missing an identity or status")
+        coordinates = valid_coordinates(a.get("LATITUDE"), a.get("LONGITUDE"))
+        rows.append({
+            "id": f"{prefix}-{a['FIRE_NUMBER']}", "source": source,
+            "status": str(a["FIRE_STATUS"]).strip(), "size_ha": a.get(size_field),
+            # Preserve the identity of an active fire whose coordinates are unavailable.
+            # Dropping that identity would falsely retire its existing alert state.
+            "lat": coordinates[0] if coordinates else None,
+            "lon": coordinates[1] if coordinates else None,
+        })
+    return rows
+
+
+def fetch_fires() -> tuple[list[dict], set[str]]:
     fires = []
+    successful_sources = set()
     ab_params = urllib.parse.urlencode({
         "where": "FIRE_STATUS <> 'Extinguished'",
         "outFields": "FIRE_NUMBER,FIRE_STATUS,AREA_ESTIMATE,LATITUDE,LONGITUDE,FIRE_TYPE,GENERAL_CAUSE",
@@ -78,18 +115,9 @@ def fetch_fires() -> list[dict]:
     })
     try:
         data = fetch_json(f"{AB_FIRES_URL}?{ab_params}")
-        for f in data.get("features", []):
-            a = f.get("attributes", {})
-            lat, lon = a.get("LATITUDE"), a.get("LONGITUDE")
-            if lat is None or lon is None:
-                continue
-            fires.append({
-                "id": f"AB-{a.get('FIRE_NUMBER')}",
-                "source": "Alberta Wildfire (Gov. of Alberta)",
-                "status": str(a.get("FIRE_STATUS") or "").strip(),
-                "size_ha": a.get("AREA_ESTIMATE"),
-                "lat": float(lat), "lon": float(lon),
-            })
+        rows = normalize_fires(data, "AB", "Alberta Wildfire (Gov. of Alberta)", "AREA_ESTIMATE")
+        fires.extend(rows)
+        successful_sources.add("AB")
     except Exception as exc:  # noqa: BLE001
         print(f"warning: Alberta Wildfire feed failed: {exc}", file=sys.stderr)
 
@@ -100,21 +128,12 @@ def fetch_fires() -> list[dict]:
     })
     try:
         data = fetch_json(f"{BC_FIRES_URL}?{bc_params}")
-        for f in data.get("features", []):
-            a = f.get("attributes", {})
-            lat, lon = a.get("LATITUDE"), a.get("LONGITUDE")
-            if lat is None or lon is None:
-                continue
-            fires.append({
-                "id": f"BC-{a.get('FIRE_NUMBER')}",
-                "source": "BC Wildfire Service (Gov. of B.C.)",
-                "status": str(a.get("FIRE_STATUS") or "").strip(),
-                "size_ha": a.get("CURRENT_SIZE"),
-                "lat": float(lat), "lon": float(lon),
-            })
+        rows = normalize_fires(data, "BC", "BC Wildfire Service (Gov. of B.C.)", "CURRENT_SIZE")
+        fires.extend(rows)
+        successful_sources.add("BC")
     except Exception as exc:  # noqa: BLE001
         print(f"warning: BC Wildfire feed failed: {exc}", file=sys.stderr)
-    return fires
+    return fires, successful_sources
 
 
 def load_asset_points() -> list[tuple[float, float, str]]:
@@ -127,10 +146,10 @@ def load_asset_points() -> list[tuple[float, float, str]]:
         assets = raw
     points = []
     for a in assets:
-        lat, lon = a.get("latitude"), a.get("longitude")
-        if lat is None or lon is None:
+        coordinates = valid_coordinates(a.get("latitude"), a.get("longitude"))
+        if not coordinates:
             continue
-        points.append((float(lat), float(lon), str(a.get("display_name") or a.get("asset_id") or "asset")))
+        points.append((*coordinates, str(a.get("display_name") or a.get("asset_id") or "asset")))
     return points
 
 
@@ -150,11 +169,12 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 
 def nearest_asset(grid, cell_deg, lat, lon, radius_km):
-    # Search neighbouring grid cells (0.25 deg ~ 28 km, plenty for a 10 km radius)
     ci, cj = int(lat / cell_deg), int(lon / cell_deg)
+    lat_cells = math.ceil(radius_km / 110.5 / cell_deg) + 1
+    lon_cells = math.ceil(radius_km / (111.32 * max(0.01, abs(math.cos(math.radians(lat))))) / cell_deg) + 1
     best = None
-    for di in (-1, 0, 1):
-        for dj in (-1, 0, 1):
+    for di in range(-lat_cells, lat_cells + 1):
+        for dj in range(-lon_cells, lon_cells + 1):
             for alat, alon, name in grid.get((ci + di, cj + dj), []):
                 d = haversine_km(lat, lon, alat, alon)
                 if d <= radius_km and (best is None or d < best[0]):
@@ -162,18 +182,46 @@ def nearest_asset(grid, cell_deg, lat, lon, radius_km):
     return best
 
 
+def observation_time(value):
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return parsed.astimezone(timezone.utc) if parsed.tzinfo is not None else None
+    except (AttributeError, ValueError, TypeError):
+        return None
+
+
 def check_power(power, state, cfg, alerts):
+    # A recent fetch time cannot establish the age of the underlying measurement.
+    observed = observation_time(power.get("observed_at"))
+    if observed is None:
+        return
+    age = (datetime.now(timezone.utc) - observed).total_seconds()
+    previous = observation_time(state.get("power_observation"))
+    if age < -300 or age > 90 * 60 or (previous is not None and observed <= previous):
+        return
+    state["power_observation"] = observed.isoformat()
     down, up, confirm = cfg["down_threshold"], cfg["recover_threshold"], cfg["confirm_runs"]
     sites = state.setdefault("power_sites", {})
     first_run = not sites
+    if previous is None or (observed - previous).total_seconds() > 90 * 60:
+        for st in sites.values():
+            st["runs_below"] = st["runs_above"] = 0
+    seen = set()
     for s in power.get("site_cogen", []):
         u = s.get("utilization")
-        key = s["site"]
-        st = sites.setdefault(key, {"status": "unknown", "runs_below": 0, "runs_above": 0})
-        if u is None:
+        key = s.get("site")
+        if not key or key in seen:
             continue
-        if first_run:
+        seen.add(key)
+        if (s.get("net_to_grid") or s.get("complete") is False or isinstance(u, bool)
+                or not isinstance(u, (int, float)) or not math.isfinite(u) or u < 0):
+            if key in sites:
+                sites[key]["runs_below"] = sites[key]["runs_above"] = 0
+            continue
+        st = sites.setdefault(key, {"status": "unknown", "runs_below": 0, "runs_above": 0})
+        if st["status"] == "unknown":
             st["status"] = "reduced" if u < down else "normal"
+            st["runs_below"] = st["runs_above"] = 0
             continue
         if u < down:
             st["runs_below"] += 1
@@ -203,17 +251,24 @@ def check_power(power, state, cfg, alerts):
         else:
             st["runs_below"] = 0
             st["runs_above"] = 0
+    for key, st in sites.items():
+        if key not in seen:
+            st["runs_below"] = st["runs_above"] = 0
     if first_run:
         alerts_note = "baseline established for power sites (no alerts on first run)"
         print(alerts_note, file=sys.stderr)
 
 
-def check_fires(fires, grid, cell_deg, state, cfg, alerts):
+def check_fires(fires, grid, cell_deg, state, cfg, alerts, successful_sources=None):
     radius = cfg["radius_km"]
+    successful_sources = {"AB", "BC"} if successful_sources is None else successful_sources
     known = state.setdefault("fires", {})
-    first_run = state.setdefault("fires_baselined", False) is False and not known
+    baselined = set(state.get("fire_sources_baselined", ["AB", "BC"] if state.get("fires_baselined") else []))
     for f in fires:
-        hit = nearest_asset(grid, cell_deg, f["lat"], f["lon"], radius)
+        coordinates = valid_coordinates(f.get("lat"), f.get("lon"))
+        if coordinates is None:
+            continue
+        hit = nearest_asset(grid, cell_deg, *coordinates, radius)
         if not hit:
             continue
         dist, asset_name = hit
@@ -222,7 +277,7 @@ def check_fires(fires, grid, cell_deg, state, cfg, alerts):
         size = f" · {f['size_ha']} ha" if f.get("size_ha") not in (None, 0) else ""
         if prev is None:
             known[f["id"]] = {"status": f["status"], "asset": asset_name, "dist_km": round(dist, 1)}
-            if not first_run:
+            if f["id"].split("-", 1)[0] in baselined:
                 alerts.append({
                     "kind": "fire-new",
                     "title": f"New fire {f['id']} {dist:.1f} km from {asset_name}",
@@ -250,9 +305,11 @@ def check_fires(fires, grid, cell_deg, state, cfg, alerts):
     # Drop fires that left the feeds (extinguished/out)
     active_ids = {f["id"] for f in fires}
     for fid in list(known.keys()):
-        if fid not in active_ids:
+        if fid not in active_ids and fid.split("-", 1)[0] in successful_sources:
             del known[fid]
-    state["fires_baselined"] = True
+    baselined.update(successful_sources)
+    state["fire_sources_baselined"] = sorted(baselined)
+    state["fires_baselined"] = bool(baselined)
 
 
 def send_email(alerts, cfg) -> str:
@@ -263,8 +320,8 @@ def send_email(alerts, cfg) -> str:
         f"[WCPE Alert] {len(alerts)} alerts: " + "; ".join(a["title"] for a in alerts[:3])
     app_url = cfg.get("app_url", "")
     body_html = "<h3>Western Canada Production Exposure — alerts</h3>" + "".join(
-        f"<p><strong>{a['title']}</strong><br>{a['detail']}</p>" for a in alerts
-    ) + f'<p style="color:#667">Checked {now_utc()}. <a href="{app_url}">Open the map</a>. ' \
+        f"<p><strong>{html.escape(a['title'])}</strong><br>{html.escape(a['detail'])}</p>" for a in alerts
+    ) + f'<p style="color:#667">Checked {now_utc()}. <a href="{html.escape(app_url, quote=True)}">Open the map</a>. ' \
         "Power figures are AESO cogeneration output (a site power-status proxy, not metered load).</p>"
 
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
@@ -328,9 +385,9 @@ def main() -> int:
     points = load_asset_points()
     if points:
         grid, cell = build_grid(points)
-        fires = fetch_fires()
+        fires, successful_sources = fetch_fires()
         print(f"assets: {len(points)}, active gov fires: {len(fires)}", file=sys.stderr)
-        check_fires(fires, grid, cell, state, fire_cfg, alerts)
+        check_fires(fires, grid, cell, state, fire_cfg, alerts, successful_sources)
     else:
         print("warning: assets.json missing/empty — fire check skipped", file=sys.stderr)
 

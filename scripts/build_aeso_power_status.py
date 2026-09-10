@@ -22,14 +22,18 @@ from __future__ import annotations
 import csv
 import io
 import json
+import math
 import re
 import sys
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "public" / "data" / "aeso_power_status.json"
+# AESO's legacy public CSV endpoint does not negotiate HTTPS (verified 2026-09).
+# No credentials are transmitted. Validate schema and observation age before publishing.
 CSD_URL = "http://ets.aeso.ca/ets_web/ip/Market/Reports/CSDReportServlet?contentType=csv"
 
 # Production-site links. Each site may aggregate several AESO cogen units
@@ -95,7 +99,8 @@ def fetch_csd() -> str:
 
 def to_num(value: str):
     try:
-        return float(value) if "." in value else int(value)
+        number = float(str(value).strip().replace(",", ""))
+        return number if math.isfinite(number) else None
     except (TypeError, ValueError):
         return None
 
@@ -117,7 +122,8 @@ def parse_csd(text: str) -> dict:
             section = m.group(1).strip()
             continue
         if cell.startswith("Last Update"):
-            last_update = cell.split(":", 1)[1].strip() if ":" in cell else cell
+            stamp = ",".join(part for part in row if part.strip()).strip()
+            last_update = stamp.split(":", 1)[1].strip() if ":" in stamp else stamp
             continue
         if len(row) == 2 and to_num(row[1]) is not None:
             system[cell] = to_num(row[1])
@@ -131,29 +137,37 @@ def parse_csd(text: str) -> dict:
                     "name": am.group("name"),
                     "code": am.group("code"),
                     "fuel": section or "Unknown",
-                    "mc_mw": to_num(row[1]) or 0,
-                    "tng_mw": to_num(row[2]) or 0,
-                    "dcr_mw": to_num(row[3]) or 0,
+                    "mc_mw": to_num(row[1]),
+                    "tng_mw": to_num(row[2]),
+                    "dcr_mw": to_num(row[3]),
+                    "net_to_grid": "*" in cell,
                 })
             elif cell.isupper():
-                groups.append({"group": cell.title(), "mc_mw": to_num(row[1]) or 0, "tng_mw": to_num(row[2]) or 0})
+                groups.append({"group": cell.title(), "mc_mw": to_num(row[1]), "tng_mw": to_num(row[2])})
     return {"system": system, "last_update": last_update, "groups": groups, "assets": assets}
 
 
 def build() -> dict:
     parsed = parse_csd(fetch_csd())
+    if not parsed["assets"] or not parsed["last_update"] or parsed["system"].get("Alberta Internal Load (AIL)") is None:
+        raise ValueError("AESO response is incomplete; preserving the last valid snapshot")
+    observed = datetime.strptime(parsed["last_update"], "%b %d, %Y %H:%M").replace(tzinfo=ZoneInfo("America/Edmonton"))
+    age = (datetime.now(timezone.utc) - observed.astimezone(timezone.utc)).total_seconds()
+    if age < -300 or age > 90 * 60:
+        raise ValueError("AESO report is stale or future-dated; preserving the last valid snapshot")
     by_code = {a["code"]: a for a in parsed["assets"]}
 
     site_cogen = []
     for entry in SITE_COGEN_SITES:
         units = [by_code[c] for c in entry["codes"] if c in by_code]
-        if not units:
-            continue
-        mc = sum(u["mc_mw"] for u in units)
-        tng = sum(u["tng_mw"] for u in units)
+        complete = len(units) == len(entry["codes"]) and all(
+            u["mc_mw"] is not None and u["mc_mw"] > 0 and u["tng_mw"] is not None
+            and (u["tng_mw"] >= 0 or u["net_to_grid"]) for u in units)
+        mc = sum(u["mc_mw"] for u in units) if complete else None
+        tng = sum(u["tng_mw"] for u in units) if complete else None
         site_cogen.append({
-            "aeso_code": "+".join(u["code"] for u in units),
-            "aeso_name": " + ".join(u["name"] for u in units),
+            "aeso_code": "+".join(entry["codes"]),
+            "aeso_name": " + ".join(u["name"] for u in units) or "AESO reading unavailable",
             "site": entry["site"],
             "operator": entry["operator"],
             "asset_names": entry.get("asset_names") or [],
@@ -162,9 +176,11 @@ def build() -> dict:
             "mc_mw": mc,
             "tng_mw": tng,
             "utilization": round(tng / mc, 3) if mc else None,
+            "net_to_grid": any(u["net_to_grid"] for u in units),
+            "complete": complete,
             "atco_heritage": bool(entry.get("atco")),
         })
-    site_cogen.sort(key=lambda x: -x["tng_mw"])
+    site_cogen.sort(key=lambda x: -(x["tng_mw"] or 0))
 
     atco_fleet = []
     for code, label in ATCO_FLEET_CODES.items():
@@ -174,13 +190,14 @@ def build() -> dict:
         atco_fleet.append({
             "aeso_code": code, "name": label, "fuel": a["fuel"],
             "mc_mw": a["mc_mw"], "tng_mw": a["tng_mw"],
-            "utilization": round(a["tng_mw"] / a["mc_mw"], 3) if a["mc_mw"] else None,
+            "utilization": round(a["tng_mw"] / a["mc_mw"], 3) if a["mc_mw"] and a["tng_mw"] is not None else None,
         })
-    atco_fleet.sort(key=lambda x: -x["tng_mw"])
+    atco_fleet.sort(key=lambda x: -(x["tng_mw"] or 0))
 
     sysm = parsed["system"]
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "observed_at": observed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": CSD_URL,
         "aeso_last_update": parsed["last_update"],
         "system": {
@@ -203,7 +220,9 @@ def build() -> dict:
 def main() -> int:
     data = build()
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    temporary = OUTPUT.with_suffix(".tmp")
+    temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+    temporary.replace(OUTPUT)
     print(f"Wrote {OUTPUT.relative_to(ROOT)}: {len(data['site_cogen'])} site cogens, "
           f"{len(data['atco_fleet'])} ATCO-fleet units, AIL {data['system']['alberta_internal_load_mw']} MW", file=sys.stderr)
     return 0

@@ -16,6 +16,8 @@ import json
 import time
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -661,7 +663,13 @@ def request_json(url: str, retries: int = 3) -> dict[str, Any]:
     for attempt in range(retries):
         try:
             with urllib.request.urlopen(req, timeout=120) as response:
-                return json.loads(response.read().decode("utf-8"))
+                data = json.loads(response.read().decode("utf-8"))
+                if not isinstance(data, dict) or data.get("error"):
+                    raise ValueError(f"ArcGIS returned an error response: {data.get('error') if isinstance(data, dict) else 'not an object'}")
+                return data
+        except ValueError:
+            # Retrying a deterministic ArcGIS 400 can stall the entire rebuild.
+            raise
         except Exception as exc:  # noqa: BLE001
             last_error = exc
             if attempt < retries - 1:
@@ -709,8 +717,12 @@ def query_arcgis_geojson(
                 }
             )
         data = request_json(f"{service_url}/query?{urllib.parse.urlencode(params)}")
-        page = data.get("features") or []
+        if data.get("type") != "FeatureCollection" or not isinstance(data.get("features"), list):
+            raise ValueError(f"Expected GeoJSON FeatureCollection from {service_url}")
+        page = data["features"]
         features.extend(page)
+        if not page and data.get("exceededTransferLimit"):
+            raise ValueError(f"ArcGIS pagination stalled at offset {offset}: {service_url}")
         if not page:
             break
         if not data.get("exceededTransferLimit") and len(page) < page_size:
@@ -721,6 +733,58 @@ def query_arcgis_geojson(
 
 def round_coord(value: Any) -> float:
     return round(float(value), 3)
+
+
+def query_rail_geojson(bbox, where: str, batch_size: int = 500) -> list[dict[str, Any]]:
+    """Select IDs once, then fetch bounded geometry batches without a spatial join.
+
+    BTS rejects/timeouts on the former 2,000-feature spatial GeoJSON request.
+    Stable IDs also avoid drifting offset pages if the source changes mid-build.
+    """
+    min_lon, min_lat, max_lon, max_lat = bbox
+    params = {
+        "where": where, "returnIdsOnly": "true", "f": "json",
+        "geometry": json.dumps({"xmin": min_lon, "ymin": min_lat, "xmax": max_lon, "ymax": max_lat,
+                                "spatialReference": {"wkid": 4326}}),
+        "geometryType": "esriGeometryEnvelope", "inSR": "4326", "spatialRel": "esriSpatialRelIntersects",
+    }
+    # The national extent is redundant for the current Canada/U.S. source, but
+    # asking ArcGIS to join that large envelope to all IDs fails upstream. Prove
+    # equivalence by count before omitting the spatial filter. Custom smaller
+    # extents retain the original spatial ID selection.
+    all_ids_params = {"where": where, "returnIdsOnly": "true", "f": "json"}
+    selected = request_json(f"{NARN_LINES_URL}/query?{urllib.parse.urlencode(all_ids_params)}")
+    count_params = {key: value for key, value in params.items() if key != "returnIdsOnly"}
+    count_params["returnCountOnly"] = "true"
+    extent_count = request_json(f"{NARN_LINES_URL}/query?{urllib.parse.urlencode(count_params)}").get("count")
+    if extent_count != len(selected.get("objectIds") or []):
+        selected = request_json(f"{NARN_LINES_URL}/query?{urllib.parse.urlencode(params)}")
+    object_ids = selected.get("objectIds")
+    object_field = selected.get("objectIdFieldName")
+    if not isinstance(object_ids, list) or not object_ids or not object_field:
+        raise ValueError("BTS did not return a usable rail feature-ID inventory")
+    object_ids = sorted(set(object_ids))
+    if len(object_ids) != extent_count:
+        raise ValueError("BTS rail ID inventory does not match the requested extent count")
+    batches = [object_ids[start:start + batch_size] for start in range(0, len(object_ids), batch_size)]
+
+    def fetch_batch(ids):
+        query = {"objectIds": ",".join(str(i) for i in ids), "outFields": object_field + "," + RAIL_OUT_FIELDS,
+                 "returnGeometry": "true", "outSR": "4326", "f": "geojson"}
+        data = request_json(f"{NARN_LINES_URL}/query?{urllib.parse.urlencode(query)}")
+        features = data.get("features")
+        if data.get("type") != "FeatureCollection" or not isinstance(features, list):
+            raise ValueError("BTS rail batch did not return GeoJSON")
+        received = {f.get("properties", {}).get(object_field) for f in features}
+        if received != set(ids) or len(features) != len(ids) or data.get("exceededTransferLimit"):
+            raise ValueError("BTS rail batch was truncated or changed during the refresh")
+        return features
+
+    features = []
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for page in pool.map(fetch_batch, batches):
+            features.extend(page)
+    return features
 
 
 def round_point_coord(value: Any) -> float:
@@ -958,7 +1022,7 @@ def build_layer(
     product_terminal_where: str,
 ) -> dict[str, Any]:
     print("Fetching North American rail lines...")
-    raw_lines = query_arcgis_geojson(NARN_LINES_URL, where=rail_where, out_fields=RAIL_OUT_FIELDS, bbox=bbox)
+    raw_lines = query_rail_geojson(bbox, rail_where)
     lines = [feature for feature in (normalize_rail_feature(f) for f in raw_lines) if feature]
     for feature in lines:
         feature["properties"] = compact_props(feature["properties"])
@@ -968,6 +1032,8 @@ def build_layer(
 
     print("Fetching EIA crude-by-rail terminals...")
     raw_crude = query_arcgis_geojson(EIA_CRUDE_RAIL_TERMINALS_URL, where=crude_terminal_where, bbox=None)
+    if crude_terminal_where == DEFAULT_CRUDE_TERMINAL_WHERE and not raw_crude:
+        raise ValueError("EIA crude terminal service returned an empty inventory; preserving existing output")
     crude = [feature for feature in (normalize_crude_terminal(f) for f in raw_crude) if feature]
     for feature in crude:
         feature["properties"] = compact_props(feature["properties"])
@@ -975,6 +1041,8 @@ def build_layer(
 
     print("Fetching EIA petroleum product terminals...")
     raw_products = query_arcgis_geojson(EIA_PRODUCT_TERMINALS_URL, where=product_terminal_where, bbox=None)
+    if product_terminal_where == DEFAULT_PRODUCT_TERMINAL_WHERE and not raw_products:
+        raise ValueError("EIA product terminal service returned an empty inventory; preserving existing output")
     products = [feature for feature in (normalize_product_terminal(f) for f in raw_products) if feature]
     for feature in products:
         feature["properties"] = compact_props(feature["properties"])
@@ -995,6 +1063,7 @@ def build_layer(
         "type": "FeatureCollection",
         "name": "Railways and petroleum terminals",
         "metadata": {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "bbox": list(bbox),
             "rail_where": rail_where,
             "crude_terminal_where": crude_terminal_where,
@@ -1002,6 +1071,13 @@ def build_layer(
             "scope": "Canada/U.S. BTS/FRA main rail network and major industrial leads, all EIA terminal service points, and a curated Canadian terminal set. Minor tracks, yards, sidings, and private spurs are not represented as complete coverage.",
             "rail_detail": "BTS/FRA NET=M main network and NET=I major industrial leads, grouped by category, country, and owner for browser performance.",
             "raw_rail_segment_count": raw_rail_segment_count,
+            "raw_rail_source_row_count": len(raw_lines),
+            "omitted_invalid_rail_geometry_count": len(raw_lines) - raw_rail_segment_count,
+            "raw_crude_terminal_source_row_count": len(raw_crude),
+            "omitted_invalid_crude_terminal_geometry_count": len(raw_crude) - len(crude),
+            "raw_product_terminal_source_row_count": len(raw_products),
+            "omitted_invalid_product_terminal_geometry_count": len(raw_products) - len(products),
+            "geometry_precision_note": "Rail coordinates are rounded to 0.001 degree for display (up to about 111 m per grid step); facility points retain 0.00001 degree. Source precision is not survey accuracy.",
             "grouped_rail_feature_count": len(lines),
             "curated_canadian_terminal_count": len(canadian),
             "curated_canadian_terminal_categories": {
@@ -1047,7 +1123,11 @@ def main() -> None:
     output = args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     data = build_layer(tuple(args.bbox), args.rail_where, args.crude_terminal_where, args.product_terminal_where)
-    output.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    if not data["metadata"]["raw_rail_segment_count"]:
+        raise ValueError("Refusing to replace the railway layer with an empty rail network")
+    temporary = output.with_suffix(output.suffix + ".tmp")
+    temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+    temporary.replace(output)
     print(f"Wrote {output.relative_to(ROOT)} with {len(data['features']):,} features ({output.stat().st_size / 1024 / 1024:.1f} MB)")
 
 

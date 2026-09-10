@@ -93,12 +93,16 @@ def main() -> int:
     pipeline = load_geojson("market_access_pipelines.geojson")
     schemes = load_geojson("aer_scheme_approvals.geojson")
     refineries = load_geojson("refineries.geojson")
+    feeders = load_geojson("aer_feeder_pipelines.geojson")
+    installations = load_geojson("aer_pipeline_installations.geojson")
 
     for name, data in [
         ("railways.geojson", rail),
         ("market_access_pipelines.geojson", pipeline),
         ("aer_scheme_approvals.geojson", schemes),
         ("refineries.geojson", refineries),
+        ("aer_feeder_pipelines.geojson", feeders),
+        ("aer_pipeline_installations.geojson", installations),
     ]:
         errors.extend(validate_geometries(name, data))
 
@@ -130,6 +134,8 @@ def main() -> int:
         "imperial-sarnia-products",
         "sun-canadian",
         "valero-pipeline-saint-laurent",
+        "vantage",
+        "norman-wells",
         "us-crude-trunk-reference",
         "us-products-reference",
         "us-hgl-reference",
@@ -147,8 +153,12 @@ def main() -> int:
     canada_refineries = [f for f in refineries["features"] if f.get("properties", {}).get("country_name") == "Canada"]
     if len(us_refineries) != 130:
         warnings.append(f"refineries.geojson: {len(us_refineries)} U.S. records; EIA 2026 reports 130 operable facilities")
-    if statuses.get("Idle", 0) == 0:
+    us_idle_count = sum(str(f.get("properties", {}).get("plant_status_desc", "")).lower().startswith("idle") for f in us_refineries)
+    if us_idle_count == 0:
         warnings.append("refineries.geojson: no idle plants are labelled; EIA 2026 reports two idle U.S. facilities")
+    plant_ids = [f.get("properties", {}).get("plant_id") for f in refineries["features"]]
+    if len(set(plant_ids)) != len(plant_ids) or None in plant_ids:
+        errors.append("refineries.geojson: duplicate or missing plant IDs")
     source_blob = json.dumps(refineries.get("source", {}), ensure_ascii=False)
     if ":/Users/" in source_blob or ":\\Users\\" in source_blob:
         errors.append("refineries.geojson: source metadata exposes a local user path")
@@ -159,7 +169,7 @@ def main() -> int:
         f"{len(terminals):,} terminals ({canadian_terminal_count} Canada); "
         f"terminal categories {dict(category_counts)}; "
         f"{len(route_features)} pipeline routes; "
-        f"{len(canada_refineries)} Canada / {len(us_refineries)} U.S. refinery records."
+        f"{len(canada_refineries)} Canada / {len(us_refineries)} U.S. refinery records ({us_idle_count} dated idle)."
     )
     for warning in warnings:
         print(f"WARNING: {warning}")

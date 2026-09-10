@@ -21,6 +21,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -161,7 +162,8 @@ ROUTES: list[dict[str, Any]] = [
     {
         "route_id": "keystone",
         "route_name": "Keystone",
-        "operator": "South Bow / TC Energy",
+        "operator": "South Bow",
+        "operator_source_url": "https://www.southbow.com/keystone-pipeline-system/",
         "commodity": "Crude oil",
         "flow_role": "Major Western Canada crude export trunk",
         "direction": "Hardisty to U.S. Midwest and Gulf Coast",
@@ -181,7 +183,8 @@ ROUTES: list[dict[str, Any]] = [
     {
         "route_id": "express-platte",
         "route_name": "Express / Platte",
-        "operator": "Express Pipeline / Platte Pipeline",
+        "operator": "Enbridge (Express Pipeline / Platte Pipeline)",
+        "operator_source_url": "https://www.enbridge.com/projects-and-infrastructure/liquids-pipelines/express-platte-system",
         "commodity": "Crude oil",
         "flow_role": "Western Canada crude export trunk to Rockies/Midwest",
         "direction": "Hardisty to Montana/Wyoming/Illinois corridor",
@@ -216,9 +219,10 @@ ROUTES: list[dict[str, Any]] = [
     {
         "route_id": "cochin",
         "route_name": "Cochin",
-        "operator": "Kinder Morgan / PKM Cochin",
-        "commodity": "Condensate / HGL",
-        "flow_role": "Condensate/HGL import trunk for diluent supply",
+        "operator": "Pembina (PKM Cochin)",
+        "operator_source_url": "https://www.pembina.com/operations/customers/",
+        "commodity": "Condensate / diluent",
+        "flow_role": "Condensate import trunk for diluent supply",
         "direction": "U.S. Midwest to Fort Saskatchewan area",
         "color": "#0e7490",
         "display_order": 60,
@@ -452,6 +456,37 @@ ROUTES: list[dict[str, Any]] = [
         ],
     },
     {
+        "route_id": "vantage",
+        "route_name": "Vantage / Stateline II",
+        "operator": "Pembina",
+        "operator_source_url": "https://www.pembina.com/operations/customers/",
+        "commodity": "Ethane",
+        "flow_role": "Bakken ethane supply to Alberta petrochemical markets",
+        "direction": "Tioga / North Dakota and Saskatchewan to Empress, Alberta",
+        "color": "#a855f7",
+        "display_order": 96,
+        "default_visible": False,
+        "menu_section": "Other Liquids / Products",
+        "coverage_scope": "EIA named Vantage system and Stateline II lateral. This ethane corridor is not a crude export or diluent pipeline.",
+        "parts": [{"source": "EIA", "url": EIA_HGL_URL, "where": "Opername = 'VANTAGE PIPELINE'"}],
+    },
+    {
+        "route_id": "norman-wells",
+        "route_name": "Norman Wells / Zama (supply shut in)",
+        "operator": "Enbridge",
+        "commodity": "Crude oil",
+        "flow_role": "Historical Northwest Territories crude supply connection",
+        "direction": "Norman Wells to Zama; Imperial shut in source production in August 2026",
+        "color": "#78716c",
+        "display_order": 99,
+        "default_visible": False,
+        "menu_section": "Other Liquids / Products",
+        "status_note": "Source production shut in August 2026; pipeline deactivation/abandonment status is not independently verified.",
+        "status_source_url": "https://www.imperialoil.ca/en-ca/company/operations/norman-wells",
+        "coverage_scope": "Retained as infrastructure context after Imperial's upstream production shut-in; does not imply continuing throughput.",
+        "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'NormanWells'"}],
+    },
+    {
         "route_id": "other-cer-liquids",
         "route_name": "Other CER liquid systems",
         "operator": "Various",
@@ -466,7 +501,7 @@ ROUTES: list[dict[str, Any]] = [
             {
                 "source": "CER",
                 "url": CER_PIPELINES_URL,
-                "where": "PipelineID IN ('Genesis', 'Montreal', 'NormanWells')",
+                "where": "PipelineID IN ('Genesis', 'Montreal')",
             }
         ],
     },
@@ -583,7 +618,13 @@ def request_json(url: str, retries: int = 3) -> dict[str, Any]:
     for attempt in range(retries):
         try:
             with urllib.request.urlopen(req, timeout=90) as response:
-                return json.loads(response.read().decode("utf-8"))
+                data = json.loads(response.read().decode("utf-8"))
+                if not isinstance(data, dict) or data.get("error"):
+                    raise ValueError(f"ArcGIS returned an error response: {data.get('error') if isinstance(data, dict) else 'not an object'}")
+                return data
+        except ValueError:
+            # Invalid schemas and ArcGIS query errors are not transient HTTP failures.
+            raise
         except Exception as exc:  # noqa: BLE001
             last_error = exc
             if attempt < retries - 1:
@@ -606,9 +647,13 @@ def query_arcgis_geojson(service_url: str, where: str, page_size: int = 2000) ->
         }
         url = f"{service_url}/query?{urllib.parse.urlencode(params)}"
         data = request_json(url)
-        page = data.get("features") or []
+        if data.get("type") != "FeatureCollection" or not isinstance(data.get("features"), list):
+            raise ValueError(f"Expected GeoJSON FeatureCollection from {service_url}")
+        page = data["features"]
         features.extend(page)
-        if not data.get("exceededTransferLimit") or not page:
+        if not page and data.get("exceededTransferLimit"):
+            raise ValueError(f"ArcGIS pagination stalled at offset {offset}: {service_url}")
+        if not page or (not data.get("exceededTransferLimit") and len(page) < page_size):
             break
         offset += len(page)
     return features
@@ -724,6 +769,8 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         except Exception as exc:  # noqa: BLE001
             warnings.append(f"{route['route_name']}: {part['source']} query failed: {exc}")
             continue
+        if not part_features:
+            warnings.append(f"{route['route_name']}: {part['source']} query returned no features ({part['where']})")
         for feature in part_features:
             lines.extend(line for line in feature_lines(feature) if line_allowed(line, part.get("line_filter")))
         if part_features:
@@ -748,6 +795,9 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "route_id": route["route_id"],
         "route_name": route["route_name"],
         "operator": route["operator"],
+        "operator_source_url": route.get("operator_source_url"),
+        "status_note": route.get("status_note"),
+        "status_source_url": route.get("status_source_url"),
         "commodity": route["commodity"],
         "flow_role": route["flow_role"],
         "direction": route["direction"],
@@ -759,7 +809,9 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "source_urls": sorted({source_reference(part) for part in route.get("parts", [])}),
         "geometry_confidence": route.get(
             "geometry_confidence",
-            "public GIS linework, route-level display",
+            "mixed public GIS and curated approximate corridor; not survey-grade"
+            if any(part.get("manual_lines") for part in route.get("parts", []))
+            else "public GIS linework, route-level display; not survey-grade",
         ),
         "coverage_scope": route.get(
             "coverage_scope",
@@ -777,6 +829,7 @@ def hub_feature(name: str, hub_type: str, lon: float, lat: float) -> dict[str, A
             "name": name,
             "hub_type": hub_type,
             "source_summary": "CAPP map route-node reference and public geographic coordinates",
+            "geometry_confidence": "Approximate market-area centroid; not an individual facility or surveyed interconnect",
         },
         "geometry": {"type": "Point", "coordinates": [lon, lat]},
     }
@@ -804,6 +857,8 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
                 "selected connected U.S. routes, hidden U.S. national reference networks, and hub points."
             ),
             "generated_with": "scripts/build_market_access_pipelines.py",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "geometry_crs": "EPSG:4326 (longitude, latitude)",
             "source_notes": [
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
                 "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
@@ -843,9 +898,19 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    if args.local_only and args.output.resolve() == DEFAULT_OUTPUT.resolve():
+        parser.error("--local-only requires a separate --output; it must not replace the production network")
+
     collection = build_feature_collection(include_remote=not args.local_only)
+    if collection["metadata"]["warnings"] and not args.local_only:
+        for warning in collection["metadata"]["warnings"]:
+            print(f"ERROR: {warning}", file=sys.stderr)
+        print("Preserving existing pipeline output because the refresh is incomplete.", file=sys.stderr)
+        return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(collection, separators=(",", ":")), encoding="utf-8")
+    temporary = args.output.with_suffix(args.output.suffix + ".tmp")
+    temporary.write_text(json.dumps(collection, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+    temporary.replace(args.output)
     size_mb = args.output.stat().st_size / (1024 * 1024)
     pipeline_count = sum(1 for f in collection["features"] if f["properties"].get("feature_kind") == "pipeline")
     hub_count = sum(1 for f in collection["features"] if f["properties"].get("feature_kind") == "hub")

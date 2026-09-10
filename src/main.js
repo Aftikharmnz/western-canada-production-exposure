@@ -457,12 +457,13 @@ const els = {
 // FORMAT HELPERS
 // ============================================================
 
+const NUMBER_FORMATTERS = new Map();
 function formatNumber(value, digits = 0) {
   if (!Number.isFinite(value)) return "--";
-  return new Intl.NumberFormat("en-CA", {
-    maximumFractionDigits: digits,
-    minimumFractionDigits: digits,
-  }).format(value);
+  if (!NUMBER_FORMATTERS.has(digits)) NUMBER_FORMATTERS.set(digits, new Intl.NumberFormat("en-CA", {
+    maximumFractionDigits: digits, minimumFractionDigits: digits,
+  }));
+  return NUMBER_FORMATTERS.get(digits).format(value);
 }
 
 function kbbl(value) {
@@ -568,6 +569,43 @@ function locationQualityText(asset) {
 // DATA LOADING
 // ============================================================
 
+async function requestJson(url, options = {}) {
+  const { timeoutMs = 45000, ...fetchOptions } = options;
+  const controller = new AbortController();
+  let timedOut = false;
+  const abort = () => controller.abort(fetchOptions.signal?.reason);
+  if (fetchOptions.signal?.aborted) abort();
+  else fetchOptions.signal?.addEventListener("abort", abort, { once: true });
+  const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+  try {
+    const response = await fetch(url, { cache: "no-cache", ...fetchOptions, signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data?.error) throw new Error(data.error.message || data.reason || "Source returned an error");
+    if (data?.exceededTransferLimit || data?.properties?.exceededTransferLimit) {
+      throw new Error("Source response is incomplete (transfer limit)");
+    }
+    return data;
+  } catch (error) {
+    if (timedOut && !fetchOptions.signal?.aborted) {
+      const timeout = new Error("Source request timed out");
+      timeout.name = "TimeoutError";
+      throw timeout;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    fetchOptions.signal?.removeEventListener("abort", abort);
+  }
+}
+
+function requireFeatureCollection(data) {
+  if (data?.type !== "FeatureCollection" || !Array.isArray(data.features)) {
+    throw new Error("Invalid geographic data response");
+  }
+  return data;
+}
+
 async function loadData() {
   const requiredDataPaths = [
     DATA_PATHS.manifest,
@@ -582,17 +620,15 @@ async function loadData() {
   ];
   state.optionalDataWarnings = [];
   const [requiredResults, optionalResults] = await Promise.all([
-    Promise.all(requiredDataPaths.map((path) =>
-      fetch(path).then((r) => {
-        if (!r.ok) throw new Error(`Could not load ${path}`);
-        return r.json();
-      })
-    )),
+    Promise.all(requiredDataPaths.map((path) => requestJson(path))),
     Promise.all(optionalData.map(([path, label]) => fetchOptionalFeatureCollection(path, label))),
   ]);
   const [manifest, assets, records] = requiredResults;
   const [schemeApprovals, st102Facilities, assetGeometries, refineries] = optionalResults;
   const assetRows = expandAssetRecords(assets);
+  if (!assetRows.length || !Array.isArray(records) || !Array.isArray(manifest.periods) || !manifest.periods.length) {
+    throw new Error("Production data is incomplete. Please reload or contact the data administrator.");
+  }
   state.manifest = manifest;
   state.assets = assetRows;
   state.assetById = new Map(assetRows.map((a) => [a.asset_id, a]));
@@ -625,18 +661,16 @@ async function loadData() {
   await ensureDateRecords(state.selectedDate);
   state.records = recordsForDate(state.selectedDate);
 
-  const sourceIds = [...new Set(records.map((r) => r.source_id))].sort();
+  const sourceIds = [...new Set([...records.map((r) => r.source_id), ...(manifest.source_coverage || []).map((r) => r.source_id)])].sort();
   recordsForDate(state.selectedDate).forEach((r) => sourceIds.push(r.source_id));
   [...new Set(sourceIds)].sort().forEach((s) => state.selectedSources.add(s));
 
   const initialRecords = recordsForDate(state.selectedDate);
-  [...new Set(initialRecords.map((r) => r.stream))].forEach((s) => state.selectedStreams.add(s));
+  [...new Set([...initialRecords.map((r) => r.stream), ...(manifest.source_coverage || []).map((r) => r.stream)])].filter(Boolean).forEach((s) => state.selectedStreams.add(s));
 }
 
 async function fetchOptionalJson(path) {
-  const response = await fetch(path);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+  return requestJson(path);
 }
 
 async function fetchOptionalFeatureCollection(path, label) {
@@ -723,12 +757,14 @@ async function ensureDateRecords(date) {
     // Keep the path relative so it resolves correctly both locally and on
     // GitHub Pages (where the app lives under a /repo-name/ subdirectory).
     const path = file.startsWith("/") ? file.slice(1) : file;
-    const response = await fetch(path);
-    if (!response.ok) throw new Error(`Could not load ${path}`);
-    const raw = await response.json();
-    state.dateRecordCache.set(date, expandMonthlyRecords(raw));
+    const raw = await requestJson(path);
+    const records = expandMonthlyRecords(raw);
+    if (!records.length || records.some((r) => r.date !== date || !state.assetById.has(r.asset_id) || !Number.isFinite(r.volume_kbbl_d) || r.volume_kbbl_d < 0)) {
+      throw new Error("Monthly production data is incomplete or invalid");
+    }
+    state.dateRecordCache.set(date, records);
+    state.timelineCache = null;
   } catch (error) {
-    state.dateRecordCache.set(date, []);
     state.dateRecordErrors.set(date, error.message || String(error));
   } finally {
     state.dateRecordLoading.delete(date);
@@ -737,12 +773,11 @@ async function ensureDateRecords(date) {
 
 function requestDateRecords(date) {
   if (!state.manifest?.monthly_record_files?.[date]) return;
-  if (state.dateRecordCache.has(date) || state.dateRecordLoading.has(date)) return;
+  if (state.dateRecordCache.has(date) || state.dateRecordLoading.has(date) || state.dateRecordErrors.has(date)) return;
   ensureDateRecords(date).then(() => {
     if (state.selectedDate === date) {
       state.records = recordsForDate(date);
-      // New on-demand records loaded — invalidate timeline total for this date
-      if (state.timelineCache) state.timelineCache.delete(date);
+      // The successful loader invalidates totals before this redraw.
       render();
     }
   });
@@ -758,7 +793,7 @@ function initControls() {
   const overlayWarningText = overlayWarningCount
     ? ` · ⚠ ${overlayWarningCount} optional overlay${overlayWarningCount === 1 ? "" : "s"} unavailable`
     : "";
-  els.freshness.textContent = `ETL: ${new Date(state.manifest.generated_at).toLocaleString("en-CA")} · default: ${dateLabel(state.manifest.default_date || state.manifest.latest_actual_date)} · ${formatNumber(state.manifest.record_count)} records · ${sourceCount || "--"} sources${overlayWarningText}`;
+  els.freshness.textContent = `${sourceCount || "--"} production sources · updated ${dateLabel(String(state.manifest.generated_at).slice(0, 10))}${overlayWarningText}`;
   els.freshness.title = state.optionalDataWarnings.join("\n");
 
   if (els.dateSelect) {
@@ -773,13 +808,13 @@ function initControls() {
     });
   }
 
-  const sourceIds = [...new Set(state.records.map((r) => r.source_id))].sort();
+  const sourceIds = [...state.selectedSources].sort();
   els.sourceFilters.innerHTML = sourceIds
     .map((s) => toggleMarkup("source", s, SOURCE_SHORT[s] || s))
     .join("");
   els.sourceFilters.addEventListener("change", (e) => updateSetFromToggle(e, "source", state.selectedSources));
 
-  const streamNames = [...new Set(state.records.map((r) => r.stream))].sort((a, b) => {
+  const streamNames = [...state.selectedStreams].sort((a, b) => {
     const aRank = PRIMARY_STREAMS.includes(a) ? PRIMARY_STREAMS.indexOf(a) : 99;
     const bRank = PRIMARY_STREAMS.includes(b) ? PRIMARY_STREAMS.indexOf(b) : 99;
     return aRank === bRank ? a.localeCompare(b) : aRank - bRank;
@@ -808,18 +843,32 @@ function initControls() {
   });
 
   els.etlCommand.textContent = "python scripts/run_etl.py --download";
-  els.etlButton.addEventListener("click", () => { els.etlPanel.hidden = false; });
-  els.closeEtl.addEventListener("click", () => { els.etlPanel.hidden = true; });
+  els.etlButton.addEventListener("click", () => { renderDataStatus(); els.etlPanel.hidden = false; els.closeEtl.focus(); });
+  els.closeEtl.addEventListener("click", () => { els.etlPanel.hidden = true; els.etlButton.focus(); });
+  document.getElementById("retryDataBtn")?.addEventListener("click", async () => {
+    state.dateRecordErrors.delete(state.selectedDate);
+    await ensureDateRecords(state.selectedDate);
+    render();
+    renderDataStatus();
+  });
+  document.getElementById("toggleFiltersBtn")?.addEventListener("click", (event) => {
+    const rail = document.querySelector(".filter-rail");
+    const expanded = event.currentTarget.getAttribute("aria-expanded") !== "true";
+    event.currentTarget.setAttribute("aria-expanded", String(expanded));
+    rail.classList.toggle("mobile-open", expanded);
+  });
 
   // ── Docs panel ──
   if (els.docsBtn && els.docsPanel) {
     els.docsBtn.addEventListener("click", () => {
       els.docsPanel.hidden = false;
       els.docsBtn.classList.add("active");
+      els.closeDocs.focus();
     });
     els.closeDocs.addEventListener("click", () => {
       els.docsPanel.hidden = true;
       els.docsBtn.classList.remove("active");
+      els.docsBtn.focus();
     });
     els.docsPanel.addEventListener("keydown", e => {
       if (e.key === "Escape") { els.docsPanel.hidden = true; els.docsBtn.classList.remove("active"); }
@@ -827,9 +876,10 @@ function initControls() {
     // Tab switching
     els.docsPanel.querySelectorAll(".docs-tab").forEach(tab => {
       tab.addEventListener("click", () => {
-        els.docsPanel.querySelectorAll(".docs-tab").forEach(t => t.classList.remove("active"));
+        els.docsPanel.querySelectorAll(".docs-tab").forEach(t => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
         els.docsPanel.querySelectorAll(".docs-section").forEach(s => { s.hidden = true; });
         tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
         const sec = els.docsPanel.querySelector(`#tab-${tab.dataset.tab}`);
         if (sec) sec.hidden = false;
       });
@@ -916,7 +966,37 @@ function initControls() {
       setFireMenuOpen(false);
     }
   });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      if (!els.etlPanel.hidden) { els.etlPanel.hidden = true; els.etlButton.focus(); }
+      if (!els.docsPanel.hidden) { els.docsPanel.hidden = true; els.docsBtn.classList.remove("active"); els.docsBtn.focus(); }
+      [setFireMenuOpen, setRefineryMenuOpen, setFormationMenuOpen, setPipelineMenuOpen, setMarketPipelineMenuOpen, setRailwayMenuOpen].forEach((close) => close(false));
+      state.setSelectMode?.(false);
+      setDistanceMode(false);
+    }
+    const panel = !els.docsPanel.hidden ? els.docsPanel : !els.etlPanel.hidden ? els.etlPanel : null;
+    if (event.key === "Tab" && panel) {
+      const focusable = [...panel.querySelectorAll('button, a[href], input, select, summary, [tabindex="0"]')].filter((el) => el.getClientRects().length && !el.disabled);
+      const first = focusable[0], last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+  });
   initLegendControls();
+}
+
+function renderDataStatus() {
+  const target = document.getElementById("dataStatusContent");
+  if (!target || !state.manifest) return;
+  const coverage = (state.manifest.source_coverage || []).filter((r) => r.scenario === "actual");
+  const warnings = [...state.optionalDataWarnings, ...state.dateRecordErrors.values()];
+  target.innerHTML = `<p>Selected month: <strong>${escapeHtml(dateLabel(state.selectedDate))}</strong>. Updated ${escapeHtml(formatDateTime(state.manifest.generated_at))} · Each source has its own reporting lag.</p>
+    ${warnings.length ? `<p class="data-status-warning">${warnings.map(escapeHtml).join("<br>")}</p>` : ""}
+    <div class="data-status-scroll"><table class="docs-table"><thead><tr><th>Source / stream</th><th>Latest actual</th></tr></thead><tbody>${coverage.map((r) => `<tr><td><strong>${escapeHtml(SOURCE_SHORT[r.source_id] || r.source_id)}</strong><br>${escapeHtml(r.stream)}</td><td>${escapeHtml(dateLabel(r.last_date))}</td></tr>`).join("")}</tbody></table></div>
+    <p>Volumes are monthly daily averages. Summing bitumen with synthetic crude, or raw NGL mix with finished NGL products, can count the same material twice. The map is an asset exposure view; its gross stream sum is not net regional supply.</p>
+    <p>Pipeline routes follow published GIS where available. Approximate corridors and DLS locations are identified in tooltips. Public infrastructure inventories may omit gathering and private systems.</p>`;
+  const retry = document.getElementById("retryDataBtn");
+  if (retry) retry.hidden = !state.dateRecordErrors.has(state.selectedDate);
 }
 
 function toggleMarkup(group, value, label) {
@@ -1324,19 +1404,15 @@ function missingSourcesForDate(date = state.selectedDate) {
   const rows = state.manifest?.date_filter_totals?.[date] || [];
   if (!rows.length) return [];
   if (!rows.some((row) => row.scenario === "actual")) return [];
-  const present = new Set(rows.map((row) => row.source_id));
+  const present = new Set(rows.filter((row) => row.scenario === "actual").map((row) => `${row.source_id}|${row.stream}`));
   const missing = new Map();
   for (const item of state.manifest?.source_coverage || []) {
     if (item.scenario !== "actual") continue;
     if (!item.last_date || !item.first_date) continue;
-    if (present.has(item.source_id)) continue;
+    if (present.has(`${item.source_id}|${item.stream}`)) continue;
     if (!state.selectedSources.has(item.source_id)) continue;
     if (!state.selectedStreams.has(item.stream)) continue;
     if (item.first_date > date || item.last_date >= date) continue;
-    // Only flag sources that ended recently (a trailing data gap), not ones
-    // whose history legitimately ends years earlier.
-    const gapDays = (new Date(date) - new Date(item.last_date)) / 86400000;
-    if (gapDays > 190) continue;
     const prev = missing.get(item.source_id);
     if (!prev || item.last_date > prev.last_date) {
       missing.set(item.source_id, { source_id: item.source_id, last_date: item.last_date });
@@ -1351,8 +1427,8 @@ function scenarioLabelForDate(date = state.selectedDate) {
   const rows = selectedDateSummaryRows(date);
   const scenarios = new Set(rows.map((row) => row.scenario).filter(Boolean));
   const warnings = state.manifest?.data_quality?.date_warnings?.[date] || [];
-  if (warnings.some((w) => w.severity === "high")) return "data warning";
   if (missingSourcesForDate(date).length) return "partial coverage";
+  if (warnings.some((w) => w.severity === "high")) return "data warning";
   if (scenarios.has("actual") && scenarios.has("forecast")) return "mixed";
   if (scenarios.has("forecast")) return "forecast";
   if (scenarios.has("actual")) return "actual";
@@ -1372,14 +1448,27 @@ function renderCoverageNotice(date = state.selectedDate) {
     .reduce((sum, row) => sum + Number(row.kbbl_d || 0), 0);
   const sources = new Set(rows.map((row) => row.source_id));
   const messages = [];
+  const forecast = state.search
+    ? filteredRecords(date).filter((r) => r.scenario === "forecast").reduce((sum, r) => sum + r.volume_kbbl_d, 0)
+    : rows.filter((r) => r.scenario === "forecast").reduce((sum, r) => sum + Number(r.kbbl_d || 0), 0);
+  if (forecast > 0) messages.push(`Includes ${kbbl(forecast)} of workbook forecasts, not reported actual production.`);
+  if (state.dateRecordLoading.has(date)) messages.push("Loading this month's facility records… Totals are incomplete until loading finishes.");
+  if (state.dateRecordErrors.has(date)) messages.push("Monthly facility records could not load. Open Data status to retry; the displayed total is incomplete.");
+  if ((state.selectedStreams.has("Mined bitumen gross") || state.selectedStreams.has("In-situ bitumen")) && state.selectedStreams.has("Synthetic crude oil")) {
+    messages.push("Gross stream sum: bitumen and upgraded synthetic crude overlap. This is not net oil supply.");
+  }
+  if (["Propane", "Butane"].some((product) => state.selectedStreams.has(`${product} mix`) && state.selectedStreams.has(`${product} spec`))) {
+    messages.push("NGL mix and spec volumes can overlap across processing stages.");
+  }
   if (warnings.length) {
-    messages.push(...warnings.slice(0, 2).map((w) => w.message));
+    const extraWarnings = warnings.filter((w) => !missingSources.some((m) => m.source_id === w.source_id) || !/has no .+ data for/.test(w.message));
+    messages.push(...extraWarnings.slice(0, 2).map((w) => Object.entries(SOURCE_SHORT).reduce((message, [id, name]) => message.replaceAll(id, name), w.message)));
   }
   if (missingSources.length) {
     const names = missingSources
       .map((m) => `${SOURCE_SHORT[m.source_id] || m.source_id} (last ${m.last_date.slice(0, 7)})`)
       .join(", ");
-    messages.push(`Partial month: no data yet from ${names}. Totals understate actual production.`);
+    messages.push(`Partial month: actual data is missing from ${names}. Do not compare this total with fully reported months.`);
   }
   if (low > 0) {
     messages.push(`${kbbl(low)} uses approximate DLS/manual coordinates; use caution for exact fire impact.`);
@@ -1395,8 +1484,8 @@ function renderCoverageNotice(date = state.selectedDate) {
     els.coverageNotice.innerHTML = "";
     return;
   }
-  const isWarning = warnings.length > 0 || missingSources.length > 0;
-  const title = isWarning ? "Data quality warning" : `Coverage note · ${sources.size || 0} source${sources.size === 1 ? "" : "s"}`;
+  const isWarning = warnings.length > 0 || missingSources.length > 0 || state.dateRecordErrors.has(date);
+  const title = state.dateRecordErrors.has(date) ? "Incomplete data load" : missingSources.length ? "Partial source coverage" : isWarning ? "Data quality warning" : `Coverage note · ${sources.size || 0} source${sources.size === 1 ? "" : "s"}`;
   els.coverageNotice.className = `coverage-notice${isWarning ? "" : " info"}`;
   els.coverageNotice.innerHTML = `<strong>${escapeHtml(title)}</strong>${messages.map(escapeHtml).join("<br>")}`;
   els.coverageNotice.hidden = false;
@@ -1463,6 +1552,7 @@ function renderMap(aggregated) {
 
   if (state.map && state.markerLayer && window.L) {
     state.markerLayer.clearLayers();
+    state.selectedProductionMarker = null;
     state.assetMarkerLayersByLegendKey = new Map();
     points.forEach((point) => {
       const legendKey = pointLegendKey(point);
@@ -1485,6 +1575,7 @@ function renderMap(aggregated) {
         }
       );
       const sortedStreams = [...point.streams.entries()].sort((a, b) => b[1] - a[1]);
+      if (isSelected) state.selectedProductionMarker = marker;
       const ttLines = [
         `<strong>${escapeHtml(point.asset.display_name)}</strong>`,
         escapeHtml(point.asset.company || point.asset.province),
@@ -1503,8 +1594,11 @@ function renderMap(aggregated) {
           handleDistanceClick(event.latlng);
           return;
         }
+        state.selectedProductionMarker?.setStyle({ weight: 1.4, color: "#ffffff", fillOpacity: .65 });
         state.selectedAssetId = point.asset.asset_id;
-        render();
+        state.selectedProductionMarker = marker;
+        marker.setStyle({ weight: 3, color: "#101820", fillOpacity: .9 });
+        renderDetails(aggregated);
       });
       marker.addTo(markerGroupForLegend(legendKey));
     });
@@ -1526,10 +1620,10 @@ function renderFallbackMap(points) {
     ((lon - lonMin) / (lonMax - lonMin)) * width,
     height - ((lat - latMin) / (latMax - latMin)) * height,
   ];
-  const circles = points.map(({ asset, kbbl: value }) => {
+  const circles = points.map(({ asset, kbbl: value, streams }) => {
     const [x, y] = project(asset.latitude, asset.longitude);
     const color = streamColor(
-      [...(aggregateForDate().byAsset.get(asset.asset_id)?.streams.entries() || [])].sort((a, b) => b[1] - a[1])[0]?.[0]
+      [...(streams?.entries() || [])].sort((a, b) => b[1] - a[1])[0]?.[0]
       || ""
     );
     const r = Math.max(5, Math.min(34, Math.sqrt(value) * 1.9));
@@ -1765,7 +1859,15 @@ function renderFireRisk(asset) {
   }
 
   const risk = getAssetFireRisk(asset);
-  const labelMap = { high: "🔴 HIGH RISK", moderate: "🟠 MODERATE", none: "🟢 Clear" };
+  const incomplete = Boolean(state.albertaFireError || state.bcFireError || (legendVisible("fire-zone") && state.wildfireError));
+  if (incomplete && risk.level === "none") {
+    els.fireRiskBadge.textContent = "Incomplete data";
+    els.fireRiskBadge.className = "risk-badge moderate";
+    els.fireDistDisplay.textContent = "Some fire feeds are unavailable";
+    els.fireVolAtRisk.textContent = "Unknown";
+    return;
+  }
+  const labelMap = { high: "Within 75 km", moderate: "Within 200 km", none: "No nearby reports" };
   const classMap = { high: "risk-badge high", moderate: "risk-badge moderate", none: "risk-badge clear" };
 
   els.fireRiskBadge.textContent = labelMap[risk.level];
@@ -1779,7 +1881,7 @@ function renderFireRisk(asset) {
     .filter((r) => r.asset_id === asset.asset_id)
     .reduce((s, r) => s + r.volume_kbbl_d, 0);
   els.fireVolAtRisk.textContent = risk.level !== "none"
-    ? `${kbbl(atRiskVol)} potentially at risk`
+    ? `${kbbl(atRiskVol)} within screening radius${incomplete ? " (partial feeds)" : ""}`
     : "--";
 }
 
@@ -1795,15 +1897,15 @@ function renderTimeline() {
     for (const date of state.dates) {
       let total;
       const hasOnDemandFile = Boolean(state.manifest?.monthly_record_files?.[date]);
-      // For unloaded on-demand files, combine:
-      //   (a) base records (oil sands, petrinex NGL — always in memory) via aggregateForDate()
-      //   (b) on-demand totals (BC, AB conventional) from pre-computed date_filter_totals.
-      // This ensures timeline bars reflect all sources even before a date is navigated to.
+      // Names are absent from manifest totals. A search cannot estimate an
+      // unloaded month from only its base records without understating it.
+      if (hasOnDemandFile && !state.dateRecordCache.has(date) && state.search) {
+        cache.set(date, null);
+        continue;
+      }
+      // Manifest summaries already include both base and on-demand records.
       if (hasOnDemandFile && !state.dateRecordCache.has(date) && !state.search) {
-        const { byAsset: baseByAsset } = aggregateForDate(date);
-        const baseTotal = [...baseByAsset.values()].reduce((s, p) => s + p.kbbl, 0);
-        const onDemandTotal = selectedDateSummaryRows(date).reduce((sum, row) => sum + Number(row.kbbl_d || 0), 0);
-        total = baseTotal + onDemandTotal;
+        total = selectedDateSummaryRows(date).reduce((sum, row) => sum + Number(row.kbbl_d || 0), 0);
       }
       if (!Number.isFinite(total)) {
         const { byAsset } = aggregateForDate(date);
@@ -1813,19 +1915,22 @@ function renderTimeline() {
     }
     state.timelineCache = cache;
   }
-  const rows = state.dates.map((date) => ({ date, total: state.timelineCache.get(date) || 0 }));
+  const rows = state.dates.map((date) => ({ date, total: state.timelineCache.get(date) ?? null }));
   const max = Math.max(...rows.map((r) => r.total), 1);
   const selectedIndex = rows.findIndex((r) => r.date === state.selectedDate);
   const windowStart = Math.max(0, selectedIndex - 30);
   const visible = rows.slice(windowStart, Math.min(rows.length, windowStart + 72));
   if (els.timelineLabel) {
-    els.timelineLabel.textContent = `${visible.length} monthly observations in view`;
+    const unloaded = visible.filter((row) => row.total === null).length;
+    els.timelineLabel.textContent = `${visible.length} months in view${unloaded ? ` · ${unloaded} search totals not loaded; select a month to load` : ''}`;
   }
   if (els.timelineBars) {
     els.timelineBars.innerHTML = visible.map((row) => {
       const height = Math.max(3, (row.total / max) * 72);
       const sel = row.date === state.selectedDate;
-      return `<button class="timeline-bar ${sel ? "selected" : ""}" style="height:${height}px" title="${dateLabel(row.date)} ${kbbl(row.total)}" data-date="${row.date}" aria-label="${dateLabel(row.date)} ${kbbl(row.total)}"></button>`;
+      const unloaded = row.total === null;
+      const label = `${dateLabel(row.date)} ${unloaded ? 'search total not loaded; select to load' : kbbl(row.total)}`;
+      return `<button class="timeline-bar ${sel ? "selected" : ""} ${unloaded ? "unloaded" : ""}" style="height:${unloaded ? 7 : height}px" title="${label}" data-date="${row.date}" aria-label="${label}"></button>`;
     }).join("");
     els.timelineBars.querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -2215,6 +2320,15 @@ function refineryUnitSummaryHtml(summary, limit = 99) {
   `</div>`;
 }
 
+function refineryCapacityProvenanceHtml(p) {
+  const source = safeHttpUrl(p.capacity_source_url);
+  const statusSource = safeHttpUrl(p.status_source_url);
+  return (source ? `<p class="rt-sub">Capacity: <a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.capacity_source_name || "Operator source")}</a> · checked ${escapeHtml(p.capacity_checked_at || "")}<br>${escapeHtml(p.capacity_basis_note || "")} Unit rows retain their original source basis.</p>` : "") +
+    (p.capacity_review_note ? `<p class="data-status-warning">${escapeHtml(p.capacity_review_note)}</p>` : "") +
+    (statusSource ? `<p class="rt-sub">Status source: <a href="${escapeHtml(statusSource)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.status_source_name || "Published status")}</a> · as of ${escapeHtml(p.status_effective_as_of || "date unavailable")}</p>` : "") +
+    (p.status_review_note ? `<p class="data-status-warning">${escapeHtml(p.status_review_note)}</p>` : "");
+}
+
 function refineryTooltipDetailedHtml(properties) {
   const p = properties || {};
   const capacity = refineryCapacityLabel(p.crud_capacity_bbl_d, "BBL/d");
@@ -2233,6 +2347,7 @@ function refineryTooltipDetailedHtml(properties) {
       `${units.length ? `<span>${formatNumber(units.length)} units</span>` : ""}` +
     `</div>` +
     `${sector ? `<div class="rt-sub">${escapeHtml(sector)}</div>` : ""}` +
+    refineryCapacityProvenanceHtml(p) +
     `${units.length ? refineryUnitSummaryHtml(p.refinery_unit_summary, 12) : ""}` +
     `<div class="refinery-units">${refineryCapacityRowsHtml(plantCapacities, 5)}</div>` +
     `${units.length ? `<div class="refinery-units detailed">${refineryUnitRowsHtml(units, 5)}</div>` : ""}` +
@@ -2255,6 +2370,7 @@ function refineryPopupHtml(properties) {
       `${units.length ? `<span>${formatNumber(units.length)} units</span>` : ""}` +
     `</div>` +
     `${p.plant_sectors ? `<p>${escapeHtml(p.plant_sectors)}</p>` : ""}` +
+    refineryCapacityProvenanceHtml(p) +
     `<h3>Plant Capacities</h3>` +
     `<div class="refinery-units">${refineryCapacityRowsHtml(plantCapacities, 20)}</div>` +
     `<h3>Refinery Units</h3>` +
@@ -2519,13 +2635,12 @@ function liveUrl(url) {
 }
 
 async function fetchJsonLive(url, options = {}) {
-  const response = await fetch(liveUrl(url), {
+  return requestJson(liveUrl(url), {
     mode: "cors",
     cache: "no-store",
+    timeoutMs: 20000,
     ...options,
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
 }
 
 function isoNoMillis(date) {
@@ -2544,13 +2659,14 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 // Parses Degrees Decimal Minutes strings used by the municipal fire service.
-// e.g. "53° 18.5410" → 53.309017,  "-112° 56.7841" → -113.046402
+// e.g. "53° 18.5410" → 53.309017,  "-112° 56.7841" → -112.946402
 function parseDDM(str) {
   if (!str) return NaN;
   const m = String(str).match(/^(-?\d+)[°\s]+(\d+\.?\d*)$/);
   if (!m) return NaN;
   const deg = Number(m[1]);
   const min = Number(m[2]);
+  if (min >= 60) return NaN;
   return deg < 0 ? deg - min / 60 : deg + min / 60;
 }
 
@@ -2598,11 +2714,9 @@ function pointInRing(lat, lon, ring) {
 }
 
 function geometryContainsPoint(feature, lat, lon) {
-  const rings = geometryRings(feature?.geometry);
-  if (!rings.length) return false;
-  // Treat any ring hit as exposed. This is intentionally conservative for
-  // wildfire screening; exact polygon-with-holes handling belongs in ETL/GIS.
-  return rings.some((ring) => pointInRing(lat, lon, ring));
+  const geometry = feature?.geometry;
+  const polygons = geometry?.type === "Polygon" ? [geometry.coordinates] : geometry?.type === "MultiPolygon" ? geometry.coordinates : [];
+  return polygons.some((rings) => rings.length && pointInRing(lat, lon, rings[0]) && !rings.slice(1).some((hole) => pointInRing(lat, lon, hole)));
 }
 
 function walkCoordinates(coords, visit) {
@@ -2622,6 +2736,19 @@ function distanceToGeometryKm(feature, lat, lon) {
     const dist = haversineKm(lat, lon, vLat, vLon);
     if (dist < best) best = dist;
   });
+  // Measure to segment interiors too; using only vertices overstates distance
+  // along long project boundaries. Local tangent-plane screening approximation.
+  const cosLat = Math.cos(lat * Math.PI / 180);
+  for (const ring of geometryRings(feature.geometry)) {
+    for (let i = 1; i < ring.length; i++) {
+      const a = ring[i - 1], b = ring[i];
+      const ax = (a[0] - lon) * cosLat, ay = a[1] - lat;
+      const dx = (b[0] - a[0]) * cosLat, dy = b[1] - a[1];
+      const length2 = dx * dx + dy * dy;
+      const t = length2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / length2)) : 0;
+      best = Math.min(best, haversineKm(lat, lon, a[1] + t * (b[1] - a[1]), a[0] + t * (b[0] - a[0])));
+    }
+  }
   return best;
 }
 
@@ -2670,7 +2797,8 @@ async function fetchWildfires() {
   updateFireToggleUI();
   updateWildfireStatus("Fetching active fire hotspots from NRCan CWFIS…");
   try {
-    const raw = await fetchJsonLive(CWFIS_URL);
+    const raw = requireFeatureCollection(await fetchJsonLive(CWFIS_URL));
+    if (raw.features.length >= 2000) throw new Error("Hotspot response reached its feature limit; coverage cannot be confirmed");
 
     // The WFS geometry is in a projected CRS (not WGS84).
     // Swap each feature's geometry to a proper WGS84 Point using
@@ -2688,9 +2816,6 @@ async function fetchWildfires() {
         })),
     };
 
-    if (normalized.features.length === 0) {
-      state.wildfireError = "No active fire hotspots in Western Canada right now.";
-    }
     state.wildfires = normalized;
   } catch (err) {
     state.wildfireError = `NRCan CWFIS unavailable (${err.message}).`;
@@ -2969,6 +3094,7 @@ function clearHoverFireImpact() {
 }
 
 function normalizeBearing(value) {
+  if (value === null || value === undefined || value === "") return null;
   const n = Number(value);
   if (!Number.isFinite(n)) return null;
   return ((n % 360) + 360) % 360;
@@ -3097,10 +3223,12 @@ function weatherRecords(features, variable, center) {
     .map((feature) => {
       const p = feature.properties || {};
       if (p.variable !== variable) return null;
+      if (p.forecast_value == null || p.forecast_value === "") return null;
       const value = Number(p.forecast_value);
       const coords = feature.geometry?.coordinates || [];
       const lon = Number(coords[0]);
       const lat = Number(coords[1]);
+      if (coords[0] == null || coords[1] == null || Math.abs(lon) > 180 || Math.abs(lat) > 90 || (variable === "WindDir" && (value < 0 || value > 360))) return null;
       const forecastMs = Date.parse(p.forecast_datetime);
       const referenceMs = Date.parse(p.reference_datetime);
       if (
@@ -3139,15 +3267,8 @@ function selectWindPair(dirFeatures, speedFeatures, center, now = new Date()) {
   let best = null;
   for (const dir of dirs) {
     let speed = speedExact.get(`${dir.stationId}|${dir.forecastMs}|${dir.referenceMs}`);
-    if (!speed) {
-      speed = speeds
-        .filter((item) => item.stationId === dir.stationId)
-        .sort((a, b) =>
-          Math.abs(a.forecastMs - dir.forecastMs) - Math.abs(b.forecastMs - dir.forecastMs) ||
-          Math.abs(a.referenceMs - dir.referenceMs) - Math.abs(b.referenceMs - dir.referenceMs)
-        )[0];
-    }
     if (!speed) continue;
+    if (!dir.stationId || speed.value < 0 || !["km/h", "km h-1", "m/s", "m s-1"].includes(speed.unit)) continue;
 
     const forecastDeltaH = Math.abs(dir.forecastMs - nowMs) / 36e5;
     const refAgeH = Math.max(0, (nowMs - Math.max(dir.referenceMs, speed.referenceMs)) / 36e5);
@@ -3166,7 +3287,7 @@ function selectWindPair(dirFeatures, speedFeatures, center, now = new Date()) {
   if (!best) return null;
   return {
     directionDeg: normalizeBearing(best.dir.value),
-    speedKmh: Number(best.speed.value),
+    speedKmh: /^(m\/s|m s-1)$/.test(best.speed.unit) ? Number(best.speed.value) * 3.6 : Number(best.speed.value),
     stationName: best.dir.stationName,
     stationDistanceKm: Math.round(best.distanceKm),
     validTime: new Date(best.dir.forecastMs),
@@ -3175,15 +3296,33 @@ function selectWindPair(dirFeatures, speedFeatures, center, now = new Date()) {
   };
 }
 
+async function fetchWeatherFeatures(url, signal) {
+  const features = [];
+  const origin = new URL(url).origin;
+  for (let page = 0; page < 8; page++) {
+    const data = requireFeatureCollection(await fetchJsonLive(url, { signal }));
+    features.push(...data.features);
+    const next = data.links?.find((link) => link.rel === "next")?.href;
+    if (!next) {
+      if (Number.isFinite(data.numberMatched) && features.length < data.numberMatched) throw new Error("Incomplete wind forecast response");
+      return features;
+    }
+    const nextUrl = new URL(next, url);
+    if (nextUrl.origin !== origin) throw new Error("Unexpected weather pagination origin");
+    url = nextUrl.href;
+  }
+  throw new Error("Wind forecast exceeded the paging limit");
+}
+
 async function fetchLiveFireWind(center, signal) {
   const now = new Date();
   try {
     for (const radius of [1.25, 2.5, 4]) {
       const [dirRaw, speedRaw] = await Promise.all([
-        fetchJsonLive(ecccWindUrl(center, "WindDir", radius, now), { signal }),
-        fetchJsonLive(ecccWindUrl(center, "WindSpeed", radius, now), { signal }),
+        fetchWeatherFeatures(ecccWindUrl(center, "WindDir", radius, now), signal),
+        fetchWeatherFeatures(ecccWindUrl(center, "WindSpeed", radius, now), signal),
       ]);
-      const pair = selectWindPair(dirRaw.features, speedRaw.features, center, now);
+      const pair = selectWindPair(dirRaw, speedRaw, center, now);
       if (pair) return pair;
     }
   } catch (err) {
@@ -3204,7 +3343,7 @@ async function fetchOpenMeteoWind(center, signal) {
   const raw = await fetchJsonLive(`${OPEN_METEO_FORECAST_URL}?${params.toString()}`, { signal });
   const current = raw.current || {};
   const direction = normalizeBearing(current.wind_direction_10m);
-  const speed = Number(current.wind_speed_10m);
+  const speed = current.wind_speed_10m == null ? NaN : Number(current.wind_speed_10m);
   const validTime = current.time ? new Date(`${current.time.replace(" ", "T")}Z`) : null;
   const ageH = validTime instanceof Date && !Number.isNaN(validTime.getTime())
     ? Math.abs(Date.now() - validTime.getTime()) / 36e5
@@ -3250,6 +3389,7 @@ function exposedProductionForFire(feature, center, downwindBearing, lengthKm, ha
 }
 
 function formatDateTime(value) {
+  if (!(value instanceof Date)) value = value ? new Date(value) : null;
   if (!(value instanceof Date) || Number.isNaN(value.getTime())) return "--";
   return value.toLocaleString("en-CA", {
     month: "short",
@@ -3424,22 +3564,19 @@ async function fetchAlbertaFires() {
   state.albertaFireLoading = true;
   state.albertaFireError = null;
   try {
-    // Fetch provincial, mutual aid, and municipal fires in parallel
-    const [provResp, maResp, munResp] = await Promise.all([
-      fetch(liveUrl(ALBERTA_FIRES_URL),       { mode: "cors", cache: "no-store" }),
-      fetch(liveUrl(ALBERTA_MUTUAL_AID_URL),  { mode: "cors", cache: "no-store" }),
-      fetch(liveUrl(ALBERTA_MUNICIPAL_URL),   { mode: "cors", cache: "no-store" }),
-    ]);
-    if (!provResp.ok) throw new Error(`HTTP ${provResp.status} (provincial)`);
-    if (!maResp.ok)   throw new Error(`HTTP ${maResp.status} (mutual aid)`);
-    // Municipal endpoint failure is non-fatal — log and continue
-    const [provRaw, maRaw] = await Promise.all([provResp.json(), maResp.json()]);
-    const munRaw = munResp.ok ? await munResp.json() : { features: [] };
+    const labels = ["provincial", "mutual aid", "municipal"];
+    const results = await Promise.allSettled([ALBERTA_FIRES_URL, ALBERTA_MUTUAL_AID_URL, ALBERTA_MUNICIPAL_URL]
+      .map(async (url) => requireFeatureCollection(await fetchJsonLive(url))));
+    const failed = results.flatMap((r, i) => r.status === "rejected" ? [labels[i]] : []);
+    if (failed.length === results.length) throw new Error("All Alberta sources failed");
+    state.albertaFireError = failed.length ? `Partial coverage: ${failed.join(", ")} unavailable` : null;
+    const [provRaw, maRaw, munRaw] = results.map((r) => r.status === "fulfilled" ? r.value : { features: [] });
 
     // Normalize provincial + mutual aid: use LATITUDE/LONGITUDE props over geometry
     // (geometry may be in a projected CRS on some ArcGIS exports).
     const normalize = f => {
       const p = f.properties || {};
+      if (p.LATITUDE == null || p.LONGITUDE == null) return null;
       const lat = Number(p.LATITUDE);
       const lon = Number(p.LONGITUDE);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
@@ -3582,11 +3719,12 @@ async function fetchBCFires() {
   state.bcFireLoading = true;
   state.bcFireError = null;
   try {
-    const raw = await fetchJsonLive(BC_FIRES_URL);
+    const raw = requireFeatureCollection(await fetchJsonLive(BC_FIRES_URL));
     // Geometry is already valid WGS84 — use as-is, but fall back to
     // LATITUDE/LONGITUDE props if geometry is null for any feature.
     const features = (raw.features || []).map(f => {
       if (f.geometry) return f;
+      if (f.properties?.LATITUDE == null || f.properties?.LONGITUDE == null) return null;
       const lat = Number(f.properties?.LATITUDE);
       const lon = Number(f.properties?.LONGITUDE);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
@@ -3704,9 +3842,10 @@ function buildFireStatusMsg() {
   const abCount      = abFeatures.filter(f => !["Mutual Aid","Municipal"].includes(f.properties?.FIRE_TYPE)).length;
   const maCount      = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Mutual Aid").length;
   const munCount     = abFeatures.filter(f => f.properties?.FIRE_TYPE === "Municipal").length;
-  if (state.albertaFireError && !abFeatures.length) {
+  if (state.albertaFireError) {
     parts.push(`AB: ${state.albertaFireError}`);
-  } else if (abFeatures.length > 0) {
+  }
+  if (abFeatures.length > 0) {
     const ooc = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Out of Control").length;
     const bh  = abFeatures.filter(f => f.properties?.FIRE_STATUS === "Being Held").length;
     const stageSummary = [
@@ -3786,6 +3925,7 @@ function updateWildfireStatus(msg) {
 }
 
 function fireScore(feature) {
+  if (feature?.properties?.fwi == null || feature.properties.fwi === "") return null;
   const fwi = Number(feature?.properties?.fwi);
   return Number.isFinite(fwi) ? fwi : null;
 }
@@ -4035,18 +4175,14 @@ async function fetchMarketPipelineData() {
   updatePipelineStatus('Loading market access pipelines and current tariffs...');
 
   try {
-    const [response, tariffResponse] = await Promise.all([
-      fetch(DATA_PATHS.marketPipelines),
-      fetch(DATA_PATHS.marketTariffs),
+    const [routes, tariffs] = await Promise.allSettled([
+      requestJson(DATA_PATHS.marketPipelines).then(requireFeatureCollection),
+      requestJson(DATA_PATHS.marketTariffs),
     ]);
-    if (!response.ok) throw new Error(`Market pipelines: HTTP ${response.status}`);
-    state.marketPipelineData = await response.json();
-    if (!tariffResponse.ok) {
-      state.marketTariffData = null;
-      console.warn(`Market tariffs unavailable: HTTP ${tariffResponse.status}`);
-    } else {
-      state.marketTariffData = await tariffResponse.json();
-    }
+    if (routes.status === "rejected") throw routes.reason;
+    state.marketPipelineData = routes.value;
+    state.marketTariffData = tariffs.status === "fulfilled" && Array.isArray(tariffs.value?.tariffs) ? tariffs.value : null;
+    if (!state.marketTariffData) state.optionalDataWarnings.push("Market tariffs unavailable; routes remain available.");
     initializeMarketPipelineSelection();
     buildMarketPipelineMenu();
   } catch (err) {
@@ -4193,6 +4329,11 @@ function renderMarketHubTooltip(p) {
     `${p.hub_type ? `<div class="pt-sub">${escapeHtml(p.hub_type)}</div>` : ''}` +
     `</div>`;
 
+  const tariffMeta = state.marketTariffData?.metadata || {};
+  if (tariffMeta.last_verified) {
+    const stale = tariffMeta.next_known_change && new Date().toISOString().slice(0, 10) >= tariffMeta.next_known_change;
+    html += `<div class="pt-sub${stale ? " data-status-warning" : ""}">Tariff snapshot verified ${escapeHtml(tariffMeta.last_verified)}${stale ? " · A scheduled tariff change has passed. Reverify rates before use." : ""}. ${escapeHtml(tariffMeta.freshness_note || "")}</div>`;
+  }
   if (!rows.length) {
     return html + '<div class="pt-sub">No current crude tariff rows loaded for this hub.</div>';
   }
@@ -4355,7 +4496,13 @@ function buildMarketPipelineMenu() {
   if (!options || !state.marketPipelineData) return;
   let html = '';
   let currentSection = '';
+  const sections = new Map();
   for (const feature of marketPipelineFeatures()) {
+    const section = feature.properties?.menu_section || 'Core Market Access Pipelines';
+    if (!sections.has(section)) sections.set(section, []);
+    sections.get(section).push(feature);
+  }
+  for (const feature of [...sections.values()].flat()) {
     const p = feature.properties || {};
     const section = p.menu_section || 'Core Market Access Pipelines';
     if (section !== currentSection) {
@@ -4544,9 +4691,7 @@ async function fetchRailwayData() {
   updatePipelineStatus("Loading railways and petroleum terminals...");
 
   try {
-    const response = await fetch(DATA_PATHS.railways);
-    if (!response.ok) throw new Error(`Railways: HTTP ${response.status}`);
-    state.railwayData = await response.json();
+    state.railwayData = requireFeatureCollection(await requestJson(DATA_PATHS.railways));
     buildRailwayMenu();
   } catch (err) {
     state.railwayError = err.message || String(err);
@@ -4963,9 +5108,11 @@ async function fetchPipelineData() {
     updatePipelineStatus('Loading AER pipeline index...');
 
     try {
-      const response = await fetch(DATA_PATHS.pipelineIndex);
-      if (!response.ok) throw new Error(`Pipeline index: HTTP ${response.status}`);
-      state.pipelineIndex = await response.json();
+      state.pipelineIndex = await requestJson(DATA_PATHS.pipelineIndex);
+      if (!state.pipelineIndex.line_categories || typeof state.pipelineIndex.line_categories !== "object" || !state.pipelineIndex.installation_categories || typeof state.pipelineIndex.installation_categories !== "object") {
+        state.pipelineIndex = null;
+        throw new Error("Invalid pipeline index");
+      }
       state.pipelineSegmentLayersByKey = new Map();
       state.pipelineInstallLayersByKey = new Map();
       state.pipelineLayerPromisesByKey = new Map();
@@ -5037,11 +5184,7 @@ async function ensurePipelineCategoryLayer(key) {
   const item = pipelineFilterItems().find((candidate) => candidate.key === key);
   updatePipelineStatus(`Loading ${item?.label || 'pipeline layer'}...`);
 
-  const promise = fetch(entry.path)
-    .then((response) => {
-      if (!response.ok) throw new Error(`${key}: HTTP ${response.status}`);
-      return response.json();
-    })
+  const promise = requestJson(entry.path).then(requireFeatureCollection)
     .then((geojson) => {
       const layer = L.geoJSON(geojson, pipelineLayerOptions(key));
       store.set(key, layer);
@@ -5135,11 +5278,7 @@ async function ensurePipelineTileLayer(key, entry, coord, store) {
 
   const item = pipelineFilterItems().find((candidate) => candidate.key === key);
   updatePipelineStatus(`Loading ${item?.label || 'pipeline'} map tile...`);
-  const promise = fetch(pipelineTileUrl(entry, coord))
-    .then((response) => {
-      if (!response.ok) throw new Error(`${key} tile ${coord.id}: HTTP ${response.status}`);
-      return response.json();
-    })
+  const promise = requestJson(pipelineTileUrl(entry, coord)).then(requireFeatureCollection)
     .then((geojson) => {
       const layer = L.geoJSON(geojson, pipelineLayerOptions(key));
       store.layers.set(coord.id, layer);
@@ -5285,15 +5424,14 @@ async function boot() {
     });
   } catch (error) {
     console.error(error);
-    if (els.freshness) {
-      els.freshness.textContent = "Data export failed to load. Run: python scripts/run_etl.py";
-    }
+    if (els.freshness) els.freshness.textContent = "Production data is temporarily unavailable.";
     if (els.map) {
       els.map.innerHTML = `
         <div class="load-error">
           <h2>Production data did not load</h2>
           <p>${escapeHtml(error.message || error)}</p>
-          <code>python scripts/run_etl.py</code>
+          <button type="button" onclick="window.location.reload()">Reload dashboard</button>
+          <p>If this continues, contact the data administrator.</p>
         </div>`;
     }
   }
@@ -5480,7 +5618,7 @@ function computeSeasonality(assetIds) {
   const addYmValue = (aid, date, vol, markIndexed = false) => {
     if (!assetSet.has(aid)) return;
     const value = Number(vol || 0);
-    if (!Number.isFinite(value) || value <= 0) return;
+    if (!Number.isFinite(value) || value < 0) return;
     const ymStr = date.slice(0, 7);
     const year = Number(ymStr.slice(0, 4));
     const month = Number(ymStr.slice(5, 7));
@@ -5504,10 +5642,10 @@ function computeSeasonality(assetIds) {
   }
 
   // Fallbacks for local data if the seasonality index is unavailable or missing an asset-month.
-  for (const r of state.baseRecords) addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
+  for (const r of state.baseRecords) if (r.scenario === "actual") addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
   if (state.dateRecordCache) {
     for (const records of state.dateRecordCache.values()) {
-      for (const r of records) addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
+      for (const r of records) if (r.scenario === "actual") addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
     }
   }
   const years = Object.keys(ym).map(Number).sort();
@@ -5579,11 +5717,11 @@ async function showSeasonalityPanel(assetIds) {
       </div>`;
     document.getElementById("map").appendChild(loadingPanel);
     try {
-      const resp = await fetch("public/data/asset_seasonality.json?v=20260527");
-      state.seasonalityIndex = await resp.json();
+      state.seasonalityIndex = await requestJson("public/data/asset_seasonality.json");
     } catch(e) {
       console.warn("Could not load asset_seasonality.json:", e);
-      state.seasonalityIndex = {};
+      state.seasonalityIndex = null;
+      state.optionalDataWarnings.push("Seasonality index unavailable; only locally loaded history is shown.");
     }
     state.seasonalityIndexLoading = false;
     loadingPanel.remove();
@@ -5608,7 +5746,7 @@ async function showSeasonalityPanel(assetIds) {
     <div class="sea-header">
       <div>
         <strong class="sea-title">${escapeHtml(titleStr)}</strong>
-        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} selected</span>
+        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · actual history, all streams per selected asset${state.seasonalityIndex ? "" : " · PARTIAL HISTORY"}</span>
       </div>
       <button id="closeSeasonality" class="sea-close" title="Close">&#x2715;</button>
     </div>
@@ -5834,27 +5972,23 @@ function drawSeasonalityChart(data, assetCount) {
 //  - W.L. Leffler, "Petroleum Refining in Nontechnical Language" (4th/2020),
 //    Table 20-1 "Refinery Yields" (medium sour crude) -> the configuration
 //    slates used below (Simple/Complex/Very-Complex).
-//  - R.E. Maples, "Petroleum Refinery Process Economics" (2000), Table 4-2,
-//    U.S. product slate as % of crude charge (sanity benchmark).
-//  - M.A. Fahim et al., "Fundamentals of Petroleum Refining" -- per-unit
-//    yields used to classify configuration (FCC ~55 vol% gasoline from gas
-//    oil; delayed coker ~30 wt% coke; visbreaking; catalytic reforming).
-// Products are expressed as % of crude charge; the "gain" line is volumetric
-// expansion from cracking/H2 addition, "fuel & loss" is internal consumption.
+//  - M.A. Fahim et al., "Fundamentals of Petroleum Refining", Chapter 6:
+//    mild visbreaking does not imply the residue conversion of a coker.
+// These are illustrative configuration scenarios, not plant production forecasts.
+// Coke uses a declared barrel-equivalent convention, never a liquid volume.
 // ============================================================
 
 const BBL_TO_GAL = 42;             // US gallons per barrel
 const BBL_TO_L   = 158.987294928;  // litres per barrel
+const COKE_BBL_EQ_PER_SHORT_TON = 5; // EIA petroleum-coke reporting convention
 
 // Leffler Table 20-1 -- % of crude charge, medium sour crude (WTS / Arab Light)
 const REFINERY_YIELD_SLATES = {
   topping:  { label: "Topping / Hydroskimming", gasoline: 30, jet: 10, distillate: 20, resid: 35, lpg: 0, coke: 0,  sco: 0,  fuelLoss: 8,  gain: 3  },
   cracking: { label: "Cracking (FCC / hydrocracker)", gasoline: 50, jet: 10, distillate: 25, resid: 10, lpg: 3, coke: 0,  sco: 0,  fuelLoss: 12, gain: 10 },
   coking:   { label: "Coking / Deep conversion", gasoline: 60, jet: 10, distillate: 25, resid: 0,  lpg: 4, coke: 3,  sco: 0,  fuelLoss: 13, gain: 15 },
-  splitter: { label: "Condensate splitter", gasoline: 58, jet: 14, distillate: 22, resid: 2,  lpg: 6, coke: 0,  sco: 0,  fuelLoss: 2,  gain: 4  },
-  upgrader: { label: "Bitumen upgrader (SCO)", gasoline: 0, jet: 0, distillate: 6, resid: 0,  lpg: 2, coke: 12, sco: 80, fuelLoss: 0,  gain: 0  },
 };
-const CONFIG_LABEL = { topping: "Hydroskimming", cracking: "Cracking", coking: "Deep conversion", splitter: "Cond. splitter", upgrader: "Upgrader" };
+const CONFIG_LABEL = { topping: "Hydroskimming", cracking: "FCC cracking", coking: "FCC + coking", splitter: "Cond. splitter", upgrader: "Upgrader", hydrocracking: "Hydrocracker", conversion: "Other conversion", distillation: "Distillation / specialty", unknown: "Unknown", inactive: "Inactive" };
 
 const REFINED_PRODUCTS = [
   { key: "gasoline",   label: "Motor gasoline",      short: "Gasoline", color: "#16a34a" },
@@ -5862,8 +5996,7 @@ const REFINED_PRODUCTS = [
   { key: "jet",        label: "Jet / kerosene",      short: "Jet",      color: "#0891b2" },
   { key: "resid",      label: "Residual fuel oil",   short: "Resid",    color: "#92400e" },
   { key: "lpg",        label: "LPG",                 short: "LPG",      color: "#d97706" },
-  { key: "coke",       label: "Petroleum coke",      short: "Coke",     color: "#475569" },
-  { key: "sco",        label: "Synthetic crude (SCO)", short: "SCO",     color: "#7c3aed" },
+  { key: "coke",       label: "Petroleum coke (short tons)", short: "Coke (st/d)", color: "#475569" },
 ];
 
 const PROCESS_UNITS = [
@@ -5880,22 +6013,53 @@ const PROCESS_UNITS = [
 // unit list — ~4% of listed BBL/d capacity. Counting them silently inflates
 // unit totals, Nelson CI, and can flip a plant's configuration class.
 function refineryUnitActive(u) {
-  const g = String(u.unit_status_group || "").toLowerCase();
-  if (g) return g === "commissioned";
-  const s = String(u.unit_status_desc || "").toLowerCase();
-  return !s || s === "operational";
+  const g = String(u.unit_status_group || "").trim().toLowerCase();
+  const s = String(u.unit_status_desc || "").trim().toLowerCase();
+  if (g && g !== "commissioned") return false;
+  return !s || ["operational", "operating", "active"].includes(s);
+}
+
+function refineryPlantActive(props) {
+  const status = String(props.plant_status_desc || "").trim().toLowerCase();
+  return !status || ["operational", "operating", "active"].includes(status);
+}
+
+function refineryPositiveNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function refineryActiveUnits(props) {
+  if (!refineryPlantActive(props)) return [];
+  const seen = new Set();
+  return (props.refinery_units || []).filter((u) => {
+    if (!refineryUnitActive(u)) return false;
+    if (u.unit_id != null) {
+      const id = String(u.unit_id);
+      if (seen.has(id)) return false;
+      seen.add(id);
+    }
+    return true;
+  });
+}
+
+function refineryUnitKbbl(u) {
+  const unit = String(u.capacity_uom || "").trim().toLowerCase();
+  if (!["bbl/d", "kbbl/d"].includes(unit)) return 0;
+  return refineryPositiveNumber(u.unit_capacity_feed_kbbl_d)
+    || refineryPositiveNumber(u.capacity_kbbl_d)
+    || refineryPositiveNumber(u.capacity) / (unit === "bbl/d" ? 1000 : 1);
 }
 
 function refineryUnitCapacities(props) {
-  const cap = { crude: Number(props.crud_capacity_kbbl_d) || 0, fcc: 0, hcu: 0, coker: 0, reformer: 0, hydrotreater: 0, alky: 0, visbreaker: 0 };
-  for (const u of props.refinery_units || []) {
-    if (u.capacity_uom !== "BBL/d") continue;
-    if (!refineryUnitActive(u)) continue;
-    const c = Number(u.capacity_kbbl_d) || 0;
+  const cap = { crude: effectiveCrudeCharge(props).charge, fcc: 0, hcu: 0, coker: 0, reformer: 0, hydrotreater: 0, alky: 0, visbreaker: 0 };
+  for (const u of refineryActiveUnits(props)) {
+    const c = refineryUnitKbbl(u);
     if (!c) continue;
     const g = (u.unit_type_group || "").toLowerCase();
     const sh = (u.unit_type_short || "").toLowerCase();
     const t = `${sh} ${(u.unit_type_desc || "").toLowerCase()}`;
+    if (/splitter|calciner/.test(t)) continue;
     // Hydrotreaters first: IIR leaves unit_type_group null for many of them
     // (reformer-feed, VGO/HGO, naphtha, lube, resid HT), and their names can
     // contain FCC/reformer tokens ("FCCU Gasoline Hydrotreater").
@@ -5912,10 +6076,8 @@ function refineryUnitCapacities(props) {
 
 function refineryThroughputUnits(props) {
   let cdu = 0, vac = 0, dru = 0, coker = 0;
-  for (const u of props.refinery_units || []) {
-    if (u.capacity_uom !== "BBL/d") continue;
-    if (!refineryUnitActive(u)) continue;
-    const c = Number(u.capacity_kbbl_d) || 0;
+  for (const u of refineryActiveUnits(props)) {
+    const c = refineryUnitKbbl(u);
     if (!c) continue;
     const sh = (u.unit_type_short || "").toLowerCase();
     const t = `${sh} ${(u.unit_type_desc || "").toLowerCase()}`;
@@ -5933,44 +6095,42 @@ function refineryIsOilSands(props) {
     Array.isArray(props.plant_sectors) ? props.plant_sectors.join(" ") : props.plant_sectors,
     props.plant_type,
   ].filter(Boolean).join(" ").toLowerCase();
-  return /\bupgrader\b|oil[\s-]*sands|synthetic crude|\bhorizon\b|mildred lake|\bsyncrude\b|long lake|scotford upgrader|sturgeon refinery/.test(descriptor);
+  return /\bupgrader\b|oil[\s-]*sands|synthetic crude|\bhorizon\b|mildred lake|\bsyncrude\b|long lake/.test(descriptor);
 }
 
-// Effective crude/feed charge: reported crude capacity, else CDU units (recovers an
-// IIR rollup gap), else a throughput proxy for plants with no CDU rows:
-//  - oil-sands upgraders: bitumen charge from vacuum/coker/DRU capacity;
-//  - conventional no-CDU plants (e.g. CITGO Corpus Christi West): coker capacity
-//    is ~30% of crude at a deep-conversion plant (Leffler), so coker/0.30 recovers
-//    a nameplate-scale charge instead of treating the plant as an SCO upgrader.
+// Reported crude capacity, otherwise active atmospheric distillation capacity.
+// Secondary-unit capacity cannot establish fresh crude or bitumen input: streams
+// may be imported, recycled, or shared with another plant. Never infer coker/0.30.
 function effectiveCrudeCharge(props) {
-  const plant = Number(props.crud_capacity_kbbl_d) || 0;
+  if (!refineryPlantActive(props)) return { charge: 0, basis: "inactive" };
+  // An upgrader's bitumen/dilbit feed rating is not conventional crude capacity.
+  if (refineryIsOilSands(props)) return { charge: 0, basis: "upgrader" };
+  const cdus = (props.refinery_units || []).filter((u) => {
+    const t = `${u.unit_type_short || ""} ${u.unit_type_desc || ""}`.toLowerCase();
+    return /\bcdu\b|atmospheric distill/.test(t);
+  });
+  if (cdus.length && cdus.every((u) => !refineryUnitActive(u))) return { charge: 0, basis: "inactive_cdu" };
+  const plant = refineryPositiveNumber(props.crud_capacity_kbbl_d)
+    || refineryPositiveNumber(props.crud_capacity_bbl_d) / 1000;
   if (plant > 0) return { charge: plant, basis: "crude" };
   const u = refineryThroughputUnits(props);
   if (u.cdu > 0) return { charge: u.cdu, basis: "cdu" };
-  if (refineryIsOilSands(props)) {
-    const proxy = Math.max(u.vac, u.coker, u.dru * 0.7); // DRU stream is ~30% diluent
-    if (proxy > 0) return { charge: proxy, basis: "upgrader" };
-  } else {
-    const proxy = Math.max(u.vac, u.coker / 0.30);
-    if (proxy > 0) return { charge: proxy, basis: "units" };
-  }
   return { charge: 0, basis: "none" };
 }
 
 function refineryConfig(props, cap, charge, basis) {
   const name = `${props.plant_name || ""} ${props.plant_sectors || ""}`.toLowerCase();
-  // Only oil-sands plants take the SCO upgrader slate; a conventional refinery
-  // with missing CDU rows must not fall through to an 80% SCO yield.
-  if (basis === "upgrader" || name.includes("upgrader") || name.includes("oil sands")) {
-    if (refineryIsOilSands(props)) return "upgrader";
-  }
-  if (name.includes("condensate") || name.includes("splitter") || name.includes("fractionat")) return "splitter";
-  if (charge <= 0) return "topping";
-  const coking = cap.coker + cap.visbreaker;
-  const cracking = cap.fcc + cap.hcu;
-  if (coking / charge >= 0.05) return "coking";
-  if (cracking / charge >= 0.05) return "cracking";
-  return "topping";
+  if (basis === "inactive" || basis === "inactive_cdu") return "inactive";
+  if (refineryIsOilSands(props)) return "upgrader";
+  if (name.includes("condensate") || name.includes("splitter")) return "splitter";
+  if (charge <= 0) return "unknown";
+  // Leffler's complex/very-complex examples have an FCC. A hydrocracker-only
+  // refinery is not assigned the same gasoline-heavy slate without an assay.
+  if (cap.fcc / charge >= 0.05) return cap.coker / charge >= 0.05 ? "coking" : "cracking";
+  if (cap.hcu / charge >= 0.05) return "hydrocracking";
+  if (cap.coker / charge >= 0.05) return "conversion";
+  if (cap.reformer > 0 && cap.hydrotreater > 0) return "topping";
+  return "distillation";
 }
 
 // Nelson Complexity Index (Kaiser/Gary/Handwerk, "Petroleum Refining: Technology,
@@ -5984,6 +6144,9 @@ function nelsonCF(u) {
   // utilities / fractionation / non-refining -> no standard complexity factor
   if (t.includes("calciner") || t.includes("splitter") || t.includes("sulfur") ||
       t.includes("amine") || t.includes("lights ends") || t.includes("diluent recovery")) return 0;
+  // Feed/service names must not override the unit's actual treatment process.
+  if (t.includes("hydrorefin") || t.includes("residual hydrotreat")) return 3;
+  if (t.includes("hydrotreat")) return 2;
   if (t.includes("vacuum")) return 2;                                   // vacuum distillation
   if (t.includes("visbreak") || t.includes("thermal crack")) return 2.75; // thermal cracking / visbreaking
   if (t.includes("cat crack") || /\bfcc\b/.test(t)) return 6;          // catalytic cracking
@@ -5995,8 +6158,6 @@ function nelsonCF(u) {
   if (t.includes("aromatic") || t.includes("benzene") || t.includes("hydrodealkyl")) return 15;
   if (t.includes("asphalt")) return 1.5;                              // asphalt
   if (t.includes("lube")) return 10;                                  // lubes
-  if (t.includes("residual hydrotreat")) return 3;                    // resid hydrorefining
-  if (t.includes("hydrotreat") || t.includes("hydrorefin")) return 2; // hydrotreating
   if (/\breform/.test(t)) return 5;                                   // catalytic reforming
   return 0;
 }
@@ -6005,11 +6166,13 @@ function nelsonCF(u) {
 // (Kaiser/Gary/Handwerk Table 7.6 worked example) treats the MMcfd figure numerically
 // as Mbpd-equivalent in the ratio, with complexity factor 1.
 function refineryHydrogenMMcfd(props) {
+  if (!refineryPlantActive(props)) return 0;
   let h = 0;
   for (const c of props.plant_capacities || []) {
     const pd = (c.product_desc || "").toLowerCase();
-    if (!pd.includes("hydrogen") || pd.includes("green")) continue;
-    const cap = c.design_capacity || c.actual_capacity || 0;
+    // Purchased hydrogen (Feed) is not an installed hydrogen production unit.
+    if (!pd.includes("hydrogen") || String(c.kind || "").toLowerCase() !== "output") continue;
+    const cap = refineryPositiveNumber(c.design_capacity) || refineryPositiveNumber(c.actual_capacity);
     const u = (c.uom || "").toLowerCase();
     if (u.includes("k cubic")) h += cap / 1000;          // k cubic ft/day -> MMcfd
     else if (u.includes("mmscfd") || u.includes("mmcfd")) h += cap;
@@ -6020,12 +6183,10 @@ function refineryHydrogenMMcfd(props) {
 
 function refineryComplexity(props) {
   const crude = effectiveCrudeCharge(props).charge;
-  if (crude <= 0) return 0;
+  if (crude <= 0 || refineryIsOilSands(props)) return null;
   let weighted = 0;
-  for (const u of props.refinery_units || []) {
-    if (u.capacity_uom !== "BBL/d") continue;
-    if (!refineryUnitActive(u)) continue;
-    const c = Number(u.capacity_kbbl_d) || 0;
+  for (const u of refineryActiveUnits(props)) {
+    const c = refineryUnitKbbl(u);
     if (!c) continue;
     const sh = (u.unit_type_short || "").toLowerCase();
     if (sh === "cdu" || sh.includes("crude")) continue; // ADU is the normalizer (counted as 1)
@@ -6035,15 +6196,19 @@ function refineryComplexity(props) {
   return 1 + weighted / crude;
 }
 
-function estimateRefineryProducts(props) {
+function estimateRefineryProducts(props, utilizationPercent = 100) {
   const cap = refineryUnitCapacities(props);
   const { charge, basis } = effectiveCrudeCharge(props);
   const cls = refineryConfig(props, cap, charge, basis);
   const slate = REFINERY_YIELD_SLATES[cls];
+  const requested = Number(utilizationPercent);
+  const utilization = Number.isFinite(requested) ? Math.max(0, Math.min(100, requested)) / 100 : 1;
+  const modeled = charge > 0 && !!slate;
+  const feed = modeled ? charge * utilization : 0;
   const products = {};
-  for (const p of REFINED_PRODUCTS) products[p.key] = charge * (slate[p.key] || 0) / 100;
-  return { cap, cls, basis, slate, crude: charge, products,
-    fuelLoss: charge * (slate.fuelLoss || 0) / 100, gain: charge * (slate.gain || 0) / 100 };
+  for (const p of REFINED_PRODUCTS) products[p.key] = modeled ? feed * (slate[p.key] || 0) / 100 : null;
+  return { cap, cls, basis, slate, modeled, utilization, feed, crude: charge, products,
+    fuelLoss: modeled ? feed * slate.fuelLoss / 100 : 0, gain: modeled ? feed * slate.gain / 100 : 0 };
 }
 
 // Volume formatting in the user-selected unit (bbl/d default).
@@ -6060,7 +6225,14 @@ function refVolFmt(kbbl_d, unit) {
   return { str, suffix, raw: v };
 }
 
-function showRefineryPanel(features) {
+function refProductFmt(key, value, unit) {
+  if (value == null) return { str: "—", suffix: "", raw: null };
+  if (key !== "coke") return refVolFmt(value, unit);
+  const raw = value * 1000 / COKE_BBL_EQ_PER_SHORT_TON;
+  return { str: raw.toLocaleString("en-CA", { maximumFractionDigits: 1 }), suffix: "short ton/d", raw };
+}
+
+function showRefineryPanel(features, utilizationPercent = 100) {
   const existing = document.getElementById("refineryPanel");
   if (existing) existing.remove();
 
@@ -6080,9 +6252,16 @@ function showRefineryPanel(features) {
   }
 
   // ---- Aggregate ----
-  const rows = features.map((ft) => {
+  const seenPlants = new Set();
+  const rows = features.filter((ft) => {
+    const id = ft.properties.plant_id;
+    if (id == null) return true;
+    if (seenPlants.has(String(id))) return false;
+    seenPlants.add(String(id));
+    return true;
+  }).map((ft) => {
     const p = ft.properties;
-    const est = estimateRefineryProducts(p);
+    const est = estimateRefineryProducts(p, utilizationPercent);
     return {
       name: p.plant_name || "Unknown",
       owner: p.parent_company || p.owner_name || p.operator_name || "Unknown",
@@ -6096,25 +6275,32 @@ function showRefineryPanel(features) {
   });
 
   const totalCrude = rows.reduce((a, r) => a + r.crude, 0) || 0;
+  const modeledRows = rows.filter(r => r.modeled);
+  const modeledCrude = modeledRows.reduce((a, r) => a + r.crude, 0);
+  const modeledFeed = modeledRows.reduce((a, r) => a + r.feed, 0);
+  const utilization = rows[0].utilization * 100;
+  const ciCrude = rows.reduce((a, r) => a + (Number.isFinite(r.ci) ? r.crude : 0), 0);
   const unitTotals = {};
   for (const u of PROCESS_UNITS) unitTotals[u.key] = rows.reduce((a, r) => a + (r.cap[u.key] || 0), 0);
   const productTotals = {};
-  for (const pr of REFINED_PRODUCTS) productTotals[pr.key] = rows.reduce((a, r) => a + r.products[pr.key], 0);
+  for (const pr of REFINED_PRODUCTS) productTotals[pr.key] = rows.reduce((a, r) => a + (r.products[pr.key] || 0), 0);
   const totalFuelLoss = rows.reduce((a, r) => a + r.fuelLoss, 0);
   const totalGain = rows.reduce((a, r) => a + r.gain, 0);
-  const totalLiquidProducts = REFINED_PRODUCTS.filter(p => p.key !== "coke" && p.key !== "sco").reduce((a, p) => a + productTotals[p.key], 0);
+  const totalLiquidProducts = REFINED_PRODUCTS.filter(p => p.key !== "coke").reduce((a, p) => a + productTotals[p.key], 0);
   // Only show product rows/columns that are non-zero across the selection (e.g. SCO
   // appears only when upgraders are included).
   const activeProducts = REFINED_PRODUCTS.filter(p => productTotals[p.key] > 0.05);
   const shownProducts = activeProducts.length ? activeProducts : REFINED_PRODUCTS;
-  const regionCI = totalCrude ? rows.reduce((a, r) => a + r.ci * r.crude, 0) / totalCrude : 0;
+  const regionCI = ciCrude ? rows.reduce((a, r) => a + (Number.isFinite(r.ci) ? r.ci * r.crude : 0), 0) / ciCrude : null;
+  const ciLabel = value => Number.isFinite(value) ? value.toFixed(1) : "—";
 
   // Owner aggregation
   const ownerMap = new Map();
   for (const r of rows) {
-    const o = ownerMap.get(r.owner) || { owner: r.owner, crude: 0, count: 0, ciw: 0, products: {} };
-    o.crude += r.crude; o.count += 1; o.ciw += r.ci * r.crude;
-    for (const pr of REFINED_PRODUCTS) o.products[pr.key] = (o.products[pr.key] || 0) + r.products[pr.key];
+    const o = ownerMap.get(r.owner) || { owner: r.owner, crude: 0, count: 0, modeledCount: 0, ciw: 0, ciCrude: 0, products: {} };
+    o.crude += r.crude; o.count += 1; o.modeledCount += Number(r.modeled);
+    if (Number.isFinite(r.ci)) { o.ciw += r.ci * r.crude; o.ciCrude += r.crude; }
+    for (const pr of REFINED_PRODUCTS) o.products[pr.key] = (o.products[pr.key] || 0) + (r.products[pr.key] || 0);
     ownerMap.set(r.owner, o);
   }
   const owners = [...ownerMap.values()].sort((a, b) => b.crude - a.crude);
@@ -6122,9 +6308,6 @@ function showRefineryPanel(features) {
   // Region descriptor + trader metrics
   const paddSet = [...new Set(rows.map(r => r.padd).filter(Boolean))];
   const countrySet = [...new Set(rows.map(r => r.country).filter(Boolean))];
-  const conversionCap = unitTotals.fcc + unitTotals.hcu + unitTotals.coker;
-  const conversionRatio = totalCrude ? conversionCap / totalCrude : 0;       // Nelson-style conversion proxy
-  const cokingRatio = totalCrude ? unitTotals.coker / totalCrude : 0;
   const hhi = owners.reduce((a, o) => { const sh = totalCrude ? o.crude / totalCrude : 0; return a + sh * sh; }, 0);
   const top3Share = totalCrude ? owners.slice(0, 3).reduce((a, o) => a + o.crude, 0) / totalCrude : 0;
   const configCounts = rows.reduce((a, r) => { a[r.cls] = (a[r.cls] || 0) + 1; return a; }, {});
@@ -6136,13 +6319,13 @@ function showRefineryPanel(features) {
     <div class="ref-header">
       <div>
         <strong class="ref-title">Refining capacity &mdash; ${rows.length} plant${rows.length > 1 ? "s" : ""}</strong>
-        <span class="ref-sub">${escapeHtml(regionStr)} · ${Math.round(totalCrude).toLocaleString("en-CA")} kbbl/d crude · ${owners.length} owner${owners.length > 1 ? "s" : ""} · avg Nelson CI ${regionCI.toFixed(1)}</span>
+        <span class="ref-sub">${escapeHtml(regionStr)} · ${Math.round(totalCrude).toLocaleString("en-CA")} kbbl/d reported / CDU capacity · ${owners.length} owner${owners.length > 1 ? "s" : ""} · estimated CI ${ciLabel(regionCI)}</span>
       </div>
       <button id="closeRefinery" class="ref-close" title="Close">&#x2715;</button>
     </div>
     <div class="ref-controls">
       <div class="ref-tabs" id="refTabs">
-        <button class="ref-tab active" data-ref-tab="products">Finished products</button>
+        <button class="ref-tab active" data-ref-tab="products">Product scenario</button>
         <button class="ref-tab" data-ref-tab="units">Process units</button>
         <button class="ref-tab" data-ref-tab="owners">Owners</button>
         <button class="ref-tab" data-ref-tab="plants">Refineries</button>
@@ -6154,14 +6337,25 @@ function showRefineryPanel(features) {
         <button class="ref-unit" data-ref-unit="l">L/d</button>
       </div>
     </div>
+    <div class="ref-scenario-controls">
+      <label for="refUtilization">Scenario utilization</label>
+      <input id="refUtilization" type="number" min="0" max="100" step="1" value="${utilization}" aria-describedby="refCoverage" />
+      <span>% of capacity</span>
+    </div>
+    <p class="ref-section-note" id="refCoverage">${modeledRows.length} of ${rows.length} plants have a supported textbook scenario (${Math.round(modeledCrude).toLocaleString("en-CA")} kbbl/d capacity). ${rows.length - modeledRows.length} excluded: missing active crude input or unsupported configuration. See Refineries for each plant.</p>
     <div class="ref-body" id="refBody"></div>
     <div class="ref-footer">
-      <span class="ref-note">Modeled output (nameplate, medium-crude slates). Method: Leffler Table&nbsp;20-1; benchmarked to Maples & Fahim.</span>
+      <span class="ref-note">Illustrative medium-crude scenario; actual yields require feed assays and operating data. Coke is always in short tons/day.</span>
       <button class="ref-csv" id="refCsv">Export CSV</button>
     </div>
   `;
   document.getElementById("map").appendChild(panel);
   document.getElementById("closeRefinery").addEventListener("click", () => panel.remove());
+  panel.querySelector("#refUtilization").addEventListener("change", (event) => {
+    const input = event.target;
+    if (!input.reportValidity() || input.value.trim() === "") return;
+    showRefineryPanel(features, Number(input.value));
+  });
 
   const view = { tab: "products", unit: "bbl" };
 
@@ -6171,30 +6365,29 @@ function showRefineryPanel(features) {
   }
 
   function renderProducts() {
+    if (!modeledRows.length) return '<p class="ref-section-note">Product estimates are unavailable for this selection. Reported process capacities remain available in the Process units tab. A feed assay and plant-specific yield model are required for splitters, upgraders and other configurations.</p>';
     const u = view.unit;
     const maxV = Math.max(...shownProducts.map(p => productTotals[p.key]), 1);
     let rowsHtml = shownProducts.map(p => {
-      const f = refVolFmt(productTotals[p.key], u);
-      const pctCrude = totalCrude ? (productTotals[p.key] / totalCrude * 100) : 0;
+      const f = refProductFmt(p.key, productTotals[p.key], u);
+      const pctCrude = modeledFeed ? (productTotals[p.key] / modeledFeed * 100) : null;
       return `<tr>
         <td><i class="ref-swatch" style="background:${p.color}"></i>${escapeHtml(p.label)}</td>
         <td class="num"><strong>${f.str}</strong> <span class="ref-u">${f.suffix}</span></td>
-        <td class="num">${pctCrude.toFixed(1)}%</td>
+        <td class="num">${pctCrude == null ? "—" : pctCrude.toFixed(1) + "%"}${p.key === "coke" && pctCrude != null ? " eq." : ""}</td>
         <td class="barcell">${bar(productTotals[p.key] / maxV * 100, p.color)}</td>
       </tr>`;
     }).join("");
     const liq = refVolFmt(totalLiquidProducts, u);
-    const fl = refVolFmt(totalFuelLoss, u);
-    const gn = refVolFmt(totalGain, u);
     return `
-      <p class="ref-section-note">Estimated salable output if the selected region runs at nameplate crude capacity (${Math.round(totalCrude).toLocaleString("en-CA")} kbbl/d charge).</p>
+      <p class="ref-section-note">Illustrative output from ${Math.round(modeledFeed).toLocaleString("en-CA")} kbbl/d scenario feed at ${utilization}% utilization. Liquid units: ${refVolFmt(0,u).suffix}; coke: short ton/d using the EIA 5 bbl-equivalent/short-ton convention. The textbook coke percentage is an equivalent-volume scenario, not a measured mass yield.</p>
       <table class="ref-table">
-        <thead><tr><th>Refined product</th><th class="num">Output</th><th class="num">% of crude</th><th></th></tr></thead>
+        <thead><tr><th>Product</th><th class="num">Scenario output</th><th class="num">% of modeled feed</th><th></th></tr></thead>
         <tbody>${rowsHtml}</tbody>
         <tfoot>
           <tr><td>Total liquid products</td><td class="num"><strong>${liq.str}</strong> <span class="ref-u">${liq.suffix}</span></td><td class="num"></td><td></td></tr>
-          <tr class="memo"><td>Refinery fuel &amp; loss</td><td class="num">${fl.str} <span class="ref-u">${fl.suffix}</span></td><td class="num">${totalCrude ? (totalFuelLoss/totalCrude*100).toFixed(1) : 0}%</td><td></td></tr>
-          <tr class="memo"><td>Processing gain</td><td class="num">+${gn.str} <span class="ref-u">${gn.suffix}</span></td><td class="num">+${totalCrude ? (totalGain/totalCrude*100).toFixed(1) : 0}%</td><td></td></tr>
+          <tr class="memo"><td>Refinery fuel (textbook memo)</td><td></td><td class="num">${modeledFeed ? (totalFuelLoss/modeledFeed*100).toFixed(1) + "%" : "—"}</td><td></td></tr>
+          <tr class="memo"><td>Processing gain (textbook memo)</td><td></td><td class="num">${modeledFeed ? "+" + (totalGain/modeledFeed*100).toFixed(1) + "%" : "—"}</td><td></td></tr>
         </tbody>
       </table>`;
   }
@@ -6213,7 +6406,7 @@ function showRefineryPanel(features) {
       </tr>`;
     }).join("");
     return `
-      <p class="ref-section-note">Installed process-unit capacity across the selection. Downstream % is relative to crude charge (a conversion-depth proxy).</p>
+      <p class="ref-section-note">Active process-unit capacity across the selection. Downstream percentages compare installed capacities; streams overlap and must not be added as fresh feed or product output. Utilization does not change installed capacity.</p>
       <table class="ref-table">
         <thead><tr><th>Process unit</th><th class="num">Capacity</th><th class="num">vs crude</th><th></th></tr></thead>
         <tbody>${rowsHtml}</tbody>
@@ -6226,19 +6419,19 @@ function showRefineryPanel(features) {
     let rowsHtml = owners.map(o => {
       const f = refVolFmt(o.crude, u);
       const share = totalCrude ? (o.crude / totalCrude * 100) : 0;
-      const prodCells = shownProducts.map(p => `<td class="num">${refVolFmt(o.products[p.key], u).str}</td>`).join("");
-      const avgCI = o.crude ? (o.ciw / o.crude) : 0;
+      const prodCells = shownProducts.map(p => `<td class="num">${refProductFmt(p.key, o.modeledCount ? o.products[p.key] : null, u).str}</td>`).join("");
+      const avgCI = o.ciCrude ? (o.ciw / o.ciCrude) : null;
       return `<tr>
         <td>${escapeHtml(o.owner)}</td>
         <td class="num">${o.count}</td>
         <td class="num"><strong>${f.str}</strong> <span class="ref-u">${f.suffix}</span></td>
-        <td class="num">${avgCI.toFixed(1)}</td>
+        <td class="num">${ciLabel(avgCI)}</td>
         <td class="num">${share.toFixed(1)}%</td>
         ${prodCells}
       </tr>`;
     }).join("");
     return `
-      <p class="ref-section-note">Modeled output by parent company (owner basis), volumes in ${refVolFmt(0,u).suffix}. Concentration: top-3 owners ${(top3Share*100).toFixed(0)}%, HHI ${Math.round(hhi*10000)}.</p>
+      <p class="ref-section-note">Scenario output grouped by the listed parent company; joint-venture equity shares are unavailable. Liquids in ${refVolFmt(0,u).suffix}; coke in short ton/d. Capacity concentration: top 3 ${(top3Share*100).toFixed(0)}%, HHI ${Math.round(hhi*10000)}; plants with unknown capacity are excluded from shares.</p>
       <table class="ref-table">
         <thead><tr><th>Owner (parent)</th><th class="num">Plants</th><th class="num">Crude cap</th><th class="num" title="Nelson Complexity Index (capacity-weighted)">CI</th><th class="num">Share</th>${prodHead}</tr></thead>
         <tbody>${rowsHtml}</tbody>
@@ -6251,18 +6444,18 @@ function showRefineryPanel(features) {
     const prodHead = shownProducts.map(p => `<th class="num" title="${escapeHtml(p.label)}">${p.short}</th>`).join("");
     let rowsHtml = sorted.map(r => {
       const f = refVolFmt(r.crude, u);
-      const prodCells = shownProducts.map(p => `<td class="num">${refVolFmt(r.products[p.key], u).str}</td>`).join("");
+      const prodCells = shownProducts.map(p => `<td class="num">${refProductFmt(p.key, r.products[p.key], u).str}</td>`).join("");
       return `<tr>
         <td>${escapeHtml(r.name)}</td>
         <td>${escapeHtml(r.owner)}</td>
-        <td class="num"><strong>${f.str}</strong></td>
-        <td class="num">${r.ci.toFixed(1)}</td>
-        <td><span class="ref-cfg ${r.cls}">${CONFIG_LABEL[r.cls]}</span></td>
+        <td class="num"><strong>${r.crude ? f.str : "—"}</strong></td>
+        <td class="num">${ciLabel(r.ci)}</td>
+        <td><span class="ref-cfg ${r.cls}">${CONFIG_LABEL[r.cls]}</span>${r.modeled ? "" : '<br><span class="muted">No product estimate</span>'}</td>
         ${prodCells}
       </tr>`;
     }).join("");
     return `
-      <p class="ref-section-note">Contributing refineries (refinery basis), largest crude capacity first. Volumes in ${refVolFmt(0,u).suffix}.</p>
+      <p class="ref-section-note">All selected plants, largest known crude capacity first. A dash means unavailable; zero means zero modeled output. Liquids in ${refVolFmt(0,u).suffix}; coke in short ton/d. CI uses only confirmed crude capacity and active units.</p>
       <table class="ref-table">
         <thead><tr><th>Refinery</th><th>Owner</th><th class="num">Crude</th><th class="num" title="Nelson Complexity Index">CI</th><th>Config</th>${prodHead}</tr></thead>
         <tbody>${rowsHtml}</tbody>
@@ -6271,8 +6464,8 @@ function showRefineryPanel(features) {
 
   function renderMethod() {
     const order = ["topping", "cracking", "coking"];
-    const slateRows = [...REFINED_PRODUCTS.map(p => ({ k: p.key, label: p.label })),
-      { k: "fuelLoss", label: "Refinery fuel & loss", memo: true },
+    const slateRows = [...REFINED_PRODUCTS.map(p => ({ k: p.key, label: p.key === "coke" ? "Petroleum coke (barrel-equivalent %)" : p.label })),
+      { k: "fuelLoss", label: "Refinery fuel", memo: true },
       { k: "gain", label: "Processing gain", memo: true }];
     const headCells = order.map(k => `<th class="num">${CONFIG_LABEL[k]}</th>`).join("");
     const slateBody = slateRows.map(r => {
@@ -6287,25 +6480,26 @@ function showRefineryPanel(features) {
       .map(k => `${configCounts[k]} ${CONFIG_LABEL[k].toLowerCase()}`).join(" · ");
 
     return `
-      <p class="ref-section-note"><strong>How the numbers are built.</strong> For each selected plant: (1) read its crude (CDU) capacity and process units; (2) classify its configuration; (3) apply the matching yield slate to its crude charge; (4) sum across the selection. Output<sub>product</sub> = crude charge × yield% ÷ 100.</p>
+      <p class="ref-section-note"><strong>How the scenario is built.</strong> Liquid output = confirmed crude capacity × utilization% ÷ 100 × textbook yield% ÷ 100. Plant and unit status must be active. Missing plant capacity can be recovered from active CDU capacity; secondary units cannot establish crude or bitumen input. Duplicate plant/unit IDs are counted once.</p>
 
       <p class="ref-method-h">1 · Configuration classifier (capacity vs crude charge)</p>
       <table class="ref-table ref-method-table">
         <thead><tr><th>Configuration</th><th>Rule</th></tr></thead>
         <tbody>
-          <tr><td><span class="ref-cfg coking">Deep conversion</span></td><td>Coking (or visbreaking) capacity ≥ 5% of crude</td></tr>
-          <tr><td><span class="ref-cfg cracking">Cracking</span></td><td>FCC or hydrocracker capacity ≥ 5% of crude (and not deep-conversion)</td></tr>
-          <tr><td><span class="ref-cfg topping">Hydroskimming</span></td><td>Neither — crude distillation, reforming, hydrotreating only</td></tr>
+          <tr><td><span class="ref-cfg coking">FCC + coking</span></td><td>FCC and coking capacity each ≥ 5% of crude; visbreaking does not qualify as coking</td></tr>
+          <tr><td><span class="ref-cfg cracking">FCC cracking</span></td><td>FCC ≥ 5% of crude without a qualifying coker</td></tr>
+          <tr><td><span class="ref-cfg topping">Hydroskimming</span></td><td>Reforming and hydrotreating, without qualifying conversion capacity</td></tr>
+          <tr><td>Other configurations</td><td>Splitters, upgraders, hydrocracker-only, distillation-only and missing-input plants have no product estimate; a feed assay and suitable plant model are required</td></tr>
         </tbody>
       </table>
-      <p class="ref-method-mini">This selection: ${split || "—"}.</p>
+      <p class="ref-method-mini">Modeled selection: ${split || "—"}. The 5% classifier is an explicit screening assumption, not a published engineering threshold. Small cokers, FCC/hydrocracker combinations and regional crude diets can differ materially from these example slates.</p>
 
       <p class="ref-method-h">2 · Yield slates — % of crude charge (medium sour crude)</p>
       <table class="ref-table ref-method-table">
         <thead><tr><th>Product</th>${headCells}</tr></thead>
         <tbody>${slateBody}</tbody>
       </table>
-      <p class="ref-method-mini">Gasoline/jet/diesel/resid/LPG/coke are salable output. "Processing gain" is volumetric expansion from cracking & H₂ addition; "refinery fuel & loss" is internal consumption — both memo items, not products.</p>
+      <p class="ref-method-mini">Refinery fuel and processing gain are textbook balance memos, not additional products. Liquid products + coke equivalent + refinery fuel = 100% + processing gain. The coke percentage is treated as barrel-equivalent solely for this scenario; it is not a weight percentage or liquid volume. No density-free mass conversion is applied to weight yields.</p>
 
       <p class="ref-method-h">3 · Unit conversions</p>
       <table class="ref-table ref-method-table">
@@ -6314,11 +6508,12 @@ function showRefineryPanel(features) {
           <tr><td>1 barrel → US gallons</td><td class="num">× ${BBL_TO_GAL}</td></tr>
           <tr><td>1 barrel → litres</td><td class="num">× ${BBL_TO_L}</td></tr>
           <tr><td>kbbl/d → bbl/d</td><td class="num">× 1,000</td></tr>
+          <tr><td>Coke bbl-equivalent → short tons</td><td class="num">÷ ${COKE_BBL_EQ_PER_SHORT_TON}</td></tr>
         </tbody>
       </table>
 
-      <p class="ref-method-h">4 · Nelson Complexity Index (this selection: ${regionCI.toFixed(1)})</p>
-      <p class="ref-method-mini">Capital-intensity / sophistication measure. Each unit's capacity is weighted by its cost factor (relative to crude distillation) and divided by crude charge: <strong>CI = 1 + &Sigma;(CF<sub>unit</sub> &times; capacity<sub>unit</sub> &divide; crude)</strong>. Crude-only ≈ 1; complex coking refineries ≈ 9&ndash;14. Owner/region values are capacity-weighted.</p>
+      <p class="ref-method-h">4 · Estimated Nelson Complexity Index (this selection: ${ciLabel(regionCI)})</p>
+      <p class="ref-method-mini">Installed capital-intensity measure: <strong>CI = 1 + &Sigma;(CF<sub>unit</sub> × capacity<sub>unit</sub> ÷ crude capacity)</strong>. It is independent of scenario utilization and is not a margin or yield measure. Owner/region averages use known-CI crude capacity only; unavailable values are not treated as zero.</p>
       <table class="ref-table ref-method-table">
         <thead><tr><th>Process unit</th><th class="num">Complexity factor</th></tr></thead>
         <tbody>
@@ -6331,18 +6526,23 @@ function showRefineryPanel(features) {
           <tr><td>Aromatics / petrochemical</td><td class="num">15</td></tr>
           <tr><td>Thermal cracking / visbreaking</td><td class="num">2.75</td></tr>
           <tr><td>Hydrotreating</td><td class="num">2</td></tr>
+          <tr><td>Hydrorefining / residual hydrotreating</td><td class="num">3</td></tr>
+          <tr><td>Vacuum distillation</td><td class="num">2</td></tr>
+          <tr><td>Isomerization</td><td class="num">15</td></tr>
+          <tr><td>Hydrogen production (MMcfd)</td><td class="num">1</td></tr>
         </tbody>
       </table>
-      <p class="ref-method-mini">Standard Nelson calculation: each unit's capacity weighted by its complexity factor, divided by crude charge (incl. vacuum distillation, isomerization, reforming, hydrotreating, and hydrogen plants — hydrogen MMcfd treated as Mbpd-equivalent per OGJ convention). Utility units (sulfur, amine, splitters) carry no standard Nelson factor and are excluded. Uncalibrated, so it runs somewhat below proprietary published figures.</p>
+      <p class="ref-method-mini">Hydrogen production in MMcfd is compared numerically with crude capacity in kbbl/d per Kaiser's worked example; this is a complexity convention, not a physical gas-to-oil conversion. Purchased hydrogen feed is excluded. Hydrotreaters are classified by process before feed names (VGO, FCC gasoline or lube). Coverage and calendar-day versus stream-day capacity bases may differ from operator-reported CI; no accuracy benchmark is claimed.</p>
 
       <p class="ref-method-h">5 · Sources</p>
       <ul class="ref-method-cites">
         <li><strong>Leffler, <em>Petroleum Refining in Nontechnical Language</em> (2020), Table 20-1</strong> — configuration yield slates above (primary).</li>
-        <li><strong>Maples, <em>Petroleum Refinery Process Economics</em> (2000), Table 4-2</strong> — U.S. product slate benchmark (gasoline ≈ 55–57%, jet ≈ 11%, distillate ≈ 23–24%, resid ≈ 6%).</li>
-        <li><strong>Fahim et&nbsp;al., <em>Fundamentals of Petroleum Refining</em></strong> — per-unit yields behind the classifier (FCC ≈ 55 vol% gasoline; delayed coker ≈ 30 wt% coke; visbreaking; reforming).</li>
-        <li><strong>Kaiser, de&nbsp;Klerk, Gary &amp; Handwerk, <em>Petroleum Refining: Technology, Economics, and Markets</em> (2019), Table 7.1</strong> — Nelson complexity factors (OGJ 1998&ndash;2019).</li>
+        <li><strong>Fahim et&nbsp;al., <em>Fundamentals of Petroleum Refining</em>, Chapter 6</strong> — visbreaking and coking are distinct processes.</li>
+        <li><strong>Kaiser, de&nbsp;Klerk, Gary &amp; Handwerk, <em>Petroleum Refining: Technology, Economics, and Markets</em> (2019), Tables 7.1 and 7.6</strong> — Nelson factors and a worked hydrogen-inclusive example.</li>
+        <li><a href="https://www.eia.gov/dnav/pet/tbldefs/pet_pnp_capfuel_tbldef2.asp" target="_blank" rel="noopener noreferrer">EIA petroleum definitions</a> — coke reporting conversion, 5 barrels per short ton.</li>
+        <li><a href="https://www.eia.gov/tools/glossary/index.php?id=R" target="_blank" rel="noopener noreferrer">EIA refinery-yield definitions</a> — reported yields also account for other inputs and product adjustments; this simplified scenario is not an EIA production estimate.</li>
       </ul>
-      <p class="ref-method-mini">Modeled output is <strong>nameplate</strong> (assumes full crude utilization) and assumes a medium sour crude diet; heavier/lighter crude shifts the slate. Petroleum coke is on the table's volumetric basis (commonly quoted in short tons), so treat it as an order-of-magnitude figure.</p>
+      <p class="ref-method-mini">The default 100% utilization is a nameplate scenario. The selected production month does not establish refinery runs. Turnarounds, crude assays, unit constraints, imports, blending components and changing product specifications are not modeled. Refinery capacity is a dated snapshot, not a live measurement.</p>
     `;
   }
 
@@ -6369,20 +6569,23 @@ function showRefineryPanel(features) {
     render();
   });
   panel.querySelector("#refCsv").addEventListener("click", () => {
-    const lines = [["Refinery","Owner","PADD","Country","Status","Config","Nelson_CI","Crude_kbbl_d","Gasoline_kbbl_d","Distillate_kbbl_d","Jet_kbbl_d","Resid_kbbl_d","LPG_kbbl_d","Coke_kbbl_d","SCO_kbbl_d"].join(",")];
+    const csvCell = value => {
+      let s = String(value ?? "");
+      if (/^[\s]*[=+@-]/.test(s)) s = "'" + s;
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const numeric = value => Number.isFinite(value) ? value.toFixed(3) : "";
+    const lines = [["Refinery","Owner","PADD","Country","Status","Config","Model_available","Capacity_basis","Estimated_Nelson_CI","Crude_capacity_kbbl_d","Scenario_utilization_pct","Modeled_feed_kbbl_d","Gasoline_kbbl_d","Distillate_kbbl_d","Jet_kbbl_d","Resid_kbbl_d","LPG_kbbl_d","Coke_short_ton_d","Coke_bbl_equivalent_per_short_ton"].map(csvCell).join(",")];
     for (const r of rows) {
       lines.push([
-        '"' + r.name.replace(/"/g, '""') + '"',
-        '"' + r.owner.replace(/"/g, '""') + '"',
-        '"' + (r.padd || "") + '"', '"' + (r.country || "") + '"', '"' + (r.status || "") + '"',
-        CONFIG_LABEL[r.cls],
-        r.ci.toFixed(2),
-        r.crude.toFixed(1),
-        r.products.gasoline.toFixed(1), r.products.distillate.toFixed(1), r.products.jet.toFixed(1),
-        r.products.resid.toFixed(1), r.products.lpg.toFixed(1), r.products.coke.toFixed(1), r.products.sco.toFixed(1),
-      ].join(","));
+        r.name, r.owner, r.padd, r.country, r.status, CONFIG_LABEL[r.cls], r.modeled ? "yes" : "no", r.basis,
+        numeric(r.ci), r.crude ? numeric(r.crude) : "", numeric(utilization), r.modeled ? numeric(r.feed) : "",
+        numeric(r.products.gasoline), numeric(r.products.distillate), numeric(r.products.jet),
+        numeric(r.products.resid), numeric(r.products.lpg), numeric(refProductFmt("coke", r.products.coke, "bbl").raw),
+        COKE_BBL_EQ_PER_SHORT_TON,
+      ].map(csvCell).join(","));
     }
-    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "refinery_selection.csv";
@@ -6426,7 +6629,12 @@ function powerStatusLabel(u) {
   if (u >= 0.7) return "running";
   if (u >= 0.3) return "reduced";
   if (u > 0)    return "low";
-  return "offline";
+  return "zero reported output";
+}
+
+function powerSnapshotStale(data = state.powerData, now = Date.now()) {
+  const published = Date.parse(data?.observed_at || "");
+  return !Number.isFinite(published) || now - published > 90 * 60000 || published > now + 5 * 60000;
 }
 
 async function fetchPowerData() {
@@ -6436,9 +6644,9 @@ async function fetchPowerData() {
   updatePowerToggleUI();
   try {
     // Cache-bust so the 30-minute snapshots come through GitHub Pages caching.
-    const response = await fetch(`${POWER_DATA_PATH}?t=${Math.floor(Date.now() / 60000)}`);
-    if (!response.ok) throw new Error(`Power status: HTTP ${response.status}`);
-    state.powerData = await response.json();
+    const data = await requestJson(`${POWER_DATA_PATH}?t=${Math.floor(Date.now() / 60000)}`);
+    if (!Array.isArray(data.site_cogen) || !data.generated_at || !data.system) throw new Error("Invalid AESO snapshot");
+    state.powerData = data;
   } catch (err) {
     state.powerError = err.message || String(err);
   }
@@ -6450,8 +6658,9 @@ async function fetchPowerData() {
 function powerHaloTooltip(s) {
   const u = s.utilization;
   const rows = [
-    ["Status", `${powerStatusLabel(u)}${u !== null && u !== undefined ? ` · ${(u * 100).toFixed(0)}% of capability` : ""}`],
-    ["Cogen output", `${s.tng_mw} MW of ${s.mc_mw} MW`],
+    ["Observed", `${formatDateTime(state.powerData?.observed_at)}${powerSnapshotStale() ? " · STALE OR UNTIMED SNAPSHOT" : ""}`],
+    ["Status", s.net_to_grid ? "Net export reading; site generation is not established" : `${powerStatusLabel(u)}${Number.isFinite(u) ? ` · ${(u * 100).toFixed(0)}% of capability` : ""}`],
+    [s.net_to_grid ? "Net export / gross MC" : "Cogen output / capability", `${Number.isFinite(s.tng_mw) ? s.tng_mw : "—"} / ${Number.isFinite(s.mc_mw) ? s.mc_mw : "—"} MW`],
     ["AESO asset", `${s.aeso_name} (${s.aeso_code})`],
     ["Operator", s.operator],
     s.atco_heritage ? ["Fleet", "ATCO-heritage (Heartland)"] : null,
@@ -6474,7 +6683,7 @@ function powerAssetLookup() {
   for (const asset of state.assets || []) {
     const name = String(asset.display_name || "").trim().toLowerCase();
     const lat = Number(asset.latitude), lon = Number(asset.longitude);
-    if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    if (!name || asset.latitude == null || asset.longitude == null || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
     if (!_powerAssetLookup.has(name)) _powerAssetLookup.set(name, [lat, lon]);
   }
   return _powerAssetLookup;
@@ -6497,7 +6706,7 @@ function renderPowerLayer() {
   }
   if (!state.powerEnabled || !state.powerData?.site_cogen?.length) return;
   const markers = state.powerData.site_cogen.map((s) => {
-    const color = powerStatusColor(s.utilization);
+    const color = powerSnapshotStale() || s.net_to_grid ? "#6b7280" : powerStatusColor(s.utilization);
     const halo = L.circleMarker(powerHaloLatLng(s), {
       radius: 15,
       color,
@@ -6522,17 +6731,17 @@ function renderPowerPanel() {
   const fmtMW = (v) => (v === null || v === undefined ? "–" : `${Math.round(v).toLocaleString("en-CA")} MW`);
   const cogenRows = (d.site_cogen || []).map((s) => `
     <tr>
-      <td><i class="pw-dot" style="background:${powerStatusColor(s.utilization)}"></i>${escapeHtml(s.site)}</td>
-      <td class="num">${s.tng_mw}</td>
-      <td class="num">${s.mc_mw}</td>
-      <td class="num">${s.utilization === null ? "–" : (s.utilization * 100).toFixed(0) + "%"}</td>
+      <td><i class="pw-dot" style="background:${powerSnapshotStale(d) || s.net_to_grid ? "#6b7280" : powerStatusColor(s.utilization)}"></i>${escapeHtml(s.site)}${s.net_to_grid ? " (net export)" : ""}</td>
+      <td class="num">${Number.isFinite(s.tng_mw) ? s.tng_mw : "—"}</td>
+      <td class="num">${Number.isFinite(s.mc_mw) ? s.mc_mw : "—"}</td>
+      <td class="num">${s.net_to_grid || !Number.isFinite(s.utilization) ? "—" : (s.utilization * 100).toFixed(0) + "%"}</td>
     </tr>`).join("");
   const atcoRows = (d.atco_fleet || []).map((a) => `
     <tr>
-      <td><i class="pw-dot" style="background:${powerStatusColor(a.utilization)}"></i>${escapeHtml(a.name)}</td>
+      <td><i class="pw-dot" style="background:${powerSnapshotStale(d) ? "#6b7280" : powerStatusColor(a.utilization)}"></i>${escapeHtml(a.name)}</td>
       <td>${escapeHtml(a.fuel || "")}</td>
-      <td class="num">${a.tng_mw}</td>
-      <td class="num">${a.mc_mw}</td>
+      <td class="num">${Number.isFinite(a.tng_mw) ? a.tng_mw : "—"}</td>
+      <td class="num">${Number.isFinite(a.mc_mw) ? a.mc_mw : "—"}</td>
     </tr>`).join("");
   const panel = document.createElement("div");
   panel.id = "powerPanel";
@@ -6540,7 +6749,7 @@ function renderPowerPanel() {
     <div class="pw-header">
       <div>
         <strong>Alberta grid & site power</strong>
-        <span class="pw-sub">AESO ${escapeHtml(d.aeso_last_update || "")} · auto-refreshed every 30 min</span>
+        <span class="pw-sub">AESO ${escapeHtml(d.aeso_last_update || "")} · refresh scheduled every 30 min</span>
       </div>
       <button id="powerPanelClose" class="ref-close" title="Close">&#x2715;</button>
     </div>
@@ -6550,13 +6759,15 @@ function renderPowerPanel() {
       <span><em>Interchange</em>${fmtMW(sys.net_actual_interchange_mw)}</span>
     </div>
     <div class="pw-body">
+      ${powerSnapshotStale(d) ? '<p class="pw-stale">Stale snapshot. These values do not establish current site conditions.</p>' : ""}
+      ${state.powerError ? `<p class="pw-stale">Refresh failed: ${escapeHtml(state.powerError)}</p>` : ""}
       <p class="pw-note">Oil-sands / refining site cogeneration (map halos) — output vs capability:</p>
       <table class="pw-table"><thead><tr><th>Site</th><th class="num">TNG</th><th class="num">MC</th><th class="num">Util</th></tr></thead>
         <tbody>${cogenRows}</tbody></table>
       <p class="pw-note">ATCO-heritage fleet (Heartland Generation):</p>
       <table class="pw-table"><thead><tr><th>Unit</th><th>Fuel</th><th class="num">TNG</th><th class="num">MC</th></tr></thead>
         <tbody>${atcoRows}</tbody></table>
-      <p class="pw-foot">Cogen output is a public power-status proxy for each site, not metered consumption. Source: AESO Current Supply Demand.</p>
+      <p class="pw-foot">Cogeneration output does not establish a refinery or production-site outage. Net-to-grid units can report zero export while serving local demand. Source: AESO Current Supply Demand.</p>
     </div>`;
   document.getElementById("map").appendChild(panel);
   document.getElementById("powerPanelClose").addEventListener("click", () => {
@@ -6574,10 +6785,10 @@ function updatePowerToggleUI() {
     btn.textContent = "Loading...";
     btn.className = "railway-toggle-btn loading";
   } else if (state.powerEnabled) {
-    btn.textContent = "Power (on)";
+    btn.textContent = powerSnapshotStale() ? "Power (stale)" : "Power (on)";
     btn.className = "railway-toggle-btn active";
   } else {
-    btn.textContent = "Power";
+    btn.textContent = state.powerError ? "Power unavailable · retry" : "Power";
     btn.className = "railway-toggle-btn";
     if (state.powerError) btn.title = `Power status unavailable: ${state.powerError}`;
   }
@@ -6601,4 +6812,10 @@ function updatePowerToggleUI() {
     renderPowerPanel();
     updatePowerToggleUI();
   });
+  setInterval(async () => {
+    if (!state.powerEnabled || document.hidden) return;
+    await fetchPowerData();
+    renderPowerLayer();
+    renderPowerPanel();
+  }, 5 * 60000);
 })();

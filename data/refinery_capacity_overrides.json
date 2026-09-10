@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-10",
+  "note": "Targeted operator capacity and EIA/SEC operating-status reconciliation. This does not refresh the IIR process-unit inventory or certify all refinery capacities or current operations. Capacity bases and status observation dates vary as documented per source.",
+  "overrides": [
+    {
+      "plant_id": "1016744", "plant_name": "Sarnia Refinery (Suncor)", "capacity_bbl_d": 92000,
+      "source_name": "Suncor refining operations, 2026 rerating", "source_url": "https://www.suncor.com/en-ca/what-we-do/refining",
+      "effective_as_of": "2026-01-01", "basis": "Operator-rated nameplate crude capacity",
+      "supporting_url": "https://www.sec.gov/Archives/edgar/data/311337/000110465926090544/su-20260804xex99d2.htm"
+    },
+    {
+      "plant_id": "1021095", "plant_name": "Montreal Refinery", "capacity_bbl_d": 157000,
+      "source_name": "Suncor refining operations, 2026 rerating", "source_url": "https://www.suncor.com/en-ca/what-we-do/refining",
+      "effective_as_of": "2026-01-01", "basis": "Operator-rated nameplate crude capacity",
+      "supporting_url": "https://www.sec.gov/Archives/edgar/data/311337/000110465926090544/su-20260804xex99d2.htm"
+    },
+    {
+      "plant_id": "2013095", "plant_name": "Edmonton Refinery", "capacity_bbl_d": 159000,
+      "source_name": "Suncor refining operations, 2026 rerating", "source_url": "https://www.suncor.com/en-ca/what-we-do/refining",
+      "effective_as_of": "2026-01-01", "basis": "Operator-rated nameplate crude capacity",
+      "supporting_url": "https://www.sec.gov/Archives/edgar/data/311337/000110465926090544/su-20260804xex99d2.htm"
+    },
+    {
+      "plant_id": "1016745", "plant_name": "Sarnia Refinery (Shell)", "capacity_bbl_d": 85000,
+      "source_name": "Shell Sarnia Manufacturing Centre", "source_url": "https://www.shell.ca/en_ca/about-us/projects-and-sites/sarnia-manufacturing-centre.html",
+      "effective_as_of": null, "basis": "Operator-published crude processing capacity; effective date not specified"
+    },
+    {
+      "plant_id": "1016783", "plant_name": "Nanticoke Refinery", "capacity_bbl_d": 113000,
+      "source_name": "Imperial 2025 Form 10-K, Refining table", "source_url": "https://www.imperialoil.ca/-/media/imperial/files/2025-sec/2025-sec-form-10k-filing.pdf",
+      "effective_as_of": "2025-12-31", "basis": "Rated atmospheric input capacity; adjusted for regular repair and maintenance shutdowns"
+    },
+    {
+      "plant_id": "2001511", "plant_name": "Sarnia Refinery (Imperial)", "capacity_bbl_d": 124000,
+      "source_name": "Imperial 2025 Form 10-K, Refining table", "source_url": "https://www.imperialoil.ca/-/media/imperial/files/2025-sec/2025-sec-form-10k-filing.pdf",
+      "effective_as_of": "2025-12-31", "basis": "Rated atmospheric input capacity; adjusted for regular repair and maintenance shutdowns"
+    },
+    {
+      "plant_id": "2015165", "plant_name": "Strathcona Refinery", "capacity_bbl_d": 197000,
+      "source_name": "Imperial 2025 Form 10-K, Refining table", "source_url": "https://www.imperialoil.ca/-/media/imperial/files/2025-sec/2025-sec-form-10k-filing.pdf",
+      "effective_as_of": "2025-12-31", "basis": "Rated atmospheric input capacity; adjusted for regular repair and maintenance shutdowns"
+    },
+    {
+      "plant_id": "2003100", "plant_name": "Regina Refinery", "capacity_bbl_d": 130000,
+      "source_name": "Federated Co-operatives energy operations", "source_url": "https://www.fcl.crs/our-business/energy",
+      "effective_as_of": null, "basis": "Crude capacity per operating day; not calendar-day throughput",
+      "supporting_url": "https://www.fcl.crs/our-business/overview"
+    },
+    {
+      "plant_id": "2014206", "plant_name": "Burnaby Refinery", "capacity_bbl_d": 55000,
+      "source_name": "Sunoco March 2026 investor presentation, p.25", "source_url": "https://www.sunocolp.com/content/userfiles/files/March-2026-Investor-Presentation_vF.pdf",
+      "effective_as_of": "2026-03-01", "basis": "Approximate operational capacity; presentation month is the source observation period"
+    }
+  ],
+  "status_overrides": [
+    {
+      "plant_id": "1516659", "plant_name": "Paulsboro Refinery (CPI)",
+      "plant_status_desc": "Idle (EIA 2026-01-01 snapshot)",
+      "source_name": "EIA 2026 Refinery Capacity Report, Table 3, printed p.14 (PDF p.10)",
+      "source_url": "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf#page=10",
+      "effective_as_of": "2026-01-01",
+      "eia_idle_capacity_bbl_calendar_d": 32000,
+      "eia_idle_capacity_bbl_stream_d": 35000,
+      "note": "EIA identifies CPI Operations LLC, Paulsboro, as fully idle on January 1, 2026. This is separate from operating Paulsboro Refining Co LLC (IIR 1008919); a shared town or parent must not transfer the idle status to that complex. No subsequent dated restart was verified. IIR crude capacity and unit rows are retained on their original basis; EIA idle capacity is recorded separately."
+    },
+    {
+      "plant_id": "1026495", "plant_name": "Eagle Springs Refinery",
+      "plant_status_desc": "Idle (confirmed 2026-08-12; restart unverified)",
+      "source_name": "Sky Quarry Q2 2026 Form 10-Q, signed August 12, 2026, Note 3",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1812447/000109690626001217/skyq-20260630_10q.htm",
+      "effective_as_of": "2026-08-12",
+      "supporting_url": "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf#page=10",
+      "eia_status_as_of": "2026-01-01",
+      "eia_idle_capacity_bbl_calendar_d": 2000,
+      "eia_idle_capacity_bbl_stream_d": 5000,
+      "conflicting_undated_url": "https://skyquarry.com/",
+      "note": "EIA lists Foreland Refining Corp, Ely, as fully idle on January 1, 2026. Sky Quarry's Q2 Form 10-Q, signed August 12, explicitly says operations had not yet restarted as of the report date, despite earlier July startup plans. Its undated homepage describes active processing; no later dated confirmation of completed restart was verified. This is a dated status with restart uncertainty, not a September operating observation. Original IIR capacity and unit rows are retained; EIA idle capacities use different documented day bases."
+    }
+  ],
+  "unresolved": [
+    {"plant_id": "1019891", "plant_name": "Jean Gaulin Refinery", "note": "Current operator location page reports 235,000 bbl/d throughput capacity; operator history and IIR list 265,000 bbl/d. Capacity definition mismatch requires reconciliation before replacing crude capacity.", "sources": ["https://www.valero.com/about/locations/jean-gaulin-refinery", "https://www.valero.com/Company/History"]},
+    {"plant_id": "1067312", "plant_name": "Scotford Upgrader", "note": "Operator reports 320,000 boe/d of diluted bitumen. This is not comparable to the IIR 100,000 bbl/d crude field. No crude or finished-product proxy is assigned; operator ownership is 90% CNRL and 10% Shell, with Shell as operator.", "sources": ["https://www.shell.ca/en_ca/about-us/projects-and-sites/scotford.html"]}
+  ]
+}

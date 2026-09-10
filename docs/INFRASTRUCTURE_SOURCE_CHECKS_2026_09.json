@@ -1,0 +1,61 @@
+{
+  "verified_at": "2026-09-10T05:45:48.612777+00:00",
+  "sources": {
+    "cer_pipeline_systems": {
+      "url": "https://services5.arcgis.com/vNzamREXvX2WcX6d/arcgis/rest/services/CER_Pipeline_Systems_WGS84_WM_v/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 28,
+      "last_edit_at": "2024-11-12T02:51:56.464000+00:00",
+      "capabilities": "Query",
+      "status": "ok"
+    },
+    "eia_crude_pipelines": {
+      "url": "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 236,
+      "last_edit_at": "2025-11-03T18:06:14.714000+00:00",
+      "capabilities": "Query,Extract",
+      "status": "ok"
+    },
+    "eia_products_pipelines": {
+      "url": "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 329,
+      "last_edit_at": "2026-06-09T18:07:12.315000+00:00",
+      "capabilities": "Query,Extract",
+      "status": "ok"
+    },
+    "eia_hgl_pipelines": {
+      "url": "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 133,
+      "last_edit_at": "2026-04-09T13:39:53.839000+00:00",
+      "capabilities": "Query,Extract",
+      "status": "ok"
+    },
+    "narn_railways": {
+      "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
+      "where": "COUNTRY IN ('CA', 'US') AND NET IN ('M', 'I')",
+      "source_row_count": 110111,
+      "last_edit_at": "2026-07-22T18:03:40.808000+00:00",
+      "capabilities": "Query,Extract",
+      "status": "ok"
+    },
+    "eia_crude_rail_terminals": {
+      "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 99,
+      "last_edit_at": "2026-04-15T15:19:10.641000+00:00",
+      "capabilities": "Query",
+      "status": "ok"
+    },
+    "eia_product_terminals": {
+      "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
+      "where": "1=1",
+      "source_row_count": 1476,
+      "last_edit_at": "2020-06-05T22:44:51.023000+00:00",
+      "capabilities": "Query",
+      "status": "ok"
+    }
+  }
+}
