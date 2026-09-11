@@ -1152,6 +1152,8 @@ function initMap() {
     zoomControl: false,
     attributionControl: true,
     preferCanvas: true,
+    // Keep thin map lines easy to hover and tap without drawing wider strokes.
+    renderer: L.canvas({ tolerance: 5 }),
   }).setView([55.7, -112.0], 5);
 
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
@@ -4454,6 +4456,8 @@ function renderMarketPipelineTooltip(p) {
 function bindPipelineCard(layer, html) {
   layer.bindTooltip(html, { sticky: true, opacity: 1, className: 'pipeline-tip pipeline-detail-tip' });
   layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true });
+  layer.on('popupopen', () => layer.closeTooltip());
+  layer.on('mouseover', () => { if (layer.isPopupOpen()) layer.closeTooltip(); });
 }
 
 function renderMarketPipelineLayers() {

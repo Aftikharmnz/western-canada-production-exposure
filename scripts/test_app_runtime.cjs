@@ -147,10 +147,16 @@ test('pipeline hover cards and tap popups escape external facts and unsafe links
   assert.doesNotMatch(html, /<script>|<img|href="javascript:/);
   assert.match(html, /&lt;script&gt;/); assert.match(html, /&amp;destination/);
   const bindings = {};
+  const events = {};
+  let tooltipClosed = 0;
   a.bindPipelineCard({ bindTooltip: (value, options) => { bindings.hover = { value, options }; },
-    bindPopup: (value, options) => { bindings.tap = { value, options }; } }, html);
+    bindPopup: (value, options) => { bindings.tap = { value, options }; },
+    on: (event, handler) => { events[event] = handler; },
+    closeTooltip: () => { tooltipClosed++; }, isPopupOpen: () => true }, html);
   assert.equal(bindings.hover.value, html); assert.equal(bindings.tap.value, html);
   assert.equal(bindings.hover.options.sticky, true); assert.equal(bindings.tap.options.autoPan, true);
+  events.popupopen(); events.mouseover();
+  assert.equal(tooltipClosed, 2, 'A pinned card hides the duplicate hover card, including on re-entry');
 });
 
 test('late pipeline tiles remain cached but hidden after zooming out or panning away', async () => {
