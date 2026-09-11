@@ -1,0 +1,2 @@
+# Generated manifests record exact file sizes; preserve published bytes on every OS.
+public/data/** -text
