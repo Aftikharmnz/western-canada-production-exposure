@@ -2610,16 +2610,16 @@ function updateRefineryToggleUI() {
   }
 }
 
-// WILDFIRE  —  CWFIS live feed (WFS hotspots_24h, Western Canada bbox)
+// WILDFIRE  —  CWFIS live feed (WFS hotspots_last24hrs, Western Canada bbox)
 // ============================================================
 
-// CWFIS GeoServer WFS — hotspots updated every 10 min; CQL filter keeps only
+// CWFIS GeoServer WFS — current 24-hour layer; CQL filter keeps only
 // points inside Western Canada (lat 49–72, lon –141 to –94).
 // The WFS geometry is in a projected CRS; real coords are in properties.lat/lon.
 const CWFIS_URL =
   "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wfs" +
   "?service=WFS&version=1.1.0&request=GetFeature" +
-  "&typeName=public:hotspots_24h" +
+  "&typeName=public:hotspots_last24hrs" +
   "&outputFormat=application%2Fjson" +
   "&CQL_FILTER=lat%3E49%20AND%20lat%3C72%20AND%20lon%3E-141%20AND%20lon%3C-94" +
   "&maxFeatures=2000";
@@ -4075,8 +4075,8 @@ function renderFireLayer() {
 
 // ============================================================
 // PIPELINE LAYER — AER Feeder Pipelines + Installations
-// 32 550 operating feeder segments + 5 502 pipeline installations
-// Data source: AER Pipeline Spatial Dataset (GCS NAD83 ≈ WGS84)
+// Counts and source dates come from the validated AER index.
+// Data source: AER Pipeline Spatial Dataset (NAD83 transformed to WGS84)
 // ============================================================
 
 const PIPELINE_SUBSTANCE_COLOR = {
@@ -4416,6 +4416,46 @@ function renderMarketHubPopup(p) {
   return `<div class="market-hub-popup-inner">${renderMarketHubTooltip(p)}</div>`;
 }
 
+function pipelineCardRows(rows) {
+  return `<div class="pt-route">${rows.map(([label, value]) =>
+    `<span class="pt-route-label">${escapeHtml(label)}</span><span class="pt-route-val">${escapeHtml(value)}</span>`
+  ).join('')}</div>`;
+}
+
+function renderMarketPipelineTooltip(p) {
+  const details = p.pipeline_details || {};
+  const capacity = Number(details.capacity_kbbl_d);
+  const capacityText = Number.isFinite(capacity) && capacity > 0
+    ? `${(capacity * 1000).toLocaleString('en-CA', { maximumFractionDigits: 0 })} bbl/d`
+    : details.capacity_label || 'Not published';
+  const basis = String(details.capacity_basis || 'not_published').replaceAll('_', ' ');
+  const capacityTitle = details.capacity_basis === 'multiple_systems' ? 'Published component capacities'
+    : ['operating', 'available', 'initial'].includes(details.capacity_basis)
+      ? `Published ${basis} capacity` : 'Nameplate / rated capacity';
+  const source = safeHttpUrl(details.source_url);
+  const routeSource = safeHttpUrl(details.route_source_url);
+  return `<div class="pipeline-card">` +
+    `<div class="pipeline-card-kind">Market access pipeline</div>` +
+    `<strong class="pipeline-card-title">${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
+    `<div class="pt-sub">${escapeHtml(p.operator || 'Operator not published')}</div>` +
+    `<div class="pipeline-card-capacity"><span>${escapeHtml(capacityTitle)}</span><strong>${escapeHtml(capacityText)}</strong>` +
+    `${details.capacity_basis && details.capacity_basis !== 'not_published' ? `<small>${escapeHtml(basis)}</small>` : ''}</div>` +
+    pipelineCardRows([['Product', details.product || p.commodity || 'Not published'], ['Origin', details.origin || 'Not published'], ['Destination', details.destination || 'Not published']]) +
+    `${details.capacity_note ? `<div class="pipeline-card-note">${escapeHtml(details.capacity_note)}</div>` : ''}` +
+    `${p.status_note ? `<div class="pipeline-card-note">${escapeHtml(p.status_note)}</div>` : ''}` +
+    `${p.geometry_note || p.coverage_note ? `<div class="pipeline-card-note">${escapeHtml(p.geometry_note || p.coverage_note)}</div>` : ''}` +
+    `<div class="pipeline-card-source">${source ? `<a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(details.source_name || 'Capacity source')}</a>` : 'Capacity not provided by the mapped GIS layer'}` +
+    `${routeSource && routeSource !== source ? ` · <a href="${escapeHtml(routeSource)}" target="_blank" rel="noopener noreferrer">Route source</a>` : ''}` +
+    `${details.as_of ? `<br>Source basis: ${escapeHtml(details.as_of)}` : ''}` +
+    `${details.verified_at ? `<br>Reviewed ${escapeHtml(details.verified_at)}` : ''}</div>` +
+    `<div class="pipeline-card-footer">${escapeHtml(p.geometry_confidence || 'Route-level map')}. Products describe service, not the current batch. Click or tap to keep this card open.</div></div>`;
+}
+
+function bindPipelineCard(layer, html) {
+  layer.bindTooltip(html, { sticky: true, opacity: 1, className: 'pipeline-tip pipeline-detail-tip' });
+  layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true });
+}
+
 function renderMarketPipelineLayers() {
   if (!state.map || !window.L) return;
   if (state.marketPipelineLineLayer) {
@@ -4433,22 +4473,7 @@ function renderMarketPipelineLayers() {
     state.marketPipelineLineLayer = L.geoJSON({ type: 'FeatureCollection', features: lineFeatures }, {
       style: marketPipelineStyle,
       onEachFeature(feature, layer) {
-        const p = feature.properties || {};
-        const source = p.source_summary || 'public GIS';
-        const confidence = p.geometry_confidence || 'route-level linework';
-        layer.bindTooltip(
-          `<div>` +
-          `<strong>${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
-          `<div class="pt-sub">${escapeHtml(p.operator || '')}${p.commodity ? ' · ' + escapeHtml(p.commodity) : ''}</div>` +
-          `<div class="pt-sub">${escapeHtml(p.flow_role || '')}</div>` +
-          `<div class="pt-route">` +
-          `<span class="pt-route-label">Source</span><span class="pt-route-val">${escapeHtml(source)}</span>` +
-          `<span class="pt-route-label">Direction</span><span class="pt-route-val">${escapeHtml(p.direction || '—')}</span>` +
-          `</div>` +
-          `<div class="pt-sub" style="margin-top:4px">${escapeHtml(source)} · ${escapeHtml(confidence)}</div>` +
-          `</div>`,
-          { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
-        );
+        bindPipelineCard(layer, renderMarketPipelineTooltip(feature.properties || {}));
       },
     }).addTo(state.map);
   }
@@ -4927,32 +4952,34 @@ function pipelineSegmentStyle(feature) {
   return { color: col, weight: w, opacity: 0.62 };
 }
 
-function bindPipelineSegmentTooltip(feature, layer) {
-  const p     = feature.properties || {};
+function renderPipelineSegmentTooltip(p) {
   const sub   = p.substance || 'Unknown';
   const badge = PIPELINE_SUBSTANCE_BADGE[sub] || '';
-  const from  = [p.from_fac, p.from_loc].filter(Boolean).join(' @ ') || '—';
-  const to    = [p.to_fac,   p.to_loc  ].filter(Boolean).join(' @ ') || '—';
+  const from  = [p.from_fac, p.from_loc].filter(Boolean).join(' · ') || 'Not published';
+  const to    = [p.to_fac,   p.to_loc  ].filter(Boolean).join(' · ') || 'Not published';
   const diam  = p.diameter_mm ? `${p.diameter_mm} mm OD` : '—';
   const maop  = p.maop_kpa ? `${Number(p.maop_kpa).toLocaleString('en-CA')} kPa MAOP` : '';
   const len   = p.length_km ? `${p.length_km} km` : '';
-  const h2s   = p.h2s_pct && p.h2s_pct !== '0' ? `H₂S ${p.h2s_pct}%` : '';
+  const h2s   = p.h2s_pct != null && Number.isFinite(Number(p.h2s_pct)) ? `H₂S ${Number(p.h2s_pct).toLocaleString('en-CA', { maximumFractionDigits: 5 })}%` : '';
   const env   = p.environ || '';
   const extras = [maop, len, h2s, env].filter(Boolean).join(' · ');
 
-  layer.bindTooltip(
-    `<div>` +
-    `<strong><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.company || '—')}</strong>` +
-    `<div class="pt-sub">Licence ${escapeHtml(p.licence || '—')} · ${escapeHtml(p.field_ctr || '—')}</div>` +
-    `<div class="pt-route">` +
-    `<span class="pt-route-label">From</span><span class="pt-route-val">${escapeHtml(from)}</span>` +
-    `<span class="pt-route-label">To</span><span class="pt-route-val">${escapeHtml(to)}</span>` +
-    `</div>` +
-    `<div class="pt-sub" style="margin-top:4px">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
+  const name = p.pipeline_name || `Licence ${p.licence || '—'} · segment ${p.segment_line || p.segment_id || '—'}`;
+  return `<div class="pipeline-card">` +
+    `<div class="pipeline-card-kind">AER feeder pipeline</div>` +
+    `<strong class="pipeline-card-title">${escapeHtml(name)}</strong>` +
+    `<div class="pt-sub">${escapeHtml(p.company || 'Operator not published')}</div>` +
+    `<div class="pt-sub"><span class="pt-badge ${badge}">${escapeHtml(sub)}</span>${escapeHtml(p.status || '')}</div>` +
+    `<div class="pipeline-card-capacity"><span>Nameplate capacity</span><strong>Not published</strong><small>AER's spatial source does not report capacity or a commercial pipeline name.</small></div>` +
+    pipelineCardRows([['Product', [...new Set([p.substance, p.substance2, p.substance3].filter(Boolean))].join(' / ') || 'Not published'], ['Origin', from], ['Destination', to]]) +
+    `<div class="pipeline-card-note">${escapeHtml(diam)}${extras ? ' · ' + escapeHtml(extras) : ''}</div>` +
     `${p.material ? `<div class="pt-sub">${escapeHtml(p.material)}${p.joint ? ' · ' + escapeHtml(p.joint) : ''}</div>` : ''}` +
-    `</div>`,
-    { sticky: true, opacity: 0.96, className: 'pipeline-tip' }
-  );
+    `<div class="pipeline-card-source"><a href="https://www.aer.ca/data/pipeline/Pipelines_SHP.zip" target="_blank" rel="noopener noreferrer">AER Pipeline Spatial Dataset</a></div>` +
+    `<div class="pipeline-card-footer">Licensed endpoints; flow direction may vary. Click or tap to keep this card open.</div></div>`;
+}
+
+function bindPipelineSegmentTooltip(feature, layer) {
+  bindPipelineCard(layer, renderPipelineSegmentTooltip(feature.properties || {}));
 }
 
 function bindPipelineInstallTooltip(feature, layer) {
@@ -5360,6 +5387,10 @@ async function syncPipelineTileCategory(key, entry, visible) {
   await Promise.all(needed.map(async (coord) => {
     const layer = await ensurePipelineTileLayer(key, entry, coord, store);
     if (!layer || !state.map || !state.pipelineEnabled || !legendVisible(key)) return;
+    // Requests may finish after a pan or zoom. Cache the result, but only show
+    // tiles that the current viewport still needs.
+    if (state.map.getZoom() < PIPELINE_TILE_MIN_MAP_ZOOM) return;
+    if (!visiblePipelineTileCoords(entry).some((current) => current.id === coord.id)) return;
     if (!state.map.hasLayer(layer)) layer.addTo(state.map);
   }));
 }

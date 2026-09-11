@@ -71,6 +71,10 @@ Monthly updates replace whole source/month observations, including revised quant
 
 The AER infrastructure builder validates matching features and properties across full layers, menu categories, tiles, and their index. It stages the complete family and installs the index last. Any AER download, transformation, validation, or installation failure rejects the whole infrastructure candidate, including otherwise successful optional refreshes. A partially updated index/category/tile combination cannot become the published app bundle.
 
+Market-access routes read the validated candidate feeder file through `--aer-feeder-input`, so their AER-derived sections use the same geometry as the released feeder layer. Infrastructure **Last data update** advances for changed geometry, feature properties, category/tile coverage, or substantive metadata such as units and builder version. Refreshed timestamps and raw download receipts remain visible as check/source evidence without being labelled new map data.
+
+`data/pipeline_route_facts.json` supplies reviewed origins, destinations, transported products, and capacity details by stable route ID. Product descriptions identify supported service, not the contents of a current batch. Every shipped route must have an entry; unknown or missing IDs, invalid capacities, and malformed source references reject a rebuild. The builder publishes these facts as `pipeline_details` and preserves their verification dates while geometry updates automatically. Composite networks can explicitly have no single capacity. A concurrent edit to this facts file requires a fresh candidate before publication.
+
 The publication helper stages only explicitly listed generated files. It fetches current `main` before pushing and allows unrelated AESO changes to remain in place. Overlapping candidate data or parser changes require a fresh run from `main`; the job does not force-push over them. Same-family workflow concurrency also prevents competing refreshes from publishing overlapping candidates.
 
 The existing AESO alert job and recipients are unchanged. The production and infrastructure pipelines do not invoke alert delivery.

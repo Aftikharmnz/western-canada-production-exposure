@@ -76,6 +76,40 @@ def write_fixture(path, kind, rows=None, mismatch=False, wrong_crs=False, null_s
 
 
 class AerInfrastructureTests(unittest.TestCase):
+    def test_h2s_source_units_zero_missing_and_physical_range(self):
+        for missing in (None, "", "   "):
+            self.assertEqual(aer.h2s_fields(missing), {})
+        self.assertEqual(aer.h2s_fields("0"), {"h2s_mol_kmol": 0.0, "h2s_pct": 0.0})
+        self.assertEqual(aer.h2s_fields("34"), {"h2s_mol_kmol": 34.0, "h2s_pct": 3.4})
+        self.assertEqual(aer.h2s_fields("9.99"), {"h2s_mol_kmol": 9.99, "h2s_pct": 0.999})
+        self.assertEqual(aer.h2s_fields("999")["h2s_pct"], 99.9)
+        self.assertEqual(aer.h2s_fields(1000)["h2s_pct"], 100.0)
+        for invalid in (-0.01, "1000.01", "NaN", "Infinity", float("-inf"), "unknown", True):
+            with self.subTest(value=invalid), self.assertRaises(ValueError):
+                aer.h2s_fields(invalid)
+
+    def test_source_attributes_are_preserved_and_h2s_is_converted_for_both_layers(self):
+        for kind in aer.SOURCES:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory(dir=aer.ROOT) as directory:
+                work = Path(directory)
+                rows = rows_for(kind)
+                rows[0]["H2S_CONT"], rows[1]["H2S_CONT"], rows[2]["H2S_CONT"] = "34", "0", ""
+                if kind == "pipelines":
+                    rows[0].update(PIPE_ENVIR="River Crossing", SUBSTANCE2="Crude Oil", SUBSTANCE3="Condensate", IS_NEB="N")
+                result = aer.convert_archive(write_fixture(work / "source.zip", kind, rows), kind, work)
+                id_key = "segment_id" if kind == "pipelines" else "inst_id"
+                by_id = {f["properties"][id_key]: f["properties"] for f in result["features"]}
+                prefix = "" if kind == "pipelines" else "200-"
+                nonzero, zero, missing = (by_id[prefix + str(i)] for i in (1, 2, 3))
+                self.assertEqual((nonzero["h2s_mol_kmol"], nonzero["h2s_pct"]), (34, 3.4))
+                self.assertEqual((zero["h2s_mol_kmol"], zero["h2s_pct"]), (0, 0))
+                self.assertNotIn("h2s_mol_kmol", missing)
+                self.assertNotIn("h2s_pct", missing)
+                self.assertEqual(result["metadata"]["attribute_units"], aer.H2S_UNITS)
+                if kind == "pipelines":
+                    self.assertEqual({k: nonzero[k] for k in aer.OPTIONAL_FIELDS}, {"environ": "River Crossing", "substance2": "Crude Oil", "substance3": "Condensate", "is_neb": "N"})
+                    self.assertNotIn("environ", missing)
+
     def test_short_parts_keep_precision_and_zero_length_parts_do_not_destroy_valid_linework(self):
         shape = shapefile.Shape(shapeType=3)
         shape.parts = [0, 2, 4]
@@ -204,6 +238,24 @@ class AerInfrastructureTests(unittest.TestCase):
                  patch.object(aer, "install_outputs") as install, redirect_stdout(io.StringIO()):
                 self.assertEqual(aer.main(), 1)
                 install.assert_not_called()
+
+    def test_output_validator_rejects_legacy_tenfold_h2s_unit_error(self):
+        with tempfile.TemporaryDirectory(dir=aer.ROOT) as directory:
+            work = Path(directory)
+            layers = {}
+            for kind in aer.SOURCES:
+                rows = rows_for(kind)
+                rows[0]["H2S_CONT"] = "34"
+                layers[kind] = aer.convert_archive(write_fixture(work / (kind + ".zip"), kind, rows), kind, work)
+            # Keep every category/tile internally consistent but use the legacy
+            # mistaken percentage. Validation must check the unit calculation.
+            for feature in layers["pipelines"]["features"]:
+                if "h2s_pct" in feature["properties"]:
+                    feature["properties"]["h2s_pct"] = 34
+            checks = {kind: dict(sha256="test", retrieved_at="2026-09-10T00:00:00Z") for kind in layers}
+            stage = work / "stage"
+            aer.stage_outputs(stage, layers, checks)
+            self.assertTrue(any("H2S conversion is invalid" in error for error in aer.validate_outputs(stage)))
 
     def test_failure_does_not_modify_existing_candidate_files(self):
         with tempfile.TemporaryDirectory(dir=aer.ROOT) as directory:

@@ -1,0 +1,54 @@
+# Reviewed pipeline hover facts
+
+Reviewed **11 September 2026**. `data/pipeline_route_facts.json` covers the exact 24 market-route IDs in `scripts/build_market_access_pipelines.py`. The builder validates the file and joins each record as `properties.pipeline_details`; it does not derive capacities from map geometry.
+
+The records contain product, origin, destination, capacity value/basis/note, primary source links and review dates. Product describes the published transportation service, not a live batch. `capacity_kbbl_d` is thousands of barrels per day; the client multiplies by 1,000 for bbl/d. Null means unavailable or inapplicable, never zero.
+
+Eight records have a sourced numeric capacity, thirteen represent multiple lines or systems, and three have no verified current capacity in the reviewed primary sources. A grouped route can contain interconnected, parallel or unrelated lines; summing their ratings would be misleading. Component ratings are explained in the note where available.
+
+## Capacity interpretation
+
+| Route | Displayed capacity treatment | Primary reference |
+| --- | --- | --- |
+| Enbridge Mainline / Lakehead | Multiple systems; distinguish the ex-Gretna and into-Sarnia nameplate ratings. | [CER Mainline profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/enbridge-canadian-mainline) |
+| Enbridge Line 9 | 300 kbbl/d operating capacity. | [CER Line 9 profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/enbridge-line-9) |
+| Enbridge Bakken / North Dakota | Multiple lines; the Canadian Line 26 rating cannot describe the entire gathering network. | [CER Bakken profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/enbridge-bakken), [Enbridge 2025 report](https://www.enbridge.com/~/media/Enb/Documents/Investor-Relations/NoticeAndAccess/2026/ENB_2025_Annual_Report_EN.pdf?hash=3AC33A8767949550990ACA7684ED7772&rev=b158e24fe41d45f5af4f3178958a071e) |
+| Enbridge U.S. downstream laterals | Multiple systems and delivery paths. | [Enbridge infrastructure factsheets](https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6) |
+| Trans Mountain / Puget Sound | Separate mainline and branch ratings; no additive capacity. | [Trans Mountain Q3 2025 report, pages 2–3](https://docs.transmountain.com/Corporate-Reports/TMC-09.30.25-Management-Report-Final_EN.pdf) |
+| Keystone | 591 kbbl/d Canadian mainline nameplate; downstream constraints differ. | [CER Keystone profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/keystone), [South Bow route](https://www.southbow.com/keystone-pipeline-system/) |
+| Express / Platte | Separate Express and section-dependent Platte capacities. | [Enbridge 2025 report, page 19](https://www.enbridge.com/~/media/Enb/Documents/Investor-Relations/NoticeAndAccess/2026/ENB_2025_Annual_Report_EN.pdf?hash=3AC33A8767949550990ACA7684ED7772&rev=b158e24fe41d45f5af4f3178958a071e) |
+| Southern Lights | 198 kbbl/d annual-average operating capacity. | [Enbridge 2025 report, page 19](https://www.enbridge.com/~/media/Enb/Documents/Investor-Relations/NoticeAndAccess/2026/ENB_2025_Annual_Report_EN.pdf?hash=3AC33A8767949550990ACA7684ED7772&rev=b158e24fe41d45f5af4f3178958a071e) |
+| Cochin | 110 kbbl/d annual-average operating capacity. | [Pembina 2025 AIF, PDF page 38](https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf) |
+| Wascana | Approximately 40 kbbl/d; nominal published rating. | [CER Wascana profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/wascana) |
+| Westspur | Approximately 247.4 kbbl/d; nominal published system rating. | [CER Westspur profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/westspur) |
+| Rangeland / Aurora / Glacier | Component capacities vary; Aurora's short border link is not the whole route. | [CER Aurora profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/aurora), [Plains April 2024 map](https://www.plains.com/wp-content/uploads/2024/12/PMC_RangelandApril2024_Screenview.pdf), [Phillips 66 Glacier agreement](https://www.sec.gov/Archives/edgar/data/1572910/000157291017000039/mlp-2017630_exhibit101.htm) |
+| Milk River | Approximately 97.9 kbbl/d; nominal published rating. | [CER Milk River profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/milk-river) |
+| Enbridge Lines 7 / 11 | Separate annual-average line ratings. | [Enbridge factsheets, pages 20 and 23](https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6) |
+| Trans-Northern | Capacities depend on the segment; no single eastern-network rating. | [CER Trans-Northern profile](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/trans-northern), [operator eastern system](https://tnpi.ca/ontario-quebec/) |
+| Imperial Sarnia Products | Current capacity not published in the reviewed sources. | [Imperial system description](https://www.imperialoil.ca/en-ca/company/waterdown-to-finch), [Imperial OEB filing, 28 October 2019](https://www.rds.oeb.ca/CMWebDrawer/Record/656705/File/document) |
+| Sun-Canadian | Current capacity not published in the reviewed operator description. | [Sun-Canadian](https://sun-canadian.com/about-us/) |
+| Valero Pipeline Saint-Laurent | Current installed capacity not verified; historical proposals are excluded. | [Valero current system description](https://www.valero.com/fr-ca/Operations/PipelineSaint-Laurent) |
+| Vantage / Stateline II | System rating retained in the note; separate lateral rating unverified. | [Pembina 2025 AIF, PDF page 38](https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf) |
+| Norman Wells / Zama | Historical 15 kbbl/d annual-average rating; no claim of current availability. | [Enbridge factsheet, page 26](https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6), [Imperial closure update](https://www.imperialoil.ca/en-ca/company/operations/norman-wells) |
+| Other CER liquid systems | Genesis and Montréal are unrelated networks with different products and capacities. | [CER Genesis](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/genesis), [CER Montréal](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/montreal) |
+| U.S. crude-oil reference | National collection; capacity and endpoint fields absent. | [EIA crude GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0) |
+| U.S. products reference | National collection; capacity and endpoint fields absent. | [EIA products GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0) |
+| U.S. HGL reference | National collection; capacity and endpoint fields absent. | [EIA HGL GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0) |
+
+## Review decisions and source differences
+
+- **Southern Lights:** use the completed-expansion figure in Enbridge's year-end report. Older factsheets describe 180 kbbl/d. The [21 January 2025 CER order](https://docs2.cer-rec.gc.ca/ll-eng/llisapi.dll/4518596/C33152-3_Commission_-_Order_XO-001-2025_-_Enbridge_Southern_Lights_GP_Inc._on_behalf_of_Enbridge_Southern_Lights_LP_-_Line_13_Expansion_Project_-_A9G5G7.pdf?func=doc.Fetch&nodeid=4518596) explains the approximately 10% annual-average expansion; an approval alone would not have demonstrated completion.
+- **Cochin:** the CER profile contains an older 95 kbbl/d narrative alongside a 110 kbbl/d details table. Pembina's AIF, dated 26 February 2026, directly supports the latter and explicitly defines annual-average capacity. It is therefore labelled operating, not nameplate or observed throughput.
+- **Trans Mountain:** proposed optimization capacity is excluded. The [August 2026 project description](https://engage.transmountain.com/mainline-optimization) still distinguishes existing capacity from future additions.
+- **Trans-Northern:** the operator's 172,900 bbl/d shipment average is throughput. It is not used as capacity.
+- **Saint-Laurent:** the [Québec assessment dated 3 September 2009, PDF page 17](https://www.environnement.gouv.qc.ca/evaluations/decret/2009/1096-2009.pdf) describes a 100–170 kbbl/d project with additional future pumping stations. The current operator page does not establish which capacity is installed. No historical proposed figure is presented as current nameplate.
+- **Vantage:** the current AIF supports a 68 kbbl/d system including gathering laterals. The [operator's 2018 brochure](https://www.pembina.com/getmedia/f3b7b2f0-c68f-44b6-83a2-4179c249383d/US-VantageBrochure-2018-Final2.pdf) names Tioga and Stateline supply and the West Spur lateral, while the GIS uses Stateline II. This does not justify a separate lateral rating or summing capacities.
+- **Norman Wells:** Imperial confirms its production shut-in in August 2026. The older pipeline rating is retained only as historical context; the review does not establish the pipeline's regulatory deactivation or abandonment status.
+
+## Endpoints, geometry and future refreshes
+
+Endpoints describe reviewed transportation routes. They are distinct from first/last GIS coordinates, which can be stored in either order and may cover only portions of a system. The Lines 7/11 source geometry, for example, omits part of the Westover–Hamilton connection. Approximate provincial product corridors retain their geometry-confidence labels. National EIA reference layers expose names and operators, but no explicit endpoint or capacity fields; the UI must show the resulting limitation rather than reverse-geocode endpoints into a claim of flow direction.
+
+The review corrected Milk River's legacy Plains ownership label to Inter Pipeline / Milk River Pipeline Ltd. and Lines 7/11's route description to Sarnia–Westover–Nanticoke. Valero's old URL redirects to a general homepage, so the current direct route page is cited.
+
+`verified_at` records the human/source review date. `as_of` preserves the source's actual reporting period or the fact that a page is undated. A GIS download date, successful HTTP response or unchanged page fingerprint must not advance either date automatically. These records should change only after rechecking primary evidence. Capacities remain planning references, separate from current nominations, tariffs, apportionment, pressure restrictions and observed flows.

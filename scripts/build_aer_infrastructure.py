@@ -21,6 +21,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from zipfile import ZipFile
@@ -34,8 +35,10 @@ LINE_CATEGORIES = {"Oil-Well Effluent": "pipe-oilwell", "Crude Oil": "pipe-crude
 INSTALL_CATEGORIES = {"Pump Station": "inst-pump", "Compressor Station": "inst-compressor", "Oil Terminal": "inst-terminal", "Tank Farm": "inst-terminal", "Meter Station": "inst-meter", "Regulator Station": "inst-meter", "Meter Regulator Stn.": "inst-meter", "Line Heater": "inst-meter"}
 LINE_STATUSES = {"Operating", "Permitted"}
 INSTALL_STATUSES = {"Operating", "Permitted", "Suspended"}
-PIPE_FIELDS = {"licence": "LICENCE_NO", "segment_id": "PLLICSEGID", "segment_line": "LINE_NO", "company": "COMP_NAME", "status": "SEG_STATUS", "substance": "SUBSTANCE1", "from_fac": "FROM_FAC", "from_loc": "FROM_LOC", "to_fac": "TO_FAC", "to_loc": "TO_LOC", "diameter_mm": "OUT_DIAMET", "maop_kpa": "PIPE_MAOP", "material": "PIP_MATERL", "length_km": "SEG_LENGTH", "field_ctr": "FLD_CTR_NM", "joint": "JOINTMETHD", "geometry_source": "GEOM_SRCE"}
-INSTALL_FIELDS = {"licence": "INSTA_LIC", "inst_id": "LICINSTNO", "company": "BA_NAME", "type": "INSTA_TYPE", "status": "PLINSTATUS", "substance": "SUBSTANCE1", "location": "INST_LOCAT", "field_ctr": "FLD_CENTRE", "power_kw": "POWER", "prime_source": "PRIME_SORC", "geometry_source": "GEOM_SRCE"}
+PIPE_FIELDS = {"licence": "LICENCE_NO", "segment_id": "PLLICSEGID", "segment_line": "LINE_NO", "company": "COMP_NAME", "status": "SEG_STATUS", "substance": "SUBSTANCE1", "from_fac": "FROM_FAC", "from_loc": "FROM_LOC", "to_fac": "TO_FAC", "to_loc": "TO_LOC", "diameter_mm": "OUT_DIAMET", "maop_kpa": "PIPE_MAOP", "material": "PIP_MATERL", "length_km": "SEG_LENGTH", "field_ctr": "FLD_CTR_NM", "joint": "JOINTMETHD", "geometry_source": "GEOM_SRCE", "h2s_mol_kmol": "H2S_CONT", "environ": "PIPE_ENVIR", "substance2": "SUBSTANCE2", "substance3": "SUBSTANCE3", "is_neb": "IS_NEB"}
+INSTALL_FIELDS = {"licence": "INSTA_LIC", "inst_id": "LICINSTNO", "company": "BA_NAME", "type": "INSTA_TYPE", "status": "PLINSTATUS", "substance": "SUBSTANCE1", "location": "INST_LOCAT", "field_ctr": "FLD_CENTRE", "power_kw": "POWER", "prime_source": "PRIME_SORC", "geometry_source": "GEOM_SRCE", "h2s_mol_kmol": "H2S_CONT"}
+OPTIONAL_FIELDS = {"environ", "substance2", "substance3", "is_neb"}
+H2S_UNITS = {"h2s_mol_kmol": "mol/kmol", "h2s_pct": "mole percent (mol/100 mol)"}
 MAX_DOWNLOAD = 300 * 1024 * 1024
 MAX_EXPANDED = 1400 * 1024 * 1024
 TILE_ZOOM = 8
@@ -140,6 +143,32 @@ def normalize(value):
             raise ValueError("Non-finite AER attribute")
         return format(value, ".15g")
     return str(value).strip()
+
+
+def h2s_fields(value):
+    """Preserve licensed source content and convert mol/kmol to mole percent.
+
+    AER Manual 012 defines pipeline H2S content in mol/kmol; the Enhanced
+    Pipeline Graphics layout specifies the same unit for installations. Missing
+    source values remain missing, while an explicit zero remains reported zero.
+    """
+    text = normalize(value)
+    if not text:
+        return {}
+    try:
+        amount = Decimal(text)
+    except InvalidOperation as error:
+        raise ValueError("Invalid AER H2S content; expected mol/kmol") from error
+    if not amount.is_finite() or not 0 <= amount <= 1000:
+        raise ValueError("AER H2S content must be finite and between 0 and 1000 mol/kmol")
+    return {"h2s_mol_kmol": float(amount), "h2s_pct": float(amount / 10)}
+
+
+def clean_properties(row, fields):
+    props = {name: normalize(row[field]) for name, field in fields.items()
+             if name != "h2s_mol_kmol" and (name not in OPTIONAL_FIELDS or normalize(row[field]))}
+    props.update(h2s_fields(row["H2S_CONT"]))
+    return props
 
 
 def mapped_csv_records(archive, source):
@@ -270,7 +299,7 @@ def convert_archive(path, kind, work_dir):
                     continue
                 if not identity:
                     raise ValueError("AER selected feature has an empty source identity")
-                props = {name: normalize(row[field]) for name, field in fields.items()}
+                props = clean_properties(row, fields)
                 if kind == "pipelines":
                     length = props["length_km"]
                     if not length or float(length) < 0:
@@ -302,6 +331,9 @@ def convert_archive(path, kind, work_dir):
     metadata = dict(source_name="AER Enhanced Pipeline Graphics File", source_url=source["url"],
                     source_crs="EPSG:4269", output_crs="EPSG:4326", coordinate_transform=transform.description,
                     transform_accuracy_m=transform.accuracy, counts=dict(stats),
+                    attribute_units=H2S_UNITS,
+                    h2s_basis="AER licensed substance content; not ambient air concentration. Percent = mol/kmol divided by 10.",
+                    attribute_source_urls=["https://www.aer.ca/data/pipeline/EnhancedPipeline_Layout.pdf", "https://www.aer.ca/documents/manuals/Manual012.pdf"],
                     scope="Selected mapped Operating/Permitted liquid pipeline categories." if kind == "pipelines" else "All mapped installations; category menus include Operating, Permitted and Suspended statuses.",
                     limitations=["Unmapped CSV records have no coordinates and are excluded from map geometry.",
                                  "Absence from a later source is not evidence of physical removal or closure.",
@@ -374,7 +406,7 @@ def publication_check(check, baseline, kind):
 
 
 def stage_outputs(stage, layers, checks):
-    index = dict(version=2, generated_at=now(), builder_version=1, line_categories={}, installation_categories={},
+    index = dict(version=2, generated_at=now(), builder_version=2, line_categories={}, installation_categories={},
                  sources=checks, filters={"pipeline_statuses": sorted(LINE_STATUSES), "pipeline_substances": sorted(LINE_CATEGORIES),
                                          "installation_menu_statuses": sorted(INSTALL_STATUSES)})
     for kind, name in (("pipelines", "aer_feeder_pipelines.geojson"), ("installations", "aer_pipeline_installations.geojson")):
@@ -462,9 +494,19 @@ def validate_outputs(data_dir):
                 errors.append(f"{name}: published feature count does not reconcile")
             if data.get("metadata", {}).get("source_sha256") != index.get("sources", {}).get(kind, {}).get("sha256"):
                 errors.append(f"{name}: source hash differs from the index")
+            if index["builder_version"] >= 2 and data.get("metadata", {}).get("attribute_units") != H2S_UNITS:
+                errors.append(f"{name}: missing or incorrect H2S unit metadata")
             grouped = collections.defaultdict(dict)
             for feature_id, feature in features.items():
                 props, geometry = feature.get("properties") or {}, feature.get("geometry") or {}
+                if index["builder_version"] >= 2:
+                    has_raw, has_percent = "h2s_mol_kmol" in props, "h2s_pct" in props
+                    if has_raw != has_percent:
+                        errors.append(f"{name}: H2S source/percent fields do not reconcile for {feature_id}")
+                    elif has_raw:
+                        values = [props["h2s_mol_kmol"], props["h2s_pct"]]
+                        if any(isinstance(value, bool) or not isinstance(value, (int, float)) for value in values) or props != dict(props, **h2s_fields(props["h2s_mol_kmol"])):
+                            errors.append(f"{name}: H2S conversion is invalid for {feature_id}")
                 if kind == "pipelines":
                     if geometry.get("type") not in {"LineString", "MultiLineString"} or props.get("status") not in LINE_STATUSES or props.get("substance") not in LINE_CATEGORIES:
                         errors.append(f"{name}: invalid selected pipeline scope/type for {feature_id}")

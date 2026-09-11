@@ -1,4 +1,5 @@
 """Release-boundary regressions; no live requests, commits, pushes or alerts."""
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -13,6 +14,93 @@ import publish_data_update as publish
 
 
 class ReleaseBoundaryTests(unittest.TestCase):
+    def test_infrastructure_refresh_metadata_does_not_advance_data_update(self):
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:
+            root = Path(directory)
+            baseline, work = root / "published", root / "work"
+            baseline.mkdir()
+            pipeline.write_json(baseline / "manifest.json", {})
+            pipeline.write_json(baseline / "elt_status.json", {"infrastructure": {"last_data_update": "2026-09-01"}})
+            feature = {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[-113, 52], [-112, 53]]},
+                       "properties": {"status": "Operating", "checked_at": "asset observation date"}}
+            layer = {"type": "FeatureCollection", "metadata": {"generated_at": "old", "source_retrieved_at": "old",
+                     "source_last_modified": "old", "source_sha256": "old", "attribute_units": {"h2s_pct": "mole percent"}},
+                     "features": [feature]}
+            for name in pipeline.INFRASTRUCTURE_GEOJSON_FILES:
+                pipeline.write_json(baseline / name, layer)
+            index = {"generated_at": "old", "builder_version": 2, "sources": {"pipelines": {
+                "url": "https://www.aer.ca/data/pipeline/Pipelines_SHP.zip", "sha256": "old", "bytes": 10,
+                "checked_at": "old", "retrieved_at": "old", "source_last_modified": "old", "etag": "old",
+                "content_changed": True, "download_content_changed": True, "fetch_status": "downloaded"}}}
+            pipeline.write_json(baseline / "aer_pipeline_index.json", index)
+            def refresh(script, arguments, logs, timeout):
+                candidate = work / "candidate"
+                if script == "build_aer_infrastructure.py":
+                    updated = copy.deepcopy(index)
+                    updated["generated_at"] = "new"
+                    receipt = updated["sources"]["pipelines"]
+                    receipt.update({key: "new" for key in pipeline.AER_REFRESH_RECEIPT_FIELDS})
+                    pipeline.write_json(candidate / "aer_pipeline_index.json", updated)
+                    names = {"aer_feeder_pipelines.geojson", "aer_pipeline_installations.geojson"}
+                elif script == "build_market_access_pipelines.py":
+                    self.assertEqual(arguments[arguments.index("--aer-feeder-input") + 1], str(candidate / "aer_feeder_pipelines.geojson"))
+                    names = {"market_access_pipelines.geojson"}
+                elif script == "build_railway_layer.py":
+                    names = {"railways.geojson"}
+                else:
+                    return
+                for name in names:
+                    updated = copy.deepcopy(layer)
+                    updated["metadata"].update({key: "new" for key in pipeline.GEOJSON_REFRESH_METADATA})
+                    pipeline.write_json(candidate / name, updated)
+            arguments = ["elt_pipeline", "--mode", "infrastructure", "--baseline-dir", str(baseline), "--work-dir", str(work), "--skip-references"]
+            with patch("sys.argv", arguments), patch.object(pipeline, "run_script", side_effect=refresh), \
+                 patch.object(pipeline.subprocess, "check_output", return_value="abc123"):
+                self.assertEqual(pipeline.main(), 0)
+            status = pipeline.read_json(work / "candidate/elt_status.json")["infrastructure"]
+            self.assertEqual(status["status"], "unchanged")
+            self.assertEqual(status["last_data_update"], "2026-09-01")
+            self.assertIsNotNone(status["checked_at"])
+            self.assertFalse(pipeline.read_json(work / "pipeline_result.json")["data_changed"])
+
+    def test_infrastructure_geometry_properties_and_meaningful_metadata_are_changes(self):
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:
+            root = Path(directory)
+            baseline, candidate = root / "before", root / "after"
+            layer = {"type": "FeatureCollection", "metadata": {"generated_at": "old", "attribute_units": {"h2s_pct": "incorrect"}},
+                     "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-113, 52]},
+                                   "properties": {"h2s_pct": 1, "checked_at": "asset observation"}}]}
+            name = "aer_pipeline_installations.geojson"
+            pipeline.write_json(baseline / name, layer)
+            edits = [lambda value: value["features"][0]["geometry"].update(coordinates=[-112, 53]),
+                     lambda value: value["features"][0]["properties"].update(h2s_pct=0.1),
+                     lambda value: value["features"][0]["properties"].update(checked_at="new asset observation"),
+                     lambda value: value["metadata"]["attribute_units"].update(h2s_pct="mole percent")]
+            for edit in edits:
+                updated = copy.deepcopy(layer)
+                edit(updated)
+                pipeline.write_json(candidate / name, updated)
+                self.assertTrue(pipeline.infrastructure_data_changed(baseline, candidate, [name]))
+            index_name = "aer_pipeline_index.json"
+            pipeline.write_json(baseline / index_name, {"builder_version": 1, "sources": {}})
+            pipeline.write_json(candidate / index_name, {"builder_version": 2, "sources": {}})
+            self.assertTrue(pipeline.infrastructure_data_changed(baseline, candidate, [index_name]))
+            self.assertTrue(pipeline.infrastructure_data_changed(baseline, candidate, ["pipeline_tiles/new.geojson"]))
+            (candidate / name).unlink()
+            self.assertTrue(pipeline.infrastructure_data_changed(baseline, candidate, [name]))
+
+    def test_geojson_digest_streams_features_without_decoding_the_geometry_array(self):
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:
+            path = Path(directory) / "large.geojson"
+            layer = {"type": "FeatureCollection", "metadata": {"generated_at": "old", "note": 'text with "features": [] ' * 5000},
+                     "features": [{"properties": {"long_field": "x" * 200000}, "geometry": None}]}
+            pipeline.write_json(path, layer)
+            with patch.object(pipeline.json, "loads", side_effect=AssertionError("Geometry must not be loaded as one JSON object")):
+                before = pipeline.infrastructure_geojson_digest(path)
+                layer["metadata"]["generated_at"] = "new"
+                pipeline.write_json(path, layer)
+                self.assertEqual(before, pipeline.infrastructure_geojson_digest(path))
+
     def test_failed_check_does_not_advance_last_good_ingestion(self):
         previous = {"production": {"last_data_update": "2026-09-01"}}
         result = pipeline.release_status(previous, mode="production", timestamp="2026-09-10", data_changed=True,
@@ -32,6 +120,7 @@ class ReleaseBoundaryTests(unittest.TestCase):
         self.assertEqual(publish.conflicting_changes({"public/data/aeso_power_status.json", "data/alerts/state.json"}, candidate), set())
         self.assertEqual(publish.conflicting_changes({"public/data/manifest.json"}, candidate), {"public/data/manifest.json"})
         self.assertEqual(publish.conflicting_changes({"scripts/run_etl.py"}, candidate), {"scripts/run_etl.py"})
+        self.assertEqual(publish.conflicting_changes({"data/pipeline_route_facts.json"}, candidate), {"data/pipeline_route_facts.json"})
 
     def test_failed_candidate_promotes_only_failure_status(self):
         with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:

@@ -657,8 +657,13 @@ RAIL_OUT_FIELDS = ",".join(
 )
 
 
-def request_json(url: str, retries: int = 3) -> dict[str, Any]:
-    req = urllib.request.Request(url, headers={"User-Agent": "western-canada-production-exposure/railway-builder"})
+def request_json(url: str, retries: int = 3, *, post_data: dict[str, Any] | None = None) -> dict[str, Any]:
+    headers = {"User-Agent": "western-canada-production-exposure/railway-builder"}
+    encoded = None
+    if post_data is not None:
+        encoded = urllib.parse.urlencode(post_data).encode("utf-8")
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+    req = urllib.request.Request(url, data=encoded, headers=headers)
     last_error: Exception | None = None
     for attempt in range(retries):
         try:
@@ -741,6 +746,8 @@ def query_rail_geojson(bbox, where: str, batch_size: int = 500) -> list[dict[str
     BTS rejects/timeouts on the former 2,000-feature spatial GeoJSON request.
     Stable IDs also avoid drifting offset pages if the source changes mid-build.
     """
+    if not 1 <= batch_size <= 800:
+        raise ValueError("Rail geometry batch_size must be between 1 and 800")
     min_lon, min_lat, max_lon, max_lat = bbox
     params = {
         "where": where, "returnIdsOnly": "true", "f": "json",
@@ -771,7 +778,9 @@ def query_rail_geojson(bbox, where: str, batch_size: int = 500) -> list[dict[str
     def fetch_batch(ids):
         query = {"objectIds": ",".join(str(i) for i in ids), "outFields": object_field + "," + RAIL_OUT_FIELDS,
                  "returnGeometry": "true", "outSR": "4326", "f": "geojson"}
-        data = request_json(f"{NARN_LINES_URL}/query?{urllib.parse.urlencode(query)}")
+        # The service returns HTTP 404 for long objectIds query strings. A form
+        # POST keeps the request URL short without reducing or omitting IDs.
+        data = request_json(f"{NARN_LINES_URL}/query", post_data=query)
         features = data.get("features")
         if data.get("type") != "FeatureCollection" or not isinstance(features, list):
             raise ValueError("BTS rail batch did not return GeoJSON")
@@ -1120,7 +1129,7 @@ def main() -> None:
     parser.add_argument("--product-terminal-where", default=DEFAULT_PRODUCT_TERMINAL_WHERE)
     args = parser.parse_args()
 
-    output = args.output
+    output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     data = build_layer(tuple(args.bbox), args.rail_where, args.crude_terminal_where, args.product_terminal_where)
     if not data["metadata"]["raw_rail_segment_count"]:
@@ -1128,7 +1137,8 @@ def main() -> None:
     temporary = output.with_suffix(output.suffix + ".tmp")
     temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
     temporary.replace(output)
-    print(f"Wrote {output.relative_to(ROOT)} with {len(data['features']):,} features ({output.stat().st_size / 1024 / 1024:.1f} MB)")
+    label = output.relative_to(ROOT) if output.is_relative_to(ROOT) else output
+    print(f"Wrote {label} with {len(data['features']):,} features ({output.stat().st_size / 1024 / 1024:.1f} MB)")
 
 
 if __name__ == "__main__":

@@ -21,13 +21,14 @@ import sys
 import time
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "public" / "data" / "market_access_pipelines.geojson"
+DEFAULT_ROUTE_FACTS = ROOT / "data" / "pipeline_route_facts.json"
 
 CER_PIPELINES_URL = "https://services5.arcgis.com/vNzamREXvX2WcX6d/arcgis/rest/services/CER_Pipeline_Systems_WGS84_WM_v/FeatureServer/0"
 EIA_CRUDE_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0"
@@ -37,7 +38,7 @@ CAPP_MAP_URL = "https://www.capp.ca/wp-content/uploads/2024/03/CAPP-2023-Pipelin
 TM_PUGET_URL = "https://www.transmountain.com/news/2019/trans-mountains-puget-sound-pipeline-shipping-products-to-washington-state-refineries-since-1954"
 IMPERIAL_SARNIA_PRODUCTS_URL = "https://www.imperialoil.ca/en-ca/company/waterdown-to-finch"
 SUN_CANADIAN_URL = "https://sun-canadian.com/about-us/"
-VALERO_SAINT_LAURENT_URL = "https://www.energievalero.ca/en-ca/operations/pipelinesaint-laurent/route"
+VALERO_SAINT_LAURENT_URL = "https://www.valero.com/fr-ca/Operations/PipelineSaint-Laurent"
 AER_FEEDER_PIPELINES = ROOT / "public" / "data" / "aer_feeder_pipelines.geojson"
 
 
@@ -47,7 +48,7 @@ ROUTES: list[dict[str, Any]] = [
         "route_name": "Enbridge Mainline / Lakehead",
         "operator": "Enbridge",
         "commodity": "Crude oil / dilbit / SCO",
-        "flow_role": "Major Western Canada crude export trunk",
+        "flow_role": "Major Western Canadian liquids transport system",
         "direction": "Edmonton/Hardisty to U.S. Midwest, Sarnia, and downstream markets",
         "color": "#2563eb",
         "display_order": 10,
@@ -296,10 +297,11 @@ ROUTES: list[dict[str, Any]] = [
     {
         "route_id": "milk-river",
         "route_name": "Milk River",
-        "operator": "Plains Midstream",
+        "operator": "Inter Pipeline (Milk River Pipeline Ltd.)",
+        "operator_source_url": "https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/milk-river",
         "commodity": "Crude oil",
         "flow_role": "Southern Alberta cross-border crude link",
-        "direction": "Milk River AB to the Montana border (Front Range/Glacier connections)",
+        "direction": "Bow River interconnection at Milk River, Alberta, to Front Range at the border west of Coutts",
         "color": "#a16207",
         "display_order": 73,
         "default_visible": True,
@@ -319,8 +321,9 @@ ROUTES: list[dict[str, Any]] = [
         "route_name": "Enbridge Lines 7 / 11",
         "operator": "Enbridge",
         "commodity": "Crude oil / liquids",
-        "flow_role": "Ontario and cross-border refinery access",
-        "direction": "Ontario/New York regional Enbridge corridors",
+        "flow_role": "Ontario refinery access",
+        "direction": "Line 7: Sarnia to Westover; Line 11: Westover to Nanticoke, Ontario",
+        "geometry_note": "The CER Line 11 geometry begins near Hamilton and does not show the connecting portion from Westover. Route endpoints describe the full reviewed system; the map shows the published segments.",
         "color": "#bfdbfe",
         "display_order": 80,
         "default_visible": False,
@@ -346,7 +349,7 @@ ROUTES: list[dict[str, Any]] = [
         "operator": "Imperial Oil",
         "commodity": "Refined petroleum products",
         "flow_role": "Southern Ontario gasoline, diesel, and jet-fuel distribution",
-        "direction": "Sarnia via London and Waterdown to Hamilton and Finch/Toronto",
+        "direction": "Sarnia refinery to Hamilton and the Greater Toronto Area through Waterdown",
         "color": "#be123c",
         "display_order": 91,
         "default_visible": False,
@@ -736,7 +739,8 @@ def source_reference(part: dict[str, Any]) -> str:
         return path.as_posix()
 
 
-def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str, Any] | None, list[str]]:
+def route_feature(route: dict[str, Any], include_remote: bool,
+                  aer_feeder_input: Path = AER_FEEDER_PIPELINES) -> tuple[dict[str, Any] | None, list[str]]:
     lines: list[list[list[float]]] = []
     sources: list[str] = []
     warnings: list[str] = []
@@ -751,6 +755,8 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
 
         if part.get("local_geojson"):
             path = Path(part["local_geojson"])
+            if path == AER_FEEDER_PIPELINES:
+                path = aer_feeder_input
             try:
                 part_features = query_local_geojson(path, part)
             except Exception as exc:  # noqa: BLE001
@@ -807,6 +813,7 @@ def route_feature(route: dict[str, Any], include_remote: bool) -> tuple[dict[str
         "menu_section": route.get("menu_section", "Core Market Access Pipelines"),
         "source_summary": "; ".join(sources),
         "source_urls": sorted({source_reference(part) for part in route.get("parts", [])}),
+        "geometry_note": route.get("geometry_note"),
         "geometry_confidence": route.get(
             "geometry_confidence",
             "mixed public GIS and curated approximate corridor; not survey-grade"
@@ -835,14 +842,62 @@ def hub_feature(name: str, hub_type: str, lon: float, lat: float) -> dict[str, A
     }
 
 
-def build_feature_collection(include_remote: bool) -> dict[str, Any]:
+def load_route_facts(path: Path) -> dict[str, dict[str, Any]]:
+    """Load dated, reviewed route facts; geometry refreshes cannot infer new capacities."""
+    def unique_keys(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"Duplicate pipeline fact key: {key}")
+            result[key] = value
+        return result
+    payload = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
+    if not isinstance(payload, dict) or set(payload) != {"schema_version", "routes"} or type(payload["schema_version"]) is not int or payload["schema_version"] != 1:
+        raise ValueError("Pipeline route facts require schema_version 1 and routes")
+    facts = payload["routes"]
+    expected = {route["route_id"] for route in ROUTES}
+    if not isinstance(facts, dict) or set(facts) != expected:
+        missing = sorted(expected - set(facts)) if isinstance(facts, dict) else sorted(expected)
+        extra = sorted(set(facts) - expected) if isinstance(facts, dict) else []
+        raise ValueError(f"Pipeline route facts do not match shipped route IDs; missing={missing}, extra={extra}")
+    required = {"origin", "destination", "product", "capacity_kbbl_d", "capacity_basis", "capacity_note", "source_url", "source_name", "verified_at"}
+    optional = {"capacity_label", "as_of", "route_source_url"}
+    for route_id, fact in facts.items():
+        if not isinstance(fact, dict) or not required <= set(fact) or set(fact) - required - optional:
+            raise ValueError(f"{route_id}: unsupported or missing pipeline fact fields")
+        for field in (required | optional) - {"capacity_kbbl_d"}:
+            if field in fact and (not isinstance(fact[field], str) or not fact[field].strip()):
+                raise ValueError(f"{route_id}: {field} must be a nonempty string")
+        capacity = fact["capacity_kbbl_d"]
+        if capacity is not None and (type(capacity) not in (int, float) or not math.isfinite(capacity) or capacity <= 0):
+            raise ValueError(f"{route_id}: capacity_kbbl_d must be a positive finite number or null")
+        for field in ("source_url", "route_source_url"):
+            if field in fact:
+                url = urllib.parse.urlsplit(fact[field])
+                if url.scheme not in {"http", "https"} or not url.hostname or url.username or url.password:
+                    raise ValueError(f"{route_id}: {field} must be a public HTTP(S) URL")
+        try:
+            valid = date.fromisoformat(fact["verified_at"])
+        except ValueError as exc:
+            raise ValueError(f"{route_id}: verified_at must be an ISO calendar date") from exc
+        if valid.isoformat() != fact["verified_at"]:
+            raise ValueError(f"{route_id}: verified_at must use YYYY-MM-DD")
+    return facts
+
+
+def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_FEEDER_PIPELINES,
+                             route_facts: Path = DEFAULT_ROUTE_FACTS) -> dict[str, Any]:
+    facts = load_route_facts(route_facts)
     features: list[dict[str, Any]] = []
     warnings: list[str] = []
 
     for route in ROUTES:
-        feature, route_warnings = route_feature(route, include_remote=include_remote)
+        feature, route_warnings = route_feature(route, include_remote=include_remote, aer_feeder_input=aer_feeder_input)
         warnings.extend(route_warnings)
         if feature:
+            details = facts[route["route_id"]]
+            feature["properties"].update(pipeline_details=details, commodity=details["product"],
+                                         direction=f"{details['origin']} → {details['destination']}")
             features.append(feature)
             print(f"{route['route_name']}: {feature['properties']['source_summary']}", file=sys.stderr)
 
@@ -891,6 +946,10 @@ def build_feature_collection(include_remote: bool) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--aer-feeder-input", type=Path, default=AER_FEEDER_PIPELINES,
+                        help="Validated AER feeder layer to use, including an isolated ELT candidate")
+    parser.add_argument("--route-facts", type=Path, default=DEFAULT_ROUTE_FACTS,
+                        help="Reviewed route endpoints and capacity facts; retained across geometry refreshes")
     parser.add_argument(
         "--local-only",
         action="store_true",
@@ -901,7 +960,8 @@ def main() -> int:
     if args.local_only and args.output.resolve() == DEFAULT_OUTPUT.resolve():
         parser.error("--local-only requires a separate --output; it must not replace the production network")
 
-    collection = build_feature_collection(include_remote=not args.local_only)
+    collection = build_feature_collection(include_remote=not args.local_only, aer_feeder_input=args.aer_feeder_input.resolve(),
+                                         route_facts=args.route_facts.resolve())
     if collection["metadata"]["warnings"] and not args.local_only:
         for warning in collection["metadata"]["warnings"]:
             print(f"ERROR: {warning}", file=sys.stderr)

@@ -134,6 +134,22 @@ with counts. Unmapped CSV rows have no coordinates and are counted separately;
 they never receive invented positions. Source identity changes are recorded, and
 absence from a later publication does not establish physical removal or closure.
 
+The importer preserves secondary/tertiary substances, pipeline crossing
+environment and the source NEB indicator when populated. It also preserves
+`H2S_CONT` as numeric `h2s_mol_kmol` and derives `h2s_pct` by dividing by ten:
+34 mol/kmol is 3.4%, and 9.99 mol/kmol is 0.999%. Missing content is omitted;
+an explicitly reported zero remains zero. Nonfinite, negative and above-1,000
+mol/kmol values fail validation. Generated index `builder_version: 2` also makes
+the output validator check this conversion and its unit metadata.
+
+These units come from the [Enhanced Pipeline Graphics layout](https://www.aer.ca/data/pipeline/EnhancedPipeline_Layout.pdf)
+and [AER Manual 012](https://www.aer.ca/documents/manuals/Manual012.pdf), which define
+licensed substance content, rather than ambient-air concentration. AER's
+[Proceeding ID 455 notice](https://www.aer.ca/applications-and-notices/application-status-and-notices/notices/hearing-notices/proceeding-id-455)
+provides the explicit example 999 mol/kmol = 99.9%. The legacy map placed raw
+mol/kmol values in a field named `h2s_pct`, producing percentages ten times too
+high; the automatic importer corrects that unit error.
+
 The builder writes both monoliths, ten category files, the version-2 index and
 zoom-8 GeoJSON tiles into temporary staging before installation in `--data-dir`.
 Tile coverage includes segments crossing a tile without a vertex inside it. The

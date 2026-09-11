@@ -17,6 +17,12 @@ import sys
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+INFRASTRUCTURE_MONITOR_FILES = {"elt_status.json", "reference_source_status.json", "api_health.json", "eia_refinery_capacity.json"}
+INFRASTRUCTURE_GEOJSON_FILES = {"aer_feeder_pipelines.geojson", "aer_pipeline_installations.geojson",
+                              "market_access_pipelines.geojson", "railways.geojson"}
+GEOJSON_REFRESH_METADATA = {"generated_at", "source_retrieved_at", "source_last_modified", "source_sha256"}
+AER_REFRESH_RECEIPT_FIELDS = {"checked_at", "retrieved_at", "source_last_modified", "sha256", "bytes", "etag",
+                              "content_changed", "download_content_changed", "fetch_status"}
 
 
 def read_json(path: Path, default=None):
@@ -44,6 +50,97 @@ def file_changes(baseline: Path, candidate: Path) -> list[str]:
     names = {path.relative_to(root).as_posix() for root in (baseline, candidate) for path in root.rglob("*") if path.is_file()}
     return sorted(name for name in names if not (baseline / name).is_file() or not (candidate / name).is_file()
                   or digest(baseline / name) != digest(candidate / name))
+
+
+def infrastructure_header(value: dict, *, index=False) -> dict:
+    """Exclude refresh receipts only; feature properties and substantive metadata remain intact."""
+    result = dict(value)
+    if index:
+        result.pop("generated_at", None)
+        result["sources"] = {name: {key: item for key, item in receipt.items() if key not in AER_REFRESH_RECEIPT_FIELDS}
+                             for name, receipt in value.get("sources", {}).items()}
+    elif isinstance(value.get("metadata"), dict):
+        result["metadata"] = {key: item for key, item in value["metadata"].items() if key not in GEOJSON_REFRESH_METADATA}
+    return result
+
+
+def geojson_header_end(text: str) -> tuple[dict, int] | None:
+    """Read top-level members up to features without decoding the large geometry array."""
+    decoder, header, position = json.JSONDecoder(), {}, 0
+    def whitespace(index):
+        while index < len(text) and text[index].isspace():
+            index += 1
+        return index
+    position = whitespace(position)
+    if position >= len(text):
+        return None
+    if text[position] != "{":
+        raise ValueError("Expected a GeoJSON object")
+    position += 1
+    try:
+        while True:
+            position = whitespace(position)
+            key, position = decoder.raw_decode(text, position)
+            position = whitespace(position)
+            if position >= len(text):
+                return None
+            if text[position] != ":":
+                raise ValueError("Malformed GeoJSON member")
+            position = whitespace(position + 1)
+            if position >= len(text):
+                return None
+            if key == "features":
+                if text[position] != "[":
+                    raise ValueError("Expected a GeoJSON feature array")
+                return header, position
+            header[key], position = decoder.raw_decode(text, position)
+            position = whitespace(position)
+            if position >= len(text):
+                return None
+            if text[position] != ",":
+                raise ValueError("GeoJSON features must follow its header")
+            position += 1
+    except json.JSONDecodeError:
+        return None
+
+
+def infrastructure_geojson_digest(path: Path) -> str:
+    """Hash the generated feature body verbatim and normalize only its small metadata header."""
+    with path.open(encoding="utf-8") as source:
+        prefix = ""
+        while len(prefix) < 2 * 1024 * 1024:
+            chunk = source.read(64 * 1024)
+            if not chunk:
+                break
+            prefix += chunk
+            parsed = geojson_header_end(prefix)
+            if parsed is not None:
+                header, position = parsed
+                hasher = hashlib.sha256(json.dumps(infrastructure_header(header), sort_keys=True, separators=(",", ":")).encode())
+                hasher.update(b"\0")
+                hasher.update(prefix[position:].encode())
+                for chunk in iter(lambda: source.read(1024 * 1024), ""):
+                    hasher.update(chunk.encode())
+                return hasher.hexdigest()
+    # An unfamiliar layout stays conservatively changed, never silently ignored.
+    return digest(path)
+
+
+def infrastructure_data_changed(baseline: Path, candidate: Path, changes: list[str]) -> bool:
+    meaningful = set(changes) - INFRASTRUCTURE_MONITOR_FILES
+    # Category/tile additions, removals, and edits already prove a real change.
+    if meaningful - INFRASTRUCTURE_GEOJSON_FILES - {"aer_pipeline_index.json"}:
+        return True
+    for name in sorted(meaningful):
+        before, after = baseline / name, candidate / name
+        if not before.is_file() or not after.is_file():
+            return True
+        if name == "aer_pipeline_index.json":
+            if infrastructure_header(read_json(before), index=True) != infrastructure_header(read_json(after), index=True):
+                return True
+        elif infrastructure_geojson_digest(before) != infrastructure_geojson_digest(after):
+            return True
+    return False
 
 
 def run_script(script: str, arguments: list[str], log_dir: Path, timeout=1800):
@@ -157,7 +254,10 @@ def main() -> int:
         for script, name in [("build_market_access_pipelines.py", "market_access_pipelines.geojson"),
                              ("build_railway_layer.py", "railways.geojson")]:
             try:
-                run_script(script, ["--output", str(candidate / name)], work / "logs", timeout=600)
+                arguments = ["--output", str(candidate / name)]
+                if script == "build_market_access_pipelines.py":
+                    arguments.extend(["--aer-feeder-input", str(candidate / "aer_feeder_pipelines.geojson")])
+                run_script(script, arguments, work / "logs", timeout=600)
             except (RuntimeError, subprocess.TimeoutExpired):
                 shutil.copyfile(baseline / name, candidate / name)
                 warnings.append(f"{name}: upstream refresh unavailable; validated existing layer retained.")
@@ -189,8 +289,8 @@ def main() -> int:
         except (RuntimeError, subprocess.TimeoutExpired) as error:
             errors.append(str(error))
     changes = [] if errors else file_changes(baseline, candidate)
-    observed_data_changed = bool(ingestion.get("candidate_changed")) if args.mode == "production" else any(
-        name not in {"elt_status.json", "reference_source_status.json", "api_health.json", "eia_refinery_capacity.json"} for name in changes)
+    observed_data_changed = (bool(ingestion.get("candidate_changed")) if args.mode == "production"
+                             else infrastructure_data_changed(baseline, candidate, changes))
     previous_status = read_json(baseline / "elt_status.json", {})
     status = release_status(previous_status, mode=args.mode, timestamp=timestamp,
                             data_changed=observed_data_changed, failed=bool(errors), warnings=warnings,

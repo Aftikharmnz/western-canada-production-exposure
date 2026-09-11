@@ -4,11 +4,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { test } = require('node:test');
 
-function app(fetch = async () => { throw new Error('Unexpected network request'); }) {
+function app(fetch = async () => { throw new Error('Unexpected network request'); }, globals = {}) {
   const source = fs.readFileSync(path.join(__dirname, '../src/main.js'), 'utf8').replace(/^boot\(\);/m, '');
   const context = { window: {}, document: { querySelector: () => null, getElementById: () => null },
-    console, fetch, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval };
-  return vm.runInNewContext(source + '\n({state,els,requestJson,requireFeatureCollection,ensureDateRecords,missingSourcesForDate,renderTimeline,normalizeBearing,parseDDM,geometryContainsPoint,distanceToGeometryKm,selectWindPair,powerSnapshotStale,computeSeasonality,fetchPipelineData})', context);
+    console, fetch, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval, ...globals };
+  return vm.runInNewContext(source + '\n({state,els,requestJson,requireFeatureCollection,ensureDateRecords,missingSourcesForDate,renderTimeline,normalizeBearing,parseDDM,geometryContainsPoint,distanceToGeometryKm,selectWindPair,powerSnapshotStale,computeSeasonality,fetchPipelineData,syncPipelineTileCategory,renderMarketPipelineTooltip,renderPipelineSegmentTooltip,bindPipelineCard})', context);
 }
 const response = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
 
@@ -109,4 +109,80 @@ test('pipeline dictionary schema used by the shipped index loads', async () => {
   const index = JSON.parse(fs.readFileSync(path.join(__dirname, '../public/data/aer_pipeline_index.json'), 'utf8'));
   const a = app(async () => response(index));
   assert.equal(await a.fetchPipelineData(), true);
+});
+
+test('pipeline cards use sourced capacity units and endpoints without inventing feeder capacity', () => {
+  const a = app(undefined, { window: { location: { href: 'https://example.com/' } } });
+  const html = a.renderMarketPipelineTooltip({ route_name: 'Example line', pipeline_details: {
+    origin: 'Origin terminal', destination: 'Destination terminal', capacity_kbbl_d: 890,
+    capacity_basis: 'nominal', product: 'Crude oil / refined products', capacity_note: 'Combined system capacity; not the capacity of each mapped segment.',
+    source_url: 'https://example.com/official', source_name: 'Operator', verified_at: '2026-09-11',
+  } });
+  assert.match(html, /890,000 bbl\/d/);
+  assert.match(html, /nominal/);
+  assert.match(html, /Product<\/span><span class="pt-route-val">Crude oil \/ refined products/);
+  assert.match(html, /Origin terminal/);
+  assert.match(html, /Destination terminal/);
+  assert.match(html, /not the capacity of each mapped segment/);
+  assert.match(html, /href="https:\/\/example.com\/official"/);
+  assert.match(a.renderMarketPipelineTooltip({ pipeline_details: { capacity_kbbl_d: null } }), /Not published/);
+  assert.doesNotMatch(a.renderMarketPipelineTooltip({ pipeline_details: { capacity_kbbl_d: null } }), /0 bbl\/d/);
+  assert.match(a.renderMarketPipelineTooltip({ pipeline_details: { capacity_kbbl_d: 100, capacity_basis: 'operating' } }), /Published operating capacity/);
+  const feeder = a.renderPipelineSegmentTooltip({ licence: '123', segment_line: '4', from_fac: 'Well', from_loc: '01-01',
+    to_fac: 'Battery', to_loc: '02-02', diameter_mm: '610', maop_kpa: '10000', h2s_pct: 0,
+    substance: 'Crude Oil', substance2: 'Condensate', substance3: 'Crude Oil' });
+  assert.match(feeder, /Licence 123 · segment 4/);
+  assert.match(feeder, /Well · 01-01/); assert.match(feeder, /Battery · 02-02/);
+  assert.match(feeder, /Nameplate capacity<\/span><strong>Not published/);
+  assert.match(feeder, /H₂S 0%/);
+  assert.match(feeder, /Product<\/span><span class="pt-route-val">Crude Oil \/ Condensate/);
+  assert.doesNotMatch(feeder, /610,000 bbl\/d/);
+});
+
+test('pipeline hover cards and tap popups escape external facts and unsafe links', () => {
+  const a = app(undefined, { window: { location: { href: 'https://example.com/' } } });
+  const html = a.renderMarketPipelineTooltip({ route_name: '<script>bad()</script>', pipeline_details: {
+    origin: '<img src=x>', destination: '&destination', capacity_label: '<b>bad</b>', source_url: 'javascript:bad()',
+  } });
+  assert.doesNotMatch(html, /<script>|<img|href="javascript:/);
+  assert.match(html, /&lt;script&gt;/); assert.match(html, /&amp;destination/);
+  const bindings = {};
+  a.bindPipelineCard({ bindTooltip: (value, options) => { bindings.hover = { value, options }; },
+    bindPopup: (value, options) => { bindings.tap = { value, options }; } }, html);
+  assert.equal(bindings.hover.value, html); assert.equal(bindings.tap.value, html);
+  assert.equal(bindings.hover.options.sticky, true); assert.equal(bindings.tap.options.autoPan, true);
+});
+
+test('late pipeline tiles remain cached but hidden after zooming out or panning away', async () => {
+  for (const action of ['zoom', 'pan', 'hide']) {
+    let resolveRequest;
+    let requests = 0;
+    let zoom = 6;
+    let longitude = -112;
+    const visible = new Set();
+    const a = app(() => { requests++; return new Promise((resolve) => { resolveRequest = resolve; }); }, {
+      L: { geoJSON: () => ({ addTo() { visible.add(this); } }) },
+    });
+    a.state.pipelineEnabled = true;
+    a.state.map = {
+      getZoom: () => zoom,
+      getBounds: () => ({ pad() { return this; }, getWest: () => longitude, getEast: () => longitude,
+        getNorth: () => 55, getSouth: () => 55 }),
+      hasLayer: (layer) => visible.has(layer), removeLayer: (layer) => visible.delete(layer),
+    };
+    const entry = { tile_zoom: 6, tile_template: '/tiles/{z}/{x}/{y}.json', tile_keys: ['12/20'] };
+    const pending = a.syncPipelineTileCategory('pipe-oil', entry, true);
+    if (action === 'zoom') zoom = 5;
+    if (action === 'pan') longitude = -80;
+    if (action === 'hide') a.state.pipelineEnabled = false;
+    await a.syncPipelineTileCategory('pipe-oil', entry, action !== 'hide');
+    resolveRequest(response({ type: 'FeatureCollection', features: [] }));
+    await pending;
+    assert.equal(visible.size, 0, action);
+    // Returning to the original viewport reuses the completed request.
+    zoom = 6; longitude = -112; a.state.pipelineEnabled = true;
+    await a.syncPipelineTileCategory('pipe-oil', entry, true);
+    assert.equal(visible.size, 1, action);
+    assert.equal(requests, 1, action);
+  }
 });

@@ -1,5 +1,7 @@
 """Regression checks for data-loss protection and independently verified tariffs."""
+import copy
 import json
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -10,6 +12,74 @@ import build_railway_layer as railways
 
 
 class InfrastructureRefreshTests(unittest.TestCase):
+    def test_route_details_are_joined_by_id_and_preserved_across_geometry_refreshes(self):
+        route = pipelines.ROUTES[0]
+        fact = {"origin": "Reviewed origin", "destination": "Reviewed destination", "product": "Crude oil", "capacity_kbbl_d": 100.5,
+                "capacity_basis": "system capacity", "capacity_note": "Dated operator evidence", "source_name": "Operator",
+                "source_url": "https://operator.example/capacity", "verified_at": "2026-09-11"}
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipelines.ROOT) as directory:
+            path = Path(directory) / "facts.json"
+            path.write_text(json.dumps({"schema_version": 1, "routes": {route["route_id"]: fact}}), encoding="utf-8")
+            with patch.object(pipelines, "ROUTES", [route]), patch.object(pipelines, "MARKET_HUBS", []):
+                for coordinates in ([[0, 0], [1, 1]], [[0, 0], [2, 2]]):
+                    feature = {"type": "Feature", "properties": {"route_id": route["route_id"], "source_summary": "Official test geometry",
+                               "commodity": "Stale product", "direction": "Stale direction"},
+                               "geometry": {"type": "LineString", "coordinates": coordinates}}
+                    with patch.object(pipelines, "route_feature", return_value=(feature, [])):
+                        output = pipelines.build_feature_collection(include_remote=False, route_facts=path)
+                    self.assertEqual(output["features"][0]["properties"]["pipeline_details"], fact)
+                    self.assertEqual(output["features"][0]["properties"]["commodity"], fact["product"])
+                    self.assertEqual(output["features"][0]["properties"]["direction"], "Reviewed origin → Reviewed destination")
+                    self.assertEqual(output["features"][0]["geometry"]["coordinates"], coordinates)
+
+    def test_route_facts_reject_missing_routes_invalid_capacity_and_untrusted_url_schemes(self):
+        fact = {"origin": "Origin", "destination": "Destination", "product": "Crude oil", "capacity_kbbl_d": None,
+                "capacity_basis": "unavailable", "capacity_note": "No defensible single system capacity", "source_name": "Operator",
+                "source_url": "https://operator.example/source", "verified_at": "2026-09-11", "as_of": "Operator disclosure for 2025"}
+        payload = {"schema_version": 1, "routes": {route["route_id"]: copy.deepcopy(fact) for route in pipelines.ROUTES}}
+        route_id = pipelines.ROUTES[0]["route_id"]
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipelines.ROOT) as directory:
+            path = Path(directory) / "facts.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            self.assertIsNone(pipelines.load_route_facts(path)[route_id]["capacity_kbbl_d"])
+            for field, invalid in [("capacity_kbbl_d", -1), ("capacity_kbbl_d", 0), ("capacity_kbbl_d", True),
+                                   ("capacity_kbbl_d", float("nan")), ("source_url", "javascript:alert(1)"),
+                                   ("route_source_url", "file:///private/source"), ("verified_at", "2026-13-01"),
+                                   ("origin", ""), ("product", ""), ("unknown", "unexpected")]:
+                edited = copy.deepcopy(payload)
+                edited["routes"][route_id][field] = invalid
+                path.write_text(json.dumps(edited), encoding="utf-8")
+                with self.subTest(field=field, value=invalid), self.assertRaises(ValueError):
+                    pipelines.load_route_facts(path)
+            edited = copy.deepcopy(payload)
+            del edited["routes"][route_id]
+            path.write_text(json.dumps(edited), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "missing"):
+                pipelines.load_route_facts(path)
+            path.write_text('{"schema_version":1,"schema_version":1,"routes":{}}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Duplicate"):
+                pipelines.load_route_facts(path)
+            path.unlink()
+            with patch.object(pipelines, "query_arcgis_geojson") as request, self.assertRaises(FileNotFoundError):
+                pipelines.build_feature_collection(include_remote=True, route_facts=path)
+            request.assert_not_called()
+
+    def test_market_access_uses_candidate_aer_geometry_and_keeps_public_provenance(self):
+        with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipelines.ROOT) as directory:
+            candidate = Path(directory) / "aer_feeder_pipelines.geojson"
+            coordinates = [[-113.1, 52.1], [-113.2, 52.2]]
+            candidate.write_text(json.dumps({"type": "FeatureCollection", "features": [{"type": "Feature",
+                "properties": {"licence": "64941", "status": "Operating"},
+                "geometry": {"type": "LineString", "coordinates": coordinates}}]}), encoding="utf-8")
+            route = next(route for route in pipelines.ROUTES if route["route_id"] == "rangeland-aurora-glacier")
+            feature, warnings = pipelines.route_feature(route, include_remote=False, aer_feeder_input=candidate)
+            self.assertEqual(warnings, [])
+            self.assertEqual(feature["geometry"]["coordinates"], coordinates)
+            self.assertIn("public/data/aer_feeder_pipelines.geojson", feature["properties"]["source_urls"])
+            self.assertNotIn(str(candidate), feature["properties"]["source_urls"])
+            # The candidate argument does not mutate the default route inputs.
+            self.assertEqual(route["parts"][0]["local_geojson"], pipelines.AER_FEEDER_PIPELINES)
+
     def test_rail_batches_reject_missing_source_ids(self):
         ids = {"objectIds": [1, 2], "objectIdFieldName": "OBJECTID"}
         partial = {"type": "FeatureCollection", "features": [{"properties": {"OBJECTID": 1}}]}

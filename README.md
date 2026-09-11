@@ -2,6 +2,8 @@
 
 An interactive map of production, pipelines, rail and terminals, refineries, wildfire proximity, weather, and Alberta power output.
 
+Hover over a pipeline for its name or regulatory identifier, product types, published capacity, origin, and destination. Click or tap to keep the card open and follow its source links. Grouped routes list component capacities separately; AER feeders show when capacity or a commercial name is not published. Product types describe the pipeline's service, not a live batch. See the [reviewed pipeline facts](docs/PIPELINE_ROUTE_FACTS.md) for dates, capacity definitions, and source limitations.
+
 ## Automatic official-data updates
 
 GitHub Actions now discovers regulator publications, downloads their source files, rebuilds a separate candidate dataset, validates it, archives changed official inputs, and publishes the app. The analyst forecast spreadsheet is no longer read. Its derived history and forecasts have been removed from the app; the original personal file remains untouched on disk.

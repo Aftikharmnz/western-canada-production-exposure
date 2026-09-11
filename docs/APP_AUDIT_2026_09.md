@@ -10,6 +10,11 @@ not included in the repository or public website.
 
 ## Material changes
 
+- Follow-up live verification on 11 September replaced the failing legacy NRCan
+  `hotspots_24h` layer with the documented `hotspots_last24hrs` layer. The
+  replacement returned valid GeoJSON and browser CORS headers; coordinates are
+  normalized from its published latitude/longitude fields. See the official
+  [CWFIS data-service guide](https://cwfis.cfs.nrcan.gc.ca/downloads/CWFIS_DataServices_HowtoAccessDailyMaps%26DataLayers.pdf).
 - Production now imports current AER observations with the correct daily versus
   monthly units, keeps workbook forecasts distinct from actuals, and excludes
   explicitly classified bitumen wells from Alberta conventional oil. The default

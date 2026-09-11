@@ -13,7 +13,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 CODE_PREFIXES = ("scripts/", ".github/workflows/", "src/")
-CODE_FILES = {"data/sources.json", "data/asset_registry.csv", "data/refinery_capacity_overrides.json", "data/market_access_tariff_snapshot.json", "data/reference_source_monitors.json"}
+CODE_FILES = {"data/sources.json", "data/asset_registry.csv", "data/refinery_capacity_overrides.json", "data/market_access_tariff_snapshot.json", "data/reference_source_monitors.json", "data/pipeline_route_facts.json"}
 
 
 def git(*args, capture=True):
