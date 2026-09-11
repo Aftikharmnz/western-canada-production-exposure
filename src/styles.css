@@ -3326,6 +3326,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible {
 .mobile-filters-btn { display: none; }
 .etl-panel {
   position: fixed;
+  background: #fff;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
   z-index: 4000;
@@ -3344,6 +3345,15 @@ button:focus-visible, summary:focus-visible, a:focus-visible {
 .data-status-scroll { max-height: 36dvh; overflow: auto; }
 .data-status-scroll th { position: sticky; top: 0; background: #f5f8f8; }
 .data-status-warning, .pw-stale { padding: 10px; border-radius: 6px; background: #fff3db; color: #854d0e; }
+.refresh-policy { padding: 12px; background: #eef5f4; border: 1px solid #d9e7e3; border-radius: 8px; font-size: 12px; line-height: 1.6; }
+.refresh-grid { display: grid; gap: 12px; margin: 16px 0; }
+.refresh-card { padding: 14px; border: 1px solid var(--line); border-radius: 10px; }
+.refresh-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.refresh-badge { padding: 3px 8px; border-radius: 20px; color: #116149; background: #e8f5ee; font-size: 11px; white-space: nowrap; }
+.refresh-badge.needs-review { color: #854d0e; background: #fff3db; }
+.refresh-links { display: flex; flex-wrap: wrap; gap: 18px; font-size: 12px; }
+.reference-review li { margin: 10px 0; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+.refresh-source-note { color: var(--muted); }
 .pipeline-status { top: 54px; }
 #powerPanel, #refineryPanel, #seasonalityPanel { max-width: calc(100% - 24px); }
 .pw-body { overflow-x: auto; }

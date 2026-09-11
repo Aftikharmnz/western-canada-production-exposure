@@ -1,0 +1,2249 @@
+{
+  "as_of": "2026-01-01",
+  "source_observation_count": 3336,
+  "facility_count": 124,
+  "facilities": [
+    {
+      "company": "ALON REFINING KROTZ SPRINGS INC",
+      "state": "Louisiana",
+      "site": "KROTZ SPRINGS",
+      "corporation": "DELEK GROUP LTD",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 80000,
+        "operable": 80000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 83000,
+        "operable": 83000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "ALON USA ENERGY INC",
+      "state": "Texas",
+      "site": "BIG SPRING",
+      "corporation": "DELEK GROUP LTD",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 73000,
+        "operable": 73000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 74000,
+        "operable": 74000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "AMERICAN REFINING GROUP INC",
+      "state": "Pennsylvania",
+      "site": "BRADFORD",
+      "corporation": "AMERICAN REFINING GROUP INC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 11000,
+        "operable": 11000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 11800,
+        "operable": 11800,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "BIG WEST OIL CO",
+      "state": "Utah",
+      "site": "NORTH SALT LAKE",
+      "corporation": "FJ MANAGEMENT INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 31664,
+        "operable": 31664,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 36000,
+        "operable": 36000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "BP PRODUCTS NORTH AMERICA INC",
+      "state": "Indiana",
+      "site": "WHITING",
+      "corporation": "BP PLC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 435000,
+        "operable": 435000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 440000,
+        "operable": 440000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "BP PRODUCTS NORTH AMERICA INC",
+      "state": "Washington",
+      "site": "FERNDALE",
+      "corporation": "BP PLC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 238500,
+        "operable": 238500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 251000,
+        "operable": 251000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "BUCKEYE TEXAS PROCESSING LLC",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI",
+      "corporation": "BUCKEYE PARTNERS LP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 60000,
+        "operable": 60000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 62500,
+        "operable": 62500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CALCASIEU REFINING CO",
+      "state": "Louisiana",
+      "site": "LAKE CHARLES",
+      "corporation": "TRANSWORLD OIL USA INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 135500,
+        "operable": 135500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 137000,
+        "operable": 137000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CALUMET COTTON VALLEY REFINING LLC",
+      "state": "Louisiana",
+      "site": "COTTON VALLEY",
+      "corporation": "CALUMET SPECIALTY PRODUCTS PARTNERS, L.P.",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 13020,
+        "operable": 13020,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 14000,
+        "operable": 14000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CALUMET MONTANA REFINING LLC",
+      "state": "Montana",
+      "site": "GREAT FALLS",
+      "corporation": "CALUMET SPECIALTY PRODUCTS PARTNERS, L.P.",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 15000,
+        "operable": 15000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 17000,
+        "operable": 17000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CALUMET PRINCETON REFINING LLC",
+      "state": "Louisiana",
+      "site": "PRINCETON",
+      "corporation": "CALUMET SPECIALTY PRODUCTS PARTNERS, L.P.",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 8300,
+        "operable": 8300,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 8655,
+        "operable": 8655,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CALUMET SHREVEPORT REFINING LLC",
+      "state": "Louisiana",
+      "site": "SHREVEPORT",
+      "corporation": "CALUMET SPECIALTY PRODUCTS PARTNERS, L.P.",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 57000,
+        "operable": 57000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 60000,
+        "operable": 60000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CENEX HARVEST STATES COOP",
+      "state": "Montana",
+      "site": "LAUREL",
+      "corporation": "CHS INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 62500,
+        "operable": 62500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 64000,
+        "operable": 64000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHALMETTE REFINING LLC",
+      "state": "Louisiana",
+      "site": "CHALMETTE",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 190000,
+        "operable": 190000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 197000,
+        "operable": 197000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHEVRON USA INC",
+      "state": "California",
+      "site": "EL SEGUNDO",
+      "corporation": "CHEVRON CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 285000,
+        "operable": 285000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 290500,
+        "operable": 290500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHEVRON USA INC",
+      "state": "California",
+      "site": "RICHMOND",
+      "corporation": "CHEVRON CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 245271,
+        "operable": 245271,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 257600,
+        "operable": 257600,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHEVRON USA INC",
+      "state": "Mississippi",
+      "site": "PASCAGOULA",
+      "corporation": "CHEVRON CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 356440,
+        "operable": 356440,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 375200,
+        "operable": 375200,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHEVRON USA INC",
+      "state": "Utah",
+      "site": "SALT LAKE CITY",
+      "corporation": "CHEVRON CORP",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 54720,
+        "operable": 54720,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 57600,
+        "operable": 57600,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CHS MCPHERSON REFINERY INC",
+      "state": "Kansas",
+      "site": "MCPHERSON",
+      "corporation": "CHS INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 119000,
+        "operable": 119000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 122600,
+        "operable": 122600,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CITGO PETROLEUM CORP",
+      "state": "Louisiana",
+      "site": "LAKE CHARLES",
+      "corporation": "PDV AMERICA INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 471200,
+        "operable": 471200,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 496000,
+        "operable": 496000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CITGO REFINING & CHEMICAL INC",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI",
+      "corporation": "PDV AMERICA INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 165000,
+        "operable": 165000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 175500,
+        "operable": 175500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CONOCOPHILLIPS ALASKA INC",
+      "state": "Alaska",
+      "site": "PRUDHOE BAY",
+      "corporation": "CONOCOPHILLIPS",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 15000,
+        "operable": 15000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 16000,
+        "operable": 16000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "COUNTRYMARK REFINING & LOGISTICS LLC",
+      "state": "Indiana",
+      "site": "MOUNT VERNON",
+      "corporation": "COUNTRYMARK COOP INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 36700,
+        "operable": 36700,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 37900,
+        "operable": 37900,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CPI OPERATIONS LLC",
+      "state": "New Jersey",
+      "site": "PAULSBORO",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "idle": 32000,
+        "operable": 32000,
+        "operating": 0
+      },
+      "capacity_bbl_stream_d": {
+        "idle": 35000,
+        "operable": 35000,
+        "operating": 0
+      },
+      "status_as_of_survey": "idle"
+    },
+    {
+      "company": "CROSS OIL REFINING & MARKETING INC",
+      "state": "Arkansas",
+      "site": "SMACKOVER",
+      "corporation": "MARTIN RESOURCE MANAGEMENT GRP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 7500,
+        "operable": 7500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 7700,
+        "operable": 7700,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CVR REFINING CVL LLC",
+      "state": "Kansas",
+      "site": "COFFEYVILLE",
+      "corporation": "CVR ENERGY",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 132000,
+        "operable": 132000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 136000,
+        "operable": 136000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "CVR REFINING WYN LLC",
+      "state": "Oklahoma",
+      "site": "WYNNEWOOD",
+      "corporation": "CVR ENERGY",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 74500,
+        "operable": 74500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 78000,
+        "operable": 78000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "DEER PARK REFINING LP",
+      "state": "Texas",
+      "site": "DEER PARK",
+      "corporation": "PEMEX",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 312500,
+        "operable": 312500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 340000,
+        "operable": 340000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "DELAWARE CITY REFINING CO LLC",
+      "state": "Delaware",
+      "site": "DELAWARE CITY",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 171000,
+        "operable": 171000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 180000,
+        "operable": 180000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "DELEK REFINING LTD",
+      "state": "Texas",
+      "site": "TYLER",
+      "corporation": "DELEK GROUP LTD",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 74000,
+        "operable": 74000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 77500,
+        "operable": 77500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "DIAMOND SHAMROCK REFINING CO LP",
+      "state": "Texas",
+      "site": "SUNRAY",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 195000,
+        "operable": 195000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 204000,
+        "operable": 204000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "DIAMOND SHAMROCK REFINING CO LP",
+      "state": "Texas",
+      "site": "THREE RIVERS",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 89000,
+        "operable": 89000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 100000,
+        "operable": 100000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "ERGON REFINING INC",
+      "state": "Mississippi",
+      "site": "VICKSBURG",
+      "corporation": "ERGON INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 26500,
+        "operable": 26500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 27300,
+        "operable": 27300,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "ERGON WEST VIRGINIA INC",
+      "state": "West Virginia",
+      "site": "NEWELL",
+      "corporation": "ERGON INC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 22300,
+        "operable": 22300,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 23000,
+        "operable": 23000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "EXXONMOBIL REFINING & SUPPLY CO",
+      "state": "Illinois",
+      "site": "JOLIET",
+      "corporation": "EXXON MOBIL CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 267000,
+        "operable": 267000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 278100,
+        "operable": 278100,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "EXXONMOBIL REFINING & SUPPLY CO",
+      "state": "Louisiana",
+      "site": "BATON ROUGE",
+      "corporation": "EXXON MOBIL CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 523500,
+        "operable": 523500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 545500,
+        "operable": 545500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "EXXONMOBIL REFINING & SUPPLY CO",
+      "state": "Texas",
+      "site": "BAYTOWN",
+      "corporation": "EXXON MOBIL CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 564500,
+        "operable": 564500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 588000,
+        "operable": 588000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "EXXONMOBIL REFINING & SUPPLY CO",
+      "state": "Texas",
+      "site": "BEAUMONT",
+      "corporation": "EXXON MOBIL CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 612000,
+        "operable": 612000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 637400,
+        "operable": 637400,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "FLINT HILLS RESOURCES LP",
+      "state": "Minnesota",
+      "site": "SAINT PAUL",
+      "corporation": "KOCH INDUSTRIES INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 335000,
+        "operable": 335000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 375000,
+        "operable": 375000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "FLINT HILLS RESOURCES LP",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI EAST",
+      "corporation": "KOCH INDUSTRIES INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 87500,
+        "operable": 87500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 90000,
+        "operable": 90000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "FLINT HILLS RESOURCES LP",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI WEST",
+      "corporation": "KOCH INDUSTRIES INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 290000,
+        "operable": 290000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 300000,
+        "operable": 300000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "FORELAND REFINING CORP",
+      "state": "Nevada",
+      "site": "ELY",
+      "corporation": "FORELAND REFINING CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "idle": 2000,
+        "operable": 2000,
+        "operating": 0
+      },
+      "capacity_bbl_stream_d": {
+        "idle": 5000,
+        "operable": 5000,
+        "operating": 0
+      },
+      "status_as_of_survey": "idle"
+    },
+    {
+      "company": "GOODWAY REFINING LLC",
+      "state": "Alabama",
+      "site": "ATMORE",
+      "corporation": "GOODWAY REFINING LLC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 4100,
+        "operable": 4100,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 5000,
+        "operable": 5000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HARTREE REFINING LLC",
+      "state": "Texas",
+      "site": "CHANNELVIEW",
+      "corporation": "HARTREE PARTNERS LP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 45000,
+        "operable": 45000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 50000,
+        "operable": 50000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR CASPER REFINING COMPANY",
+      "state": "Wyoming",
+      "site": "EVANSVILLE",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 31000,
+        "operable": 31000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 32200,
+        "operable": 32200,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR EL DORADO REFINING LLC",
+      "state": "Kansas",
+      "site": "EL DORADO",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 162000,
+        "operable": 162000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 165000,
+        "operable": 165000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR NAVAJO REFINING LLC",
+      "state": "New Mexico",
+      "site": "ARTESIA",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 110000,
+        "operable": 110000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 124000,
+        "operable": 124000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR PUGET SOUND REFG LLC",
+      "state": "Washington",
+      "site": "ANACORTES",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 145000,
+        "operable": 145000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 149000,
+        "operable": 149000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR TULSA REFINING LLC",
+      "state": "Oklahoma",
+      "site": "TULSA EAST",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 70300,
+        "operable": 70300,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 75500,
+        "operable": 75500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR TULSA REFINING LLC",
+      "state": "Oklahoma",
+      "site": "TULSA WEST",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 85000,
+        "operable": 85000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 91020,
+        "operable": 91020,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR WOODS CROSS REFINING LLC",
+      "state": "Utah",
+      "site": "WOODS CROSS",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 41705,
+        "operable": 41705,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 43900,
+        "operable": 43900,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HF SINCLAIR WYOMING REFINING CO",
+      "state": "Wyoming",
+      "site": "SINCLAIR",
+      "corporation": "HF SINCLAIR CORP",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 75000,
+        "operable": 75000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 92000,
+        "operable": 92000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HILCORP NORTH SLOPE LLC",
+      "state": "Alaska",
+      "site": "PRUDHOE BAY",
+      "corporation": "HILCORP ENERGY CO",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 6500,
+        "operable": 6500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 8000,
+        "operable": 8000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HUNT REFINING CO",
+      "state": "Alabama",
+      "site": "TUSCALOOSA",
+      "corporation": "HUNT CONSLD INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 50000,
+        "operable": 50000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 52500,
+        "operable": 52500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "HUNT SOUTHLAND REFINING CO",
+      "state": "Mississippi",
+      "site": "SANDERSVILLE",
+      "corporation": "HUNT CONSLD INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 11000,
+        "operable": 11000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 12500,
+        "operable": 12500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "KERN OIL & REFINING CO",
+      "state": "California",
+      "site": "BAKERSFIELD",
+      "corporation": "KERN OIL & REFINING CO",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 26000,
+        "operable": 26000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 27000,
+        "operable": 27000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "KINDER MORGAN CRUDE & CONDENSATE",
+      "state": "Texas",
+      "site": "GALENA PARK",
+      "corporation": "KINDER MORGAN ENERGY PTNRS LP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 105000,
+        "operable": 105000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 121000,
+        "operable": 121000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "LAZARUS ENERGY LLC",
+      "state": "Texas",
+      "site": "NIXON",
+      "corporation": "BLUE DOLPHIN ENERGY CO",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 14000,
+        "operable": 14000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 15000,
+        "operable": 15000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "LIMA REFINING COMPANY",
+      "state": "Ohio",
+      "site": "LIMA",
+      "corporation": "CENOVUS MARKETING (USA) INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 183000,
+        "operable": 183000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 185000,
+        "operable": 185000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "LION OIL CO",
+      "state": "Arkansas",
+      "site": "EL DORADO",
+      "corporation": "DELEK GROUP LTD",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 83000,
+        "operable": 83000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 85000,
+        "operable": 85000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "LUNDAY THAGARD CO",
+      "state": "California",
+      "site": "SOUTH GATE",
+      "corporation": "WORLD OIL CO",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 8500,
+        "operable": 8500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 10000,
+        "operable": 10000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MAGELLAN PROCESSING LP",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI",
+      "corporation": "ONEOK INC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 50000,
+        "operable": 50000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 55000,
+        "operable": 55000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Illinois",
+      "site": "ROBINSON",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 253000,
+        "operable": 253000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 267000,
+        "operable": 267000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Kentucky",
+      "site": "CATLETTSBURG",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 307000,
+        "operable": 307000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 324000,
+        "operable": 324000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Louisiana",
+      "site": "GARYVILLE",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 617000,
+        "operable": 617000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 649000,
+        "operable": 649000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Michigan",
+      "site": "DETROIT",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 146000,
+        "operable": 146000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 154000,
+        "operable": 154000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Ohio",
+      "site": "CANTON",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 100000,
+        "operable": 100000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 105000,
+        "operable": 105000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARATHON PETROLEUM CO LP",
+      "state": "Texas",
+      "site": "GALVESTON BAY",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 631000,
+        "operable": 631000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 665000,
+        "operable": 665000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MARTINEZ REFINING CO LLC",
+      "state": "California",
+      "site": "MARTINEZ",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 156400,
+        "operable": 156400,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 157000,
+        "operable": 157000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MONROE ENERGY LLC",
+      "state": "Pennsylvania",
+      "site": "TRAINER",
+      "corporation": "DELTA AIR LINES INC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 190000,
+        "operable": 190000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 208000,
+        "operable": 208000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "MOTIVA ENTERPRISES LLC",
+      "state": "Texas",
+      "site": "PORT ARTHUR",
+      "corporation": "SAUDI ARAMCO",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 656400,
+        "operable": 656400,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 678000,
+        "operable": 678000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "OHIO REFINING COMPANY LLC",
+      "state": "Ohio",
+      "site": "TOLEDO",
+      "corporation": "CENOVUS MARKETING (USA) INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 150800,
+        "operable": 150800,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 160000,
+        "operable": 160000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PAR HAWAII REFINING LLC",
+      "state": "Hawaii",
+      "site": "KAPOLEI",
+      "corporation": "PAR PETROLEUM INC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 93500,
+        "operable": 93500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 95000,
+        "operable": 95000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PAR MONTANA LLC",
+      "state": "Montana",
+      "site": "BILLINGS",
+      "corporation": "PAR PETROLEUM INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 61500,
+        "operable": 61500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 62900,
+        "operable": 62900,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PASADENA REFINING SYSTEMS INC",
+      "state": "Texas",
+      "site": "PASADENA",
+      "corporation": "CHEVRON CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 118750,
+        "operable": 118750,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 125000,
+        "operable": 125000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PAULSBORO REFINING CO LLC",
+      "state": "New Jersey",
+      "site": "PAULSBORO",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 160000,
+        "operable": 160000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 166000,
+        "operable": 166000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PDV MIDWEST REFINING LLC",
+      "state": "Illinois",
+      "site": "LEMONT",
+      "corporation": "PDV AMERICA INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 188023,
+        "operable": 188023,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 197919,
+        "operable": 197919,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PETRO STAR INC",
+      "state": "Alaska",
+      "site": "NORTH POLE",
+      "corporation": "ARCTIC SLOPE REGIONAL CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 25000,
+        "operable": 25000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 25600,
+        "operable": 25600,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PETRO STAR INC",
+      "state": "Alaska",
+      "site": "VALDEZ",
+      "corporation": "ARCTIC SLOPE REGIONAL CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 62500,
+        "operable": 62500,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 65000,
+        "operable": 65000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PETROMAX REFINING CO LLC",
+      "state": "Texas",
+      "site": "HOUSTON",
+      "corporation": "PETROMAX REFINING CO LLC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 25000,
+        "operable": 25000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 27500,
+        "operable": 27500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "Louisiana",
+      "site": "WESTLAKE",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 263700,
+        "operable": 263700,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 277600,
+        "operable": 277600,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "Montana",
+      "site": "BILLINGS",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 71000,
+        "operable": 71000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 74900,
+        "operable": 74900,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "New Jersey",
+      "site": "LINDEN",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 275000,
+        "operable": 275000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 289100,
+        "operable": 289100,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "Oklahoma",
+      "site": "PONCA CITY",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 228000,
+        "operable": 228000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 239500,
+        "operable": 239500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "Texas",
+      "site": "SWEENY",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 277000,
+        "operable": 277000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 291700,
+        "operable": 291700,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PHILLIPS 66 COMPANY",
+      "state": "Washington",
+      "site": "FERNDALE",
+      "corporation": "PHILLIPS 66 COMPANY",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 105000,
+        "operable": 105000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 116238,
+        "operable": 116238,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PLACID REFINING CO",
+      "state": "Louisiana",
+      "site": "PORT ALLEN",
+      "corporation": "PLACID OIL CO",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 75000,
+        "operable": 75000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 82500,
+        "operable": 82500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "PREMCOR REFINING GROUP INC",
+      "state": "Texas",
+      "site": "PORT ARTHUR",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 385000,
+        "operable": 385000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 424000,
+        "operable": 424000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SAN JOAQUIN REFINING CO INC",
+      "state": "California",
+      "site": "BAKERSFIELD",
+      "corporation": "SAN JOAQUIN REFINING CO INC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 15000,
+        "operable": 15000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 25000,
+        "operable": 25000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SHELL OIL PRODUCTS US",
+      "state": "Louisiana",
+      "site": "NORCO",
+      "corporation": "SHELL PLC",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 231153,
+        "operable": 231153,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 250000,
+        "operable": 250000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SILVER EAGLE REFINING",
+      "state": "Utah",
+      "site": "WOODS CROSS",
+      "corporation": "SILVER EAGLE REFINING INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 15000,
+        "operable": 15000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 15700,
+        "operable": 15700,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SILVER EAGLE REFINING",
+      "state": "Wyoming",
+      "site": "EVANSTON",
+      "corporation": "SILVER EAGLE REFINING INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 3000,
+        "operable": 3000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 3400,
+        "operable": 3400,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "ST PAUL PARK REFINING CO LLC",
+      "state": "Minnesota",
+      "site": "SAINT PAUL",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 105000,
+        "operable": 105000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 111000,
+        "operable": 111000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SUNCOR ENERGY (USA) INC",
+      "state": "Colorado",
+      "site": "COMMERCE CITY EAST",
+      "corporation": "SUNCOR ENERGY INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 36000,
+        "operable": 36000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 38700,
+        "operable": 38700,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SUNCOR ENERGY (USA) INC",
+      "state": "Colorado",
+      "site": "COMMERCE CITY WEST",
+      "corporation": "SUNCOR ENERGY INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 67000,
+        "operable": 67000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 73000,
+        "operable": 73000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "SUPERIOR REFINING COMPANY LLC",
+      "state": "Wisconsin",
+      "site": "SUPERIOR",
+      "corporation": "CENOVUS MARKETING (USA) INC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 49547,
+        "operable": 49547,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 50000,
+        "operable": 50000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TALLEY ASPHALT PRODUCTS INC",
+      "state": "California",
+      "site": "KERN",
+      "corporation": "TALLEY ASPHALT PRODUCTS INC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 1700,
+        "operable": 1700,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 2000,
+        "operable": 2000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TESORO ALASKA COMPANY LLC",
+      "state": "Alaska",
+      "site": "KENAI",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 68000,
+        "operable": 68000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 72000,
+        "operable": 72000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TESORO REFINING & MARKETING CO",
+      "state": "California",
+      "site": "CARSON",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 365000,
+        "operable": 365000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 384500,
+        "operable": 384500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TESORO REFINING & MARKETING CO",
+      "state": "North Dakota",
+      "site": "MANDAN",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 72000,
+        "operable": 72000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 76500,
+        "operable": 76500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TESORO REFINING & MARKETING CO",
+      "state": "Utah",
+      "site": "SALT LAKE CITY",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 70000,
+        "operable": 70000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 74500,
+        "operable": 74500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TESORO REFINING & MARKETING CO",
+      "state": "Washington",
+      "site": "ANACORTES",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 119000,
+        "operable": 119000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 125000,
+        "operable": 125000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TEXAS INTERNATIONAL TERMINALS",
+      "state": "Texas",
+      "site": "GALVESTON",
+      "corporation": "TEXAS INTL TERMINALS",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 45000,
+        "operable": 45000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 50000,
+        "operable": 50000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "THE SAN ANTONIO REFINERY LLC",
+      "state": "Texas",
+      "site": "SAN ANTONIO",
+      "corporation": "STARLIGHT RELATIVITY ACQUISITION CO",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 20000,
+        "operable": 20000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 21000,
+        "operable": 21000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TOLEDO REFINING CO LLC",
+      "state": "Ohio",
+      "site": "TOLEDO",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 172800,
+        "operable": 172800,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 180000,
+        "operable": 180000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TORRANCE REFINING CO LLC",
+      "state": "California",
+      "site": "TORRANCE",
+      "corporation": "PBF ENERGY CO LLC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 160000,
+        "operable": 160000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 166200,
+        "operable": 166200,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "TOTALENERGIES PETROCHEM & REFG USA",
+      "state": "Texas",
+      "site": "PORT ARTHUR",
+      "corporation": "TOTALENERGIES SE",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 238000,
+        "operable": 238000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 245000,
+        "operable": 245000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "ULTRAMAR INC",
+      "state": "California",
+      "site": "WILMINGTON REFINERY",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 85000,
+        "operable": 85000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 87000,
+        "operable": 87000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "UNITED REFINING CO",
+      "state": "Pennsylvania",
+      "site": "WARREN",
+      "corporation": "RED APPLE GROUP INC",
+      "padd": "1",
+      "capacity_bbl_calendar_d": {
+        "operating": 67000,
+        "operable": 67000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 70000,
+        "operable": 70000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "US OIL & REFINING CO",
+      "state": "Washington",
+      "site": "TACOMA",
+      "corporation": "PAR PETROLEUM INC",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 40700,
+        "operable": 40700,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 42000,
+        "operable": 42000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REF COMPANY TENNESSEE LLC",
+      "state": "Tennessee",
+      "site": "MEMPHIS",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 180000,
+        "operable": 180000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 205000,
+        "operable": 205000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING - MERAUX LLC",
+      "state": "Louisiana",
+      "site": "MERAUX",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 125000,
+        "operable": 125000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 135000,
+        "operable": 135000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO CALIFORNIA",
+      "state": "California",
+      "site": "BENICIA",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 145000,
+        "operable": 145000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 150000,
+        "operable": 150000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO CALIFORNIA",
+      "state": "California",
+      "site": "WILMINGTON ASPHALT PLANT",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "5",
+      "capacity_bbl_calendar_d": {
+        "operating": 6300,
+        "operable": 6300,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 6500,
+        "operable": 6500,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO OKLAHOMA",
+      "state": "Oklahoma",
+      "site": "ARDMORE",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 86000,
+        "operable": 86000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 90000,
+        "operable": 90000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO TEXAS LP",
+      "state": "Texas",
+      "site": "CORPUS CHRISTI",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 290000,
+        "operable": 290000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 301000,
+        "operable": 301000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO TEXAS LP",
+      "state": "Texas",
+      "site": "HOUSTON",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 205000,
+        "operable": 205000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 218700,
+        "operable": 218700,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING CO TEXAS LP",
+      "state": "Texas",
+      "site": "TEXAS CITY",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 225000,
+        "operable": 225000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 227400,
+        "operable": 227400,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VALERO REFINING NEW ORLEANS LLC",
+      "state": "Louisiana",
+      "site": "NORCO",
+      "corporation": "VALERO ENERGY CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 215000,
+        "operable": 215000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 235000,
+        "operable": 235000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "VERTEX REFINING ALABAMA LLC",
+      "state": "Alabama",
+      "site": "SARALAND",
+      "corporation": "VERTEX ENERGY LP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 88000,
+        "operable": 88000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 91200,
+        "operable": 91200,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "WESTERN REFINING COMPANY LP",
+      "state": "Texas",
+      "site": "EL PASO",
+      "corporation": "MARATHON PETROLEUM CORP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 133000,
+        "operable": 133000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 140000,
+        "operable": 140000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "WRB REFINING LP",
+      "state": "Illinois",
+      "site": "WOOD RIVER",
+      "corporation": "WRB REFINING LP",
+      "padd": "2",
+      "capacity_bbl_calendar_d": {
+        "operating": 345000,
+        "operable": 345000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 370900,
+        "operable": 370900,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "WRB REFINING LP",
+      "state": "Texas",
+      "site": "BORGER",
+      "corporation": "WRB REFINING LP",
+      "padd": "3",
+      "capacity_bbl_calendar_d": {
+        "operating": 149000,
+        "operable": 149000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 165542,
+        "operable": 165542,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    },
+    {
+      "company": "WYOMING REFINING CO",
+      "state": "Wyoming",
+      "site": "NEWCASTLE",
+      "corporation": "PAR PETROLEUM INC",
+      "padd": "4",
+      "capacity_bbl_calendar_d": {
+        "operating": 18000,
+        "operable": 18000,
+        "idle": 0
+      },
+      "capacity_bbl_stream_d": {
+        "operating": 20000,
+        "operable": 20000,
+        "idle": 0
+      },
+      "status_as_of_survey": "operating"
+    }
+  ],
+  "schema_version": 1,
+  "source_url": "https://www.eia.gov/petroleum/refinerycapacity/refcap26.xlsx",
+  "source_index_url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
+  "source_sha256": "5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4",
+  "retrieved_at": "2026-09-10T06:59:13+00:00",
+  "scope": "Facilities with reported atmospheric crude distillation capacity. This is not the count of all operable petroleum processing facilities; downstream-only plants are omitted.",
+  "mapping_status": "Independent EIA survey; not automatically joined to IIR geometry or later operating-status reviews.",
+  "raw_path": "data/raw/reference/refcap26-5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4.xlsx",
+  "raw_receipt": "data/raw/reference/refcap26-5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4.receipt.json",
+  "source_bytes": 159911
+}

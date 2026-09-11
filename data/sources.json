@@ -19,8 +19,8 @@
     "source_id": "aer_st44",
     "agency": "Alberta Energy Regulator",
     "name": "AER ST44 Active Oil Sands Schemes",
-    "url": "https://static.aer.ca/prd/documents/sts/ST44_2026-Q2.xlsx",
-    "raw_file": "aer_st44_2026_q2.xlsx",
+    "url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
+    "raw_file": "aer_st44_current.xlsx",
     "grain": "active scheme bridge"
   },
   {

@@ -1,5 +1,7 @@
 # Application audit — 10 September 2026
 
+> Historical audit record. The later [official-data ELT pipeline](ELT_PIPELINE.md) replaces the workbook/forecast handling described below with direct official actuals and scheduled validated releases. Other application and infrastructure findings remain part of the audit trail.
+
 This audit covers the published production data, pipeline and railway layers,
 refinery calculations, weather and wildfire requests, AESO power status, client
 interface, and deployment checks. The supplied petroleum books were treated as

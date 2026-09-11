@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "eia_index_url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
+  "reviewed_fingerprints": {
+    "tariff:trans_mountain_123": "0891d4aea8974cd479b07e4c2a0e6434c28dc23a7f99cd625246ea92cf0ff7eb",
+    "tariff:trans_mountain_puget_416": "9bba898db42ba75fe187bfb0b8a93e942f6ae91ea134b954a9f478e900befd6e",
+    "tariff:express_cer_204": "8cfb07832cff4535127c9ec8590a822d089dc0ec4533c8e2d18bc5456dfcfc4f"
+  },
+  "fingerprint_provenance": "Trans Mountain fingerprints are from the exact tm123.pdf and puget416.pdf retained during the September 10, 2026 source-table audit. Seven other reviewed PDF fingerprints are in market_access_tariff_snapshot.json. Express CER 204 was independently reconciled against its official two-page filing on September 10, 2026: April 1 effective date, USD/m3, Hardisty 0.3096 all grades, Wild Horse 5.0384/5.4414/6.1467/6.3986, and 0.0500 abandonment only to Wild Horse. Exact reviewed bytes and receipt are retained under data/raw/reference.",
+  "publication_indexes": [
+    {"id": "mainline_tariff_index", "name": "Enbridge Canadian Mainline publications", "kind": "pdf_index", "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Enbridge-Mainline-GP-Inc-Enbridge-Canadian-Mainline-LP-Canadian-Mainline-Tariffs", "link_pattern": "Documents/Tariffs/"},
+    {"id": "express_tariff_index", "name": "Enbridge Express Canada publications", "kind": "pdf_index", "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Express-Pipeline-Ltd-Express-Canada-Tariffs", "link_pattern": "Documents/Tariffs/"},
+    {"id": "keystone_tariff_index", "name": "South Bow Keystone publications", "kind": "pdf_index", "url": "https://www.southbow.com/keystone-pipeline-system/", "link_pattern": "(?i)(tariff|CER-|FERC-)"},
+    {"id": "transmountain_tariff_index", "name": "Trans Mountain toll publications", "kind": "pdf_index", "url": "https://www.transmountain.com/tolls-tariffs", "link_pattern": "Tolls-and-Tariffs/"},
+    {"id": "foreland_filings", "name": "Sky Quarry recent regulatory filings", "kind": "sec_filings", "url": "https://data.sec.gov/submissions/CIK0001812447.json"}
+  ],
+  "limitations": [
+    "EIA annual crude-capacity records have no map coordinates and do not replace a facility/complex identity crosswalk or later operator status confirmations.",
+    "IIR process-unit and non-US inventories are retained source snapshots; there is no equivalent complete public global unit API.",
+    "Operator webpages and tariff publication indexes are checked for availability and change, not automatically interpreted as verified capacity, operating status or effective toll changes.",
+    "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
+  ]
+}

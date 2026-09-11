@@ -1,0 +1,266 @@
+{
+  "checked_at": "2026-09-10T07:00:53+00:00",
+  "scope": "Official linked AER source publications; raw files not redistributed; no analyst workbook input",
+  "publications": [
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2017-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
+      "bytes": 238592,
+      "observations": 2021,
+      "first_period": "2017-01",
+      "latest_period": "2017-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2018-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
+      "bytes": 244224,
+      "observations": 1983,
+      "first_period": "2018-01",
+      "latest_period": "2018-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2019-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "2537b8a1fc9a511355e1d6e48fe1a2a0621e097898871a29f15ece2c32bfbc52",
+      "bytes": 253952,
+      "observations": 1942,
+      "first_period": "2019-01",
+      "latest_period": "2019-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2020-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "561ba2cb8553878342b804cc1901ff68f23ad916a37f9885faeb215135d1227d",
+      "bytes": 284160,
+      "observations": 1823,
+      "first_period": "2020-01",
+      "latest_period": "2020-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2021-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "0791ebdfdfb290b6ed90f9a532e2e5fce3d112da8d6f571fb40246c5b4fb1e87",
+      "bytes": 263680,
+      "observations": 2010,
+      "first_period": "2021-01",
+      "latest_period": "2021-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2022-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "82f02255cee2f95fd30f841f51e43a0a895b3a42b70569f84c74a1ebed578d99",
+      "bytes": 314880,
+      "observations": 2140,
+      "first_period": "2022-01",
+      "latest_period": "2022-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_2023-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
+      "bytes": 298496,
+      "observations": 2390,
+      "first_period": "2023-01",
+      "latest_period": "2023-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/prd/documents/sts/ST53/ST53_2024-12.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
+      "bytes": 316416,
+      "observations": 2706,
+      "first_period": "2024-01",
+      "latest_period": "2024-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/prd/documents/sts/ST53/ST53_2025.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
+      "bytes": 340480,
+      "observations": 2999,
+      "first_period": "2025-01",
+      "latest_period": "2025-12",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st53",
+      "source_url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
+      "sha256": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd",
+      "bytes": 314368,
+      "observations": 1814,
+      "first_period": "2026-01",
+      "latest_period": "2026-07",
+      "units": [
+        "m3/d"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2017.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "2f5b35a848ff1b9c10be6ed5bc44be363ea525a0868c91180869d22e24b7f522",
+      "bytes": 219648,
+      "observations": 204,
+      "first_period": "2017-01",
+      "latest_period": "2017-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2018.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "7a346240550e9a5f2513047ea3559e202fcf4926ad0652086a6a0f6bd7bbd31c",
+      "bytes": 236544,
+      "observations": 240,
+      "first_period": "2018-01",
+      "latest_period": "2018-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2019.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "88c60b94edf4dfb96fa1037aad06f9c0943018a4685d390d6023eee5e6bb6cdb",
+      "bytes": 230400,
+      "observations": 228,
+      "first_period": "2019-01",
+      "latest_period": "2019-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2020.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "179ffa8894d69f43bb579da35f3c8847556418b5531ae616501d94ebaa83043b",
+      "bytes": 237504,
+      "observations": 228,
+      "first_period": "2020-01",
+      "latest_period": "2020-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2021.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "bac7bc3e4d455058da39364fe0cf7b5527fed8f45e0a8f3b885b9589400bfc33",
+      "bytes": 241152,
+      "observations": 240,
+      "first_period": "2021-01",
+      "latest_period": "2021-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2022.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "50a03e7b21ae95bbd6e6dfb617c9cfa1f9262f53ad8abc2c3910a07595e1dfbc",
+      "bytes": 253888,
+      "observations": 252,
+      "first_period": "2022-01",
+      "latest_period": "2022-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39-2023.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "1d15f085ec50b0f723b02041ed0bcb9fb0b0dcf04478e5706dd457f582677500",
+      "bytes": 253888,
+      "observations": 252,
+      "first_period": "2023-01",
+      "latest_period": "2023-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/prd/documents/sts/ST39-2024.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "2a1c5a3ca3030c94ba84359cfb7a8f21c38745eb0ca9131dd7f2a934b3229855",
+      "bytes": 253888,
+      "observations": 252,
+      "first_period": "2024-01",
+      "latest_period": "2024-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/prd/documents/sts/ST39-2025.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "7dfffa7b8956bc789d702675ec6db082164dcff8ae67c9e9e7b0c3936c53d5d6",
+      "bytes": 253888,
+      "observations": 252,
+      "first_period": "2025-01",
+      "latest_period": "2025-12",
+      "units": [
+        "m3/month"
+      ]
+    },
+    {
+      "source_id": "aer_st39",
+      "source_url": "https://www.aer.ca/documents/sts/ST39.xls",
+      "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
+      "sha256": "e6f977392aa177a27e1da7ce1f4d62c61a7b5f955ab64ae685e3c95bc122ccf8",
+      "bytes": 245696,
+      "observations": 105,
+      "first_period": "2026-01",
+      "latest_period": "2026-05",
+      "units": [
+        "m3/month"
+      ]
+    }
+  ]
+}

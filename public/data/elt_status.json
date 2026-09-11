@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "production": "Official reported actuals only",
+    "production_checks": "Daily",
+    "revision_window_months": 3,
+    "infrastructure_checks": "Weekly",
+    "power_checks": "Every 30 minutes",
+    "publication": "Validated releases only"
+  },
+  "production": {
+    "checked_at": null,
+    "raw_archive_url": null,
+    "last_data_update": "2026-09-10T07:17:31+00:00",
+    "status": "unchanged",
+    "run_url": null,
+    "warnings": [],
+    "latest_actual_date": "2026-07-31",
+    "default_date": "2026-05-31",
+    "execution_mode": "offline_replay",
+    "last_attempt_at": "2026-09-10T07:23:01+00:00"
+  },
+  "infrastructure": {
+    "checked_at": "2026-09-10T07:28:51+00:00",
+    "last_data_update": "2026-09-10T07:31:42+00:00",
+    "status": "updated",
+    "run_url": null,
+    "raw_archive_url": null,
+    "execution_mode": "online",
+    "scope": "AER feeder pipelines and installations",
+    "warnings": [],
+    "latest_actual_date": "2026-07-31",
+    "default_date": "2026-05-31"
+  }
+}

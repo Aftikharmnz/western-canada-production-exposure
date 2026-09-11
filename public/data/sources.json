@@ -1,0 +1,210 @@
+[
+  {
+    "source_id": "aer_st53",
+    "agency": "Alberta Energy Regulator",
+    "name": "AER ST53 In-Situ Oil Sands Scheme Production",
+    "url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
+    "raw_file": "aer_st53_current.xls",
+    "grain": "monthly scheme/asset"
+  },
+  {
+    "source_id": "aer_st39",
+    "agency": "Alberta Energy Regulator",
+    "name": "AER ST39 Alberta Mined Oil Sands Production",
+    "url": "https://www.aer.ca/documents/sts/ST39.xls",
+    "raw_file": "aer_st39_current.xls",
+    "grain": "monthly mine/project"
+  },
+  {
+    "source_id": "aer_st44",
+    "agency": "Alberta Energy Regulator",
+    "name": "AER ST44 Active Oil Sands Schemes",
+    "url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
+    "raw_file": "aer_st44_current.xlsx",
+    "grain": "active scheme bridge"
+  },
+  {
+    "source_id": "aer_scheme_spatial",
+    "agency": "Alberta Energy Regulator",
+    "name": "AER Scheme Approval Spatial Data",
+    "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
+    "raw_file": "aer_scheme_approval_spatial.zip",
+    "grain": "scheme geometry"
+  },
+  {
+    "source_id": "aer_st102_facility_spatial",
+    "agency": "Alberta Energy Regulator",
+    "name": "AER ST102 Facility List Shapefile",
+    "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
+    "raw_file": "aer_st102_facility_list_shapefile.zip",
+    "grain": "facility point geometry"
+  },
+  {
+    "source_id": "petrinex_ab_conventional_vol",
+    "agency": "Petrinex",
+    "name": "Petrinex Alberta Conventional Volumetrics",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/YYYY-MM/CSV",
+    "raw_file": "petrinex/ab/vol/Vol_YYYY-MM-AB.zip",
+    "grain": "monthly well/facility/DLS",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_ab_well_facility_link",
+    "agency": "Petrinex",
+    "name": "Petrinex Alberta Well to Facility Link",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
+    "raw_file": "petrinex/ab/infra/well_to_facility_link_ab.zip",
+    "grain": "current well/facility/DLS bridge",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_ab_facility_infrastructure",
+    "agency": "Petrinex",
+    "name": "Petrinex Alberta Facility Infrastructure",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Facility%20Infrastructure/CSV",
+    "raw_file": "petrinex/ab/infra/facility_infrastructure_ab.zip",
+    "grain": "current facility/DLS reference",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_bc_facility_ids",
+    "agency": "Petrinex",
+    "name": "Petrinex BC PRA Facility IDs",
+    "url": "https://www.petrinex.gov.ab.ca/bbreportsBC/PRAFacilityIds.csv",
+    "raw_file": "petrinex/bc/reference/PRAFacilityIds.csv",
+    "grain": "BC facility reference"
+  },
+  {
+    "source_id": "petrinex_bc_formation_codes",
+    "agency": "Petrinex",
+    "name": "Petrinex BC PRA Formation Codes",
+    "url": "https://www.petrinex.gov.ab.ca/bbreportsBC/PRAFormationCodes.csv",
+    "raw_file": "petrinex/bc/reference/PRAFormationCodes.csv",
+    "grain": "BC formation reference"
+  },
+  {
+    "source_id": "petrinex_bc_activity_codes",
+    "agency": "Petrinex",
+    "name": "Petrinex BC PRA Activity Codes",
+    "url": "https://www.petrinex.gov.ab.ca/bbreportsBC/PRAActivityCodes.csv",
+    "raw_file": "petrinex/bc/reference/PRAActivityCodes.csv",
+    "grain": "BC activity reference"
+  },
+  {
+    "source_id": "bcer_well_production",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Production Data for All Wells in B.C.",
+    "url": "https://iris.bcogc.ca/download/prod_csv.zip",
+    "raw_file": "bcer/prod_csv.zip",
+    "grain": "monthly well/completion/zone production",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_index",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Index",
+    "url": "https://iris.bcogc.ca/download/well_index.csv",
+    "raw_file": "bcer/well_index.csv",
+    "grain": "well reference",
+    "download": false
+  },
+  {
+    "source_id": "bcer_well_surface_locations",
+    "agency": "British Columbia Energy Regulator",
+    "name": "BCER Well Surface Hole Locations",
+    "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query",
+    "raw_file": "bcer/well_surface_locations.geojson",
+    "grain": "well surface point geometry",
+    "download": false
+  },
+  {
+    "source_id": "ndic_well_production",
+    "agency": "North Dakota Industrial Commission, Department of Mineral Resources",
+    "name": "NDIC Monthly Production Report - Oil Sheet",
+    "url": "https://www.dmr.nd.gov/oilgas/mpr/YYYY_MM.xlsx",
+    "raw_file": "nd/mpr/YYYY_MM.xlsx",
+    "grain": "monthly well crude oil production",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_sk_well_production",
+    "agency": "Petrinex",
+    "name": "Petrinex Saskatchewan Conventional Volumetrics",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/YYYY-MM/CSV",
+    "raw_file": "petrinex/sk/vol/Vol_YYYY-MM-SK.zip",
+    "grain": "monthly well crude oil production",
+    "download": false
+  },
+  {
+    "source_id": "petrinex_sk_well_infrastructure",
+    "agency": "Petrinex",
+    "name": "Petrinex Saskatchewan Well Infrastructure",
+    "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+    "raw_file": "petrinex/sk/infra/well_infrastructure_sk.zip",
+    "grain": "current well/DLS reference",
+    "download": false
+  },
+  {
+    "source_id": "manitoba_well_production",
+    "agency": "Province of Manitoba",
+    "name": "Manitoba Monthly Well Production Reports",
+    "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
+    "raw_file": "manitoba/wmp_2023_2026_excel.zip",
+    "grain": "monthly well crude oil production",
+    "download": false
+  },
+  {
+    "source_id": "montana_bogc_well_production",
+    "agency": "Montana Board of Oil and Gas Conservation",
+    "name": "Montana Historical Well Production",
+    "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
+    "raw_file": "montana/MT_Historical_Production.zip",
+    "grain": "monthly well oil/condensate production; ETL filters Bakken and Three Forks rows",
+    "download": false
+  },
+  {
+    "source_id": "montana_bogc_well_list",
+    "agency": "Montana Board of Oil and Gas Conservation",
+    "name": "Montana Complete Well List",
+    "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
+    "raw_file": "montana/MT_CompleteWellList.zip",
+    "grain": "well reference and lat/long",
+    "download": false
+  },
+  {
+    "source_id": "railway_narn_lines",
+    "agency": "Bureau of Transportation Statistics / Federal Railroad Administration",
+    "name": "North American Rail Network Lines",
+    "url": "https://services.arcgis.com/xOi1kZaI0eWDREZv/arcgis/rest/services/NTAD_North_American_Rail_Network_Lines/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "Canada/U.S. main-network and major-industrial rail segments, grouped for browser rendering",
+    "download": false
+  },
+  {
+    "source_id": "eia_crude_rail_terminals",
+    "agency": "U.S. Energy Information Administration",
+    "name": "Crude Oil Rail Terminals",
+    "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "crude-by-rail terminal points",
+    "download": false
+  },
+  {
+    "source_id": "eia_petroleum_product_terminals",
+    "agency": "U.S. Energy Information Administration",
+    "name": "Petroleum Product Terminals",
+    "url": "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/PetroleumProduct_Terminals_US_EIA/FeatureServer/0",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "public EIA petroleum/refined-product terminal GIS snapshot points (service data edit 2020)",
+    "download": false
+  },
+  {
+    "source_id": "canadian_petroleum_terminals",
+    "agency": "Public operator/regulator pages",
+    "name": "Reviewed Canadian Petroleum Terminals",
+    "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+    "raw_file": "public/data/railways.geojson",
+    "grain": "reviewed Canadian crude storage/marine/rail, diluent/transload, specialty, and refined-product terminal points",
+    "download": false
+  }
+]

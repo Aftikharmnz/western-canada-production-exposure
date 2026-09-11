@@ -296,6 +296,10 @@ const POINT_LEGEND_KEYS = new Set([
 
 const state = {
   manifest: null,
+  refreshStatus: null,
+  referenceStatus: null,
+  statusLoading: false,
+  statusError: null,
   assets: [],
   assetById: new Map(),
   records: [],
@@ -842,8 +846,8 @@ function initControls() {
     scheduleRender();
   });
 
-  els.etlCommand.textContent = "python scripts/run_etl.py --download";
-  els.etlButton.addEventListener("click", () => { renderDataStatus(); els.etlPanel.hidden = false; els.closeEtl.focus(); });
+  els.etlCommand.textContent = "gh workflow run refresh-official-data.yml --ref main";
+  els.etlButton.addEventListener("click", () => { renderDataStatus(); els.etlPanel.hidden = false; els.closeEtl.focus(); refreshDataStatus(); });
   els.closeEtl.addEventListener("click", () => { els.etlPanel.hidden = true; els.etlButton.focus(); });
   document.getElementById("retryDataBtn")?.addEventListener("click", async () => {
     state.dateRecordErrors.delete(state.selectedDate);
@@ -985,12 +989,49 @@ function initControls() {
   initLegendControls();
 }
 
+async function refreshDataStatus() {
+  if (state.statusLoading) return;
+  state.statusLoading = true;
+  state.statusError = null;
+  renderDataStatus();
+  const results = await Promise.allSettled([
+    fetchJsonLive("public/data/elt_status.json"),
+    fetchJsonLive("public/data/reference_source_status.json"),
+  ]);
+  ["refreshStatus", "referenceStatus"].forEach((key, index) => {
+    if (results[index].status === "fulfilled" && results[index].value?.schema_version === 1) state[key] = results[index].value;
+    else state.statusError = "Automatic refresh status is temporarily unavailable. Published production remains accessible.";
+  });
+  state.statusLoading = false;
+  renderDataStatus();
+}
+
+function dataStatusLink(url, label) {
+  if (!/^https:\/\/(github\.com|www\.eia\.gov)\//.test(String(url || ""))) return "";
+  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+}
+
 function renderDataStatus() {
   const target = document.getElementById("dataStatusContent");
   if (!target || !state.manifest) return;
   const coverage = (state.manifest.source_coverage || []).filter((r) => r.scenario === "actual");
-  const warnings = [...state.optionalDataWarnings, ...state.dateRecordErrors.values()];
-  target.innerHTML = `<p>Selected month: <strong>${escapeHtml(dateLabel(state.selectedDate))}</strong>. Updated ${escapeHtml(formatDateTime(state.manifest.generated_at))} · Each source has its own reporting lag.</p>
+  const warnings = [...state.optionalDataWarnings, ...state.dateRecordErrors.values(), ...(state.statusError ? [state.statusError] : [])];
+  const checks = ["production", "infrastructure"].filter((key) => state.refreshStatus?.[key]).map((key) => {
+    const check = state.refreshStatus[key];
+    const statusLabel = {failed: "Update held", degraded: "Needs attention", updated: "Updated", unchanged: "No new data"}[check.status] || "Pending";
+    return `<div class="refresh-card"><div class="refresh-card-heading"><strong>${key === "production" ? "Production" : "Infrastructure"}</strong><span class="refresh-badge ${["failed", "degraded"].includes(check.status) ? "needs-review" : ""}">${escapeHtml(statusLabel)}</span></div>
+      ${check.scope ? `<p>${escapeHtml(check.scope)}</p>` : ""}<p>${check.execution_mode === "offline_replay" ? "Local replay of official inputs · " : ""}${check.checked_at ? `Checked ${escapeHtml(formatDateTime(check.checked_at))}` : "Online source check pending"}<br>Last data update: ${check.last_data_update ? escapeHtml(formatDateTime(check.last_data_update)) : "Awaiting first successful refresh"}</p>
+      ${(check.warnings || []).map((warning) => `<p class="data-status-warning">${escapeHtml(warning)}</p>`).join("")}
+      <div class="refresh-links">${dataStatusLink(check.run_url, "Run details")}${dataStatusLink(check.raw_archive_url, "Source archive")}</div></div>`;
+  }).join("");
+  const review = (state.referenceStatus?.checks || []).filter((check) => check.review_required);
+  target.innerHTML = `<p>Official reported production · <strong>No analyst forecasts</strong></p>
+    <p>Selected month: <strong>${escapeHtml(dateLabel(state.selectedDate))}</strong>. Dataset built ${escapeHtml(formatDateTime(state.manifest.generated_at))} · Each source has its own reporting lag.</p>
+    <div class="refresh-policy">Production checked daily · Infrastructure weekly · Power every 30 minutes</div>
+    ${state.statusLoading ? '<p role="status">Checking refresh status…</p>' : ""}
+    ${checks ? `<div class="refresh-grid">${checks}</div>` : ""}
+    ${review.length ? `<details class="reference-review"><summary>${review.length} reference sources need attention</summary><p>Reviewed capacities, tariffs and statuses retain their verification dates until a change is reconciled.</p><ul>${review.map((check) => `<li><strong>${escapeHtml(check.name || check.id)}</strong>: ${escapeHtml(check.error || check.reason || check.status)}</li>`).join("")}</ul></details>` : ""}
+    ${state.referenceStatus ? `<p class="refresh-source-note">Reference check: ${escapeHtml(formatDateTime(state.referenceStatus.checked_at))} · ${dataStatusLink("https://www.eia.gov/petroleum/refinerycapacity/", "EIA annual capacity source")} · <a href="public/data/eia_refinery_capacity.json" target="_blank" rel="noopener noreferrer">Official capacity snapshot</a></p>` : ""}
     ${warnings.length ? `<p class="data-status-warning">${warnings.map(escapeHtml).join("<br>")}</p>` : ""}
     <div class="data-status-scroll"><table class="docs-table"><thead><tr><th>Source / stream</th><th>Latest actual</th></tr></thead><tbody>${coverage.map((r) => `<tr><td><strong>${escapeHtml(SOURCE_SHORT[r.source_id] || r.source_id)}</strong><br>${escapeHtml(r.stream)}</td><td>${escapeHtml(dateLabel(r.last_date))}</td></tr>`).join("")}</tbody></table></div>
     <p>Volumes are monthly daily averages. Summing bitumen with synthetic crude, or raw NGL mix with finished NGL products, can count the same material twice. The map is an asset exposure view; its gross stream sum is not net regional supply.</p>
@@ -1451,7 +1492,7 @@ function renderCoverageNotice(date = state.selectedDate) {
   const forecast = state.search
     ? filteredRecords(date).filter((r) => r.scenario === "forecast").reduce((sum, r) => sum + r.volume_kbbl_d, 0)
     : rows.filter((r) => r.scenario === "forecast").reduce((sum, r) => sum + Number(r.kbbl_d || 0), 0);
-  if (forecast > 0) messages.push(`Includes ${kbbl(forecast)} of workbook forecasts, not reported actual production.`);
+  if (forecast > 0) messages.push(`Includes ${kbbl(forecast)} of legacy forecast data. Refresh the app to load official actuals.`);
   if (state.dateRecordLoading.has(date)) messages.push("Loading this month's facility records… Totals are incomplete until loading finishes.");
   if (state.dateRecordErrors.has(date)) messages.push("Monthly facility records could not load. Open Data status to retry; the displayed total is incomplete.");
   if ((state.selectedStreams.has("Mined bitumen gross") || state.selectedStreams.has("In-situ bitumen")) && state.selectedStreams.has("Synthetic crude oil")) {

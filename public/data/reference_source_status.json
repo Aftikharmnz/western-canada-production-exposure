@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-10T07:09:51+00:00",
+  "status": "review_required",
+  "checks": [
+    {
+      "id": "mainline_tariff_index",
+      "name": "Enbridge Canadian Mainline publications",
+      "kind": "pdf_index",
+      "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Enbridge-Mainline-GP-Inc-Enbridge-Canadian-Mainline-LP-Canadian-Mainline-Tariffs",
+      "facts_last_verified": null,
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "fb0d5ad088b3de5aebf6de89cd2dbe63948154e91ef40086c47269aff37e7766",
+      "document_links": [
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2011/CDMN-RT-12.pdf?rev=d15aaaf1bb6e4a23a4d724391265f9af&hash=636F242B527919716ED6EEFF3A7AA437",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-497.pdf?rev=5f2631d77d534e6688038ceb4afab595&hash=6D70018208884759856A470565538027",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-498.pdf?rev=7cc331db39f745c783cf55545be9c8f0&hash=7B536EFD4EA731FCDDD34E43A78EEAF5",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-499.pdf?rev=60e9ce1a359a47c9a9da05d95bc77d56&hash=9E44392BEE42485AD550FCC708714D41",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2023/Schedules-to-Automatic-Balancing-Practice-September-1-2023.pdf?rev=1d5f86b3df564a568b53201a1f07baaf&hash=45C9549B19760D932E13126C8748A979",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2025/CDMN-CER-577-FERC-1341-L9-LKH.pdf?rev=7923064eaa7741bea2db1d4329d37543&hash=63937BA19B3091E9E50ADD3C6379831A",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2025/CDMN-CER-578-FERC-1350-L9-LKH.pdf?rev=cae314a250ee494bbbc83800882db9ec&hash=87FA0D78364B8ED7BFAD358AC1E26EB3",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Automatic-Balancing-Practice--July-2-2026.pdf?rev=0abba95183a44746a8d9d144acafdc80&hash=A48F1FE805B622EDC8D25EF7737DB73E",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-CER-8-FERC-4630.pdf?rev=5a68df5823f44ded8a8468ca6c08d39d&hash=594EE8722A9709ECF469DBCE829E598F",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-FERC-4621-CER-9.pdf?rev=dc11374ede384f609c1d47f324238a66&hash=E626B9139F196AD72554206C309E5499",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-1.pdf?rev=627d126edb2e4e4f92357b6b2e4f7f32&hash=CF0B561C87186D95CBBD09EA347EDFF7",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-2.pdf?rev=8478f9aa68cf44dc905a0290d3dc946e&hash=0ADEFF10362336744720ACC665A94F78",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-3.pdf?rev=02651e4c86fe426480346684a1703102&hash=3FEDAA47D8A65821C11757BC1DC1275A",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-4.pdf?rev=ef28836ca1d64917b6ad9a0e0f73e3a4&hash=0B9245A51E4B90CA2B64DE7C31EBEAC1",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-5-FERC-45480-LKH.pdf?rev=e2d29581e92a443096cda5b4f580773e&hash=C7334BD6FDE9D78B4C769DAD046284A0",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-600.pdf?rev=0eb6bf1289ff4e8dae0b43a0c455bc21&hash=B49790732EDC39F17A65069BCE43EBA0",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-601-FERC-45470-LKH.pdf?rev=f86edada9b834d588884b790748cebe9&hash=DBB22CCF25EED5B60C0FD408F59D7391",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-RT-26-2.pdf?rev=3168756bbe164128a15005628b37e597&hash=2E2977412E03753CBC6F4509D8ACFB12",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-RT-26.pdf?rev=fbec2a07da814ea69a5ec415a1e7dfc4&hash=5CB195E44EE53082F586A3529ABEFF7E",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-RT-26-1.pdf?rev=678028be205641c6ab2832d92d42a5ab&hash=A651700C22689631ED53A0FFD8D016A6",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDN-Mainline-CER-CLT-Tariff-No-10-Posting.pdf?rev=dada9afecc4e45d3a0bf3d50036d84e8&hash=98427DBABA1B773DBBA0895411246812",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDN-Mainline-CER-IJT-Tariff-No-11-Posting.pdf?rev=284f29462f604fb08d72227f51d17ced&hash=9DB0A492484088782EB11297E7FA6D24",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Destination-Verification-Procedure-July-24-2013.pdf?rev=4249da9f21c74fe086a8175a27792b11&hash=5D2287B099C23B8C2629DA0C57B9679F",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-6-FERC-3590.pdf?rev=a665fdddae7f409d8b7062874b6a035e&hash=993FC29AB7A3A2023ADE2FF54E6C1DFD",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-602-FERC-3580.pdf?rev=d91a86f23fa149589e1b1be5905fd7b9&hash=51CCD93E03A1307943D38F1DDCE4D15A",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-IJT-CER-12-FERC-3600.pdf?rev=0fa5dcca3f2346b593429d0c45f33867&hash=71696F8C0CE3E890C8E1A47E5C3CB6DC",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Supply-Exception-Procedure-July--2--2026.pdf?rev=51ef53b3c7fe47a490bc25715b60c523&hash=82456236872DFC96F14D5A4527D372EE",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/TOL-CER-7-FERC-37240.pdf?rev=d9c0943979c145a9b45f00c0e1d6f83c&hash=7085EC6E2E0FB463AC8F4A43DEA33452",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/TOLEDO-CER-603-FERC-37230.pdf?rev=f18f425859f64d0b852caaf1dfc3b5f3&hash=0F82A28E6D9805663471231B8AC11065",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/Shippers/governingin-linetransfers.pdf?rev=f02daa6e96b34cdb83b3f154e95a6a2a&hash=F8E659BC33D7F2C146B936AD64EC11CF"
+      ],
+      "comparison_basis": "observed_source",
+      "observation_baseline": "fb0d5ad088b3de5aebf6de89cd2dbe63948154e91ef40086c47269aff37e7766",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "express_tariff_index",
+      "name": "Enbridge Express Canada publications",
+      "kind": "pdf_index",
+      "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Express-Pipeline-Ltd-Express-Canada-Tariffs",
+      "facts_last_verified": null,
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "63e8a33368f4212e922b081b808ff2f689ae0c6307eb87b2347786a1b9e28809",
+      "document_links": [
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2016/EXP-US-PLT-Commodity.pdf?rev=43528ec604994858b9d3cc36d52f63af&hash=AB25FA2EF0E1AA308F42BFB5642E316F",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2018/Table-of-Loss-Allowance-Percentages-April-2018.pdf?rev=83e1bfad918345af8a850ee4ec787c5a&hash=FC12D38D1A61469C924CC3E335C35856",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/EXP-CAN-CER-182.pdf?rev=92c5a5207d9e4f26a6bd2dc17c61adb4&hash=684A5D598518D9631B6EB5B8F0830EEC",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2023/Schedules-to-Automatic-Balancing-Practice-September-1-2023.pdf?rev=1d5f86b3df564a568b53201a1f07baaf&hash=45C9549B19760D932E13126C8748A979",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Automatic-Balancing-Practice--July-2-2026.pdf?rev=0abba95183a44746a8d9d144acafdc80&hash=A48F1FE805B622EDC8D25EF7737DB73E",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-201.pdf?rev=ffdbf39a44cc4c20868fcbdc70b30569&hash=3CEC995AEA8E49E41E2EE3160CBA5CDB",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-202.pdf?rev=745f1f59de64488cbad4c82ff1910f13&hash=9B87497D240D726795F1B1E352572D66",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-204.pdf?rev=56bb61598fba47fc91ac2b4cf18368d1&hash=54D97272C347AB02AB423EDCB300E261",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-205.pdf?rev=c8c342333bb4451ea1b5c04bcfb70d91&hash=E7BB9DCFE0A3963C98D7E6D41F4A8DE7",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-207-FERC-167331.pdf?rev=fcf04ca093df43d1887e7ce25caa9fe7&hash=F5386D552CAD15BC8FE9254748305D0C",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-208.pdf?rev=e318b7de1db04539b7658e3c3748762b&hash=600529C0ED500677F4B60DB59262050E",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-US-CER-203-EXP-CAN-FERC-16732-PLT.pdf?rev=abcd00be578f4717b8fae1d51adc05ae&hash=12063B8A253AAC8B16786250D5DC4141"
+      ],
+      "comparison_basis": "observed_source",
+      "observation_baseline": "63e8a33368f4212e922b081b808ff2f689ae0c6307eb87b2347786a1b9e28809",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "keystone_tariff_index",
+      "name": "South Bow Keystone publications",
+      "kind": "pdf_index",
+      "url": "https://www.southbow.com/keystone-pipeline-system/",
+      "facts_last_verified": null,
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "01ad4decfd4b56ab14c85776e622fa1fea09b68be504e1b49134def1aca90098",
+      "document_links": [
+        "https://www.southbow.com/wp-content/uploads/2026/03/C37492-1_South_Bow_CER_Tariff_No._78_-_A9R3W7.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/03/FERC-5.7.0-South-Bow-FERC-Rules-and-Regulations.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/03/South-Bow-CER-Tariff-No.-77_C37491-1.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/03/cer-no-57-keystone-rules-and-regulations-effective-august-1-2022.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/03/tc-keystone-ferc-n-5.6.0-rules-and-regulations-effective-august-1-2022.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/04/C38750-6_Appendix_5_-_Abandonment_Surcharge_-_CER_Tariff_No._81_-_Clean_-_A9T3V8.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/05/C39551-1_CER_No._83_South_Bow_IJT_Rate_Tariff_-_A9U5U2.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/05/FERC-6.113.0-South-Bow-Rate-Schedule.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/05/FERC-6.114.0-South-Bow-Rate-Schedule.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/05/FERC-7.43.0-South-Bow-IJT-Rate-Schedule.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/06/FERC-6.112.0-Keystone-Rate-Schedule.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/07/CER-No.-84-South-Bow-IJT-Rates-Tariff.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/07/FERC-7.44.0-South-Bow-IJT-Rate-Schedule.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/07/FERC-South-Bow-Tariff-Index-August-1-2026.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/07/Historical-CER-Tariffs.pdf"
+      ],
+      "comparison_basis": "observed_source",
+      "observation_baseline": "01ad4decfd4b56ab14c85776e622fa1fea09b68be504e1b49134def1aca90098",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "transmountain_tariff_index",
+      "name": "Trans Mountain toll publications",
+      "kind": "pdf_index",
+      "url": "https://www.transmountain.com/tolls-tariffs",
+      "facts_last_verified": null,
+      "facts_automatically_updated": false,
+      "available": false,
+      "status": "unavailable",
+      "review_required": true,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "foreland_filings",
+      "name": "Sky Quarry recent regulatory filings",
+      "kind": "sec_filings",
+      "url": "https://data.sec.gov/submissions/CIK0001812447.json",
+      "facts_last_verified": null,
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "5dddd4bb6bf2e698cd2b68fb414b4805df6d76f07de73b75fa93b8c391fd0987",
+      "recent_filings": [
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001268",
+          "filingDate": "2026-08-21",
+          "primaryDocument": "skyq-20260818_8k.htm"
+        },
+        {
+          "form": "10-Q",
+          "accessionNumber": "0001096906-26-001217",
+          "filingDate": "2026-08-13",
+          "primaryDocument": "skyq-20260630_10q.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001147",
+          "filingDate": "2026-07-30",
+          "primaryDocument": "skyq-20260730_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001101",
+          "filingDate": "2026-07-21",
+          "primaryDocument": "skyq-20260715_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001038",
+          "filingDate": "2026-07-02",
+          "primaryDocument": "skyq-20260629_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000977",
+          "filingDate": "2026-06-22",
+          "primaryDocument": "skyq-20260622_8k.htm"
+        },
+        {
+          "form": "10-Q",
+          "accessionNumber": "0001096906-26-000807",
+          "filingDate": "2026-05-15",
+          "primaryDocument": "skyq-20260331_10q.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000587",
+          "filingDate": "2026-04-22",
+          "primaryDocument": "skyq-20260422_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000585",
+          "filingDate": "2026-04-22",
+          "primaryDocument": "skyq-20260422_8k.htm"
+        },
+        {
+          "form": "10-K",
+          "accessionNumber": "0001096906-26-000438",
+          "filingDate": "2026-03-31",
+          "primaryDocument": "skyq-20251231_10k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000405",
+          "filingDate": "2026-03-30",
+          "primaryDocument": "skyq-20260324_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001213900-26-024171",
+          "filingDate": "2026-03-05",
+          "primaryDocument": "ea0280145-8k_sky.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000187",
+          "filingDate": "2026-02-02",
+          "primaryDocument": "skyq-20260128_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000077",
+          "filingDate": "2026-01-12",
+          "primaryDocument": "skyq-20260112_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-000041",
+          "filingDate": "2026-01-08",
+          "primaryDocument": "skyq-20260108_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-002043",
+          "filingDate": "2025-12-15",
+          "primaryDocument": "skyq-20251215_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001924",
+          "filingDate": "2025-11-21",
+          "primaryDocument": "skyq-20251121_8k.htm"
+        },
+        {
+          "form": "10-Q",
+          "accessionNumber": "0001096906-25-001869",
+          "filingDate": "2025-11-14",
+          "primaryDocument": "skyq-20250930_10q.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001752",
+          "filingDate": "2025-11-05",
+          "primaryDocument": "skyq-20251105_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001647",
+          "filingDate": "2025-10-06",
+          "primaryDocument": "skyq-20251006_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001599",
+          "filingDate": "2025-09-30",
+          "primaryDocument": "skyq-20250930_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001526",
+          "filingDate": "2025-09-16",
+          "primaryDocument": "skyq-20250916_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001480",
+          "filingDate": "2025-09-04",
+          "primaryDocument": "skyq-20250904_8k.htm"
+        },
+        {
+          "form": "10-K/A",
+          "accessionNumber": "0001096906-25-001422",
+          "filingDate": "2025-08-25",
+          "primaryDocument": "skyq-20241231_10kz.htm"
+        },
+        {
+          "form": "10-Q",
+          "accessionNumber": "0001096906-25-001340",
+          "filingDate": "2025-08-14",
+          "primaryDocument": "skyq-20250630_10q.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001254",
+          "filingDate": "2025-08-08",
+          "primaryDocument": "skyq-20250808_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001206",
+          "filingDate": "2025-07-30",
+          "primaryDocument": "skyq-20250730.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001183",
+          "filingDate": "2025-07-24",
+          "primaryDocument": "skyq-20250724.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001153",
+          "filingDate": "2025-07-17",
+          "primaryDocument": "skyq-20250717.htm"
+        },
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-25-001147",
+          "filingDate": "2025-07-15",
+          "primaryDocument": "skyq-20250715.htm"
+        }
+      ],
+      "comparison_basis": "observed_source",
+      "observation_baseline": "5dddd4bb6bf2e698cd2b68fb414b4805df6d76f07de73b75fa93b8c391fd0987",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "tariff:express_cer_204",
+      "name": "Express Canada Uncommitted Local Rates Tariff - CER No. 204",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-204.pdf?hash=54D97272C347AB02AB423EDCB300E261&rev=56bb61598fba47fc91ac2b4cf18368d1",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "8cfb07832cff4535127c9ec8590a822d089dc0ec4533c8e2d18bc5456dfcfc4f",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "8cfb07832cff4535127c9ec8590a822d089dc0ec4533c8e2d18bc5456dfcfc4f",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:trans_mountain_123",
+      "name": "Trans Mountain Interim Tariff No. 123",
+      "kind": "pdf",
+      "url": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "0891d4aea8974cd479b07e4c2a0e6434c28dc23a7f99cd625246ea92cf0ff7eb",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "0891d4aea8974cd479b07e4c2a0e6434c28dc23a7f99cd625246ea92cf0ff7eb",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:trans_mountain_puget_416",
+      "name": "Trans Mountain Pipeline (Puget Sound) LLC Local Tariff - FERC No. 4.16.0",
+      "kind": "pdf",
+      "url": "https://docs.transmountain.com/Tolls-and-Tariffs/FERC-No.-4.16.0.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "9bba898db42ba75fe187bfb0b8a93e942f6ae91ea134b954a9f478e900befd6e",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "9bba898db42ba75fe187bfb0b8a93e942f6ae91ea134b954a9f478e900befd6e",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:enbridge4",
+      "name": "Enbridge Canadian Mainline Local Tolls - CER No. 4",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-4.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "58520d6f5b2535109602a9042183896be91c3e622c9848a3fa057e621cf88509",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "58520d6f5b2535109602a9042183896be91c3e622c9848a3fa057e621cf88509",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:enbridge5",
+      "name": "Enbridge Canadian Mainline / Lakehead International Joint Rates - CER No. 5 / FERC No. 45.48.0",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-5-FERC-45480-LKH.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "452e5849d9a0a5f81c5857cf2676f25693d4248cd86fa53a3935899d82fb82a8",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "452e5849d9a0a5f81c5857cf2676f25693d4248cd86fa53a3935899d82fb82a8",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:enbridge6",
+      "name": "Enbridge Mainline / Lakehead / Flanagan South - CER No. 6 / FERC No. 3.59.0",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-6-FERC-3590.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "f4710f65bb295270981c523734f3abf3fed583ae6f0e1175a0ef267c12a74e76",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "f4710f65bb295270981c523734f3abf3fed583ae6f0e1175a0ef267c12a74e76",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:enbridge9",
+      "name": "Enbridge Mainline / Lakehead / Spearhead - CER No. 9 / FERC No. 46.2.1",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-FERC-4621-CER-9.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "eb695a2d2e274676520aa26bdaae804212077b95d84138ed8e28c4a7b2c7d958",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "eb695a2d2e274676520aa26bdaae804212077b95d84138ed8e28c4a7b2c7d958",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:keystone84",
+      "name": "South Bow Keystone International Joint Rates - CER No. 84 / FERC No. 7.44.0",
+      "kind": "pdf",
+      "url": "https://www.southbow.com/wp-content/uploads/2026/07/CER-No.-84-South-Bow-IJT-Rates-Tariff.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "517b8d3dd7a1a95ac022ddfb92a6d4a021c62576529e7dd60e279629a239598d",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "517b8d3dd7a1a95ac022ddfb92a6d4a021c62576529e7dd60e279629a239598d",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:express205",
+      "name": "Express Canada Term Rate Tariff - CER No. 205",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-205.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "73c3236cb8bd77ab29017ef23db1d783d30d5482135fc84aee1992cbda9be6d1",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "73c3236cb8bd77ab29017ef23db1d783d30d5482135fc84aee1992cbda9be6d1",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "tariff:express207",
+      "name": "Express / Platte International Joint Term Rates - CER No. 207 / FERC No. 167.33.1",
+      "kind": "pdf",
+      "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-207-FERC-167331.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "38dd8437c972bb09365a1fca7e7e2412ba44785d2b3280733a839df66722777d",
+      "comparison_basis": "reviewed_document",
+      "observation_baseline": "38dd8437c972bb09365a1fca7e7e2412ba44785d2b3280733a839df66722777d",
+      "review_required": false,
+      "status": "unchanged"
+    },
+    {
+      "id": "refinery:81935ea46b38",
+      "name": "Suncor refining operations, 2026 rerating",
+      "kind": "html",
+      "url": "https://www.suncor.com/en-ca/what-we-do/refining",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": false,
+      "status": "unavailable",
+      "review_required": true,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "refinery:4ff5cb7370f7",
+      "name": "Shell Sarnia Manufacturing Centre",
+      "kind": "html",
+      "url": "https://www.shell.ca/en_ca/about-us/projects-and-sites/sarnia-manufacturing-centre.html",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": false,
+      "status": "unavailable",
+      "review_required": true,
+      "error": "Reference page is empty or a service/access error"
+    },
+    {
+      "id": "refinery:cfb4b4b32597",
+      "name": "Imperial 2025 Form 10-K, Refining table",
+      "kind": "pdf",
+      "url": "https://www.imperialoil.ca/-/media/imperial/files/2025-sec/2025-sec-form-10k-filing.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "28f96bc768c6c8060d3f21b3cc3ea1cce8e607ea6a872b72758ba2ccfbe9a615",
+      "comparison_basis": "observed_source",
+      "observation_baseline": "28f96bc768c6c8060d3f21b3cc3ea1cce8e607ea6a872b72758ba2ccfbe9a615",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "refinery:5de8bab8a727",
+      "name": "Federated Co-operatives energy operations",
+      "kind": "html",
+      "url": "https://www.fcl.crs/our-business/energy",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
+      "comparison_basis": "observed_source",
+      "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "refinery:ab48e02afec3",
+      "name": "Sunoco March 2026 investor presentation, p.25",
+      "kind": "pdf",
+      "url": "https://www.sunocolp.com/content/userfiles/files/March-2026-Investor-Presentation_vF.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "32e174dd2f60d8f1906919c8e0182d91fd505d7228e0b99d5d218844ff9fc505",
+      "comparison_basis": "observed_source",
+      "observation_baseline": "32e174dd2f60d8f1906919c8e0182d91fd505d7228e0b99d5d218844ff9fc505",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "refinery:fe2f047f1a50",
+      "name": "EIA 2026 Refinery Capacity Report, Table 3, printed p.14 (PDF p.10)",
+      "kind": "pdf",
+      "url": "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": true,
+      "fingerprint": "f0f9bdd90f22da19dd1d00cea4c9be45fa92e075ac2723b6cf2ae3fd7051c8e5",
+      "comparison_basis": "observed_source",
+      "observation_baseline": "f0f9bdd90f22da19dd1d00cea4c9be45fa92e075ac2723b6cf2ae3fd7051c8e5",
+      "review_required": false,
+      "status": "unchanged",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+    },
+    {
+      "id": "refinery:93bba180e46a",
+      "name": "Sky Quarry Q2 2026 Form 10-Q, signed August 12, 2026, Note 3",
+      "kind": "html",
+      "url": "https://www.sec.gov/Archives/edgar/data/1812447/000109690626001217/skyq-20260630_10q.htm",
+      "facts_last_verified": "2026-09-10",
+      "facts_automatically_updated": false,
+      "available": false,
+      "status": "unavailable",
+      "review_required": true,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "eia_refinery_capacity",
+      "name": "EIA annual refinery crude capacity",
+      "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
+      "checked_at": "2026-09-10T07:09:32+00:00",
+      "available": true,
+      "status": "unchanged",
+      "review_required": false,
+      "facts_automatically_updated": false,
+      "as_of": "2026-01-01",
+      "facility_count": 124,
+      "source_url": "https://www.eia.gov/petroleum/refinerycapacity/refcap26.xlsx",
+      "raw_path": "data/raw/reference/refcap26-5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4.xlsx",
+      "raw_receipt": "data/raw/reference/refcap26-5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4.receipt.json",
+      "sha256": "5b3c06f37b2924a6924e7643cc7ad529ebdb85fd6049e780f5883f88dfb17eb4",
+      "bytes": 159911,
+      "content_changed": false,
+      "reason": "Official annual observations imported separately; integration with map identities and later statuses requires review."
+    }
+  ],
+  "tariffs_last_verified": "2026-09-10",
+  "refinery_facts_last_verified": "2026-09-10",
+  "next_known_tariff_change": "2026-10-01",
+  "limitations": [
+    "EIA annual crude-capacity records have no map coordinates and do not replace a facility/complex identity crosswalk or later operator status confirmations.",
+    "IIR process-unit and non-US inventories are retained source snapshots; there is no equivalent complete public global unit API.",
+    "Operator webpages and tariff publication indexes are checked for availability and change, not automatically interpreted as verified capacity, operating status or effective toll changes.",
+    "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
+  ],
+  "review_required_count": 4,
+  "failure_count": 4,
+  "failures": [
+    "transmountain_tariff_index",
+    "refinery:81935ea46b38",
+    "refinery:4ff5cb7370f7",
+    "refinery:93bba180e46a"
+  ]
+}

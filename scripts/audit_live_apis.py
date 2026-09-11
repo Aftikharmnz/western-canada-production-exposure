@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import argparse
 import json
 import re
 import urllib.parse
@@ -62,10 +63,14 @@ def check(endpoint):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "public/data/api_health.json")
+    args = parser.parse_args()
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
         checks = list(pool.map(check, endpoints()))
     report = {"checked_at": datetime.now(timezone.utc).isoformat(), "scope": "Browser runtime APIs and basemaps. ETL and infrastructure services are documented in the production/infrastructure audits.", "checks": checks}
-    (ROOT / "public/data/api_health.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     for row in checks:
         print(row["name"], row["status"], row.get("feature_count", ""), row.get("units", ""), row.get("error", ""))
     return int(any(c["status"] != "ok" for c in checks))

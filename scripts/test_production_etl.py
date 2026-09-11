@@ -1,15 +1,157 @@
 """Regression tests for production units, source identity and data integrity."""
 import datetime as dt
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import run_etl as etl
+import production_refresh as refresh
+import official_source_discovery as discovery
 
 
 class ProductionIntegrityTests(unittest.TestCase):
+    def test_bcer_geometry_refresh_requires_complete_counted_pages(self):
+        feature = dict(type="Feature", properties={}, geometry=None)
+        for last_page, expected in [([feature], "downloaded"), ([], "failed")]:
+            responses = [dict(count=3), dict(type="FeatureCollection", features=[feature, feature]), dict(type="FeatureCollection", features=last_page)]
+            with self.subTest(status=expected), patch.object(Path, "mkdir"), patch.object(etl, "write_json_file") as writer, \
+                 patch.object(etl.urllib.request, "urlopen", side_effect=[io.BytesIO(json.dumps(row).encode()) for row in responses]):
+                result = etl.download_bcer_well_surface_points(force=True)
+                self.assertEqual(result["status"], expected)
+                if expected == "downloaded":
+                    self.assertEqual(len(writer.call_args.args[1]["features"]), 3)
+                else:
+                    writer.assert_not_called()
+
+    def test_actual_compact_asset_schema_round_trips_without_optional_metadata(self):
+        asset = etl.Asset("site", "01-01-001-01W4", "petrinex_ab_conventional_vol", "AB", "conventional", "dls_site", "Operator", "Alberta", 51.5, -113.5,
+                          coordinate_method="ags_ats_v4_1_web_converter", location_confidence="medium", geometry_kind="dls_centroid")
+        payload = etl.compact_asset_payload([vars(asset)])
+        self.assertNotIn("source_name", payload["fields"])
+        restored = refresh.asset_from_public_row(etl, refresh.asset_payload_rows(payload)[0])
+        self.assertEqual(restored.source_name, etl.source_name(asset.source_id))
+        self.assertEqual(restored.geometry_kind, "dls_centroid")
+        self.assertIn(("Alberta", "01-01-001-01W4"), refresh.seed_published_dls(etl, {restored.asset_id: restored}))
+
+    def test_weekly_scan_only_adds_changed_historical_petrinex_tokens(self):
+        periods = ["2024-01", "2026-04", "2026-05", "2026-06", "2026-07"]
+        source = "petrinex_ab_conventional_vol"
+        found = [dict(period=period, updated_at="new", timestamp_timezone="unspecified", url="https://www.petrinex.gov.ab.ca/PublicData?Jurisdiction=AB") for period in periods]
+        baseline = dict(source_coverage=[dict(source_id=source, scenario="actual", first_date="2024-01-31", last_date="2026-07-31")],
+                        source_state=dict(files={}, publication_tokens={f"{source}:{period}": dict(updated_at="old" if period == "2024-01" else "new") for period in periods}))
+        args = SimpleNamespace(offline=False, history_start=None, update_months=3, full_revision_scan=True)
+        with patch.object(discovery, "discover_petrinex_months", return_value=found):
+            rows, _ = refresh.collect_inputs(etl, args, {"petrinex-ab"}, baseline)
+        self.assertEqual({row["period"] for row in rows if row.get("period")}, {"2024-01", "2026-05", "2026-06", "2026-07"})
+        args.full_revision_scan = False
+        with patch.object(discovery, "discover_petrinex_months", return_value=found):
+            rows, _ = refresh.collect_inputs(etl, args, {"petrinex-ab"}, baseline)
+        self.assertEqual({row["period"] for row in rows if row.get("period")}, {"2026-05", "2026-06", "2026-07"})
+        self.assertEqual(args.publication_tokens[f"{source}:2024-01"]["updated_at"], "old")
+
+    def test_fingerprint_match_skips_parse_and_offline_is_not_a_web_check(self):
+        with tempfile.NamedTemporaryFile(dir=etl.ROOT, suffix=".json", delete=False) as temporary:
+            path = Path(temporary.name)
+            temporary.write(b"official source bytes")
+        try:
+            fingerprint = refresh.sha256_file(path)
+            descriptor = dict(source_id="aer_st53", raw_file=path.name, url="https://example.invalid/report.json", current=True)
+            prior = {path.name: dict(sha256=fingerprint)}
+            args = SimpleNamespace(offline=False, full_revision_scan=False)
+            with patch.object(etl, "RAW_DIR", etl.ROOT), patch.object(etl, "download_url", return_value=dict(status="downloaded", error=None)):
+                live = refresh.check_inputs(etl, args, [descriptor], prior)[0]
+                args.offline = True
+                offline = refresh.check_inputs(etl, args, [descriptor], prior)[0]
+            self.assertFalse(live["content_changed"])
+            self.assertEqual(live["sha256"], fingerprint)
+            self.assertEqual(live["checked_at"], etl.RUN_DATE.isoformat())
+            self.assertIsNone(offline["checked_at"])
+            self.assertEqual(offline["mode"], "offline")
+        finally:
+            path.unlink(missing_ok=True)
+
+    def test_seed_rejects_workbook_history_forecasts_and_saskatchewan_st39(self):
+        assets = {"ab": {"province": "Alberta", "asset_kind": "in_situ_scheme"},
+                  "sk": {"province": "Saskatchewan", "asset_kind": "upgrader"}}
+        record = dict(asset_id="ab", source_id="aer_st53", scenario="actual", workbook_sheet="In-Situ (All Sites)")
+        self.assertFalse(refresh.keep_official_record(record, assets))
+        record["workbook_sheet"] = "Official aer_st53 current XLS"
+        self.assertTrue(refresh.keep_official_record(record, assets))
+        self.assertFalse(refresh.keep_official_record({**record, "scenario": "forecast"}, assets, True))
+        self.assertFalse(refresh.keep_official_record({**record, "asset_id": "sk", "source_id": "aer_st39"}, assets, True))
+
+    def test_partition_replacement_is_idempotent_and_removes_deleted_wells(self):
+        def row(aid, month, value):
+            return dict(asset_id=aid, date=month + "-30", source_id="source", stream="oil", volume_bbl_d=value * 1000, volume_kbbl_d=value)
+        old = [row("deleted", "2026-06", 10), row("retained_history", "2026-04", 20)]
+        new = [row("reported_zero", "2026-06", 0)]
+        once = refresh.replace_partitions(old, new, {"source"}, {"2026-06"})
+        twice = refresh.replace_partitions(once, new, {"source"}, {"2026-06"})
+        self.assertEqual(once, twice)
+        self.assertEqual({row["asset_id"] for row in twice}, {"retained_history", "reported_zero"})
+
+    def test_current_report_regression_and_dropped_product_fail_closed(self):
+        old = [dict(source_id="source", stream="oil", date="2026-06-30"),
+               dict(source_id="source", stream="condensate", date="2026-06-30")]
+        with self.assertRaisesRegex(ValueError, "dropped previously published"):
+            refresh.guard_source_replacement(old, old[:1], {"source"}, {"2026-06"})
+        with self.assertRaisesRegex(ValueError, "coverage regressed"):
+            refresh.guard_source_replacement(old[:1], [dict(source_id="source", stream="oil", date="2026-05-31")], {"source"}, {"2026-05"}, True)
+        with self.assertRaisesRegex(ValueError, "Active official product streams"):
+            refresh.guard_source_replacement(old, [dict(source_id="source", stream="oil", date="2026-07-31")], {"source"}, {"2026-07"}, active_streams=True)
+        historical = dict(source_id="source", stream="oil", date="2024-01-31")
+        refresh.guard_source_replacement(old + [historical], [historical], {"source"}, {"2024-01"}, active_streams=True)
+
+    def test_cold_runner_keeps_published_higher_confidence_dls_coordinates(self):
+        assets = {"site": etl.Asset("site", "01-01-001-01W4", "petrinex_ab_conventional_vol", "AB", "conventional", "dls_site", "Operator", "Alberta", 51.5, -113.5,
+                                    coordinate_method="ags_ats_v4_1_web_converter", location_confidence="medium", location_basis="well_dls_current_link", geometry_kind="dls_centroid")}
+        add_asset, _ = refresh.make_callbacks(etl, assets, [])
+        add_asset(asset_id_override="site", display_name="01-01-001-01W4", source_id="petrinex_ab_conventional_vol", production_system="conventional", company="Operator",
+                  asset_kind="dls_site", province="Alberta", latitude=50.0, longitude=-110.0, coordinate_method="approx_dls_centroid", geometry_kind="dls_centroid")
+        self.assertEqual((assets["site"].latitude, assets["site"].longitude), (51.5, -113.5))
+        with patch.object(etl, "BASELINE_DLS_CACHE", refresh.seed_published_dls(etl, assets)), patch.object(etl, "load_dls_cache") as private_cache:
+            result = etl.resolve_dls_locations([dict(province="Alberta", dls="01-01-001-01W4", volume_bbl_d=1)], 0)
+        private_cache.assert_not_called()
+        self.assertEqual(float(result["Alberta", "01-01-001-01W4"]["latitude"]), 51.5)
+
+    def test_callbacks_reject_forecast_rows(self):
+        _, add_record = refresh.make_callbacks(etl, {}, [])
+        with self.assertRaisesRegex(ValueError, "Only directly sourced actual"):
+            add_record(dt.date(2026, 6, 1), "a", "oil", 1, "report", "row", "aer_st53", scenario="forecast")
+
+    def test_unchanged_successful_download_has_no_transform_work(self):
+        baseline = dict(dataset_mode=refresh.DATASET_MODE, pipeline_version=refresh.PIPELINE_VERSION)
+        checks = [dict(source_id="aer_st53", status="downloaded", raw_path="aer_st53_current.xls", sha256="a" * 64, content_changed=False)]
+        result_path = etl.PROCESSED_DIR / "fixture-result.json"
+        with patch.object(Path, "exists", return_value=True), patch.object(Path, "read_text", return_value=json.dumps(baseline)), \
+             patch.object(Path, "mkdir"), patch.object(etl, "write_json_file") as writer, patch.object(etl, "write_web_exports") as exporter, \
+             patch.object(refresh, "collect_inputs", return_value=([], [])), patch.object(refresh, "check_inputs", return_value=checks), \
+             patch.object(refresh, "load_baseline") as loader:
+            status = refresh.main(etl, ["--output-dir", str(etl.PROCESSED_DIR / "fixture-candidate"), "--result-json", str(result_path), "--sources", "aer"])
+        self.assertEqual(status, 0)
+        loader.assert_not_called()
+        exporter.assert_not_called()
+        writer.assert_called_once()
+        result = writer.call_args.args[1]
+        self.assertEqual(result["status"], "noop")
+        self.assertEqual(result["checks"], checks)
+
+    def test_failed_published_input_never_writes_a_candidate(self):
+        baseline = dict(dataset_mode=refresh.DATASET_MODE, pipeline_version=refresh.PIPELINE_VERSION)
+        checks = [dict(source_id="aer_st53", status="failed", raw_path="aer_st53_current.xls", error="HTTP 500", content_changed=False)]
+        with patch.object(Path, "exists", return_value=True), patch.object(Path, "read_text", return_value=json.dumps(baseline)), \
+             patch.object(Path, "mkdir"), patch.object(etl, "write_json_file"), patch.object(etl, "write_web_exports") as exporter, \
+             patch.object(refresh, "collect_inputs", return_value=([], [])), patch.object(refresh, "check_inputs", return_value=checks), \
+             patch.object(refresh, "load_baseline") as loader:
+            status = refresh.main(etl, ["--output-dir", str(etl.PROCESSED_DIR / "fixture-candidate"), "--sources", "aer"])
+        self.assertEqual(status, 1)
+        loader.assert_not_called()
+        exporter.assert_not_called()
+
     def test_date_strings_do_not_use_format_length_as_input_length(self):
         self.assertEqual(etl.as_date("2026-07-31"), dt.date(2026, 7, 31))
         self.assertEqual(etl.as_date("2026-07"), dt.date(2026, 7, 1))

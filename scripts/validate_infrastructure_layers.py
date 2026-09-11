@@ -12,6 +12,7 @@ remain visible without pretending two differently scoped datasets are identical.
 from __future__ import annotations
 
 import json
+import argparse
 import math
 import sys
 from collections import Counter
@@ -106,6 +107,13 @@ def main() -> int:
     ]:
         errors.extend(validate_geometries(name, data))
 
+    aer_index_path = DATA / "aer_pipeline_index.json"
+    if aer_index_path.exists():
+        aer_index = json.loads(aer_index_path.read_text(encoding="utf-8"))
+        if aer_index.get("builder_version", 0):
+            from build_aer_infrastructure import validate_outputs
+            errors.extend(validate_outputs(DATA))
+
     rail_lines = [f for f in rail["features"] if f.get("properties", {}).get("feature_kind") == "rail_line"]
     terminals = [f for f in rail["features"] if f.get("properties", {}).get("feature_kind") == "terminal"]
     raw_segments = sum(int(f.get("properties", {}).get("segment_count") or 1) for f in rail_lines)
@@ -179,4 +187,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data-dir", type=Path, default=DATA)
+    DATA = parser.parse_args().data_dir.resolve()
     raise SystemExit(main())

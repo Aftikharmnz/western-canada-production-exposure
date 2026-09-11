@@ -1,0 +1,19 @@
+# Official publication discovery
+
+The production import reads regulator publications directly. The analyst forecast workbook is not an input. Some regulators distribute their observed production as XLS/XLSX files; these official downloads remain valid raw sources and are separate from the removed analyst spreadsheet.
+
+| Source | Publication discovery | Accepted observations | Availability verified during migration |
+| --- | --- | --- | --- |
+| [AER ST53](https://www.aer.ca/data-and-performance-reports/statistical-reports/st53) | Follow the current issue and annual XLS/XLSX links on the report page | Scheme bitumen rates in m³ per calendar day; only months through the issue date | Annual 2017–2025 plus January–July 2026 |
+| [AER ST39](https://www.aer.ca/data-and-performance-reports/statistical-reports/st39) | Follow the current issue and annual XLS/XLSX links on the report page | Facility product production in monthly m³; convert using each calendar month's length | Annual 2017–2025 plus January–May 2026 |
+| [AER ST44](https://www.aer.ca/data-and-performance-reports/statistical-reports/st44) | Select the highest year/quarter actually linked by the regulator | Scheme reference and location attributes; no production volumes | Q2 2026 |
+| [Petrinex AB](https://www.petrinex.gov.ab.ca/PublicData?Jurisdiction=AB) and [SK](https://www.petrinex.gov.ab.ca/PublicData?Jurisdiction=SK) | Parse enabled volumetric downloads, file identifiers, and revision timestamps | The monthly API is requested only for published periods | January 2022–July 2026 in both indexes |
+| [Manitoba](https://www.gov.mb.ca/iem/petroleum/reports/index.html) | Discover the published `wmp_START_END_excel.zip` archives; select archives overlapping the requested history | OIL observations; the regulator specifies m³ for this fluid | Current archive covers 2023–2026; the app's regional history starts in 2024 |
+
+The AER self-service pages currently link archives starting in 2017. The app does not retain analyst-derived 2015–2016 AER history or reconstruct missing observations from forecasts. ST39 directs requests for earlier issues to its Information Distribution Services. Public access to an older official issue would require a separately validated import.
+
+`scripts/official_source_discovery.py` deliberately does not guess that a month or quarter has been published from today's date. It accepts report links only on the corresponding official domains, rejects unrecognized publication layouts, and caches successful index pages under ignored `data/raw/discovery/`. Index errors are failed refreshes, never evidence that a source has zero production or no history. Petrinex's displayed update time is retained as a revision token with unspecified timezone; it is not labeled UTC.
+
+`scripts/extract_aer_current.R` validates sheet names, identity columns, units, calendar columns, facility/approval identifiers, and issue dates. It preserves reported zeroes, excludes numeric cells after the issue month, and rejects malformed or negative production values. Annual archive identities must agree with the issue year. Unknown formats require an extractor update before publication. The ETL processes annual reports first and the current issue last so a current official revision can replace an earlier observation.
+
+All 20 AER files listed in `OFFICIAL_HISTORY_VERIFICATION.json` were downloaded from the official report indexes and extracted successfully. Their byte hashes identify the source publications used for the migration. They are not redistributed with the app. Eight offline tests cover discovery, rolling years, unavailable months, revision metadata, monthly versus daily units, zeroes, and schema changes. Synthetic extraction fixtures require R with `readxl`; no user workbook is used by those tests.

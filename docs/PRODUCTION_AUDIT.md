@@ -1,5 +1,7 @@
 # Production data audit — 10 September 2026 UTC
 
+> Historical audit record. The later [official-data ELT pipeline](ELT_PIPELINE.md) supersedes this report's workbook import, forecast retention, command-line flags, and dataset counts. The app now uses direct official actuals; the analyst workbook and its forecasts are no longer inputs. The earlier findings below are retained as an audit trail, not as current operating instructions.
+
 The audit refreshes published regulator observations. Reporting periods differ by source; a recent refresh timestamp does not mean every jurisdiction has reported the latest calendar month.
 
 ## Corrections

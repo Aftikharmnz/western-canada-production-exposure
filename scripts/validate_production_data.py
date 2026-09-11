@@ -4,14 +4,21 @@ from __future__ import annotations
 import csv
 import json
 import math
+import argparse
+from pathlib import Path
 from collections import defaultdict
 
-from run_etl import M3_TO_BBL, PUBLIC_DATA_DIR, PROCESSED_DIR
+from run_etl import M3_TO_BBL, PUBLIC_DATA_DIR, PROCESSED_DIR, write_json_file
+from production_refresh import DATASET_MODE, safe_relative_path
 
 
-def main() -> None:
-    manifest = json.loads((PUBLIC_DATA_DIR / "manifest.json").read_text(encoding="utf-8"))
-    payload = json.loads((PUBLIC_DATA_DIR / "assets.json").read_text(encoding="utf-8"))
+def main(data_dir: Path = PUBLIC_DATA_DIR) -> None:
+    manifest = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))
+    payload = json.loads((data_dir / "assets.json").read_text(encoding="utf-8"))
+    official_only = manifest.get("dataset_mode") == DATASET_MODE
+    if official_only:
+        assert not any(key.startswith("workbook_") for key in manifest), "Analyst workbook metadata remains"
+        assert manifest.get("source_state", {}).get("schema_version") == 1, "Missing durable ingestion receipts"
     assets = [dict(zip(payload["fields"], row)) for row in payload["rows"]]
     asset_by_id = {asset["asset_id"]: asset for asset in assets}
     assert len(asset_by_id) == len(assets), "Duplicate asset identifiers"
@@ -27,7 +34,7 @@ def main() -> None:
         else:
             for part in coords:
                 check_coordinates(part)
-    geometries = json.loads((PUBLIC_DATA_DIR / "asset_geometries.geojson").read_text(encoding="utf-8"))["features"]
+    geometries = json.loads((data_dir / "asset_geometries.geojson").read_text(encoding="utf-8"))["features"]
     for feature in geometries:
         assert feature["properties"]["asset_id"] in asset_by_id, "Orphaned production footprint"
         check_coordinates(feature["geometry"]["coordinates"])
@@ -44,6 +51,9 @@ def main() -> None:
         assert aid in asset_by_id, f"Unresolved asset reference: {aid}"
         assert date in manifest["periods"], f"Unindexed period: {date}"
         assert scenario in {"actual", "forecast"}, f"Unknown scenario: {scenario}"
+        if official_only:
+            assert scenario == "actual", "Forecast in an official-observations dataset"
+            assert not any(key.startswith("workbook_") for key in record), "Analyst workbook record fields remain"
         value = record["volume_kbbl_d"]
         assert isinstance(value, (int, float)) and math.isfinite(value), "Nonfinite production"
         if "volume_bbl_d" in record:
@@ -62,15 +72,20 @@ def main() -> None:
         entry["count"] += 1
         count += 1
 
-    base = json.loads((PUBLIC_DATA_DIR / "monthly_production.json").read_text(encoding="utf-8"))
+    base = json.loads((data_dir / "monthly_production.json").read_text(encoding="utf-8"))
     seen = set()
     for record in base:
+        if official_only:
+            assert record.get("provenance_kind") == "official", "Unproven base-record origin"
+            if record["source_id"] in {"aer_st53", "aer_st39"}:
+                assert asset_by_id[record["asset_id"]]["province"] == "Alberta", "ST39/ST53 observation outside Alberta"
         key = tuple(record[k] for k in ("asset_id", "date", "source_id", "stream"))
         assert key not in seen, f"Duplicate or forecast/actual overlap: {key}"
         seen.add(key)
         check(record)
     for date, relative in manifest["monthly_record_files"].items():
-        path = PUBLIC_DATA_DIR.parents[1] / relative
+        assert relative.startswith("public/data/"), "Unexpected shard URL"
+        path = safe_relative_path(data_dir, relative[len("public/data/"):])
         groups = json.loads(path.read_text(encoding="utf-8"))
         if isinstance(groups, dict):
             groups = [groups]
@@ -97,8 +112,26 @@ def main() -> None:
     assert "workbook_path" not in manifest, "Private workstation path in public metadata"
     assert manifest["data_quality"]["duplicate_asset_date_stream_group_count"] == 0
     reconciled = []
-    for source in ("aer_st53", "aer_st39"):
-        extract = PROCESSED_DIR / f"{source}_current_production.csv"
+    if official_only:
+        inputs = manifest["source_state"]["files"]
+        source_totals = manifest.get("source_reconciliation", [])
+        assert source_totals, "No independently retained AER source-unit totals"
+        for item in source_totals:
+            source, stream, period = item["source_id"], item["stream"], item["period"]
+            fingerprints = item.get("input_sha256", {})
+            assert fingerprints and all(inputs.get(path, {}).get("sha256") == digest and inputs[path]["source_id"] == source for path, digest in fingerprints.items()), "Reconciliation input receipts do not match the candidate"
+            value = item["source_unit_total"] * M3_TO_BBL / 1000
+            if item["units"] == "m3/month":
+                import calendar
+                year, month = map(int, period.split("-"))
+                value /= calendar.monthrange(year, month)[1]
+            else:
+                assert item["units"] == "m3/d", "Unknown reconciliation unit"
+            actual = official[source, stream, period]
+            assert abs(actual - value) < 0.00001, f"Official source reconciliation failed: {source} {stream} {period}: {actual} / {value}"
+            reconciled.append(dict(source=source, stream=stream, period=period, kbbl_d=round(value, 4)))
+    for source in (() if official_only else ("aer_st53", "aer_st39")):
+        extract = PROCESSED_DIR / f"{source}_{'official' if official_only else 'current'}_production.csv"
         if not extract.exists():
             continue
         expected = defaultdict(float)
@@ -118,10 +151,12 @@ def main() -> None:
                   latest_actual_date=manifest["latest_actual_date"], default_date=manifest["default_date"],
                   reconciled_official_periods=reconciled)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    (PROCESSED_DIR / "production_validation.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    write_json_file(PROCESSED_DIR / "production_validation.json", result, indent=2)
     print(json.dumps({k: v for k, v in result.items() if k != "reconciled_official_periods"}, indent=2))
     print(f"All production references, units, coordinates, coverage and totals valid; {len(reconciled)} official series/months reconciled.")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Validate production provenance, units and every staged browser shard.")
+    parser.add_argument("--data-dir", type=Path, default=PUBLIC_DATA_DIR)
+    main(parser.parse_args().data_dir)

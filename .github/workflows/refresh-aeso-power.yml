@@ -43,19 +43,7 @@ jobs:
 
       - name: Commit and push if changed
         id: publish
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/aeso_power_status.json data/alerts/state.json
-          if git diff --cached --quiet; then
-            echo "No change in AESO snapshot."
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git commit -m "Auto-refresh AESO power status"
-          git pull --rebase origin main
-          git push origin main
-          echo "changed=true" >> "$GITHUB_OUTPUT"
+        run: python scripts/publish_data_update.py --paths public/data/aeso_power_status.json data/alerts/state.json --message "Auto-refresh AESO power status" --push
 
       - name: Redeploy Pages after a data refresh
         if: steps.publish.outputs.changed == 'true'

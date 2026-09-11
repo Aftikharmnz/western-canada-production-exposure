@@ -12,12 +12,16 @@ Output: public/data/asset_seasonality.json
 import glob
 import json
 import os
+import argparse
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MONTHLY_DIR = os.path.join(BASE, "public", "data", "monthly")
-BASE_PROD_FILE = os.path.join(BASE, "public", "data", "monthly_production.json")
-ASSETS_FILE = os.path.join(BASE, "public", "data", "assets.json")
-OUT_FILE = os.path.join(BASE, "public", "data", "asset_seasonality.json")
+parser = argparse.ArgumentParser(description="Build actual-only asset seasonality for a public or staged dataset.")
+parser.add_argument("--data-dir", default=os.path.join(BASE, "public", "data"))
+args = parser.parse_args()
+MONTHLY_DIR = os.path.join(args.data_dir, "monthly")
+BASE_PROD_FILE = os.path.join(args.data_dir, "monthly_production.json")
+ASSETS_FILE = os.path.join(args.data_dir, "assets.json")
+OUT_FILE = os.path.join(args.data_dir, "asset_seasonality.json")
 
 print("Loading assets...")
 with open(ASSETS_FILE) as f:

@@ -7,7 +7,7 @@
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <link rel="stylesheet" href="src/styles.css?v=20260910" />
+    <link rel="stylesheet" href="src/styles.css?v=20260910-elt1" />
   </head>
   <body>
     <div id="app" class="app-shell">
@@ -119,7 +119,7 @@
                 <button type="button" data-railway-action="none">None</button>
               </div>
               <div id="railwayOptions" class="railway-options"></div>
-              <p class="layer-source-note">Checked September 10, 2026. Existing rail geometry retained because the source could not complete a full refresh. Minor tracks and private spurs may be missing.</p>
+              <p class="layer-source-note">Rail geometry is checked weekly. Data status shows unsuccessful refreshes; the last validated layer remains available. Minor tracks and private spurs may be missing.</p>
             </div>
           </div>
           <div id="fireControl" class="fire-control">
@@ -220,7 +220,7 @@
             <h2 id="dataStatusTitle">Data status &amp; coverage</h2>
             <div id="dataStatusContent"></div>
             <button id="retryDataBtn" class="primary-action" type="button" hidden>Retry this month</button>
-            <details><summary>For data administrators</summary><p>Refresh from the project folder. Public releases have different reporting lags.</p><code id="etlCommand"></code></details>
+            <details><summary>For data administrators</summary><p>Scheduled GitHub checks publish validated official releases automatically. Repository maintainers can also run a refresh manually.</p><code id="etlCommand"></code><p><a href="https://github.com/Aftikharmnz/western-canada-production-exposure/actions/workflows/refresh-official-data.yml" target="_blank" rel="noopener noreferrer">Open refresh workflow</a></p></details>
           </div>
         </section>
         <aside class="detail-panel" aria-label="Selected production detail">
@@ -328,7 +328,7 @@
             <h2>Volume Terminology &amp; NGL Streams</h2>
 
             <h3>Units</h3>
-            <p>Production volumes are monthly daily averages in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB/SK, BCER, Manitoba and AER ST39 monthly cubic metres are converted using 6.28981077 bbl/m³ and divided by calendar days. AER ST53 publishes m³/day, so no further division by days applies. NDIC and Montana monthly barrels are divided by calendar days. Current official AER observations replace overlapping workbook forecasts; earlier history retains its workbook provenance.</p>
+            <p>Production volumes are monthly daily averages in <strong>bbl/d</strong> or <strong>kbbl/d</strong>. Petrinex AB/SK, BCER, Manitoba and AER ST39 monthly cubic metres are converted using 6.28981077 bbl/m³ and divided by calendar days. AER ST53 publishes m³/day, so no further division by days applies. NDIC and Montana monthly barrels are divided by calendar days. Production contains official reported actuals only. Analyst workbook history and forecasts have been removed; official AER history begins in 2017.</p>
             <p>The gross stream sum measures selected asset activity. Bitumen and its upgraded synthetic crude, and NGL mix and spec products, can represent different processing stages of the same material. Do not interpret their combined sum as net supply. Later months with incomplete source reporting are labelled partial coverage.</p>
 
             <h3>Activity Codes (Petrinex)</h3>
@@ -436,7 +436,7 @@
             <p>The map opens in <strong>Topo</strong> mode. Use the <strong>Map: Dark / Topo</strong> switch above the lower-right zoom buttons to change the background for the current session. Dark mode keeps province, city, town, and smaller-place labels while muting most other basemap detail, and it uses brighter railway colours so infrastructure routes remain legible.</p>
 
             <h3>AER feeder layer</h3>
-            <p>Line segments represent AER feeder pipeline records where geometry is available. Feeder line categories are pre-split into static map tiles and load only after zooming in to reduce first-load latency. Each segment is attributed with operator, substance, licence, diameter, pressure, and other available technical fields. Installations include pump stations, compressor stations, terminals, tank farms, and meter/regulator sites where present in the AER export.</p>
+            <p>Official AER pipeline and installation publications are checked weekly. Mapped shapefile records are reconciled against the source tables and converted from NAD83 to WGS84 before publication. Feeder categories load as map tiles after zooming in. They retain operating and permitted lines in the selected substance classes; installation menus retain operating, permitted and suspended facilities. Records without published coordinates remain unmapped. Each segment retains its available operator, substance, licence, diameter, pressure and source identity.</p>
 
             <h3>Commodity types</h3>
             <table class="docs-table">
@@ -465,7 +465,7 @@
           <!-- ── DATA SOURCES ── -->
           <section class="docs-section" id="tab-sources" hidden>
             <h2>Data Sources</h2>
-            <p>All data is processed locally via the ETL pipeline (<code>python scripts/run_etl.py</code>) and stored in a SQLite database. The frontend reads pre-built JSON files from <code>public/data/</code>.</p>
+            <p>Official production publications are checked daily and validated before an updated release appears. Data status shows reporting coverage, refresh results and source review items. Website checks can be delayed by publication schedules or source outages; unavailable observations remain missing.</p>
 
             <table class="docs-table">
               <thead><tr><th>Source</th><th>Dataset</th><th>Coverage</th><th>Streams</th></tr></thead>
@@ -478,13 +478,13 @@
                 </tr>
                 <tr>
                   <td><strong>AER ST53</strong></td>
-                  <td>Official current AER ST53 BITUMEN worksheet; workbook history before the current issue</td>
+                  <td>Official AER ST53 current publication and annual archives from 2017</td>
                   <td>Monthly, Alberta oil sands projects</td>
                   <td>In-situ bitumen</td>
                 </tr>
                 <tr>
                   <td><strong>AER ST39</strong></td>
-                  <td>Official current AER ST39 mined bitumen and synthetic crude worksheets; earlier workbook history</td>
+                  <td>Official AER ST39 mined bitumen and synthetic crude publications and annual archives from 2017</td>
                   <td>Monthly, Alberta mined oil sands and upgraders</td>
                   <td>Mined bitumen gross, Synthetic crude oil</td>
                 </tr>
@@ -556,7 +556,7 @@
                 </tr>
                 <tr>
                   <td><strong>AER Pipelines</strong></td>
-                  <td>AER feeder pipeline and pipeline installation GeoJSON exports</td>
+                  <td>Official AER mapped shapefile and CSV publications, checked weekly</td>
                   <td>Alberta pipeline context</td>
                   <td>Oil-well effluent, crude, HVP/LVP products, condensate, diluents, installations</td>
                 </tr>
@@ -618,6 +618,6 @@
         freshness.textContent = "Loading production and infrastructure data… This may take a moment on a slower connection.";
       }, 8000);
     </script>
-    <script src="src/main.js?v=20260910"></script>
+    <script src="src/main.js?v=20260910-elt1"></script>
   </body>
 </html>
