@@ -14,6 +14,30 @@ import official_source_discovery as discovery
 
 
 class ProductionIntegrityTests(unittest.TestCase):
+    def test_canonical_mines_resolve_verified_scheme_ids_without_name_matching(self):
+        assets, records, rows = {}, [], []
+        by_root = {}
+        for facility, (company, label, scheme) in etl.ST39_MINED_APPROVAL_MAP.items():
+            feature = dict(type="Feature", properties=dict(scheme_no=scheme + "R", name="Official amended scheme"),
+                           geometry=dict(type="Polygon", coordinates=[[[-113, 57], [-112, 57], [-112, 58], [-113, 58], [-113, 57]]]))
+            by_root[scheme] = [dict(centroid=(57.5, -112.5), area=1, feature=feature)]
+            rows.append(dict(operator=company, facility="Changed regulator display name", approval=facility,
+                             area="", recovery="", stream="Mined bitumen gross", period="2026-05", value=1000, units="m3/month"))
+        locations = dict(scheme_index=dict(by_root=by_root), st44_rows=[])
+        add_asset, add_record = refresh.make_callbacks(etl, assets, records)
+        with patch.object(etl, "extract_aer_current", side_effect=lambda source: rows if source == "aer_st39" else []), \
+             patch.object(etl, "resolve_oil_sands_asset_location") as name_matcher:
+            etl.overlay_official_aer_current(assets, records, add_asset, add_record, locations, canonical_ids=True)
+        name_matcher.assert_not_called()
+        self.assertEqual(len(assets), 8)
+        self.assertEqual(len(records), 8)
+        for facility, (_, _, scheme) in etl.ST39_MINED_APPROVAL_MAP.items():
+            asset = assets[f"aer_st39:mined:approval_{etl.approval_root(facility)}"]
+            self.assertEqual(asset.coordinate_method, "aer_scheme_approval_centroid")
+            self.assertEqual(asset.location_confidence, "high")
+            self.assertEqual(asset.geometry_features[0]["properties"]["scheme_no"], scheme + "R")
+            self.assertIsNotNone(asset.latitude)
+
     def test_bcer_geometry_refresh_requires_complete_counted_pages(self):
         feature = dict(type="Feature", properties={}, geometry=None)
         for last_page, expected in [([feature], "downloaded"), ([], "failed")]:

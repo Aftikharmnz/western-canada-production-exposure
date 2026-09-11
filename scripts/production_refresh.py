@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PIPELINE_VERSION = 2
+PIPELINE_VERSION = 3
 DATASET_MODE = "official_actuals"
 GROUP_SOURCES = {
     "aer": {"aer_st53", "aer_st39"},

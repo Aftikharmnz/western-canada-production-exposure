@@ -322,6 +322,20 @@ ST39_SYNTHETIC_APPROVAL_MAP = {
     "ABOS0077533": {"display_name": "Syncrude Mildred Lake Upgrader", "company": "Syncrude JV"},
 }
 
+# ST39 uses oil-sands facility IDs; scheme spatial data uses a separate approval
+# namespace. Keep this reviewed crosswalk independent of displayed asset names.
+# Approval roots retain the latest official amendment, e.g. Horizon 9752R.
+ST39_MINED_APPROVAL_MAP = {
+    "ABOS0093231": ("CNRL", "Horizon", "9752"),
+    "ABOS0077303": ("CNRL", "Muskeg River", "8512"),
+    "ABOS0098351": ("CNRL", "Jackpine", "9756"),
+    "ABOS0104948": ("Suncor", "Fort Hills", "9241"),
+    "ABOS0101871": ("Imperial Oil", "Kearl", "10829"),
+    "ABOS0077189": ("Suncor", "Suncor OSG", "8535"),
+    "ABOS0077533": ("Syncrude JV", "Syncrude Mildred Lake", "8573"),
+    "ABOS0080249": ("Syncrude JV", "Syncrude Aurora", "10781"),
+}
+
 STREAM_LEGEND_KEYS_EXPORT = {
     "In-situ bitumen": "in-situ",
     "Mined bitumen gross": "mined",
@@ -1384,12 +1398,7 @@ def official_approval_location(approval: str, locations: dict[str, Any]) -> dict
 
 def overlay_official_aer_current(assets: dict[str, Asset], records: list[dict[str, Any]],
                                 add_asset: Any, add_record: Any, locations: dict[str, Any], canonical_ids: bool = False) -> None:
-    mined_map = {
-        "ABOS0093231": ("CNRL", "Horizon"), "ABOS0077303": ("CNRL", "Muskeg River"),
-        "ABOS0098351": ("CNRL", "Jackpine"), "ABOS0104948": ("Suncor", "Fort Hills"),
-        "ABOS0101871": ("Imperial Oil", "Kearl"), "ABOS0077189": ("Suncor", "Suncor OSG"),
-        "ABOS0077533": ("Syncrude JV", "Syncrude Mildred Lake"), "ABOS0080249": ("Syncrude JV", "Syncrude Aurora"),
-    }
+    mined_map = ST39_MINED_APPROVAL_MAP
     location_cache: dict[tuple[str, str], dict[str, Any]] = {}
     for source_id in ("aer_st53", "aer_st39"):
         rows = extract_aer_current(source_id)
@@ -1424,7 +1433,7 @@ def overlay_official_aer_current(assets: dict[str, Asset], records: list[dict[st
                         and not a.is_rollup]
             if source_id == "aer_st39":
                 if system == "mined":
-                    company, token = mined_map[row["approval"]]
+                    company, token, scheme_approval = mined_map[row["approval"]]
                     existing = [] if canonical_ids else [a for a in assets.values() if a.source_id == source_id and a.production_system == system
                                 and normalize_match_text(token) in normalize_match_text(a.display_name) and not a.is_rollup]
                     exact = [a for a in existing if normalize_match_text(a.display_name) == normalize_match_text(f"{token} Mine")]
@@ -1436,7 +1445,13 @@ def overlay_official_aer_current(assets: dict[str, Asset], records: list[dict[st
                     company, name = mapping["company"], mapping["display_name"]
                     existing = [] if canonical_ids else [a for a in assets.values() if a.source_id == source_id and a.production_system == system and a.display_name == name]
                 if location_key not in location_cache:
-                    location_cache[location_key] = resolve_oil_sands_asset_location(system, company, name, locations) or {}
+                    if system == "mined":
+                        mapped = official_approval_location(scheme_approval, locations)
+                        if mapped:
+                            mapped["notes"] = f"ST39 facility {row['approval']} maps to scheme approval {scheme_approval}. " + mapped.get("notes", "")
+                        location_cache[location_key] = mapped
+                    else:
+                        location_cache[location_key] = resolve_oil_sands_asset_location(system, company, name, locations) or {}
                 location = location_cache[location_key]
             asset_id = existing[0].asset_id if len(existing) == 1 else f"{source_id}:{system}:approval_{approval_root(row['approval'])}"
             aid = add_asset(display_name=name, source_id=source_id, production_system=system, company=company,
