@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-10T07:09:51+00:00",
+  "checked_at": "2026-09-11T04:44:04+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -507,12 +507,12 @@
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
+      "fingerprint": "5fedccd169590fca9c04568cd79bfd536faf2577f6d7a3d2fbe42103fb0d2894",
       "comparison_basis": "observed_source",
       "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
-      "review_required": false,
-      "status": "unchanged",
-      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+      "review_required": true,
+      "status": "review_required",
+      "reason": "Source fingerprint differs from its baseline; published facts have been preserved."
     },
     {
       "id": "refinery:ab48e02afec3",
@@ -551,16 +551,19 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1812447/000109690626001217/skyq-20260630_10q.htm",
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
-      "available": false,
-      "status": "unavailable",
-      "review_required": true,
-      "error": "HTTP Error 403: Forbidden"
+      "available": true,
+      "fingerprint": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
+      "comparison_basis": "first_observation",
+      "observation_baseline": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
+      "review_required": false,
+      "status": "available",
+      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
     },
     {
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-10T07:09:32+00:00",
+      "checked_at": "2026-09-11T04:44:04+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
@@ -586,11 +589,10 @@
     "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
   ],
   "review_required_count": 4,
-  "failure_count": 4,
+  "failure_count": 3,
   "failures": [
     "transmountain_tariff_index",
     "refinery:81935ea46b38",
-    "refinery:4ff5cb7370f7",
-    "refinery:93bba180e46a"
+    "refinery:4ff5cb7370f7"
   ]
 }
