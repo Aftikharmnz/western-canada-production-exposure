@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-11T04:44:04+00:00",
+  "checked_at": "2026-09-11T04:48:40+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -553,17 +553,17 @@
       "facts_automatically_updated": false,
       "available": true,
       "fingerprint": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
-      "comparison_basis": "first_observation",
+      "comparison_basis": "observed_source",
       "observation_baseline": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
       "review_required": false,
-      "status": "available",
+      "status": "unchanged",
       "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
     },
     {
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-11T04:44:04+00:00",
+      "checked_at": "2026-09-11T04:48:40+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,

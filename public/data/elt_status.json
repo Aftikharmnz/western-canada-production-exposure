@@ -23,15 +23,19 @@
     "last_attempt_at": "2026-09-11T04:38:05+00:00"
   },
   "infrastructure": {
-    "checked_at": "2026-09-10T07:28:51+00:00",
-    "last_data_update": "2026-09-10T07:31:42+00:00",
-    "status": "updated",
-    "run_url": null,
-    "raw_archive_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/releases/tag/elt-bootstrap-c92ffc9257fc",
-    "execution_mode": "online",
-    "scope": "AER feeder pipelines and installations",
-    "warnings": [],
+    "checked_at": "2026-09-11T04:46:58+00:00",
+    "raw_archive_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/releases/tag/elt-raw-34563209270-1",
+    "last_data_update": "2026-09-11T04:46:58+00:00",
+    "status": "degraded",
+    "run_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/34563209270",
+    "warnings": [
+      "railways.geojson: upstream refresh unavailable; validated existing layer retained.",
+      "Some live weather, wildfire or map services are unavailable; see API health details.",
+      "4 reference sources need review; reviewed facts retain their original verification dates."
+    ],
     "latest_actual_date": "2026-07-31",
-    "default_date": "2026-05-31"
+    "default_date": "2026-05-31",
+    "execution_mode": "online",
+    "last_attempt_at": "2026-09-11T04:46:58+00:00"
   }
 }
