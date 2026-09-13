@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-11T05:12:47.710498+00:00",
+  "checked_at": "2026-09-13T13:28:34.468994+00:00",
   "scope": "Browser runtime APIs and basemaps. ETL and infrastructure services are documented in the production/infrastructure audits.",
   "checks": [
     {
@@ -8,7 +8,7 @@
       "http_status": 200,
       "content_type": "application/json;charset=UTF-8",
       "cors": "*",
-      "feature_count": 54,
+      "feature_count": 34,
       "sample_fields": [
         "age",
         "agency",
@@ -54,7 +54,7 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 112,
+      "feature_count": 107,
       "sample_fields": [
         "CURRENT_SIZE",
         "FIRE_NUMBER",
@@ -133,11 +133,11 @@
     },
     {
       "name": "ECCC_WindDir",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-09-11T04%3A12%3A33.868343%2B00%3A00%2F2026-09-11T08%3A12%3A33.868343%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-09-13T12%3A28%3A33.475401%2B00%3A00%2F2026-09-13T16%3A28%3A33.475401%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",
-      "feature_count": 422,
+      "feature_count": 403,
       "sample_fields": [
         "ade_id",
         "forecast_datetime",
@@ -163,11 +163,11 @@
     },
     {
       "name": "ECCC_WindSpeed",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-09-11T04%3A12%3A33.868343%2B00%3A00%2F2026-09-11T08%3A12%3A33.868343%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-09-13T12%3A28%3A33.475401%2B00%3A00%2F2026-09-13T16%3A28%3A33.475401%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",
-      "feature_count": 700,
+      "feature_count": 676,
       "sample_fields": [
         "ade_id",
         "forecast_datetime",
