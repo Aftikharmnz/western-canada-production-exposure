@@ -48,7 +48,7 @@
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 0
+   "runs_above": 1
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-09-16 23:37 UTC",
- "power_observation": "2026-09-16T23:37:00+00:00",
+ "last_check": "2026-09-17 21:39 UTC",
+ "power_observation": "2026-09-17T21:38:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
