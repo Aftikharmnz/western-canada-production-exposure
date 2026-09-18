@@ -53,7 +53,7 @@
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 0
+   "runs_above": 1
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-09-18 17:34 UTC",
- "power_observation": "2026-09-18T17:33:00+00:00",
+ "last_check": "2026-09-18 20:35 UTC",
+ "power_observation": "2026-09-18T20:34:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
