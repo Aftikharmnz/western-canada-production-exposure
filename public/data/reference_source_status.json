@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-20T12:33:13+00:00",
+  "checked_at": "2026-09-20T13:14:39+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -506,13 +506,12 @@
       "url": "https://www.fcl.crs/our-business/energy",
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
-      "available": true,
-      "fingerprint": "f220f4fbb83ebecd6f97c39e813cea6eb4bbbf9649d92bb0b493bdfdcc6ea368",
-      "comparison_basis": "observed_source",
-      "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
+      "available": false,
+      "status": "unavailable",
       "review_required": true,
-      "status": "review_required",
-      "reason": "Source fingerprint differs from its baseline; published facts have been preserved."
+      "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
+      "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
+      "fingerprint": "f220f4fbb83ebecd6f97c39e813cea6eb4bbbf9649d92bb0b493bdfdcc6ea368"
     },
     {
       "id": "refinery:ab48e02afec3",
@@ -563,7 +562,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-20T12:33:12+00:00",
+      "checked_at": "2026-09-20T13:14:39+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
@@ -589,10 +588,11 @@
     "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
   ],
   "review_required_count": 4,
-  "failure_count": 3,
+  "failure_count": 4,
   "failures": [
     "transmountain_tariff_index",
     "refinery:81935ea46b38",
-    "refinery:4ff5cb7370f7"
+    "refinery:4ff5cb7370f7",
+    "refinery:5de8bab8a727"
   ]
 }
