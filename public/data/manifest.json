@@ -1,7 +1,7 @@
 {
   "dataset_mode": "official_actuals",
   "pipeline_version": 3,
-  "generated_at": "2026-09-21T14:13:48+00:00",
+  "generated_at": "2026-09-23T12:48:06+00:00",
   "latest_actual_date": "2026-08-31",
   "cutoff_date": "2015-01-01",
   "source_state": {
@@ -323,20 +323,20 @@
         "raw_path": "bcer/well_surface_locations.geojson",
         "sha256": "e0e268c59b7f2d1a1abcf700f6db94325054721c21304cfff65176d65a2a1c7c",
         "bytes": 9451075,
-        "checked_at": "2026-09-21T14:13:48+00:00",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "bcer/well_index.csv": {
         "source_id": "bcer_well_index",
         "url": "https://iris.bcogc.ca/download/well_index.csv",
         "raw_path": "bcer/well_index.csv",
-        "sha256": "7119e96ae48807c7ddbe081b8b9ad8caea94afedc9666142af3ab2a0a0776ad6",
+        "sha256": "ff3c35b1be1a5291b4b05077ceed7119ea5c002f8791567d8b3c8bb64b5983b9",
         "bytes": 14844116,
-        "checked_at": "2026-09-21T14:13:48+00:00",
-        "etag": "\"e280d4-65bfc92648c9e\"",
-        "last_modified": "Mon, 21 Sep 2026 11:30:06 GMT",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "etag": "\"e280d4-65c24ce173a8c\"",
+        "last_modified": "Wed, 23 Sep 2026 11:30:06 GMT",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "bcer/prod_csv.zip": {
@@ -345,10 +345,10 @@
         "raw_path": "bcer/prod_csv.zip",
         "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
         "bytes": 123407266,
-        "checked_at": "2026-09-21T14:13:48+00:00",
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "etag": "\"75b0ba2-65a691977cb24\"",
         "last_modified": "Tue, 01 Sep 2026 10:08:25 GMT",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "manitoba/wmp_2023_2026_excel.zip": {
@@ -406,11 +406,11 @@
         "raw_path": "nd/mpr/2026_05.xlsx",
         "sha256": "91a5c07902855b21d33653a615026bcec240d53f2e1ce1a84c55b2cdb37e60c9",
         "bytes": 3290653,
-        "checked_at": "2026-09-11T04:38:05+00:00",
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "etag": "\"066aa2d2815dd1:0\"",
         "last_modified": "Thu, 16 Jul 2026 13:37:00 GMT",
         "period": "2026-05",
-        "ingested_at": "2026-09-11T04:38:05+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "nd/mpr/2026_06.xlsx": {
@@ -419,21 +419,21 @@
         "raw_path": "nd/mpr/2026_06.xlsx",
         "sha256": "256f63ecdff8d0b7bad5a256a2a2ec4281d629eb6adec33e19ed66a6ad7db6eb",
         "bytes": 3296675,
-        "checked_at": "2026-09-11T04:38:05+00:00",
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "etag": "\"07a109c802edd1:0\"",
         "last_modified": "Mon, 17 Aug 2026 19:43:00 GMT",
         "period": "2026-06",
-        "ingested_at": "2026-09-11T04:38:05+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/infra/well_to_facility_link_ab.zip": {
         "source_id": "petrinex_ab_well_facility_link",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
         "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-        "sha256": "8344d9c9ee4d3bfe526ae868dbeb5e2a7ed034e9e4e08b056b0281cfd0e001f8",
-        "bytes": 14940417,
-        "checked_at": "2026-09-21T14:13:48+00:00",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "f8e8de0dc55cfadc5e5d5e4496d12d105921ba719ca04ed33b7164e7f4bd4fa0",
+        "bytes": 14940354,
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-05-AB.zip": {
@@ -452,34 +452,34 @@
         "source_id": "petrinex_ab_conventional_vol",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
         "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
-        "sha256": "64e511500c691862ce6a901438a2978655c5e0e6c1e1215e5f4328ee5cdf6a47",
-        "bytes": 7625701,
-        "checked_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "3f7f97e4d67a4bbd415548e92603a59ae56e91eebd2d75e73aa783f85782fb36",
+        "bytes": 7628529,
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "period": "2026-06",
-        "updated_at": "2026-09-19 02:34:13",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "updated_at": "2026-09-22 06:25:29",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-07-AB.zip": {
         "source_id": "petrinex_ab_conventional_vol",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
         "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
-        "sha256": "133fbb21f74fc33029a4f22d7362b9f38bb745c743b1c3a66e484a7b5d15da88",
-        "bytes": 7700069,
-        "checked_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "db7c048c53e211530b292e0462c931ee1d65649a3d4d4917fab69a486fb0e7fd",
+        "bytes": 7704515,
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "period": "2026-07",
-        "updated_at": "2026-09-19 02:23:20",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "updated_at": "2026-09-22 06:15:41",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/infra/well_infrastructure_sk.zip": {
         "source_id": "petrinex_sk_well_infrastructure",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
         "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-        "sha256": "f43f99bf105e5c1d10c7541b34faba50950e298bb846fea28acb0f44f91eec3d",
-        "bytes": 13421063,
-        "checked_at": "2026-09-21T14:13:48+00:00",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "6f616758c01fe838de8ca1e2c6a31e04af259e17f0867f67f11fd7c670c1fa29",
+        "bytes": 13421912,
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-05-SK.zip": {
@@ -498,24 +498,24 @@
         "source_id": "petrinex_sk_well_production",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
         "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
-        "sha256": "e4d58c2ac4ca967aa30ca5e1b53abccf447e6aaae089c160ad19652001979c96",
-        "bytes": 2864831,
-        "checked_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
+        "bytes": 2864429,
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "period": "2026-06",
-        "updated_at": "2026-09-17 17:43:02",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "updated_at": "2026-09-21 21:16:16",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-07-SK.zip": {
         "source_id": "petrinex_sk_well_production",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
         "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
-        "sha256": "31fd69c1d3978e6b38f04f037f267c970ac849c6d665b9851e432841f7658954",
-        "bytes": 2890654,
-        "checked_at": "2026-09-21T14:13:48+00:00",
+        "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
+        "bytes": 2891160,
+        "checked_at": "2026-09-23T12:48:06+00:00",
         "period": "2026-07",
-        "updated_at": "2026-09-17 17:39:24",
-        "ingested_at": "2026-09-21T14:13:48+00:00",
+        "updated_at": "2026-09-21 21:13:33",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2023-03-SK.zip": {
@@ -1153,6 +1153,43 @@
         "updated_at": "2026-09-17 19:44:02",
         "ingested_at": "2026-09-20T12:25:52+00:00",
         "ingestion_mode": "online"
+      },
+      "nd/mpr/2026_07.xlsx": {
+        "source_id": "ndic_well_production",
+        "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_07.xlsx",
+        "raw_path": "nd/mpr/2026_07.xlsx",
+        "sha256": "dd55c53342e1079deb48985587c8064abd69400fa5d7fdb25b47e652ad85ec92",
+        "bytes": 3306982,
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "etag": "\"80333ae4e4add1:0\"",
+        "last_modified": "Mon, 21 Sep 2026 21:19:31 GMT",
+        "period": "2026-07",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
+        "ingestion_mode": "online"
+      },
+      "petrinex/ab/vol/Vol_2026-08-AB.zip": {
+        "source_id": "petrinex_ab_conventional_vol",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
+        "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
+        "sha256": "3fa898bf33175b42fd76d9fdf1bd23778115a8ef3c9a4fdb25ec367c1842ef9d",
+        "bytes": 7658893,
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "period": "2026-08",
+        "updated_at": "2026-09-22 06:07:46",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
+        "ingestion_mode": "online"
+      },
+      "petrinex/sk/vol/Vol_2026-08-SK.zip": {
+        "source_id": "petrinex_sk_well_production",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
+        "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
+        "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
+        "bytes": 2876971,
+        "checked_at": "2026-09-23T12:48:06+00:00",
+        "period": "2026-08",
+        "updated_at": "2026-09-21 21:08:34",
+        "ingested_at": "2026-09-23T12:48:06+00:00",
+        "ingestion_mode": "online"
       }
     },
     "publication_tokens": {
@@ -1528,17 +1565,17 @@
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-06": {
-        "updated_at": "2026-09-19 02:34:13",
+        "updated_at": "2026-09-22 06:25:29",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
-        "observed_at": "2026-09-21T14:13:48+00:00",
+        "observed_at": "2026-09-23T12:48:06+00:00",
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-07": {
-        "updated_at": "2026-09-19 02:23:20",
+        "updated_at": "2026-09-22 06:15:41",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
-        "observed_at": "2026-09-21T14:13:48+00:00",
+        "observed_at": "2026-09-23T12:48:06+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2022-01": {
@@ -1913,17 +1950,31 @@
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-06": {
-        "updated_at": "2026-09-17 17:43:02",
+        "updated_at": "2026-09-21 21:16:16",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
-        "observed_at": "2026-09-21T14:13:48+00:00",
+        "observed_at": "2026-09-23T12:48:06+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-07": {
-        "updated_at": "2026-09-17 17:39:24",
+        "updated_at": "2026-09-21 21:13:33",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
-        "observed_at": "2026-09-21T14:13:48+00:00",
+        "observed_at": "2026-09-23T12:48:06+00:00",
+        "catalog_only": false
+      },
+      "petrinex_ab_conventional_vol:2026-08": {
+        "updated_at": "2026-09-22 06:07:46",
+        "timestamp_timezone": "not specified by source",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
+        "observed_at": "2026-09-23T12:48:06+00:00",
+        "catalog_only": false
+      },
+      "petrinex_sk_well_production:2026-08": {
+        "updated_at": "2026-09-21 21:08:34",
+        "timestamp_timezone": "not specified by source",
+        "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
+        "observed_at": "2026-09-23T12:48:06+00:00",
         "catalog_only": false
       }
     }
@@ -8411,21 +8462,22 @@
       }
     }
   ],
-  "record_count": 4405921,
-  "base_record_count": 56313,
-  "on_demand_record_count": 4349608,
-  "asset_count": 125305,
-  "mapped_asset_count": 125297,
+  "record_count": 4481747,
+  "base_record_count": 56886,
+  "on_demand_record_count": 4424861,
+  "asset_count": 125737,
+  "mapped_asset_count": 125729,
   "asset_geometry_feature_count": 341,
   "location_quality_asset_count": {
     "exact": 10459,
     "high": 326,
-    "low": 90727,
-    "medium": 23785,
+    "low": 91084,
+    "medium": 23860,
     "unmapped": 8
   },
   "location_quality_latest_actual_kbbl_d": {
-    "medium": 0.001
+    "low": 1569.4747,
+    "medium": 197.8715
   },
   "periods": [
     "2015-01-31",
@@ -8840,7 +8892,7 @@
     "2025-04-30": 7669.5224,
     "2025-05-31": 6911.7719,
     "2025-06-30": 7619.6925,
-    "2025-07-31": 8088.6759,
+    "2025-07-31": 8088.6758,
     "2025-08-31": 8020.1143,
     "2025-09-30": 7979.2452,
     "2025-10-31": 7976.0991,
@@ -8851,9 +8903,9 @@
     "2026-03-31": 7924.0293,
     "2026-04-30": 7976.6078,
     "2026-05-31": 7599.3445,
-    "2026-06-30": 4844.2203,
-    "2026-07-31": 3929.7311,
-    "2026-08-31": 0.001
+    "2026-06-30": 4844.5405,
+    "2026-07-31": 4939.9823,
+    "2026-08-31": 1767.3462
   },
   "date_filter_totals": {
     "2015-01-31": [
@@ -20173,7 +20225,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "conventional",
-        "kbbl_d": 59.2968
+        "kbbl_d": 59.2969
       },
       {
         "source_id": "ndic_well_production",
@@ -21545,7 +21597,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "conventional",
-        "kbbl_d": 61.8498
+        "kbbl_d": 61.8499
       },
       {
         "source_id": "ndic_well_production",
@@ -22449,7 +22501,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "conventional",
-        "kbbl_d": 67.7218
+        "kbbl_d": 67.7219
       },
       {
         "source_id": "ndic_well_production",
@@ -24289,7 +24341,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 9.1495
+        "kbbl_d": 9.1493
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -24305,7 +24357,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 501.3811
+        "kbbl_d": 501.5882
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -24321,7 +24373,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 94.9625
+        "kbbl_d": 93.9562
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24329,7 +24381,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 3.353
+        "kbbl_d": 4.4
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24337,15 +24389,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 11.3156
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 0.0507
+        "kbbl_d": 11.3663
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24369,7 +24413,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 137.8404
+        "kbbl_d": 135.9277
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24377,7 +24421,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 1.9811
+        "kbbl_d": 3.9521
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24385,15 +24429,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 31.8934
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 0.0607
+        "kbbl_d": 31.9541
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24417,7 +24453,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 320.7515
+        "kbbl_d": 320.7657
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -24494,6 +24530,14 @@
         "kbbl_d": 52.6848
       },
       {
+        "source_id": "ndic_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 1010.4166
+      },
+      {
         "source_id": "petrinex_ab_condensate_vol",
         "stream": "Condensate production",
         "scenario": "actual",
@@ -24515,7 +24559,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 508.4756
+        "kbbl_d": 508.6041
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -24531,7 +24575,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 97.4022
+        "kbbl_d": 96.2932
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24539,7 +24583,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 3.6016
+        "kbbl_d": 4.7141
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24547,15 +24591,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 12.504
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 0.0466
+        "kbbl_d": 12.5505
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24563,7 +24599,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 9.5492
+        "kbbl_d": 9.371
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24575,19 +24611,11 @@
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane spec",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 0.0898
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
         "stream": "Propane mix",
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 143.0256
+        "kbbl_d": 141.0227
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24595,7 +24623,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 1.6089
+        "kbbl_d": 3.621
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24603,15 +24631,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 35.5239
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 0.0534
+        "kbbl_d": 35.5772
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -24635,7 +24655,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 320.3995
+        "kbbl_d": 320.3686
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -24651,7 +24671,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 423.9039
+        "kbbl_d": 423.8962
       }
     ],
     "2026-08-31": [
@@ -24662,6 +24682,142 @@
         "location_confidence": "medium",
         "legend_key": "conventional",
         "kbbl_d": 0.001
+      },
+      {
+        "source_id": "petrinex_ab_condensate_vol",
+        "stream": "Condensate production",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "condensate",
+        "kbbl_d": 7.8583
+      },
+      {
+        "source_id": "petrinex_ab_condensate_vol",
+        "stream": "Condensate production",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "condensate",
+        "kbbl_d": 84.6692
+      },
+      {
+        "source_id": "petrinex_ab_conventional_vol",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "conventional",
+        "kbbl_d": 516.6802
+      },
+      {
+        "source_id": "petrinex_ab_conventional_vol",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "conventional",
+        "kbbl_d": 57.957
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Butane mix",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "gas-plant",
+        "kbbl_d": 95.6401
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Butane mix",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "integrated-plant",
+        "kbbl_d": 4.5187
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Butane mix",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "gas-plant",
+        "kbbl_d": 14.2937
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Butane spec",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "spec-plant",
+        "kbbl_d": 10.2135
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Butane spec",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "integrated-plant",
+        "kbbl_d": 0.9305
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Propane mix",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "gas-plant",
+        "kbbl_d": 138.9683
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Propane mix",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "integrated-plant",
+        "kbbl_d": 3.0623
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Propane mix",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "gas-plant",
+        "kbbl_d": 40.1498
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Propane spec",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "spec-plant",
+        "kbbl_d": 19.1891
+      },
+      {
+        "source_id": "petrinex_ab_ngl_vol",
+        "stream": "Propane spec",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "integrated-plant",
+        "kbbl_d": 12.1435
+      },
+      {
+        "source_id": "petrinex_ab_pentanes_plus_vol",
+        "stream": "Pentanes plus total",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "pentanes-plus",
+        "kbbl_d": 322.7998
+      },
+      {
+        "source_id": "petrinex_ab_pentanes_plus_vol",
+        "stream": "Pentanes plus total",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "pentanes-plus",
+        "kbbl_d": 0.8008
+      },
+      {
+        "source_id": "petrinex_sk_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "conventional",
+        "kbbl_d": 437.4704
       }
     ]
   },
@@ -24741,7 +24897,7 @@
       "last_date": "2026-08-31",
       "record_count": 38208,
       "asset_count": 1359,
-      "sum_kbbl_d_observations": 1786.0219
+      "sum_kbbl_d_observations": 1786.022
     },
     {
       "source_id": "ndic_well_production",
@@ -24749,10 +24905,10 @@
       "stream": "Conventional crude oil",
       "scenario": "actual",
       "first_date": "2024-01-31",
-      "last_date": "2026-06-30",
-      "record_count": 559961,
-      "asset_count": 21504,
-      "sum_kbbl_d_observations": 32132.2706
+      "last_date": "2026-07-31",
+      "record_count": 579351,
+      "asset_count": 21573,
+      "sum_kbbl_d_observations": 33142.6872
     },
     {
       "source_id": "petrinex_ab_condensate_vol",
@@ -24760,10 +24916,10 @@
       "stream": "Condensate production",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 60104,
-      "asset_count": 4071,
-      "sum_kbbl_d_observations": 4443.4888
+      "last_date": "2026-08-31",
+      "record_count": 61067,
+      "asset_count": 4102,
+      "sum_kbbl_d_observations": 4536.0163
     },
     {
       "source_id": "petrinex_ab_conventional_vol",
@@ -24771,10 +24927,10 @@
       "stream": "Conventional crude oil",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 1436082,
-      "asset_count": 45381,
-      "sum_kbbl_d_observations": 29454.3713
+      "last_date": "2026-08-31",
+      "record_count": 1461873,
+      "asset_count": 45561,
+      "sum_kbbl_d_observations": 30029.3441
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -24782,10 +24938,10 @@
       "stream": "Butane mix",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 15813,
-      "asset_count": 429,
-      "sum_kbbl_d_observations": 5578.2458
+      "last_date": "2026-08-31",
+      "record_count": 16087,
+      "asset_count": 432,
+      "sum_kbbl_d_observations": 5692.7425
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -24793,10 +24949,10 @@
       "stream": "Butane spec",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 662,
+      "last_date": "2026-08-31",
+      "record_count": 674,
       "asset_count": 24,
-      "sum_kbbl_d_observations": 569.2531
+      "sum_kbbl_d_observations": 580.1292
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -24804,10 +24960,10 @@
       "stream": "Propane mix",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 15768,
-      "asset_count": 428,
-      "sum_kbbl_d_observations": 8974.4505
+      "last_date": "2026-08-31",
+      "record_count": 16042,
+      "asset_count": 431,
+      "sum_kbbl_d_observations": 9156.6983
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -24815,10 +24971,10 @@
       "stream": "Propane spec",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 703,
+      "last_date": "2026-08-31",
+      "record_count": 716,
       "asset_count": 20,
-      "sum_kbbl_d_observations": 1645.8447
+      "sum_kbbl_d_observations": 1677.1772
     },
     {
       "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -24826,10 +24982,10 @@
       "stream": "Pentanes plus total",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 27605,
-      "asset_count": 1115,
-      "sum_kbbl_d_observations": 14949.1075
+      "last_date": "2026-08-31",
+      "record_count": 28098,
+      "asset_count": 1121,
+      "sum_kbbl_d_observations": 15272.6913
     },
     {
       "source_id": "petrinex_sk_well_production",
@@ -24837,10 +24993,10 @@
       "stream": "Conventional crude oil",
       "scenario": "actual",
       "first_date": "2022-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 1561894,
-      "asset_count": 35983,
-      "sum_kbbl_d_observations": 24476.9899
+      "last_date": "2026-08-31",
+      "record_count": 1590510,
+      "asset_count": 36126,
+      "sum_kbbl_d_observations": 24914.4526
     }
   ],
   "data_quality": {
@@ -24864,34 +25020,6 @@
         "stream": "Conventional crude oil",
         "date": "2026-08-31",
         "message": "Conventional crude oil total is 0.0 kbbl/d on 2026-08-31, down from 52.7 kbbl/d on 2026-07-31. Treat this month as incomplete until source reconciliation passes."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_ngl_vol has no Propane mix data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane spec",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_ngl_vol has no Propane spec data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_ngl_vol has no Butane mix data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane spec",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_ngl_vol has no Butane spec data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
       },
       {
         "severity": "high",
@@ -24944,34 +25072,6 @@
       },
       {
         "severity": "high",
-        "source_id": "petrinex_ab_condensate_vol",
-        "stream": "Condensate production",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_condensate_vol has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_conventional_vol",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_conventional_vol has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_ab_pentanes_plus_vol",
-        "stream": "Pentanes plus total",
-        "date": "2026-08-31",
-        "message": "petrinex_ab_pentanes_plus_vol has no Pentanes plus total data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "petrinex_sk_well_production",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "petrinex_sk_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
         "source_id": "manitoba_well_production",
         "stream": "Conventional crude oil",
         "date": "2026-08-31",
@@ -24981,15 +25081,8 @@
         "severity": "high",
         "source_id": "ndic_well_production",
         "stream": "Conventional crude oil",
-        "date": "2026-07-31",
-        "message": "ndic_well_production has no Conventional crude oil data for 2026-07-31; last reported month is 2026-06-30. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "ndic_well_production",
-        "stream": "Conventional crude oil",
         "date": "2026-08-31",
-        "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-06-30. Totals for this month are partial."
+        "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
       },
       {
         "severity": "high",
@@ -25037,13 +25130,6 @@
           "stream": "Synthetic crude oil",
           "date": "2026-07-31",
           "message": "aer_st39 has no Synthetic crude oil data for 2026-07-31; last reported month is 2026-05-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "ndic_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-07-31",
-          "message": "ndic_well_production has no Conventional crude oil data for 2026-07-31; last reported month is 2026-06-30. Totals for this month are partial."
         }
       ],
       "2026-08-31": [
@@ -25053,34 +25139,6 @@
           "stream": "Conventional crude oil",
           "date": "2026-08-31",
           "message": "Conventional crude oil total is 0.0 kbbl/d on 2026-08-31, down from 52.7 kbbl/d on 2026-07-31. Treat this month as incomplete until source reconciliation passes."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_ngl_vol",
-          "stream": "Propane mix",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_ngl_vol has no Propane mix data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_ngl_vol",
-          "stream": "Propane spec",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_ngl_vol has no Propane spec data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_ngl_vol",
-          "stream": "Butane mix",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_ngl_vol has no Butane mix data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_ngl_vol",
-          "stream": "Butane spec",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_ngl_vol has no Butane spec data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
         },
         {
           "severity": "high",
@@ -25105,34 +25163,6 @@
         },
         {
           "severity": "high",
-          "source_id": "petrinex_ab_condensate_vol",
-          "stream": "Condensate production",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_condensate_vol has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_conventional_vol",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_conventional_vol has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_ab_pentanes_plus_vol",
-          "stream": "Pentanes plus total",
-          "date": "2026-08-31",
-          "message": "petrinex_ab_pentanes_plus_vol has no Pentanes plus total data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "petrinex_sk_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "petrinex_sk_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
           "source_id": "manitoba_well_production",
           "stream": "Conventional crude oil",
           "date": "2026-08-31",
@@ -25143,7 +25173,7 @@
           "source_id": "ndic_well_production",
           "stream": "Conventional crude oil",
           "date": "2026-08-31",
-          "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-06-30. Totals for this month are partial."
+          "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
         },
         {
           "severity": "high",
@@ -25330,8 +25360,9 @@
       "2026-03-31": 1574.5124,
       "2026-04-30": 1577.7866,
       "2026-05-31": 1533.5814,
-      "2026-06-30": 1571.2793,
-      "2026-07-31": 1580.4864
+      "2026-06-30": 1571.5994,
+      "2026-07-31": 1580.4108,
+      "2026-08-31": 1569.4747
     }
   },
   "source_manifest": [
@@ -25684,7 +25715,7 @@
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:13:52.396088+00:00",
+      "retrieved_at": "2026-09-23T12:48:10.610870+00:00",
       "bytes": 314368,
       "sha256": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd",
       "etag": "0x8DF0AB9E0082FE1",
@@ -25694,7 +25725,7 @@
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_current.xls",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -25837,7 +25868,7 @@
       "url": "https://www.aer.ca/documents/sts/ST39.xls",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:13:52.830394+00:00",
+      "retrieved_at": "2026-09-23T12:48:11.078999+00:00",
       "bytes": 245696,
       "sha256": "e6f977392aa177a27e1da7ce1f4d62c61a7b5f955ab64ae685e3c95bc122ccf8",
       "etag": "0x8DF02F1C45AC9A7",
@@ -25847,7 +25878,7 @@
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_current.xls",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -25855,7 +25886,7 @@
       "url": "https://www.aer.ca/prd/documents/sts/ST44_2026-Q2.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:13:53.208440+00:00",
+      "retrieved_at": "2026-09-23T12:48:11.490538+00:00",
       "bytes": 75470,
       "sha256": "e3fb46ba1bec7544dddc1deb62bad5682b2292ca139c1c9d9ffc3d5f080adb60",
       "etag": "0x8DEFFA327967FD4",
@@ -25866,7 +25897,7 @@
       "source_id": "aer_st44",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
       "raw_path": "aer_st44_current.xlsx",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -25874,7 +25905,7 @@
       "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:13:58.029934+00:00",
+      "retrieved_at": "2026-09-23T12:48:16.211339+00:00",
       "bytes": 12550692,
       "sha256": "fb3e70d727e86e6655b4dd84b02144e182d93c1d3a82a791307df01169870171",
       "etag": null,
@@ -25885,115 +25916,7 @@
       "source_id": "manitoba_well_production",
       "discovery_url": "https://www.gov.mb.ca/iem/petroleum/reports/index.html",
       "raw_path": "manitoba/wmp_2023_2026_excel.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:07.454002+00:00",
-      "bytes": 13421063,
-      "sha256": "f43f99bf105e5c1d10c7541b34faba50950e298bb846fea28acb0f44f91eec3d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_infrastructure",
-      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:09.845684+00:00",
-      "bytes": 2896783,
-      "sha256": "99373ed41f6c14d06346714dc41ae3da4f55349d9903faff9df372e4d43e3f6c",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-05",
-      "current": true,
-      "updated_at": "2026-09-17 17:46:35",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-05-SK.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:12.191545+00:00",
-      "bytes": 2864831,
-      "sha256": "e4d58c2ac4ca967aa30ca5e1b53abccf447e6aaae089c160ad19652001979c96",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-06",
-      "current": true,
-      "updated_at": "2026-09-17 17:43:02",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:14.649098+00:00",
-      "bytes": 2890654,
-      "sha256": "31fd69c1d3978e6b38f04f037f267c970ac849c6d665b9851e432841f7658954",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-07",
-      "current": true,
-      "updated_at": "2026-09-17 17:39:24",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:16.107605+00:00",
-      "bytes": 14060144,
-      "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
-      "etag": "0x8DF0AA12CD61BDE",
-      "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT",
-      "http_status": 200,
-      "source_id": "aer_st102_facility_spatial",
-      "raw_path": "aer_st102_facility_list_shapefile.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:16.752723+00:00",
-      "bytes": 2237505,
-      "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
-      "etag": "0x8DEF2F741E5782C",
-      "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT",
-      "http_status": 200,
-      "source_id": "aer_scheme_spatial",
-      "raw_path": "aer_scheme_approval_spatial.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26007,7 +25930,7 @@
       "raw_file": "bcer/well_surface_locations.geojson",
       "grain": "34,415 well surface point geometries",
       "raw_path": "bcer/well_surface_locations.geojson",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "sha256": "e0e268c59b7f2d1a1abcf700f6db94325054721c21304cfff65176d65a2a1c7c",
       "bytes": 9451075,
@@ -26017,15 +25940,15 @@
       "url": "https://iris.bcogc.ca/download/well_index.csv",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:14:32.403231+00:00",
+      "retrieved_at": "2026-09-23T12:48:28.506485+00:00",
       "bytes": 14844116,
-      "sha256": "7119e96ae48807c7ddbe081b8b9ad8caea94afedc9666142af3ab2a0a0776ad6",
-      "etag": "\"e280d4-65bfc92648c9e\"",
-      "last_modified": "Mon, 21 Sep 2026 11:30:06 GMT",
+      "sha256": "ff3c35b1be1a5291b4b05077ceed7119ea5c002f8791567d8b3c8bb64b5983b9",
+      "etag": "\"e280d4-65c24ce173a8c\"",
+      "last_modified": "Wed, 23 Sep 2026 11:30:06 GMT",
       "http_status": 200,
       "source_id": "bcer_well_index",
       "raw_path": "bcer/well_index.csv",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": true
     },
@@ -26033,7 +25956,7 @@
       "url": "https://iris.bcogc.ca/download/prod_csv.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:14:43.850816+00:00",
+      "retrieved_at": "2026-09-23T12:48:32.925098+00:00",
       "bytes": 123407266,
       "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
       "etag": "\"75b0ba2-65a691977cb24\"",
@@ -26042,58 +25965,7 @@
       "source_id": "bcer_well_production",
       "current": true,
       "raw_path": "bcer/prod_csv.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:14:46.388196+00:00",
-      "bytes": 1854076,
-      "sha256": "25c4e41a7d1b3f3fc0ff225a004e96d4b1d0c979dff56e9b46f0d4e406defa56",
-      "etag": "\"1c4a7c-65bfe1e678963\"",
-      "last_modified": "Mon, 21 Sep 2026 13:20:50 GMT",
-      "http_status": 200,
-      "source_id": "montana_bogc_well_list",
-      "raw_path": "montana/MT_CompleteWellList.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:15:35.259844+00:00",
-      "bytes": 73961220,
-      "sha256": "b1b0108d0c0c66085140c31f6dbe2c61cd124cd4767067550638105e339fb4c0",
-      "etag": "\"4688f04-65bfe1f3e73ce\"",
-      "last_modified": "Mon, 21 Sep 2026 13:21:04 GMT",
-      "http_status": 200,
-      "source_id": "montana_bogc_well_production",
-      "current": true,
-      "raw_path": "montana/MT_Historical_Production.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_04.xlsx",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:15:36.074727+00:00",
-      "bytes": 3271477,
-      "sha256": "09bca7d6cf02b8d39db01438d3060e4b55009e455877c3a8f62b05a8561d7a85",
-      "etag": "\"806736a0422dd1:0\"",
-      "last_modified": "Mon, 22 Jun 2026 12:28:27 GMT",
-      "http_status": 200,
-      "source_id": "ndic_well_production",
-      "period": "2026-04",
-      "current": true,
-      "raw_path": "nd/mpr/2026_04.xlsx",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26101,7 +25973,7 @@
       "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_05.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:15:36.856672+00:00",
+      "retrieved_at": "2026-09-23T12:48:33.527736+00:00",
       "bytes": 3290653,
       "sha256": "91a5c07902855b21d33653a615026bcec240d53f2e1ce1a84c55b2cdb37e60c9",
       "etag": "\"066aa2d2815dd1:0\"",
@@ -26111,7 +25983,7 @@
       "period": "2026-05",
       "current": true,
       "raw_path": "nd/mpr/2026_05.xlsx",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26119,7 +25991,7 @@
       "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_06.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:15:37.722052+00:00",
+      "retrieved_at": "2026-09-23T12:48:33.935509+00:00",
       "bytes": 3296675,
       "sha256": "256f63ecdff8d0b7bad5a256a2a2ec4281d629eb6adec33e19ed66a6ad7db6eb",
       "etag": "\"07a109c802edd1:0\"",
@@ -26129,7 +26001,57 @@
       "period": "2026-06",
       "current": true,
       "raw_path": "nd/mpr/2026_06.xlsx",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": false
+    },
+    {
+      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_07.xlsx",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:48:34.297491+00:00",
+      "bytes": 3306982,
+      "sha256": "dd55c53342e1079deb48985587c8064abd69400fa5d7fdb25b47e652ad85ec92",
+      "etag": "\"80333ae4e4add1:0\"",
+      "last_modified": "Mon, 21 Sep 2026 21:19:31 GMT",
+      "http_status": 200,
+      "source_id": "ndic_well_production",
+      "period": "2026-07",
+      "current": true,
+      "raw_path": "nd/mpr/2026_07.xlsx",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:48:35.813883+00:00",
+      "bytes": 14060144,
+      "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
+      "etag": "0x8DF0AA12CD61BDE",
+      "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT",
+      "http_status": 200,
+      "source_id": "aer_st102_facility_spatial",
+      "raw_path": "aer_st102_facility_list_shapefile.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": false
+    },
+    {
+      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:48:36.568892+00:00",
+      "bytes": 2237505,
+      "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
+      "etag": "0x8DEF2F741E5782C",
+      "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT",
+      "http_status": 200,
+      "source_id": "aer_scheme_spatial",
+      "raw_path": "aer_scheme_approval_spatial.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26137,96 +26059,189 @@
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:15:46.740718+00:00",
-      "bytes": 14940417,
-      "sha256": "8344d9c9ee4d3bfe526ae868dbeb5e2a7ed034e9e4e08b056b0281cfd0e001f8",
+      "retrieved_at": "2026-09-23T12:48:44.960151+00:00",
+      "bytes": 14940354,
+      "sha256": "f8e8de0dc55cfadc5e5d5e4496d12d105921ba719ca04ed33b7164e7f4bd4fa0",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_well_facility_link",
       "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-21T14:15:51.718553+00:00",
-      "bytes": 7731102,
-      "sha256": "50e9cc4e94e57f2e8a33c0b920c9f06b89bdb103cf012fe2691a3aea1a4063b3",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-05",
-      "current": true,
-      "updated_at": "2026-09-19 02:46:35",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-05-AB.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
-      "mode": "online",
-      "content_changed": false
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:15:56.506911+00:00",
-      "bytes": 7625701,
-      "sha256": "64e511500c691862ce6a901438a2978655c5e0e6c1e1215e5f4328ee5cdf6a47",
+      "retrieved_at": "2026-09-23T12:48:49.573964+00:00",
+      "bytes": 7628529,
+      "sha256": "3f7f97e4d67a4bbd415548e92603a59ae56e91eebd2d75e73aa783f85782fb36",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_conventional_vol",
       "period": "2026-06",
       "current": true,
-      "updated_at": "2026-09-19 02:34:13",
+      "updated_at": "2026-09-22 06:25:29",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-21T14:16:01.723944+00:00",
-      "bytes": 7700069,
-      "sha256": "133fbb21f74fc33029a4f22d7362b9f38bb745c743b1c3a66e484a7b5d15da88",
+      "retrieved_at": "2026-09-23T12:48:53.863764+00:00",
+      "bytes": 7704515,
+      "sha256": "db7c048c53e211530b292e0462c931ee1d65649a3d4d4917fab69a486fb0e7fd",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_conventional_vol",
       "period": "2026-07",
       "current": true,
-      "updated_at": "2026-09-19 02:23:20",
+      "updated_at": "2026-09-22 06:15:41",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
-      "checked_at": "2026-09-21T14:13:48+00:00",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:48:57.854629+00:00",
+      "bytes": 7658893,
+      "sha256": "3fa898bf33175b42fd76d9fdf1bd23778115a8ef3c9a4fdb25ec367c1842ef9d",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_ab_conventional_vol",
+      "period": "2026-08",
+      "current": true,
+      "updated_at": "2026-09-22 06:07:46",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:04.408634+00:00",
+      "bytes": 13421912,
+      "sha256": "6f616758c01fe838de8ca1e2c6a31e04af259e17f0867f67f11fd7c670c1fa29",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_infrastructure",
+      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:06.325189+00:00",
+      "bytes": 2864429,
+      "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-06",
+      "current": true,
+      "updated_at": "2026-09-21 21:16:16",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:08.075088+00:00",
+      "bytes": 2891160,
+      "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-07",
+      "current": true,
+      "updated_at": "2026-09-21 21:13:33",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:09.894670+00:00",
+      "bytes": 2876971,
+      "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-08",
+      "current": true,
+      "updated_at": "2026-09-21 21:08:34",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:11.687324+00:00",
+      "bytes": 1854076,
+      "sha256": "25c4e41a7d1b3f3fc0ff225a004e96d4b1d0c979dff56e9b46f0d4e406defa56",
+      "etag": "\"1c4a7c-65bfe1e678963\"",
+      "last_modified": "Mon, 21 Sep 2026 13:20:50 GMT",
+      "http_status": 200,
+      "source_id": "montana_bogc_well_list",
+      "raw_path": "montana/MT_CompleteWellList.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "source_id": "petrinex_sk_well_production",
-      "status": "not_published",
-      "period": "2026-08",
-      "latest_published_period": "2026-07",
-      "basis": "Official published-report index",
+      "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-23T12:49:51.058608+00:00",
+      "bytes": 73961220,
+      "sha256": "b1b0108d0c0c66085140c31f6dbe2c61cd124cd4767067550638105e339fb4c0",
+      "etag": "\"4688f04-65bfe1f3e73ce\"",
+      "last_modified": "Mon, 21 Sep 2026 13:21:04 GMT",
+      "http_status": 200,
+      "source_id": "montana_bogc_well_production",
+      "current": true,
+      "raw_path": "montana/MT_Historical_Production.zip",
+      "checked_at": "2026-09-23T12:48:06+00:00",
+      "mode": "online",
       "content_changed": false
     },
     {
       "source_id": "ndic_well_production",
-      "status": "not_published",
-      "period": "2026-08",
-      "latest_published_period": "2026-06",
-      "basis": "Official published-report index",
-      "content_changed": false
-    },
-    {
-      "source_id": "petrinex_ab_conventional_vol",
       "status": "not_published",
       "period": "2026-08",
       "latest_published_period": "2026-07",

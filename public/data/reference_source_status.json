@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-21T14:20:27+00:00",
+  "checked_at": "2026-09-23T12:52:33+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -131,8 +131,14 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "5dddd4bb6bf2e698cd2b68fb414b4805df6d76f07de73b75fa93b8c391fd0987",
+      "fingerprint": "29b0c65ae6ad07261b5f3791e48049670c40a75d5e297684ade2f6fd6569195a",
       "recent_filings": [
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001404",
+          "filingDate": "2026-09-22",
+          "primaryDocument": "skyq-20260918_8k.htm"
+        },
         {
           "form": "8-K",
           "accessionNumber": "0001096906-26-001268",
@@ -306,19 +312,13 @@
           "accessionNumber": "0001096906-25-001153",
           "filingDate": "2025-07-17",
           "primaryDocument": "skyq-20250717.htm"
-        },
-        {
-          "form": "8-K",
-          "accessionNumber": "0001096906-25-001147",
-          "filingDate": "2025-07-15",
-          "primaryDocument": "skyq-20250715.htm"
         }
       ],
       "comparison_basis": "observed_source",
       "observation_baseline": "5dddd4bb6bf2e698cd2b68fb414b4805df6d76f07de73b75fa93b8c391fd0987",
-      "review_required": false,
-      "status": "unchanged",
-      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+      "review_required": true,
+      "status": "review_required",
+      "reason": "Source fingerprint differs from its baseline; published facts have been preserved."
     },
     {
       "id": "tariff:express_cer_204",
@@ -563,7 +563,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-21T14:20:25+00:00",
+      "checked_at": "2026-09-23T12:52:32+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
@@ -588,7 +588,7 @@
     "Operator webpages and tariff publication indexes are checked for availability and change, not automatically interpreted as verified capacity, operating status or effective toll changes.",
     "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
   ],
-  "review_required_count": 4,
+  "review_required_count": 5,
   "failure_count": 3,
   "failures": [
     "transmountain_tariff_index",
