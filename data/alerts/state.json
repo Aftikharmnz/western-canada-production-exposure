@@ -23,7 +23,7 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 0
+   "runs_above": 1
   },
   "CNRL Horizon": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-09-24 14:19 UTC",
- "power_observation": "2026-09-24T14:18:00+00:00",
+ "last_check": "2026-09-24 18:35 UTC",
+ "power_observation": "2026-09-24T18:34:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
