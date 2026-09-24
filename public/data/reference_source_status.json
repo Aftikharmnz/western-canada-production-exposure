@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-23T12:52:33+00:00",
+  "checked_at": "2026-09-24T12:50:52+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -131,8 +131,14 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "29b0c65ae6ad07261b5f3791e48049670c40a75d5e297684ade2f6fd6569195a",
+      "fingerprint": "b2c593c49be45e49620eed87e1ee9ceadb180294ec4e1b0fd9bd19e6a4d1fbd5",
       "recent_filings": [
+        {
+          "form": "8-K",
+          "accessionNumber": "0001096906-26-001430",
+          "filingDate": "2026-09-24",
+          "primaryDocument": "skyq-20260924_8k.htm"
+        },
         {
           "form": "8-K",
           "accessionNumber": "0001096906-26-001404",
@@ -306,12 +312,6 @@
           "accessionNumber": "0001096906-25-001183",
           "filingDate": "2025-07-24",
           "primaryDocument": "skyq-20250724.htm"
-        },
-        {
-          "form": "8-K",
-          "accessionNumber": "0001096906-25-001153",
-          "filingDate": "2025-07-17",
-          "primaryDocument": "skyq-20250717.htm"
         }
       ],
       "comparison_basis": "observed_source",
@@ -551,19 +551,18 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1812447/000109690626001217/skyq-20260630_10q.htm",
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
-      "available": true,
-      "fingerprint": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
-      "comparison_basis": "observed_source",
+      "available": false,
+      "status": "unavailable",
+      "review_required": true,
+      "error": "HTTP Error 503: Service Unavailable",
       "observation_baseline": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f",
-      "review_required": false,
-      "status": "unchanged",
-      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+      "fingerprint": "1d20a9936237e397a9dc407d904760fd91a4ad8c79d1cfc219d893224219a05f"
     },
     {
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-23T12:52:32+00:00",
+      "checked_at": "2026-09-24T12:50:51+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
@@ -588,11 +587,12 @@
     "Operator webpages and tariff publication indexes are checked for availability and change, not automatically interpreted as verified capacity, operating status or effective toll changes.",
     "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
   ],
-  "review_required_count": 5,
-  "failure_count": 3,
+  "review_required_count": 6,
+  "failure_count": 4,
   "failures": [
     "transmountain_tariff_index",
     "refinery:81935ea46b38",
-    "refinery:4ff5cb7370f7"
+    "refinery:4ff5cb7370f7",
+    "refinery:93bba180e46a"
   ]
 }
