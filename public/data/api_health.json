@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-20T13:13:56.480611+00:00",
+  "checked_at": "2026-09-27T14:16:03.098862+00:00",
   "scope": "Browser runtime APIs and basemaps. ETL and infrastructure services are documented in the production/infrastructure audits.",
   "checks": [
     {
@@ -8,7 +8,7 @@
       "http_status": 200,
       "content_type": "application/json;charset=UTF-8",
       "cors": "*",
-      "feature_count": 93,
+      "feature_count": 24,
       "sample_fields": [
         "age",
         "agency",
@@ -54,7 +54,7 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 93,
+      "feature_count": 96,
       "sample_fields": [
         "CURRENT_SIZE",
         "FIRE_NUMBER",
@@ -75,8 +75,24 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 0,
-      "sample_fields": [],
+      "feature_count": 1,
+      "sample_fields": [
+        "AREA_ESTIMATE",
+        "ASSESSMENT_ASSISTANCE_DATE",
+        "CO_FLAG",
+        "FIRE_NUMBER",
+        "FIRE_STATUS",
+        "FIRE_STATUS_DATE",
+        "FIRE_TYPE",
+        "FIRE_YEAR",
+        "GENERAL_CAUSE",
+        "LABEL",
+        "LATITUDE",
+        "LONGITUDE",
+        "RESPONSE_TYPE",
+        "RESP_AREA",
+        "SIZE_CLASS"
+      ],
       "status": "ok"
     },
     {
@@ -117,7 +133,7 @@
     },
     {
       "name": "ECCC_WindDir",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-09-20T12%3A13%3A55.509978%2B00%3A00%2F2026-09-20T16%3A13%3A55.509978%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-09-27T13%3A16%3A02.411496%2B00%3A00%2F2026-09-27T17%3A16%3A02.411496%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",
@@ -147,7 +163,7 @@
     },
     {
       "name": "ECCC_WindSpeed",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-09-20T12%3A13%3A55.509978%2B00%3A00%2F2026-09-20T16%3A13%3A55.509978%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-09-27T13%3A16%3A02.411496%2B00%3A00%2F2026-09-27T17%3A16%3A02.411496%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-27T13:17:38+00:00",
+  "checked_at": "2026-09-27T14:16:06+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -564,7 +564,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-27T13:17:38+00:00",
+      "checked_at": "2026-09-27T14:16:05+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
