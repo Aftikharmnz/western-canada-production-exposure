@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-09-27 17:10 UTC",
- "power_observation": "2026-09-27T17:10:00+00:00",
+ "last_check": "2026-09-27 20:19 UTC",
+ "power_observation": "2026-09-27T20:19:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
