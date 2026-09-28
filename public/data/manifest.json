@@ -1,7 +1,7 @@
 {
   "dataset_mode": "official_actuals",
   "pipeline_version": 3,
-  "generated_at": "2026-09-27T13:05:29+00:00",
+  "generated_at": "2026-09-28T15:33:02+00:00",
   "latest_actual_date": "2026-08-31",
   "cutoff_date": "2015-01-01",
   "source_state": {
@@ -323,20 +323,20 @@
         "raw_path": "bcer/well_surface_locations.geojson",
         "sha256": "e699a3e7290b72eabb629d1b101abb6d41fab92636d86066df8c1d018df892e5",
         "bytes": 9453869,
-        "checked_at": "2026-09-25T12:48:39+00:00",
-        "ingested_at": "2026-09-25T12:48:39+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "bcer/well_index.csv": {
         "source_id": "bcer_well_index",
         "url": "https://iris.bcogc.ca/download/well_index.csv",
         "raw_path": "bcer/well_index.csv",
-        "sha256": "fef54e0022f795d83820a8bffce0ee73378fa082dde1179f48d2268fa2866ff4",
+        "sha256": "3fa702538430cdf25c0c7e5f74f5160b8c2e2b7e4893b00dfbe174003f67d3ed",
         "bytes": 14847126,
-        "checked_at": "2026-09-25T12:48:39+00:00",
-        "etag": "\"e28c96-65c4d09a827ab\"",
-        "last_modified": "Fri, 25 Sep 2026 11:30:04 GMT",
-        "ingested_at": "2026-09-25T12:48:39+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
+        "etag": "\"e28c96-65c8963686736\"",
+        "last_modified": "Mon, 28 Sep 2026 11:30:08 GMT",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "bcer/prod_csv.zip": {
@@ -345,10 +345,10 @@
         "raw_path": "bcer/prod_csv.zip",
         "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
         "bytes": 123407266,
-        "checked_at": "2026-09-25T12:48:39+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "etag": "\"75b0ba2-65a691977cb24\"",
         "last_modified": "Tue, 01 Sep 2026 10:08:25 GMT",
-        "ingested_at": "2026-09-25T12:48:39+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "manitoba/wmp_2023_2026_excel.zip": {
@@ -430,10 +430,10 @@
         "source_id": "petrinex_ab_well_facility_link",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
         "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-        "sha256": "3a9b5524916840b400773d1c86116d7030f10738422c8ce667623735fc32a1cd",
-        "bytes": 14935746,
-        "checked_at": "2026-09-27T13:05:29+00:00",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "sha256": "4d24fdb560b50b9a19008ca2e9d93e20ff4dee975f2a9baa82c3f2d05c1c0e82",
+        "bytes": 14938134,
+        "checked_at": "2026-09-28T15:33:02+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-05-AB.zip": {
@@ -454,10 +454,10 @@
         "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
         "sha256": "c7381c319e1b6a52d5fd8a606b1f2e9b6bad2d46554687145d0d4609873f829b",
         "bytes": 7629857,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-06",
         "updated_at": "2026-09-25 02:40:06",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-07-AB.zip": {
@@ -466,20 +466,20 @@
         "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
         "sha256": "b1d2e5b0f21a4aa8af84c51d3a15b8034996353920e636b31a11174f14ee6b89",
         "bytes": 7704526,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-07",
         "updated_at": "2026-09-25 02:30:39",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/infra/well_infrastructure_sk.zip": {
         "source_id": "petrinex_sk_well_infrastructure",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
         "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-        "sha256": "0e093420b36d8c8d9e02e8bc0975be58190ed81fef40584290befde6a8a7f52d",
-        "bytes": 13423353,
-        "checked_at": "2026-09-27T13:05:29+00:00",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "sha256": "8e41738e1236c2b41270c5a41a70455f9815f0d3f97899efbbca25506609b74a",
+        "bytes": 13424241,
+        "checked_at": "2026-09-28T15:33:02+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-05-SK.zip": {
@@ -500,10 +500,10 @@
         "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
         "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
         "bytes": 2864429,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-06",
         "updated_at": "2026-09-21 21:16:16",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-07-SK.zip": {
@@ -512,10 +512,10 @@
         "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
         "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
         "bytes": 2891160,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-07",
         "updated_at": "2026-09-21 21:13:33",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2023-03-SK.zip": {
@@ -1173,10 +1173,10 @@
         "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
         "sha256": "135776b9d47987733663fceeea2693d880e6967810d0da860b3adb67f0890b26",
         "bytes": 7658440,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-08",
         "updated_at": "2026-09-25 02:23:45",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-08-SK.zip": {
@@ -1185,10 +1185,10 @@
         "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
         "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
         "bytes": 2876971,
-        "checked_at": "2026-09-27T13:05:29+00:00",
+        "checked_at": "2026-09-28T15:33:02+00:00",
         "period": "2026-08",
         "updated_at": "2026-09-21 21:08:34",
-        "ingested_at": "2026-09-27T13:05:29+00:00",
+        "ingested_at": "2026-09-28T15:33:02+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2022-01-AB.zip": {
@@ -2180,14 +2180,14 @@
         "updated_at": "2026-09-25 02:40:06",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-07": {
         "updated_at": "2026-09-25 02:30:39",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2022-01": {
@@ -2565,28 +2565,28 @@
         "updated_at": "2026-09-21 21:16:16",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-07": {
         "updated_at": "2026-09-21 21:13:33",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-08": {
         "updated_at": "2026-09-25 02:23:45",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-08": {
         "updated_at": "2026-09-21 21:08:34",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
-        "observed_at": "2026-09-27T13:05:29+00:00",
+        "observed_at": "2026-09-28T15:33:02+00:00",
         "catalog_only": false
       }
     }
@@ -9112,17 +9112,17 @@
       }
     }
   ],
-  "record_count": 4482105,
+  "record_count": 4482096,
   "base_record_count": 56900,
-  "on_demand_record_count": 4425205,
-  "asset_count": 125705,
-  "mapped_asset_count": 125697,
+  "on_demand_record_count": 4425196,
+  "asset_count": 125709,
+  "mapped_asset_count": 125701,
   "asset_geometry_feature_count": 341,
   "location_quality_asset_count": {
     "exact": 10459,
     "high": 326,
-    "low": 91055,
-    "medium": 23857,
+    "low": 91058,
+    "medium": 23858,
     "unmapped": 8
   },
   "location_quality_latest_actual_kbbl_d": {
@@ -9417,144 +9417,144 @@
   },
   "date_totals_kbbl_d": {
     "2015-01-31": 32.738,
-    "2015-02-28": 32.8433,
+    "2015-02-28": 32.8434,
     "2015-03-31": 33.8746,
-    "2015-04-30": 33.714,
+    "2015-04-30": 33.7138,
     "2015-05-31": 31.145,
-    "2015-06-30": 26.8726,
+    "2015-06-30": 26.8724,
     "2015-07-31": 28.867,
     "2015-08-31": 31.2534,
-    "2015-09-30": 29.2308,
+    "2015-09-30": 29.2306,
     "2015-10-31": 32.2896,
-    "2015-11-30": 39.1391,
+    "2015-11-30": 39.139,
     "2015-12-31": 40.3786,
     "2016-01-31": 42.962,
     "2016-02-29": 43.7225,
     "2016-03-31": 43.4627,
-    "2016-04-30": 41.2844,
+    "2016-04-30": 41.2843,
     "2016-05-31": 39.6354,
-    "2016-06-30": 39.8757,
+    "2016-06-30": 39.8756,
     "2016-07-31": 38.4631,
     "2016-08-31": 38.3807,
-    "2016-09-30": 31.5236,
+    "2016-09-30": 31.5235,
     "2016-10-31": 35.5717,
-    "2016-11-30": 36.4688,
+    "2016-11-30": 36.4687,
     "2016-12-31": 39.3839,
-    "2017-01-31": 4153.3762,
-    "2017-02-28": 4186.1635,
+    "2017-01-31": 4153.3763,
+    "2017-02-28": 4186.1636,
     "2017-03-31": 3740.0561,
-    "2017-04-30": 3157.8406,
+    "2017-04-30": 3157.8405,
     "2017-05-31": 3449.6924,
-    "2017-06-30": 3626.2156,
+    "2017-06-30": 3626.2154,
     "2017-07-31": 3939.4791,
     "2017-08-31": 4297.4586,
-    "2017-09-30": 3882.5359,
+    "2017-09-30": 3882.5357,
     "2017-10-31": 3661.9239,
-    "2017-11-30": 4208.3937,
+    "2017-11-30": 4208.3935,
     "2017-12-31": 4415.782,
-    "2018-01-31": 4033.5435,
-    "2018-02-28": 4255.8059,
+    "2018-01-31": 4033.5436,
+    "2018-02-28": 4255.806,
     "2018-03-31": 4246.0701,
-    "2018-04-30": 3614.2505,
+    "2018-04-30": 3614.2504,
     "2018-05-31": 3994.0735,
-    "2018-06-30": 4074.6379,
+    "2018-06-30": 4074.6377,
     "2018-07-31": 4128.7065,
     "2018-08-31": 4496.8086,
-    "2018-09-30": 3934.396,
-    "2018-10-31": 4421.6606,
-    "2018-11-30": 4633.6049,
+    "2018-09-30": 3934.3958,
+    "2018-10-31": 4421.6607,
+    "2018-11-30": 4633.6048,
     "2018-12-31": 4508.2504,
     "2019-01-31": 4316.2548,
-    "2019-02-28": 4294.922,
+    "2019-02-28": 4294.9221,
     "2019-03-31": 4304.7029,
-    "2019-04-30": 4285.2601,
+    "2019-04-30": 4285.2599,
     "2019-05-31": 4109.1165,
-    "2019-06-30": 4392.9538,
+    "2019-06-30": 4392.9537,
     "2019-07-31": 4536.5356,
     "2019-08-31": 4532.0613,
-    "2019-09-30": 4133.6095,
+    "2019-09-30": 4133.6094,
     "2019-10-31": 3967.2328,
-    "2019-11-30": 4198.3683,
+    "2019-11-30": 4198.3681,
     "2019-12-31": 4553.286,
     "2020-01-31": 4448.0552,
     "2020-02-29": 4509.4965,
     "2020-03-31": 4407.4981,
-    "2020-04-30": 3967.2115,
+    "2020-04-30": 3967.2114,
     "2020-05-31": 3802.5378,
-    "2020-06-30": 3948.9382,
+    "2020-06-30": 3948.9381,
     "2020-07-31": 3812.7178,
-    "2020-08-31": 3636.0943,
-    "2020-09-30": 3832.7003,
-    "2020-10-31": 4050.5431,
-    "2020-11-30": 4642.8089,
+    "2020-08-31": 3636.0944,
+    "2020-09-30": 3832.7001,
+    "2020-10-31": 4050.5432,
+    "2020-11-30": 4642.8088,
     "2020-12-31": 4888.6781,
     "2021-01-31": 4800.9969,
-    "2021-02-28": 4607.4699,
+    "2021-02-28": 4607.47,
     "2021-03-31": 4516.5525,
-    "2021-04-30": 3782.3933,
+    "2021-04-30": 3782.3932,
     "2021-05-31": 4110.08,
-    "2021-06-30": 4504.6258,
+    "2021-06-30": 4504.6256,
     "2021-07-31": 4619.0836,
     "2021-08-31": 4350.549,
-    "2021-09-30": 4320.2425,
+    "2021-09-30": 4320.2423,
     "2021-10-31": 4882.1132,
-    "2021-11-30": 4819.6375,
+    "2021-11-30": 4819.6373,
     "2021-12-31": 4566.2699,
-    "2022-01-31": 5911.4792,
+    "2022-01-31": 5911.4793,
     "2022-02-28": 6212.1724,
     "2022-03-31": 6185.4028,
-    "2022-04-30": 6002.8132,
-    "2022-05-31": 5683.0933,
+    "2022-04-30": 6002.8131,
+    "2022-05-31": 5683.0932,
     "2022-06-30": 5880.7706,
-    "2022-07-31": 6163.1245,
+    "2022-07-31": 6163.1246,
     "2022-08-31": 6138.822,
     "2022-09-30": 6152.6891,
-    "2022-10-31": 6158.6929,
+    "2022-10-31": 6158.693,
     "2022-11-30": 6511.4978,
-    "2022-12-31": 6242.9258,
-    "2023-01-31": 6085.1221,
+    "2022-12-31": 6242.9259,
+    "2023-01-31": 6085.1222,
     "2023-02-28": 6348.8685,
-    "2023-03-31": 6370.1388,
-    "2023-04-30": 5875.8349,
-    "2023-05-31": 5587.3051,
-    "2023-06-30": 5910.5376,
-    "2023-07-31": 6514.7129,
-    "2023-08-31": 6470.269,
-    "2023-09-30": 6124.3085,
+    "2023-03-31": 6370.1389,
+    "2023-04-30": 5875.835,
+    "2023-05-31": 5587.3052,
+    "2023-06-30": 5910.5375,
+    "2023-07-31": 6514.7128,
+    "2023-08-31": 6470.2689,
+    "2023-09-30": 6124.3086,
     "2023-10-31": 6075.1183,
     "2023-11-30": 6830.452,
-    "2023-12-31": 6912.1815,
-    "2024-01-31": 7483.497,
+    "2023-12-31": 6912.1814,
+    "2024-01-31": 7483.4972,
     "2024-02-29": 7791.1668,
-    "2024-03-31": 7875.2947,
+    "2024-03-31": 7875.2948,
     "2024-04-30": 7690.2149,
-    "2024-05-31": 7097.7639,
-    "2024-06-30": 7482.8701,
-    "2024-07-31": 7726.9354,
-    "2024-08-31": 7895.5139,
-    "2024-09-30": 7471.2764,
+    "2024-05-31": 7097.764,
+    "2024-06-30": 7482.8702,
+    "2024-07-31": 7726.9355,
+    "2024-08-31": 7895.514,
+    "2024-09-30": 7471.2765,
     "2024-10-31": 7831.6633,
     "2024-11-30": 8111.7573,
     "2024-12-31": 8180.7714,
-    "2025-01-31": 8117.4813,
-    "2025-02-28": 7799.4423,
-    "2025-03-31": 8078.3062,
-    "2025-04-30": 7669.9438,
+    "2025-01-31": 8117.4814,
+    "2025-02-28": 7799.4422,
+    "2025-03-31": 8078.3063,
+    "2025-04-30": 7669.944,
     "2025-05-31": 6912.1852,
-    "2025-06-30": 7620.0696,
-    "2025-07-31": 8089.5596,
-    "2025-08-31": 8020.8168,
-    "2025-09-30": 7980.5299,
+    "2025-06-30": 7620.0698,
+    "2025-07-31": 8089.5597,
+    "2025-08-31": 8020.8169,
+    "2025-09-30": 7980.53,
     "2025-10-31": 7977.0741,
     "2025-11-30": 8387.2468,
     "2025-12-31": 8246.7784,
-    "2026-01-31": 7987.3853,
-    "2026-02-28": 7900.3606,
+    "2026-01-31": 7987.3854,
+    "2026-02-28": 7900.3605,
     "2026-03-31": 7924.6906,
     "2026-04-30": 7976.688,
-    "2026-05-31": 7599.2662,
-    "2026-06-30": 7851.4086,
-    "2026-07-31": 4939.9821,
+    "2026-05-31": 7599.2663,
+    "2026-06-30": 7851.4085,
+    "2026-07-31": 4939.9822,
     "2026-08-31": 1767.3462
   },
   "date_filter_totals": {
@@ -9583,7 +9583,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 10.9348
+        "kbbl_d": 10.9349
       },
       {
         "source_id": "bcer_well_production",
@@ -9609,7 +9609,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 22.8135
+        "kbbl_d": 22.8134
       }
     ],
     "2015-04-30": [
@@ -9619,7 +9619,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 10.2131
+        "kbbl_d": 10.2129
       },
       {
         "source_id": "bcer_well_production",
@@ -9637,7 +9637,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 10.0262
+        "kbbl_d": 10.0263
       },
       {
         "source_id": "bcer_well_production",
@@ -9655,7 +9655,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 7.8039
+        "kbbl_d": 7.8037
       },
       {
         "source_id": "bcer_well_production",
@@ -9691,7 +9691,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 11.7309
+        "kbbl_d": 11.731
       },
       {
         "source_id": "bcer_well_production",
@@ -9709,7 +9709,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 10.9301
+        "kbbl_d": 10.9299
       },
       {
         "source_id": "bcer_well_production",
@@ -9727,7 +9727,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 12.1896
+        "kbbl_d": 12.1897
       },
       {
         "source_id": "bcer_well_production",
@@ -9745,7 +9745,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 14.6571
+        "kbbl_d": 14.657
       },
       {
         "source_id": "bcer_well_production",
@@ -9835,7 +9835,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 16.2056
+        "kbbl_d": 16.2055
       },
       {
         "source_id": "bcer_well_production",
@@ -9853,7 +9853,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 16.6255
+        "kbbl_d": 16.6256
       },
       {
         "source_id": "bcer_well_production",
@@ -9871,7 +9871,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 17.996
+        "kbbl_d": 17.9959
       },
       {
         "source_id": "bcer_well_production",
@@ -9879,7 +9879,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 21.8796
+        "kbbl_d": 21.8797
       }
     ],
     "2016-07-31": [
@@ -9889,7 +9889,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 17.0826
+        "kbbl_d": 17.0827
       },
       {
         "source_id": "bcer_well_production",
@@ -9925,7 +9925,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 11.9507
+        "kbbl_d": 11.9506
       },
       {
         "source_id": "bcer_well_production",
@@ -9943,7 +9943,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 14.3019
+        "kbbl_d": 14.302
       },
       {
         "source_id": "bcer_well_production",
@@ -9961,7 +9961,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 14.5183
+        "kbbl_d": 14.5181
       },
       {
         "source_id": "bcer_well_production",
@@ -10037,7 +10037,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 15.4845
+        "kbbl_d": 15.4846
       },
       {
         "source_id": "bcer_well_production",
@@ -10095,7 +10095,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 16.5413
+        "kbbl_d": 16.5414
       },
       {
         "source_id": "bcer_well_production",
@@ -10211,7 +10211,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 14.594
+        "kbbl_d": 14.5938
       },
       {
         "source_id": "bcer_well_production",
@@ -10277,7 +10277,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 20.9131
+        "kbbl_d": 20.9132
       }
     ],
     "2017-06-30": [
@@ -10327,7 +10327,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 13.965
+        "kbbl_d": 13.9648
       },
       {
         "source_id": "bcer_well_production",
@@ -10501,7 +10501,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 20.2894
+        "kbbl_d": 20.2892
       },
       {
         "source_id": "bcer_well_production",
@@ -10617,7 +10617,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 32.5281
+        "kbbl_d": 32.5279
       },
       {
         "source_id": "bcer_well_production",
@@ -10791,7 +10791,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 31.8319
+        "kbbl_d": 31.8321
       },
       {
         "source_id": "bcer_well_production",
@@ -10907,7 +10907,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.8427
+        "kbbl_d": 37.8425
       },
       {
         "source_id": "bcer_well_production",
@@ -11023,7 +11023,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.8587
+        "kbbl_d": 41.8586
       },
       {
         "source_id": "bcer_well_production",
@@ -11197,7 +11197,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 40.7881
+        "kbbl_d": 40.788
       },
       {
         "source_id": "bcer_well_production",
@@ -11313,7 +11313,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 51.3907
+        "kbbl_d": 51.3905
       },
       {
         "source_id": "bcer_well_production",
@@ -11379,7 +11379,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 19.1995
+        "kbbl_d": 19.1994
       }
     ],
     "2019-01-31": [
@@ -11429,7 +11429,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.7479
+        "kbbl_d": 38.748
       },
       {
         "source_id": "bcer_well_production",
@@ -11487,7 +11487,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.2041
+        "kbbl_d": 41.2042
       },
       {
         "source_id": "bcer_well_production",
@@ -11603,7 +11603,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 52.6477
+        "kbbl_d": 52.6476
       },
       {
         "source_id": "bcer_well_production",
@@ -11719,7 +11719,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 49.9851
+        "kbbl_d": 49.985
       },
       {
         "source_id": "bcer_well_production",
@@ -11893,7 +11893,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 50.4539
+        "kbbl_d": 50.4537
       },
       {
         "source_id": "bcer_well_production",
@@ -12009,7 +12009,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 47.5054
+        "kbbl_d": 47.5052
       },
       {
         "source_id": "bcer_well_production",
@@ -12299,7 +12299,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 46.0401
+        "kbbl_d": 46.0399
       },
       {
         "source_id": "bcer_well_production",
@@ -12399,7 +12399,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 43.3475
+        "kbbl_d": 43.3473
       },
       {
         "source_id": "bcer_well_production",
@@ -12573,7 +12573,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 33.6456
+        "kbbl_d": 33.6454
       },
       {
         "source_id": "bcer_well_production",
@@ -12689,7 +12689,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 40.58
+        "kbbl_d": 40.5798
       },
       {
         "source_id": "bcer_well_production",
@@ -12863,7 +12863,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.9139
+        "kbbl_d": 37.9141
       },
       {
         "source_id": "bcer_well_production",
@@ -12979,7 +12979,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 39.5678
+        "kbbl_d": 39.5676
       },
       {
         "source_id": "bcer_well_production",
@@ -13095,7 +13095,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.5566
+        "kbbl_d": 38.5565
       },
       {
         "source_id": "bcer_well_production",
@@ -13269,7 +13269,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.9488
+        "kbbl_d": 38.9486
       },
       {
         "source_id": "bcer_well_production",
@@ -13327,7 +13327,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.7133
+        "kbbl_d": 37.7134
       },
       {
         "source_id": "bcer_well_production",
@@ -13385,7 +13385,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 44.3131
+        "kbbl_d": 44.3129
       },
       {
         "source_id": "bcer_well_production",
@@ -13703,7 +13703,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 36.5628
+        "kbbl_d": 36.5629
       },
       {
         "source_id": "bcer_well_production",
@@ -13855,7 +13855,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 441.1622
+        "kbbl_d": 441.1621
       }
     ],
     "2022-03-31": [
@@ -13937,7 +13937,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 480.7496
+        "kbbl_d": 480.7495
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -14065,7 +14065,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 457.594
+        "kbbl_d": 457.5941
       }
     ],
     "2022-04-30": [
@@ -14115,7 +14115,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.3185
+        "kbbl_d": 37.3183
       },
       {
         "source_id": "bcer_well_production",
@@ -14267,7 +14267,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 457.8778
+        "kbbl_d": 457.8779
       }
     ],
     "2022-05-31": [
@@ -14469,7 +14469,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 451.0357
+        "kbbl_d": 451.0356
       }
     ],
     "2022-06-30": [
@@ -14519,7 +14519,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 31.7531
+        "kbbl_d": 31.7529
       },
       {
         "source_id": "bcer_well_production",
@@ -14551,7 +14551,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 482.667
+        "kbbl_d": 482.6672
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -14721,7 +14721,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 31.5658
+        "kbbl_d": 31.5659
       },
       {
         "source_id": "bcer_well_production",
@@ -14729,7 +14729,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 11.4142
+        "kbbl_d": 11.4141
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -14753,7 +14753,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 484.8329
+        "kbbl_d": 484.833
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -15075,7 +15075,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 455.4153
+        "kbbl_d": 455.4152
       }
     ],
     "2022-09-30": [
@@ -15125,7 +15125,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 28.8478
+        "kbbl_d": 28.8477
       },
       {
         "source_id": "bcer_well_production",
@@ -15277,7 +15277,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 464.5092
+        "kbbl_d": 464.5093
       }
     ],
     "2022-10-31": [
@@ -15359,7 +15359,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 500.2814
+        "kbbl_d": 500.2815
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -15529,7 +15529,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.4719
+        "kbbl_d": 38.4717
       },
       {
         "source_id": "bcer_well_production",
@@ -15561,7 +15561,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 495.2964
+        "kbbl_d": 495.2965
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -15875,7 +15875,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 257.4363
+        "kbbl_d": 257.4362
       },
       {
         "source_id": "petrinex_sk_well_production",
@@ -15965,7 +15965,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 506.8876
+        "kbbl_d": 506.8877
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -16077,7 +16077,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 253.1665
+        "kbbl_d": 253.1666
       },
       {
         "source_id": "petrinex_sk_well_production",
@@ -16135,7 +16135,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 32.6563
+        "kbbl_d": 32.6564
       },
       {
         "source_id": "bcer_well_production",
@@ -16167,7 +16167,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 511.8017
+        "kbbl_d": 511.8016
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -16287,7 +16287,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 457.2569
+        "kbbl_d": 457.2568
       }
     ],
     "2023-03-31": [
@@ -16369,7 +16369,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 517.4821
+        "kbbl_d": 517.4822
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -16481,7 +16481,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 253.746
+        "kbbl_d": 253.7461
       },
       {
         "source_id": "petrinex_sk_well_production",
@@ -16489,7 +16489,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 458.9527
+        "kbbl_d": 458.9528
       }
     ],
     "2023-04-30": [
@@ -16539,7 +16539,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 36.8098
+        "kbbl_d": 36.8096
       },
       {
         "source_id": "bcer_well_production",
@@ -16555,7 +16555,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 5.2033
+        "kbbl_d": 5.2034
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -16571,7 +16571,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 521.5822
+        "kbbl_d": 521.5823
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -16691,7 +16691,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 455.8019
+        "kbbl_d": 455.802
       }
     ],
     "2023-05-31": [
@@ -16893,7 +16893,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 449.971
+        "kbbl_d": 449.9711
       }
     ],
     "2023-06-30": [
@@ -16943,7 +16943,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 29.665
+        "kbbl_d": 29.6648
       },
       {
         "source_id": "bcer_well_production",
@@ -16975,7 +16975,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 476.192
+        "kbbl_d": 476.1921
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -17095,7 +17095,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 442.7464
+        "kbbl_d": 442.7465
       }
     ],
     "2023-07-31": [
@@ -17379,7 +17379,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 514.9048
+        "kbbl_d": 514.9049
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -17499,7 +17499,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 449.2955
+        "kbbl_d": 449.2954
       }
     ],
     "2023-09-30": [
@@ -17549,7 +17549,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 31.3916
+        "kbbl_d": 31.3914
       },
       {
         "source_id": "bcer_well_production",
@@ -17581,7 +17581,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 511.4745
+        "kbbl_d": 511.4746
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -17701,7 +17701,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 446.1672
+        "kbbl_d": 446.1673
       }
     ],
     "2023-10-31": [
@@ -17783,7 +17783,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 517.3356
+        "kbbl_d": 517.3357
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -17953,7 +17953,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 43.0449
+        "kbbl_d": 43.0447
       },
       {
         "source_id": "bcer_well_production",
@@ -18105,7 +18105,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 456.7003
+        "kbbl_d": 456.7004
       }
     ],
     "2023-12-31": [
@@ -18163,7 +18163,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 9.7073
+        "kbbl_d": 9.7072
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -18179,7 +18179,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "condensate",
-        "kbbl_d": 69.2702
+        "kbbl_d": 69.2701
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -18533,7 +18533,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 444.0696
+        "kbbl_d": 444.0697
       }
     ],
     "2024-02-29": [
@@ -18639,7 +18639,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 521.2648
+        "kbbl_d": 521.2647
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -18759,7 +18759,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 455.9905
+        "kbbl_d": 455.9906
       }
     ],
     "2024-03-31": [
@@ -19035,7 +19035,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 46.6705
+        "kbbl_d": 46.6704
       },
       {
         "source_id": "bcer_well_production",
@@ -19075,7 +19075,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 4.1312
+        "kbbl_d": 4.1313
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -19091,7 +19091,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 528.6723
+        "kbbl_d": 528.6724
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -19211,7 +19211,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 460.3372
+        "kbbl_d": 460.3373
       }
     ],
     "2024-05-31": [
@@ -19261,7 +19261,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 45.8224
+        "kbbl_d": 45.8223
       },
       {
         "source_id": "bcer_well_production",
@@ -19317,7 +19317,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 522.4879
+        "kbbl_d": 522.488
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -19487,7 +19487,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 43.5031
+        "kbbl_d": 43.503
       },
       {
         "source_id": "bcer_well_production",
@@ -19543,7 +19543,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 512.4562
+        "kbbl_d": 512.4563
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -19897,7 +19897,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 436.2043
+        "kbbl_d": 436.2044
       }
     ],
     "2024-08-31": [
@@ -20123,7 +20123,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 445.2937
+        "kbbl_d": 445.2938
       }
     ],
     "2024-09-30": [
@@ -20173,7 +20173,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 45.0742
+        "kbbl_d": 45.0741
       },
       {
         "source_id": "bcer_well_production",
@@ -20213,7 +20213,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 3.685
+        "kbbl_d": 3.6851
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -20229,7 +20229,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 506.3963
+        "kbbl_d": 506.3965
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -20349,7 +20349,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 433.9831
+        "kbbl_d": 433.983
       }
     ],
     "2024-10-31": [
@@ -20575,7 +20575,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 448.3581
+        "kbbl_d": 448.3582
       }
     ],
     "2024-11-30": [
@@ -20625,7 +20625,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 42.1938
+        "kbbl_d": 42.1937
       },
       {
         "source_id": "bcer_well_production",
@@ -20681,7 +20681,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 537.7777
+        "kbbl_d": 537.7778
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -20801,7 +20801,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 448.0126
+        "kbbl_d": 448.0127
       }
     ],
     "2024-12-31": [
@@ -20907,7 +20907,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 537.1746
+        "kbbl_d": 537.1747
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -21117,7 +21117,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 3.6609
+        "kbbl_d": 3.6608
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -21303,7 +21303,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 39.5776
+        "kbbl_d": 39.5778
       },
       {
         "source_id": "bcer_well_production",
@@ -21359,7 +21359,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 526.513
+        "kbbl_d": 526.5129
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -21479,7 +21479,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 436.8396
+        "kbbl_d": 436.8395
       }
     ],
     "2025-03-31": [
@@ -21713,7 +21713,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 452.6221
+        "kbbl_d": 452.6222
       }
     ],
     "2025-04-30": [
@@ -21763,7 +21763,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.7662
+        "kbbl_d": 38.7661
       },
       {
         "source_id": "bcer_well_production",
@@ -21803,7 +21803,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "condensate",
-        "kbbl_d": 3.2159
+        "kbbl_d": 3.216
       },
       {
         "source_id": "petrinex_ab_condensate_vol",
@@ -21819,7 +21819,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 541.2455
+        "kbbl_d": 541.2456
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -21939,7 +21939,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 450.8502
+        "kbbl_d": 450.8503
       }
     ],
     "2025-05-31": [
@@ -22223,7 +22223,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.7894
+        "kbbl_d": 41.7893
       },
       {
         "source_id": "bcer_well_production",
@@ -22279,7 +22279,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 511.2768
+        "kbbl_d": 511.2769
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -22399,7 +22399,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 418.4339
+        "kbbl_d": 418.434
       }
     ],
     "2025-07-31": [
@@ -22505,7 +22505,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 513.2177
+        "kbbl_d": 513.2178
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -22851,7 +22851,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 421.3368
+        "kbbl_d": 421.3369
       }
     ],
     "2025-09-30": [
@@ -22901,7 +22901,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 34.7404
+        "kbbl_d": 34.7403
       },
       {
         "source_id": "bcer_well_production",
@@ -22957,7 +22957,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 498.6073
+        "kbbl_d": 498.6074
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -23077,7 +23077,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 418.9071
+        "kbbl_d": 418.9073
       }
     ],
     "2025-10-31": [
@@ -23353,7 +23353,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.0681
+        "kbbl_d": 38.068
       },
       {
         "source_id": "bcer_well_production",
@@ -23409,7 +23409,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 501.0044
+        "kbbl_d": 501.0045
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -23529,7 +23529,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 449.0422
+        "kbbl_d": 449.0423
       }
     ],
     "2025-12-31": [
@@ -23869,7 +23869,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 474.5083
+        "kbbl_d": 474.5084
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -23989,7 +23989,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 432.9694
+        "kbbl_d": 432.9695
       }
     ],
     "2026-02-28": [
@@ -24039,7 +24039,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.744
+        "kbbl_d": 41.7441
       },
       {
         "source_id": "bcer_well_production",
@@ -24095,7 +24095,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 486.8848
+        "kbbl_d": 486.8847
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -24499,7 +24499,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 44.1325
+        "kbbl_d": 44.1324
       },
       {
         "source_id": "bcer_well_production",
@@ -24555,7 +24555,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 511.1119
+        "kbbl_d": 511.112
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -24667,7 +24667,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "pentanes-plus",
-        "kbbl_d": 297.407
+        "kbbl_d": 297.4069
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -24967,7 +24967,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 42.717
+        "kbbl_d": 42.7169
       },
       {
         "source_id": "bcer_well_production",
@@ -25055,15 +25055,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 2.9964
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 8.3699
+        "kbbl_d": 11.3663
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25071,7 +25063,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 6.217
+        "kbbl_d": 9.0275
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25079,7 +25071,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 3.8193
+        "kbbl_d": 1.0087
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25087,7 +25079,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 135.6742
+        "kbbl_d": 135.9277
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25095,7 +25087,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 4.2055
+        "kbbl_d": 3.9521
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25103,15 +25095,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 7.571
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 24.3831
+        "kbbl_d": 31.9541
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25119,7 +25103,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 11.0617
+        "kbbl_d": 18.3622
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25127,7 +25111,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 18.8261
+        "kbbl_d": 11.5255
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -25185,7 +25169,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.2722
+        "kbbl_d": 37.2723
       },
       {
         "source_id": "bcer_well_production",
@@ -25273,15 +25257,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 3.0443
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 9.5062
+        "kbbl_d": 12.5505
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25289,7 +25265,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 6.4178
+        "kbbl_d": 9.371
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25297,7 +25273,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 3.9359
+        "kbbl_d": 0.9827
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25305,7 +25281,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "gas-plant",
-        "kbbl_d": 140.6757
+        "kbbl_d": 141.0227
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25313,7 +25289,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 3.968
+        "kbbl_d": 3.621
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25321,15 +25297,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 7.7158
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 27.8614
+        "kbbl_d": 35.5772
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25337,7 +25305,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 11.2314
+        "kbbl_d": 18.4665
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25345,7 +25313,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 18.4438
+        "kbbl_d": 11.2087
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -25435,15 +25403,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 3.0187
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Butane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 11.275
+        "kbbl_d": 14.2937
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25451,7 +25411,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 6.9959
+        "kbbl_d": 10.2135
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25459,7 +25419,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 4.1481
+        "kbbl_d": 0.9305
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25483,15 +25443,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "gas-plant",
-        "kbbl_d": 7.5571
-      },
-      {
-        "source_id": "petrinex_ab_ngl_vol",
-        "stream": "Propane mix",
-        "scenario": "actual",
-        "location_confidence": "medium",
-        "legend_key": "integrated-plant",
-        "kbbl_d": 32.5927
+        "kbbl_d": 40.1498
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25499,7 +25451,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "spec-plant",
-        "kbbl_d": 10.5467
+        "kbbl_d": 19.1891
       },
       {
         "source_id": "petrinex_ab_ngl_vol",
@@ -25507,7 +25459,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "integrated-plant",
-        "kbbl_d": 20.7859
+        "kbbl_d": 12.1435
       },
       {
         "source_id": "petrinex_ab_pentanes_plus_vol",
@@ -25578,7 +25530,7 @@
       "last_date": "2026-07-31",
       "record_count": 430538,
       "asset_count": 9127,
-      "sum_kbbl_d_observations": 4750.7782
+      "sum_kbbl_d_observations": 4750.7735
     },
     {
       "source_id": "bcer_well_production",
@@ -25589,7 +25541,7 @@
       "last_date": "2026-07-31",
       "record_count": 107562,
       "asset_count": 1326,
-      "sum_kbbl_d_observations": 2131.3792
+      "sum_kbbl_d_observations": 2131.3791
     },
     {
       "source_id": "manitoba_well_production",
@@ -25631,9 +25583,9 @@
       "scenario": "actual",
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
-      "record_count": 61180,
+      "record_count": 61171,
       "asset_count": 4096,
-      "sum_kbbl_d_observations": 4566.7604
+      "sum_kbbl_d_observations": 4566.7607
     },
     {
       "source_id": "petrinex_ab_conventional_vol",
@@ -25644,7 +25596,7 @@
       "last_date": "2026-08-31",
       "record_count": 1462100,
       "asset_count": 45545,
-      "sum_kbbl_d_observations": 30045.944
+      "sum_kbbl_d_observations": 30045.9457
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -25654,7 +25606,7 @@
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
       "record_count": 16087,
-      "asset_count": 428,
+      "asset_count": 429,
       "sum_kbbl_d_observations": 5692.7425
     },
     {
@@ -25665,7 +25617,7 @@
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
       "record_count": 673,
-      "asset_count": 21,
+      "asset_count": 23,
       "sum_kbbl_d_observations": 580.3851
     },
     {
@@ -25676,7 +25628,7 @@
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
       "record_count": 16043,
-      "asset_count": 427,
+      "asset_count": 429,
       "sum_kbbl_d_observations": 9156.6982
     },
     {
@@ -25687,7 +25639,7 @@
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
       "record_count": 716,
-      "asset_count": 18,
+      "asset_count": 20,
       "sum_kbbl_d_observations": 1677.5821
     },
     {
@@ -25710,7 +25662,7 @@
       "last_date": "2026-08-31",
       "record_count": 1590513,
       "asset_count": 36126,
-      "sum_kbbl_d_observations": 24914.4314
+      "sum_kbbl_d_observations": 24914.4333
     }
   ],
   "data_quality": {
@@ -25772,20 +25724,6 @@
       },
       {
         "severity": "high",
-        "source_id": "bcer_well_production",
-        "stream": "Condensate production",
-        "date": "2026-08-31",
-        "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "bcer_well_production",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
         "source_id": "manitoba_well_production",
         "stream": "Conventional crude oil",
         "date": "2026-08-31",
@@ -25797,6 +25735,20 @@
         "stream": "Conventional crude oil",
         "date": "2026-08-31",
         "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
+      },
+      {
+        "severity": "high",
+        "source_id": "bcer_well_production",
+        "stream": "Condensate production",
+        "date": "2026-08-31",
+        "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
+      },
+      {
+        "severity": "high",
+        "source_id": "bcer_well_production",
+        "stream": "Conventional crude oil",
+        "date": "2026-08-31",
+        "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
       }
     ],
     "date_warnings": {
@@ -25847,20 +25799,6 @@
         },
         {
           "severity": "high",
-          "source_id": "bcer_well_production",
-          "stream": "Condensate production",
-          "date": "2026-08-31",
-          "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "bcer_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
           "source_id": "manitoba_well_production",
           "stream": "Conventional crude oil",
           "date": "2026-08-31",
@@ -25872,6 +25810,20 @@
           "stream": "Conventional crude oil",
           "date": "2026-08-31",
           "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
+        },
+        {
+          "severity": "high",
+          "source_id": "bcer_well_production",
+          "stream": "Condensate production",
+          "date": "2026-08-31",
+          "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
+        },
+        {
+          "severity": "high",
+          "source_id": "bcer_well_production",
+          "stream": "Conventional crude oil",
+          "date": "2026-08-31",
+          "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
         }
       ]
     },
@@ -25991,58 +25943,58 @@
       "2026-07-31": 0.0695
     },
     "low_confidence_kbbl_d_by_date": {
-      "2022-01-31": 1373.7488,
-      "2022-02-28": 1412.6191,
+      "2022-01-31": 1373.7489,
+      "2022-02-28": 1412.6189,
       "2022-03-31": 1456.7375,
-      "2022-04-30": 1461.5202,
-      "2022-05-31": 1434.8964,
-      "2022-06-30": 1417.0354,
-      "2022-07-31": 1454.6163,
+      "2022-04-30": 1461.5203,
+      "2022-05-31": 1434.8963,
+      "2022-06-30": 1417.0356,
+      "2022-07-31": 1454.6164,
       "2022-08-31": 1443.7145,
-      "2022-09-30": 1453.6068,
-      "2022-10-31": 1475.2603,
-      "2022-11-30": 1462.3832,
+      "2022-09-30": 1453.607,
+      "2022-10-31": 1475.2604,
+      "2022-11-30": 1462.3833,
       "2022-12-31": 1440.6992,
-      "2023-01-31": 1458.8593,
-      "2023-02-28": 1466.4045,
-      "2023-03-31": 1480.9938,
-      "2023-04-30": 1471.658,
-      "2023-05-31": 1314.0395,
-      "2023-06-30": 1371.5972,
-      "2023-07-31": 1459.4361,
-      "2023-08-31": 1483.4165,
-      "2023-09-30": 1466.6631,
-      "2023-10-31": 1489.8168,
-      "2023-11-30": 1529.8109,
+      "2023-01-31": 1458.8594,
+      "2023-02-28": 1466.4044,
+      "2023-03-31": 1480.994,
+      "2023-04-30": 1471.6583,
+      "2023-05-31": 1314.0396,
+      "2023-06-30": 1371.5973,
+      "2023-07-31": 1459.436,
+      "2023-08-31": 1483.4164,
+      "2023-09-30": 1466.6633,
+      "2023-10-31": 1489.8169,
+      "2023-11-30": 1529.8111,
       "2023-12-31": 1544.5133,
-      "2024-01-31": 1492.6182,
+      "2024-01-31": 1492.6183,
       "2024-02-29": 1533.5647,
       "2024-03-31": 1555.8325,
-      "2024-04-30": 1563.8144,
+      "2024-04-30": 1563.8146,
       "2024-05-31": 1513.6309,
-      "2024-06-30": 1503.4487,
-      "2024-07-31": 1500.1554,
-      "2024-08-31": 1530.8865,
-      "2024-09-30": 1470.7891,
-      "2024-10-31": 1561.8337,
-      "2024-11-30": 1582.7543,
-      "2024-12-31": 1586.1252,
+      "2024-06-30": 1503.4488,
+      "2024-07-31": 1500.1555,
+      "2024-08-31": 1530.8866,
+      "2024-09-30": 1470.7893,
+      "2024-10-31": 1561.8338,
+      "2024-11-30": 1582.7545,
+      "2024-12-31": 1586.1253,
       "2025-01-31": 1567.8227,
-      "2025-02-28": 1543.5941,
-      "2025-03-31": 1604.4817,
-      "2025-04-30": 1590.5571,
+      "2025-02-28": 1543.5939,
+      "2025-03-31": 1604.4818,
+      "2025-04-30": 1590.5573,
       "2025-05-31": 1532.2031,
-      "2025-06-30": 1504.3225,
-      "2025-07-31": 1536.6474,
-      "2025-08-31": 1538.4847,
-      "2025-09-30": 1531.5654,
+      "2025-06-30": 1504.3228,
+      "2025-07-31": 1536.6476,
+      "2025-08-31": 1538.4848,
+      "2025-09-30": 1531.5657,
       "2025-10-31": 1550.4033,
-      "2025-11-30": 1593.3687,
-      "2025-12-31": 1560.0237,
-      "2026-01-31": 1556.5845,
-      "2026-02-28": 1568.0656,
+      "2025-11-30": 1593.3688,
+      "2025-12-31": 1560.0238,
+      "2026-01-31": 1556.5846,
+      "2026-02-28": 1568.0655,
       "2026-03-31": 1575.3492,
-      "2026-04-30": 1577.8666,
+      "2026-04-30": 1577.8668,
       "2026-05-31": 1533.5082,
       "2026-06-30": 1571.5994,
       "2026-07-31": 1580.4108,
@@ -26262,180 +26214,144 @@
   "download_status": [
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2017-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:33.647191+00:00",
       "bytes": 238592,
-      "sha256": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
-      "etag": "0x8DD11886A140F08",
-      "last_modified": "Sat, 30 Nov 2024 21:46:14 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2017,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2017.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2018-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:34.168831+00:00",
       "bytes": 244224,
-      "sha256": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
-      "etag": "0x8DD118869AFA3BC",
-      "last_modified": "Sat, 30 Nov 2024 21:46:14 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2018,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2018.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2019-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:34.605310+00:00",
       "bytes": 253952,
-      "sha256": "2537b8a1fc9a511355e1d6e48fe1a2a0621e097898871a29f15ece2c32bfbc52",
-      "etag": "0x8DD11886F9D7991",
-      "last_modified": "Sat, 30 Nov 2024 21:46:24 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2019,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2019.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "2537b8a1fc9a511355e1d6e48fe1a2a0621e097898871a29f15ece2c32bfbc52",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2020-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:35.123999+00:00",
       "bytes": 284160,
-      "sha256": "561ba2cb8553878342b804cc1901ff68f23ad916a37f9885faeb215135d1227d",
-      "etag": "0x8DD11886FCA7175",
-      "last_modified": "Sat, 30 Nov 2024 21:46:24 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2020,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2020.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "561ba2cb8553878342b804cc1901ff68f23ad916a37f9885faeb215135d1227d",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2021-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:35.611026+00:00",
       "bytes": 263680,
-      "sha256": "0791ebdfdfb290b6ed90f9a532e2e5fce3d112da8d6f571fb40246c5b4fb1e87",
-      "etag": "0x8DD118870FFE798",
-      "last_modified": "Sat, 30 Nov 2024 21:46:26 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2021,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2021.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "0791ebdfdfb290b6ed90f9a532e2e5fce3d112da8d6f571fb40246c5b4fb1e87",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2022-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:36.142405+00:00",
       "bytes": 314880,
-      "sha256": "82f02255cee2f95fd30f841f51e43a0a895b3a42b70569f84c74a1ebed578d99",
-      "etag": "0x8DD11886E5B4086",
-      "last_modified": "Sat, 30 Nov 2024 21:46:22 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2022,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2022.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "82f02255cee2f95fd30f841f51e43a0a895b3a42b70569f84c74a1ebed578d99",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_2023-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:36.603395+00:00",
       "bytes": 298496,
-      "sha256": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
-      "etag": "0x8DD118870CAE278",
-      "last_modified": "Sat, 30 Nov 2024 21:46:26 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2023,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2023.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/prd/documents/sts/ST53/ST53_2024-12.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:37.129451+00:00",
       "bytes": 316416,
-      "sha256": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
-      "etag": "0x8DD4612E97A9BCB",
-      "last_modified": "Wed, 05 Feb 2025 18:28:39 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2024,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2024.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/prd/documents/sts/ST53/ST53_2025.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:37.614452+00:00",
       "bytes": 340480,
-      "sha256": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-      "etag": "0x8DE64F088368A17",
-      "last_modified": "Thu, 05 Feb 2026 19:55:37 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2025,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_2025.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:38.094242+00:00",
+      "retrieved_at": "2026-09-28T15:33:07.275975+00:00",
       "bytes": 314368,
       "sha256": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd",
       "etag": "0x8DF0AB9E0082FE1",
@@ -26445,186 +26361,150 @@
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_current.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2017.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:38.784925+00:00",
       "bytes": 219648,
-      "sha256": "2f5b35a848ff1b9c10be6ed5bc44be363ea525a0868c91180869d22e24b7f522",
-      "etag": "0x8DD118867C56489",
-      "last_modified": "Sat, 30 Nov 2024 21:46:11 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2017,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2017.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "2f5b35a848ff1b9c10be6ed5bc44be363ea525a0868c91180869d22e24b7f522",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2018.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:39.235344+00:00",
       "bytes": 236544,
-      "sha256": "7a346240550e9a5f2513047ea3559e202fcf4926ad0652086a6a0f6bd7bbd31c",
-      "etag": "0x8DD11886863D873",
-      "last_modified": "Sat, 30 Nov 2024 21:46:12 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2018,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2018.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "7a346240550e9a5f2513047ea3559e202fcf4926ad0652086a6a0f6bd7bbd31c",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2019.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:39.695096+00:00",
       "bytes": 230400,
-      "sha256": "88c60b94edf4dfb96fa1037aad06f9c0943018a4685d390d6023eee5e6bb6cdb",
-      "etag": "0x8DD1188673D6C90",
-      "last_modified": "Sat, 30 Nov 2024 21:46:10 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2019,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2019.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "88c60b94edf4dfb96fa1037aad06f9c0943018a4685d390d6023eee5e6bb6cdb",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2020.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:40.136757+00:00",
       "bytes": 237504,
-      "sha256": "179ffa8894d69f43bb579da35f3c8847556418b5531ae616501d94ebaa83043b",
-      "etag": "0x8DD1188675090E3",
-      "last_modified": "Sat, 30 Nov 2024 21:46:10 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2020,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2020.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "179ffa8894d69f43bb579da35f3c8847556418b5531ae616501d94ebaa83043b",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2021.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:40.449272+00:00",
       "bytes": 241152,
-      "sha256": "bac7bc3e4d455058da39364fe0cf7b5527fed8f45e0a8f3b885b9589400bfc33",
-      "etag": "0x8DD118867DEEA50",
-      "last_modified": "Sat, 30 Nov 2024 21:46:11 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2021,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2021.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "bac7bc3e4d455058da39364fe0cf7b5527fed8f45e0a8f3b885b9589400bfc33",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2022.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:40.843791+00:00",
       "bytes": 253888,
-      "sha256": "50a03e7b21ae95bbd6e6dfb617c9cfa1f9262f53ad8abc2c3910a07595e1dfbc",
-      "etag": "0x8DD118868DFF6E8",
-      "last_modified": "Sat, 30 Nov 2024 21:46:12 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2022,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2022.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "50a03e7b21ae95bbd6e6dfb617c9cfa1f9262f53ad8abc2c3910a07595e1dfbc",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2023.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:41.542362+00:00",
       "bytes": 253888,
-      "sha256": "1d15f085ec50b0f723b02041ed0bcb9fb0b0dcf04478e5706dd457f582677500",
-      "etag": "0x8DD118866AFAEB2",
-      "last_modified": "Sat, 30 Nov 2024 21:46:09 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2023,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2023.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "1d15f085ec50b0f723b02041ed0bcb9fb0b0dcf04478e5706dd457f582677500",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/prd/documents/sts/ST39-2024.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:41.930964+00:00",
       "bytes": 253888,
-      "sha256": "2a1c5a3ca3030c94ba84359cfb7a8f21c38745eb0ca9131dd7f2a934b3229855",
-      "etag": "0x8DD6BD8564ECD25",
-      "last_modified": "Tue, 25 Mar 2025 20:05:06 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2024,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2024.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "2a1c5a3ca3030c94ba84359cfb7a8f21c38745eb0ca9131dd7f2a934b3229855",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/prd/documents/sts/ST39-2025.xls",
-      "status": "downloaded",
+      "status": "cached",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:42.314905+00:00",
       "bytes": 253888,
-      "sha256": "7dfffa7b8956bc789d702675ec6db082164dcff8ae67c9e9e7b0c3936c53d5d6",
-      "etag": "0x8DEA22F725332A5",
-      "last_modified": "Fri, 24 Apr 2026 18:29:39 GMT",
-      "http_status": 200,
       "current": false,
       "report_year": 2025,
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_2025.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": null,
       "mode": "online",
+      "sha256": "7dfffa7b8956bc789d702675ec6db082164dcff8ae67c9e9e7b0c3936c53d5d6",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39.xls",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:42.758556+00:00",
+      "retrieved_at": "2026-09-28T15:33:08.153893+00:00",
       "bytes": 245696,
       "sha256": "d8898eb97e51dfb536f9217f728eeb0f80dfc522f2c96d889cbe6d44563920ca",
       "etag": "0x8DF1B41E1CE46B5",
@@ -26634,7 +26514,7 @@
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_current.xls",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26642,7 +26522,7 @@
       "url": "https://www.aer.ca/prd/documents/sts/ST44_2026-Q2.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:43.129798+00:00",
+      "retrieved_at": "2026-09-28T15:33:08.923929+00:00",
       "bytes": 75470,
       "sha256": "e3fb46ba1bec7544dddc1deb62bad5682b2292ca139c1c9d9ffc3d5f080adb60",
       "etag": "0x8DEFFA327967FD4",
@@ -26653,7 +26533,7 @@
       "source_id": "aer_st44",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
       "raw_path": "aer_st44_current.xlsx",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26661,7 +26541,7 @@
       "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:47.486853+00:00",
+      "retrieved_at": "2026-09-28T15:33:15.391199+00:00",
       "bytes": 12550692,
       "sha256": "fb3e70d727e86e6655b4dd84b02144e182d93c1d3a82a791307df01169870171",
       "etag": null,
@@ -26672,79 +26552,7 @@
       "source_id": "manitoba_well_production",
       "discovery_url": "https://www.gov.mb.ca/iem/petroleum/reports/index.html",
       "raw_path": "manitoba/wmp_2023_2026_excel.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_04.xlsx",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:05:48.099414+00:00",
-      "bytes": 3271477,
-      "sha256": "09bca7d6cf02b8d39db01438d3060e4b55009e455877c3a8f62b05a8561d7a85",
-      "etag": "\"806736a0422dd1:0\"",
-      "last_modified": "Mon, 22 Jun 2026 12:28:27 GMT",
-      "http_status": 200,
-      "source_id": "ndic_well_production",
-      "period": "2026-04",
-      "current": true,
-      "raw_path": "nd/mpr/2026_04.xlsx",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_05.xlsx",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:05:48.461032+00:00",
-      "bytes": 3290653,
-      "sha256": "91a5c07902855b21d33653a615026bcec240d53f2e1ce1a84c55b2cdb37e60c9",
-      "etag": "\"066aa2d2815dd1:0\"",
-      "last_modified": "Thu, 16 Jul 2026 13:37:00 GMT",
-      "http_status": 200,
-      "source_id": "ndic_well_production",
-      "period": "2026-05",
-      "current": true,
-      "raw_path": "nd/mpr/2026_05.xlsx",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_06.xlsx",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:05:48.872055+00:00",
-      "bytes": 3296675,
-      "sha256": "256f63ecdff8d0b7bad5a256a2a2ec4281d629eb6adec33e19ed66a6ad7db6eb",
-      "etag": "\"07a109c802edd1:0\"",
-      "last_modified": "Mon, 17 Aug 2026 19:43:00 GMT",
-      "http_status": 200,
-      "source_id": "ndic_well_production",
-      "period": "2026-06",
-      "current": true,
-      "raw_path": "nd/mpr/2026_06.xlsx",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_07.xlsx",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:05:49.241212+00:00",
-      "bytes": 3306982,
-      "sha256": "dd55c53342e1079deb48985587c8064abd69400fa5d7fdb25b47e652ad85ec92",
-      "etag": "\"80333ae4e4add1:0\"",
-      "last_modified": "Mon, 21 Sep 2026 21:19:31 GMT",
-      "http_status": 200,
-      "source_id": "ndic_well_production",
-      "period": "2026-07",
-      "current": true,
-      "raw_path": "nd/mpr/2026_07.xlsx",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26752,1075 +26560,15 @@
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:05:57.002096+00:00",
-      "bytes": 14935746,
-      "sha256": "3a9b5524916840b400773d1c86116d7030f10738422c8ce667623735fc32a1cd",
+      "retrieved_at": "2026-09-28T15:33:20.141147+00:00",
+      "bytes": 14938134,
+      "sha256": "4d24fdb560b50b9a19008ca2e9d93e20ff4dee975f2a9baa82c3f2d05c1c0e82",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_well_facility_link",
       "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:00.686389+00:00",
-      "bytes": 8073759,
-      "sha256": "93785cd7f2c38b84a078225955d09ec24e0fba7d961a8e48ddf498de1c6351e6",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-01",
-      "current": true,
-      "updated_at": "2026-09-22 05:57:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-01-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:04.594648+00:00",
-      "bytes": 7994899,
-      "sha256": "815c098a3896086ea30d687a121de70accbf8f5c3459f3d25cfc82c78daaa4c1",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-02",
-      "current": true,
-      "updated_at": "2026-09-22 05:49:47",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-02-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:08.353910+00:00",
-      "bytes": 8175816,
-      "sha256": "fefa8ce73fe3ae5001878ba5aa4d7865bc335a175390260fea87d6283fd2226e",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-03",
-      "current": true,
-      "updated_at": "2026-09-22 05:40:39",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-03-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:12.026277+00:00",
-      "bytes": 8016738,
-      "sha256": "eaa773d5871b5eaafc420d9808d8a1ae9e749f8300df7fb25416a1f52666b2a0",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-04",
-      "current": true,
-      "updated_at": "2026-09-22 05:29:44",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-04-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:15.730200+00:00",
-      "bytes": 8023541,
-      "sha256": "f8074484f64fdd09eb743026f13519050dc1d5c80fd5dfd23439ba74f467d5d0",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-05",
-      "current": true,
-      "updated_at": "2026-09-22 05:19:15",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-05-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:19.294617+00:00",
-      "bytes": 7934919,
-      "sha256": "707b97c3ccd379e55c747e2e75a516efa1f2ee7bbdc5db60ef3fcf7be9ab7769",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-06",
-      "current": true,
-      "updated_at": "2026-09-22 05:11:42",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-06-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:22.987132+00:00",
-      "bytes": 7987767,
-      "sha256": "1525b1097ec8fc875f9e246863e3ca2754b3ea7238fa0a60b9174cd407c7c666",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-07",
-      "current": true,
-      "updated_at": "2026-09-22 04:59:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-07-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:26.616582+00:00",
-      "bytes": 8006620,
-      "sha256": "962633514e51af7a498f088d819c0de52107d71fbb0445e9c9957255147ed20d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-08",
-      "current": true,
-      "updated_at": "2026-09-22 04:49:13",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-08-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:30.300004+00:00",
-      "bytes": 8023629,
-      "sha256": "355f29ec2dbbe1836cb276b51e8608e867bd6106d273531bc393d9b9c1987e0c",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-09",
-      "current": true,
-      "updated_at": "2026-09-22 04:40:54",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-09-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:34.008245+00:00",
-      "bytes": 8284818,
-      "sha256": "fb05dcee5cfffd46e672913d5b3ba62c964171a3d28ea11d07b168da8d97e05a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-10",
-      "current": true,
-      "updated_at": "2026-09-22 04:32:06",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-10-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:37.978917+00:00",
-      "bytes": 8239723,
-      "sha256": "28cd569f32b53c5531411c62d58ac8cd220e3ce4c7e434e3b73f07e572ed9215",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-11",
-      "current": true,
-      "updated_at": "2026-09-22 04:23:13",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-11-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2022-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:41.882240+00:00",
-      "bytes": 8163164,
-      "sha256": "04274e31859eaf9ea6978ad4a096a9d4a37ffdfe57b92e56b03827037368cc0b",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2022-12",
-      "current": true,
-      "updated_at": "2026-09-22 04:14:24",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2022-12-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:45.657354+00:00",
-      "bytes": 8259893,
-      "sha256": "c91ddef5254bd131ee29e1e8f2a1ed3905ec688806288e46f070b2210c9ad454",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-01",
-      "current": true,
-      "updated_at": "2026-09-22 04:05:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-01-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:49.360859+00:00",
-      "bytes": 8135769,
-      "sha256": "f6588f41f234ade9dfd7a30b7e05efa51015aa88139449980118b43c84a41b7a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-02",
-      "current": true,
-      "updated_at": "2026-09-22 03:56:50",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-02-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:53.149386+00:00",
-      "bytes": 8252681,
-      "sha256": "2a36ab13cfa15628498dc9f48cc94dfc81db6ab1f2f4f73e76e1efd14093ef97",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-03",
-      "current": true,
-      "updated_at": "2026-09-22 03:48:47",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-03-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:06:56.903962+00:00",
-      "bytes": 8021983,
-      "sha256": "a44f662881b04a00779500ca0e762d9b84c98319fea663be4c26260baa7bb8cd",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-04",
-      "current": true,
-      "updated_at": "2026-09-22 03:40:43",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-04-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:00.530655+00:00",
-      "bytes": 7942933,
-      "sha256": "f6b6894fbaec47ab360894a8c5e81b1aad9120f367223b7e8d21f2f360f0cbb3",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-05",
-      "current": true,
-      "updated_at": "2026-09-22 03:33:15",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-05-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:04.537285+00:00",
-      "bytes": 7845521,
-      "sha256": "57131a0c30b8e2d779954f7d93c5bcdfcb2b79123ee25dcec1e0ff2468804b0d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-06",
-      "current": true,
-      "updated_at": "2026-09-22 03:26:31",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-06-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:08.133556+00:00",
-      "bytes": 7878921,
-      "sha256": "19fe969fef0c0ffa5670bbb9474469f804418cc3d8e02d0c8a0abfa95bbe3cf8",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-07",
-      "current": true,
-      "updated_at": "2026-09-22 03:19:38",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-07-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:11.774433+00:00",
-      "bytes": 7877402,
-      "sha256": "6a052beaf8af82fe52a96c0f03e4cc41eb83473de274ce1032b9c6143d2f8832",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-08",
-      "current": true,
-      "updated_at": "2026-09-22 03:11:39",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-08-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:15.431293+00:00",
-      "bytes": 7905870,
-      "sha256": "886a96c6e3015a2444229f22f2ba3ee26917f395d1edf9b883fed3cacb39f596",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-09",
-      "current": true,
-      "updated_at": "2026-09-22 03:03:35",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-09-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:19.178685+00:00",
-      "bytes": 8241099,
-      "sha256": "e51db3652a0d072bb36781bd1da01e452949068405bb0e46e2a89ac1e305ad9e",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-10",
-      "current": true,
-      "updated_at": "2026-09-22 02:56:02",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-10-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:22.921694+00:00",
-      "bytes": 8229795,
-      "sha256": "0a915ace714bd9fb9bb7569e95c41069859f1608f2ed39673acc23606c664ffc",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-11",
-      "current": true,
-      "updated_at": "2026-09-22 02:47:07",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-11-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2023-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:26.621528+00:00",
-      "bytes": 8197374,
-      "sha256": "6a1a33895974173fc9b77dd8606d85df12e0b007bb4b164d4129cacf19f67664",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2023-12",
-      "current": true,
-      "updated_at": "2026-09-22 02:38:38",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2023-12-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:30.324929+00:00",
-      "bytes": 8159898,
-      "sha256": "b8eb0d69a7ea06dbed22410279289c64c18b4b214ab919fa5a75f5974bca36b8",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-01",
-      "current": true,
-      "updated_at": "2026-09-22 02:30:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-01-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:34.098144+00:00",
-      "bytes": 8093592,
-      "sha256": "c09a255363b6b42d1b85fe5d0fe9ba3fd741db168e327cdd8678384ad4aa500b",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-02",
-      "current": true,
-      "updated_at": "2026-09-22 02:23:06",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-02-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:37.789532+00:00",
-      "bytes": 8123935,
-      "sha256": "9239daeff653b6bc3a1f13133333313a81e3aa159b46fa01ef26260cd4f450f5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-03",
-      "current": true,
-      "updated_at": "2026-09-22 02:14:32",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-03-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:41.467412+00:00",
-      "bytes": 7966882,
-      "sha256": "521dfc31f2767e80988d47c26d5ae7e6d8d930db83186943fd2358215444211f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-04",
-      "current": true,
-      "updated_at": "2026-09-22 02:06:12",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-04-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:45.024910+00:00",
-      "bytes": 7873983,
-      "sha256": "6f9f95085fb4b715e5a0817c9ec4ec1d37d673d2b4dd4a9b60b061a13a0e4c0d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-05",
-      "current": true,
-      "updated_at": "2026-09-22 01:59:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-05-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:48.673519+00:00",
-      "bytes": 7817615,
-      "sha256": "debb6ed1e5d1cda54cecee3b4b3cf3a09ed8d2b631fb844ad4018d32b5e0ab95",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-06",
-      "current": true,
-      "updated_at": "2026-09-22 01:53:51",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-06-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:52.203692+00:00",
-      "bytes": 7823227,
-      "sha256": "23f133881c5681bb23d7b50ccf23f9acbddf4724c39edafce4b3c045d84c373e",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-07",
-      "current": true,
-      "updated_at": "2026-09-22 01:48:28",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-07-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:55.758330+00:00",
-      "bytes": 7776859,
-      "sha256": "036cf0e062a890ef467cd8607e45d783c4cdc3aa592a66ecc71a41dc782bb2ac",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-08",
-      "current": true,
-      "updated_at": "2026-09-22 01:42:51",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-08-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:07:59.311801+00:00",
-      "bytes": 7804117,
-      "sha256": "5ff0462ac343389f08926c104cc640aa76e66488ef3ab6a8e00dd766ade11b28",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-09",
-      "current": true,
-      "updated_at": "2026-09-22 01:37:13",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-09-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:03.384612+00:00",
-      "bytes": 8139119,
-      "sha256": "c5114d519d450d8cdd86f28b3278698766360ab1de84d654dcb5ea2cabd64d8a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-10",
-      "current": true,
-      "updated_at": "2026-09-22 01:29:14",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-10-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:07.028064+00:00",
-      "bytes": 8060135,
-      "sha256": "9aca2f4a97f10ba2b5d6e3e1d021a1a465f00ff93298a7448cc32d104dc52721",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-11",
-      "current": true,
-      "updated_at": "2026-09-22 01:16:54",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-11-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2024-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:10.687763+00:00",
-      "bytes": 8062832,
-      "sha256": "8172cd3cf454113bfca6e344ccf6d88d6608c1740a0f0e53c176bd2cae9303ac",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2024-12",
-      "current": true,
-      "updated_at": "2026-09-22 01:05:25",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2024-12-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:14.356703+00:00",
-      "bytes": 8085032,
-      "sha256": "07cfaffd7d562a225ed53dec5f692599fe709eee60245ff14f5d2a2af526de4c",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-01",
-      "current": true,
-      "updated_at": "2026-09-22 00:53:59",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-01-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:18.125669+00:00",
-      "bytes": 7976008,
-      "sha256": "bd8d6172048959625851cbe1419e1bc8bde396f66f748b88cd8ce8200e9307c7",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-02",
-      "current": true,
-      "updated_at": "2026-09-22 00:42:39",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-02-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:21.800909+00:00",
-      "bytes": 8097450,
-      "sha256": "62574148de09ab1547f936ab435b12ec99c0e834ddcc572c9a747fb72ca9becb",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-03",
-      "current": true,
-      "updated_at": "2026-09-22 00:31:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-03-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:25.357953+00:00",
-      "bytes": 7902623,
-      "sha256": "b5c2ae67fbe365eccb357c1d322e797b0d242f4afd7a6f27b706b2265b778ebc",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-04",
-      "current": true,
-      "updated_at": "2026-09-22 00:18:09",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-04-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:29.230069+00:00",
-      "bytes": 7816232,
-      "sha256": "c84e8c3221ecd5be315d3e2353314d9c1f8550d612e33a27bb6b15576aed18c3",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-05",
-      "current": true,
-      "updated_at": "2026-09-22 00:07:29",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-05-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:32.738995+00:00",
-      "bytes": 7691812,
-      "sha256": "23291e59e4bf86307acf85407c73a86c66c9e8670c9b9c17b19957539fb17e98",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-06",
-      "current": true,
-      "updated_at": "2026-09-21 23:56:36",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-06-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:36.337714+00:00",
-      "bytes": 7682635,
-      "sha256": "a40c5afc8be6ccf1405786f170a2e7cffadb1016c70025e9a33e325a9c739dd7",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-07",
-      "current": true,
-      "updated_at": "2026-09-21 23:44:57",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-07-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:39.883627+00:00",
-      "bytes": 7692143,
-      "sha256": "7f5f4e0a8c0ce2cbe6c0aefc5bc77215130d035de99f21f31a0c5c2cd20b80df",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-08",
-      "current": true,
-      "updated_at": "2026-09-21 23:34:23",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-08-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:43.408635+00:00",
-      "bytes": 7683430,
-      "sha256": "3efd7264a491e1707beee4efe7c330b46a398131305f31679f17b3a4f2c95cf9",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-09",
-      "current": true,
-      "updated_at": "2026-09-21 23:24:39",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-09-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:47.053267+00:00",
-      "bytes": 7972469,
-      "sha256": "adb107d2612bd2bbfe0a6487b8852bd38ad993dc6bd35740e78863d2fb153fe5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-10",
-      "current": true,
-      "updated_at": "2026-09-21 23:14:21",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-10-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:50.695879+00:00",
-      "bytes": 7955590,
-      "sha256": "09d1d6649a730058725acbae1f51bf02d4cdb5288fa9c48f23b56be839415e74",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-11",
-      "current": true,
-      "updated_at": "2026-09-21 23:03:42",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-11-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2025-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:54.298522+00:00",
-      "bytes": 7891453,
-      "sha256": "81ebed28b8f38054e7d860436a060fd7c50c1be7abf1c6a2bf7eb4629bd81571",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2025-12",
-      "current": true,
-      "updated_at": "2026-09-21 22:52:07",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2025-12-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:08:57.939221+00:00",
-      "bytes": 7932977,
-      "sha256": "98552132c4ed7d04885e7a68bc9c86387cb5bf6b3f0a428b9ab189d6678f5f10",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-01",
-      "current": true,
-      "updated_at": "2026-09-21 22:40:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-01-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:09:01.732093+00:00",
-      "bytes": 7829495,
-      "sha256": "227569bbeecf5526113982d06776daf9629fb4cc9ad11b0cc6508f6c5e85e62c",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-02",
-      "current": true,
-      "updated_at": "2026-09-21 22:31:28",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-02-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:09:05.752975+00:00",
-      "bytes": 7905321,
-      "sha256": "10ee7e92c87e8d429d9322dc0b269b571b11eb041bdf9a4cc16e87105e017c13",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-03",
-      "current": true,
-      "updated_at": "2026-09-21 22:20:55",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-03-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:09:09.360890+00:00",
-      "bytes": 7712665,
-      "sha256": "19c457e5c75df22ab4798e611d29b88311d6e864e072dfcd7ec6cb16d1318577",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-04",
-      "current": true,
-      "updated_at": "2026-09-22 06:50:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-04-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:09:13.302858+00:00",
-      "bytes": 7733123,
-      "sha256": "9d18008a84e7340abbc069cca1bd7e70f6edb8e5cfe61621142296cf96c9f863",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_ab_conventional_vol",
-      "period": "2026-05",
-      "current": true,
-      "updated_at": "2026-09-25 02:49:39",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/ab/vol/Vol_2026-05-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": true
     },
@@ -27828,7 +26576,7 @@
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:09:16.793853+00:00",
+      "retrieved_at": "2026-09-28T15:33:22.823570+00:00",
       "bytes": 7629857,
       "sha256": "c7381c319e1b6a52d5fd8a606b1f2e9b6bad2d46554687145d0d4609873f829b",
       "etag": null,
@@ -27840,7 +26588,7 @@
       "updated_at": "2026-09-25 02:40:06",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -27848,7 +26596,7 @@
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:09:20.363773+00:00",
+      "retrieved_at": "2026-09-28T15:33:25.801139+00:00",
       "bytes": 7704526,
       "sha256": "b1d2e5b0f21a4aa8af84c51d3a15b8034996353920e636b31a11174f14ee6b89",
       "etag": null,
@@ -27860,7 +26608,7 @@
       "updated_at": "2026-09-25 02:30:39",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -27868,7 +26616,7 @@
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:09:23.887565+00:00",
+      "retrieved_at": "2026-09-28T15:33:28.667420+00:00",
       "bytes": 7658440,
       "sha256": "135776b9d47987733663fceeea2693d880e6967810d0da860b3adb67f0890b26",
       "etag": null,
@@ -27880,7 +26628,7 @@
       "updated_at": "2026-09-25 02:23:45",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -27888,7 +26636,7 @@
       "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:09:27.022040+00:00",
+      "retrieved_at": "2026-09-28T15:33:29.619989+00:00",
       "bytes": 1854076,
       "sha256": "25c4e41a7d1b3f3fc0ff225a004e96d4b1d0c979dff56e9b46f0d4e406defa56",
       "etag": "\"1c4a7c-65bfe1e678963\"",
@@ -27896,7 +26644,7 @@
       "http_status": 200,
       "source_id": "montana_bogc_well_list",
       "raw_path": "montana/MT_CompleteWellList.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -27904,7 +26652,7 @@
       "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:02.079894+00:00",
+      "retrieved_at": "2026-09-28T15:33:48.171447+00:00",
       "bytes": 73961220,
       "sha256": "b1b0108d0c0c66085140c31f6dbe2c61cd124cd4767067550638105e339fb4c0",
       "etag": "\"4688f04-65bfe1f3e73ce\"",
@@ -27913,55 +26661,83 @@
       "source_id": "montana_bogc_well_production",
       "current": true,
       "raw_path": "montana/MT_Historical_Production.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:03.330088+00:00",
-      "bytes": 14060144,
-      "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
-      "etag": "0x8DF0AA12CD61BDE",
-      "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT",
+      "retrieved_at": "2026-09-28T15:33:52.388171+00:00",
+      "bytes": 13424241,
+      "sha256": "8e41738e1236c2b41270c5a41a70455f9815f0d3f97899efbbca25506609b74a",
+      "etag": null,
+      "last_modified": null,
       "http_status": 200,
-      "source_id": "aer_st102_facility_spatial",
-      "raw_path": "aer_st102_facility_list_shapefile.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "source_id": "petrinex_sk_well_infrastructure",
+      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-28T15:33:53.543853+00:00",
+      "bytes": 2864429,
+      "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-06",
+      "current": true,
+      "updated_at": "2026-09-21 21:16:16",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:04.043328+00:00",
-      "bytes": 2237505,
-      "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
-      "etag": "0x8DEF2F741E5782C",
-      "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT",
+      "retrieved_at": "2026-09-28T15:33:54.787959+00:00",
+      "bytes": 2891160,
+      "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
+      "etag": null,
+      "last_modified": null,
       "http_status": 200,
-      "source_id": "aer_scheme_spatial",
-      "raw_path": "aer_scheme_approval_spatial.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-07",
+      "current": true,
+      "updated_at": "2026-09-21 21:13:33",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "url": "https://iris.bcogc.ca/download/well_index.csv",
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:04.996803+00:00",
-      "bytes": 14847126,
-      "sha256": "fef54e0022f795d83820a8bffce0ee73378fa082dde1179f48d2268fa2866ff4",
-      "etag": "\"e28c96-65c4d09a827ab\"",
-      "last_modified": "Fri, 25 Sep 2026 11:30:04 GMT",
+      "retrieved_at": "2026-09-28T15:33:55.955649+00:00",
+      "bytes": 2876971,
+      "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
+      "etag": null,
+      "last_modified": null,
       "http_status": 200,
-      "source_id": "bcer_well_index",
-      "raw_path": "bcer/well_index.csv",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-08",
+      "current": true,
+      "updated_at": "2026-09-21 21:08:34",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -27975,17 +26751,33 @@
       "raw_file": "bcer/well_surface_locations.geojson",
       "grain": "34,425 well surface point geometries",
       "raw_path": "bcer/well_surface_locations.geojson",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "sha256": "e699a3e7290b72eabb629d1b101abb6d41fab92636d86066df8c1d018df892e5",
       "bytes": 9453869,
       "content_changed": false
     },
     {
+      "url": "https://iris.bcogc.ca/download/well_index.csv",
+      "status": "downloaded",
+      "error": null,
+      "retrieved_at": "2026-09-28T15:34:03.129936+00:00",
+      "bytes": 14847126,
+      "sha256": "3fa702538430cdf25c0c7e5f74f5160b8c2e2b7e4893b00dfbe174003f67d3ed",
+      "etag": "\"e28c96-65c8963686736\"",
+      "last_modified": "Mon, 28 Sep 2026 11:30:08 GMT",
+      "http_status": 200,
+      "source_id": "bcer_well_index",
+      "raw_path": "bcer/well_index.csv",
+      "checked_at": "2026-09-28T15:33:02+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
       "url": "https://iris.bcogc.ca/download/prod_csv.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:21.956941+00:00",
+      "retrieved_at": "2026-09-28T15:34:12.026384+00:00",
       "bytes": 123407266,
       "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
       "etag": "\"75b0ba2-65a691977cb24\"",
@@ -27994,1143 +26786,93 @@
       "source_id": "bcer_well_production",
       "current": true,
       "raw_path": "bcer/prod_csv.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
+      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:27.929927+00:00",
-      "bytes": 13423353,
-      "sha256": "0e093420b36d8c8d9e02e8bc0975be58190ed81fef40584290befde6a8a7f52d",
-      "etag": null,
-      "last_modified": null,
+      "retrieved_at": "2026-09-28T15:34:13.999282+00:00",
+      "bytes": 14060144,
+      "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
+      "etag": "0x8DF0AA12CD61BDE",
+      "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT",
       "http_status": 200,
-      "source_id": "petrinex_sk_well_infrastructure",
-      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "source_id": "aer_st102_facility_spatial",
+      "raw_path": "aer_st102_facility_list_shapefile.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
-      "content_changed": true
+      "content_changed": false
     },
     {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-01/CSV",
+      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:29.654144+00:00",
-      "bytes": 3018677,
-      "sha256": "b2b2c06652e0edd10e98d98b7e56d1d424490b3d43f913f4113dd5fa54918df7",
-      "etag": null,
-      "last_modified": null,
+      "retrieved_at": "2026-09-28T15:34:14.685569+00:00",
+      "bytes": 2237505,
+      "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
+      "etag": "0x8DEF2F741E5782C",
+      "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT",
       "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-01",
-      "current": true,
-      "updated_at": "2026-09-22 00:24:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-01-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "source_id": "aer_scheme_spatial",
+      "raw_path": "aer_scheme_approval_spatial.zip",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
-      "content_changed": true
+      "content_changed": false
     },
     {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-02/CSV",
+      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_05.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:10:31.324325+00:00",
-      "bytes": 2992425,
-      "sha256": "3b09384c38d328b80f9d4260656fa8017778e2d7dd5bff287aacb60de4298185",
-      "etag": null,
-      "last_modified": null,
+      "retrieved_at": "2026-09-28T15:34:15.515042+00:00",
+      "bytes": 3290653,
+      "sha256": "91a5c07902855b21d33653a615026bcec240d53f2e1ce1a84c55b2cdb37e60c9",
+      "etag": "\"066aa2d2815dd1:0\"",
+      "last_modified": "Thu, 16 Jul 2026 13:37:00 GMT",
       "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-02",
-      "current": true,
-      "updated_at": "2026-09-22 00:19:33",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-02-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:33.058841+00:00",
-      "bytes": 3038017,
-      "sha256": "0067c103518b6f6a82a1b0dd21094e3f81396c274bd15d08d76a0791992bf3b1",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-03",
-      "current": true,
-      "updated_at": "2026-09-22 00:15:59",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-03-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:34.846875+00:00",
-      "bytes": 2991653,
-      "sha256": "c9963703da4ff6d5bdec0c9d77fe3a3ae9f762fb101956828d3fb3e555b3f520",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-04",
-      "current": true,
-      "updated_at": "2026-09-22 00:12:10",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-04-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:36.786068+00:00",
-      "bytes": 3046634,
-      "sha256": "a4effcb5cc965cc159335bb0c791106edc2c1478de923f081c0dabd0e33c3ea6",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-05",
-      "current": true,
-      "updated_at": "2026-09-22 00:08:47",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-05-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:38.484935+00:00",
-      "bytes": 3034640,
-      "sha256": "49c1ca863ae5135799be9246f7ad184e53ba1ba110284ec1065940d95ee5d080",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-06",
-      "current": true,
-      "updated_at": "2026-09-22 00:05:18",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-06-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:40.213830+00:00",
-      "bytes": 3058473,
-      "sha256": "52093e00050c75c50a649ba990d2999180a15521f947ada5baf3aef0d208a33d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-07",
-      "current": true,
-      "updated_at": "2026-09-22 00:01:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-07-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:41.957480+00:00",
-      "bytes": 3078797,
-      "sha256": "5be28259f4652c650623dad0aa57b8dab5f679e492fafae514e11a39c909410a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-08",
-      "current": true,
-      "updated_at": "2026-09-21 23:57:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-08-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:43.760161+00:00",
-      "bytes": 3110447,
-      "sha256": "7a5e31db4a2ebb27328158c56dc467c6845a009181a2202dea961b71d84896d8",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-09",
-      "current": true,
-      "updated_at": "2026-09-21 23:54:38",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-09-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:45.462181+00:00",
-      "bytes": 3137649,
-      "sha256": "56e381848e232ad8c287d7c1150ef52338e1a77ffdbb6db3bbdae39a750ebd6f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-10",
-      "current": true,
-      "updated_at": "2026-09-21 23:50:10",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-10-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:47.242464+00:00",
-      "bytes": 3076984,
-      "sha256": "8c843e0e18b93c85022620fa1544b452312fdd9f4c170575f80366ba094e86a3",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-11",
-      "current": true,
-      "updated_at": "2026-09-21 23:45:26",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-11-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2022-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:48.881760+00:00",
-      "bytes": 3047168,
-      "sha256": "44954f7bab95ad8cd02d4b5acad47f0f45d56bd714deed0330fca4d5d90b4f59",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2022-12",
-      "current": true,
-      "updated_at": "2026-09-21 23:41:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2022-12-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:50.642620+00:00",
-      "bytes": 3084255,
-      "sha256": "130093cf8bc4ffbe2276ae6084e02550448a84101051a13d8a7beb2fd666bc91",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-01",
-      "current": true,
-      "updated_at": "2026-09-21 23:38:04",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-01-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:52.350746+00:00",
-      "bytes": 3059397,
-      "sha256": "48be9aac83ece5571c6c61158e15be11bede38d17e5422193ab52bf24ae20f7f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-02",
-      "current": true,
-      "updated_at": "2026-09-21 23:34:50",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-02-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:54.035169+00:00",
-      "bytes": 3082444,
-      "sha256": "e40deb14cc7554e0e09d370bcb45c3abedfe72e47896e31662859d51678b0512",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-03",
-      "current": true,
-      "updated_at": "2026-09-21 23:32:37",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-03-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:55.648315+00:00",
-      "bytes": 2986872,
-      "sha256": "dfd8b1323bc6ddd2b18af4dcf07adcda29e4e31cada974845a21b9e95ea56a66",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-04",
-      "current": true,
-      "updated_at": "2026-09-21 23:29:18",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-04-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:57.324678+00:00",
-      "bytes": 3039017,
-      "sha256": "339664a91aa3729bb4d6311bf849bd3241700c2f6d1028913a5680853a784477",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-05",
-      "current": true,
-      "updated_at": "2026-09-21 23:26:15",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-05-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:10:59.014896+00:00",
-      "bytes": 3035830,
-      "sha256": "29458d74d57414bbabd203510493dcdfb78c38a96a0f4fb17e6cc80f24d94106",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-06",
-      "current": true,
-      "updated_at": "2026-09-21 23:23:32",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-06-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:00.740609+00:00",
-      "bytes": 3044941,
-      "sha256": "4309c5df23a9bd8902d79733ed73650dc9be1f0633155e64ed6b0d59dfcc75e2",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-07",
-      "current": true,
-      "updated_at": "2026-09-21 23:20:03",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-07-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:02.361043+00:00",
-      "bytes": 3041810,
-      "sha256": "9c766bde4d080f5df685054bd51ce7d919322d680952d1a4ca191ac5ca29d5c1",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-08",
-      "current": true,
-      "updated_at": "2026-09-21 23:16:04",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-08-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:03.993807+00:00",
-      "bytes": 3074297,
-      "sha256": "21b4ef1dc4d34838e9225c52c731e47029a00eaf3de3f2aa9088a394ff61325f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-09",
-      "current": true,
-      "updated_at": "2026-09-21 23:12:36",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-09-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:05.844148+00:00",
-      "bytes": 3051255,
-      "sha256": "d46c9864923d487b9b9298ee7280f40540a4d7a0e0e2b29fef76114f4ca679cd",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-10",
-      "current": true,
-      "updated_at": "2026-09-21 23:08:52",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-10-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:07.491373+00:00",
-      "bytes": 3008337,
-      "sha256": "a4c6eb374682f91b292d17663febe3e72707f7d24395d1e92f1fe3c263f02883",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-11",
-      "current": true,
-      "updated_at": "2026-09-21 23:05:04",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-11-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2023-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:09.087508+00:00",
-      "bytes": 2988884,
-      "sha256": "9dec291caa48dae604dbc984cff191753375972e2ff9f85a4473ac8aea392a34",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2023-12",
-      "current": true,
-      "updated_at": "2026-09-21 23:01:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2023-12-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:10.838939+00:00",
-      "bytes": 2999240,
-      "sha256": "0068c5938413d4aa014b0249899a80756d9ff951e65f7a601664d629551d8485",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-01",
-      "current": true,
-      "updated_at": "2026-09-21 22:57:32",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-01-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:12.486730+00:00",
-      "bytes": 2980329,
-      "sha256": "a94f84f9e55bbec21fa37866183355ca051305af8779f940c3fbc554f3e1fccb",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-02",
-      "current": true,
-      "updated_at": "2026-09-21 22:53:58",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-02-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:14.140344+00:00",
-      "bytes": 2988169,
-      "sha256": "6dbe04c2e94c0a042bf69857bf0380c944d44478b036a8423184d651a24baa22",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-03",
-      "current": true,
-      "updated_at": "2026-09-21 22:50:50",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-03-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:15.840983+00:00",
-      "bytes": 2949923,
-      "sha256": "f866bdc9e1133b2fb3c297cc87daa7d3862bf8ded699c8640a09592469bcf811",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-04",
-      "current": true,
-      "updated_at": "2026-09-21 22:47:16",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-04-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:17.568663+00:00",
-      "bytes": 2959788,
-      "sha256": "63b3f6897b68f12a4538e6ddeb95afa5f9bc4f9e8dccf9787c7dd3dbd3885806",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-05",
-      "current": true,
-      "updated_at": "2026-09-21 22:44:03",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-05-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:19.182102+00:00",
-      "bytes": 2963973,
-      "sha256": "057497290f1d1562cc40e32a1d104f6a52d67d0f5aa0bda2df5df01ab201380d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-06",
-      "current": true,
-      "updated_at": "2026-09-21 22:40:54",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-06-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:20.824257+00:00",
-      "bytes": 2989184,
-      "sha256": "db92cbad488b4c06a74266988f929d90370710dfbd5eb706b49ea74eeb84d33f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-07",
-      "current": true,
-      "updated_at": "2026-09-21 22:37:31",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-07-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:22.443163+00:00",
-      "bytes": 2977971,
-      "sha256": "561fd85a0875d214988260cd8114e06f9d80fdf2adef0afd462a4eac8d97e586",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-08",
-      "current": true,
-      "updated_at": "2026-09-21 22:34:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-08-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:24.046119+00:00",
-      "bytes": 2955528,
-      "sha256": "087aaae9b50d5f9caab23127b4183cafbc4cd689d238438039dba2e7be5dc0a9",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-09",
-      "current": true,
-      "updated_at": "2026-09-21 22:31:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-09-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:25.735280+00:00",
-      "bytes": 2976369,
-      "sha256": "9e2926eacd3ee158ee7733746d424cf8af155e66cc6d89c3adb386034e9247dc",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-10",
-      "current": true,
-      "updated_at": "2026-09-21 22:27:57",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-10-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:27.435781+00:00",
-      "bytes": 2941383,
-      "sha256": "f197abe0490446b04d501806819bb46cf7f37f0675ff5fe7c9da93a86b51053a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-11",
-      "current": true,
-      "updated_at": "2026-09-21 22:25:09",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-11-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2024-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:28.986419+00:00",
-      "bytes": 2908760,
-      "sha256": "0e898900c6f711aece28ae3ca83be3c0c8837f8c28494fea85edbdbfad5bb38f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2024-12",
-      "current": true,
-      "updated_at": "2026-09-21 22:21:31",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2024-12-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:30.596800+00:00",
-      "bytes": 2922003,
-      "sha256": "4d507808f3aff3ec353031ec09054258c79c202e42565ded622561483436b6bc",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-01",
-      "current": true,
-      "updated_at": "2026-09-21 22:18:58",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-01-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:32.307728+00:00",
-      "bytes": 2896652,
-      "sha256": "0216268b798980d175d4be3e6f41915451f1082c441e7c025e16c3672ada4ec0",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-02",
-      "current": true,
-      "updated_at": "2026-09-21 22:16:24",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-02-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:33.986984+00:00",
-      "bytes": 2937550,
-      "sha256": "db0625c33194c321a2df45094f32f1540fa34a49432730cb8f8dd8cd70631670",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-03",
-      "current": true,
-      "updated_at": "2026-09-21 22:13:16",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-03-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:35.588527+00:00",
-      "bytes": 2899242,
-      "sha256": "b367912eba78ab0033852859a9fb54cb5e4f7b9a88a580a28d12fef518e4781f",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-04",
-      "current": true,
-      "updated_at": "2026-09-21 22:09:32",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-04-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:37.228956+00:00",
-      "bytes": 2935210,
-      "sha256": "343427eacd9bb3e34a8ec3d8a3114977facf3c505a056e1ef613d81224766c75",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-05",
-      "current": true,
-      "updated_at": "2026-09-21 22:06:08",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-05-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:38.819457+00:00",
-      "bytes": 2906622,
-      "sha256": "1572dfa1532c74435811f0362c272dbbe113a3e52317c0d9d2770b0d3dfc1634",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-06",
-      "current": true,
-      "updated_at": "2026-09-21 22:03:25",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-06-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:40.429947+00:00",
-      "bytes": 2923403,
-      "sha256": "87ffecf054951aa7dec64ec3744a943074f729e465fc8ec3907cf0b41f8678b5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-07",
-      "current": true,
-      "updated_at": "2026-09-21 21:59:22",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-07-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:42.102359+00:00",
-      "bytes": 2927103,
-      "sha256": "d417ace4d820d0816f101c9bcfb751f60f5919240c54745bf5e3e816a305aeb5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-08",
-      "current": true,
-      "updated_at": "2026-09-21 21:55:38",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-08-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-09/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:43.740713+00:00",
-      "bytes": 2919837,
-      "sha256": "2efce617937ed43db81a517b59f72ec5c4c1e6e1bf34727fa7da2bf4df2fed1d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-09",
-      "current": true,
-      "updated_at": "2026-09-21 21:52:30",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-09-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-10/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:45.412134+00:00",
-      "bytes": 2932972,
-      "sha256": "97a4d94346be1f0c26ada357e48c402f7fbb4b0ee932ec980281d04cfe6b276c",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-10",
-      "current": true,
-      "updated_at": "2026-09-21 21:49:57",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-10-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-11/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:47.013705+00:00",
-      "bytes": 2911052,
-      "sha256": "de830c5f9292ef613b0b9c6cf4b21a904c333ff588a71466beda9b5862787ed5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-11",
-      "current": true,
-      "updated_at": "2026-09-21 21:47:28",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-11-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2025-12/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:48.603160+00:00",
-      "bytes": 2887763,
-      "sha256": "0ff613f7b184cf506d4520cdac6d5ec71dae7fa7d73af7623b48a19cefcb8c3d",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2025-12",
-      "current": true,
-      "updated_at": "2026-09-21 21:42:23",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2025-12-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-01/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:50.171265+00:00",
-      "bytes": 2877824,
-      "sha256": "86b209c84d1b82a3f6b9f7585b65a574d13a812d0ff7763adabd7b0d90b1fcda",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-01",
-      "current": true,
-      "updated_at": "2026-09-21 21:38:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-01-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-02/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:51.765141+00:00",
-      "bytes": 2867208,
-      "sha256": "4bed5af160b99a4b77911d7e6a944214dc36a6f146572d4b0d4ce167e5865761",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-02",
-      "current": true,
-      "updated_at": "2026-09-21 21:36:11",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-02-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-03/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:53.322513+00:00",
-      "bytes": 2890018,
-      "sha256": "c22fd2233623bd712a611475e960e45538534e2e1018151c90efa5ac42c19bf5",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-03",
-      "current": true,
-      "updated_at": "2026-09-21 21:30:47",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-03-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-04/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:54.886017+00:00",
-      "bytes": 2826082,
-      "sha256": "ac7b60b5f69be1f450de08864a851527d419d3d23f5da05ea4c184eff23fadbd",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-04",
-      "current": true,
-      "updated_at": "2026-09-21 21:27:24",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-04-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-05/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:11:56.518077+00:00",
-      "bytes": 2896858,
-      "sha256": "cea15077401fe5797d12f7edae3d0e1a7571ced342c4f93339c4c4634fbadb2e",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
+      "source_id": "ndic_well_production",
       "period": "2026-05",
       "current": true,
-      "updated_at": "2026-09-21 21:21:49",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-05-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "raw_path": "nd/mpr/2026_05.xlsx",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
-      "content_changed": true
+      "content_changed": false
     },
     {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
+      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_06.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:11:58.084804+00:00",
-      "bytes": 2864429,
-      "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
-      "etag": null,
-      "last_modified": null,
+      "retrieved_at": "2026-09-28T15:34:16.336205+00:00",
+      "bytes": 3296675,
+      "sha256": "256f63ecdff8d0b7bad5a256a2a2ec4281d629eb6adec33e19ed66a6ad7db6eb",
+      "etag": "\"07a109c802edd1:0\"",
+      "last_modified": "Mon, 17 Aug 2026 19:43:00 GMT",
       "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
+      "source_id": "ndic_well_production",
       "period": "2026-06",
       "current": true,
-      "updated_at": "2026-09-21 21:16:16",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "raw_path": "nd/mpr/2026_06.xlsx",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
+      "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_07.xlsx",
       "status": "downloaded",
       "error": null,
-      "retrieved_at": "2026-09-27T13:11:59.660297+00:00",
-      "bytes": 2891160,
-      "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
-      "etag": null,
-      "last_modified": null,
+      "retrieved_at": "2026-09-28T15:34:17.294381+00:00",
+      "bytes": 3306982,
+      "sha256": "dd55c53342e1079deb48985587c8064abd69400fa5d7fdb25b47e652ad85ec92",
+      "etag": "\"80333ae4e4add1:0\"",
+      "last_modified": "Mon, 21 Sep 2026 21:19:31 GMT",
       "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
+      "source_id": "ndic_well_production",
       "period": "2026-07",
       "current": true,
-      "updated_at": "2026-09-21 21:13:33",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-27T13:12:01.237229+00:00",
-      "bytes": 2876971,
-      "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-08",
-      "current": true,
-      "updated_at": "2026-09-21 21:08:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
-      "checked_at": "2026-09-27T13:05:29+00:00",
+      "raw_path": "nd/mpr/2026_07.xlsx",
+      "checked_at": "2026-09-28T15:33:02+00:00",
       "mode": "online",
       "content_changed": false
     },
