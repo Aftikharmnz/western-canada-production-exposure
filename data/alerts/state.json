@@ -62,7 +62,7 @@
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
-   "runs_below": 1,
+   "runs_below": 0,
    "runs_above": 0
   },
   "Foster Creek SAGD": {
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-09-29 16:17 UTC",
- "power_observation": "2026-09-29T16:16:00+00:00",
+ "last_check": "2026-09-29 18:19 UTC",
+ "power_observation": "2026-09-29T18:18:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
