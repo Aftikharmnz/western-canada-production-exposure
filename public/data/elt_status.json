@@ -9,18 +9,18 @@
     "publication": "Validated releases only"
   },
   "production": {
-    "checked_at": "2026-09-28T15:33:02+00:00",
+    "checked_at": "2026-09-29T07:39:41+00:00",
     "raw_archive_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/releases/tag/elt-raw-36444134878-1",
     "last_data_update": "2026-09-28T15:33:02+00:00",
     "status": "degraded",
-    "run_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/36444134878",
+    "run_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/36537808908",
     "warnings": [
       "6 reference sources need review; reviewed facts retain their original verification dates."
     ],
     "latest_actual_date": "2026-08-31",
     "default_date": "2026-06-30",
     "execution_mode": "online",
-    "last_attempt_at": "2026-09-28T15:33:02+00:00"
+    "last_attempt_at": "2026-09-29T07:39:41+00:00"
   },
   "infrastructure": {
     "checked_at": "2026-09-27T14:14:21+00:00",
