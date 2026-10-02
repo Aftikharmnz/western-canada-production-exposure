@@ -77,7 +77,7 @@
   },
   "Long Lake Upgrader": {
    "status": "normal",
-   "runs_below": 1,
+   "runs_below": 0,
    "runs_above": 0
   },
   "Strathcona Refinery": {
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-10-01 23:12 UTC",
- "power_observation": "2026-10-01T23:11:00+00:00",
+ "last_check": "2026-10-02 15:41 UTC",
+ "power_observation": "2026-10-02T15:40:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
