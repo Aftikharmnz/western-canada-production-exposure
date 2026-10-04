@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-29T07:42:22+00:00",
+  "checked_at": "2026-10-04T14:21:15+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -11,15 +11,13 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "fb0d5ad088b3de5aebf6de89cd2dbe63948154e91ef40086c47269aff37e7766",
+      "fingerprint": "7cc37843accfd1b2f923f298e2d01f02bba13de9f7afa1c2af574162933ebfd4",
       "document_links": [
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2011/CDMN-RT-12.pdf?rev=d15aaaf1bb6e4a23a4d724391265f9af&hash=636F242B527919716ED6EEFF3A7AA437",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-497.pdf?rev=5f2631d77d534e6688038ceb4afab595&hash=6D70018208884759856A470565538027",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-498.pdf?rev=7cc331db39f745c783cf55545be9c8f0&hash=7B536EFD4EA731FCDDD34E43A78EEAF5",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-499.pdf?rev=60e9ce1a359a47c9a9da05d95bc77d56&hash=9E44392BEE42485AD550FCC708714D41",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2023/Schedules-to-Automatic-Balancing-Practice-September-1-2023.pdf?rev=1d5f86b3df564a568b53201a1f07baaf&hash=45C9549B19760D932E13126C8748A979",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2025/CDMN-CER-577-FERC-1341-L9-LKH.pdf?rev=7923064eaa7741bea2db1d4329d37543&hash=63937BA19B3091E9E50ADD3C6379831A",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2025/CDMN-CER-578-FERC-1350-L9-LKH.pdf?rev=cae314a250ee494bbbc83800882db9ec&hash=87FA0D78364B8ED7BFAD358AC1E26EB3",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Automatic-Balancing-Practice--July-2-2026.pdf?rev=0abba95183a44746a8d9d144acafdc80&hash=A48F1FE805B622EDC8D25EF7737DB73E",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-CER-8-FERC-4630.pdf?rev=5a68df5823f44ded8a8468ca6c08d39d&hash=594EE8722A9709ECF469DBCE829E598F",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-FERC-4621-CER-9.pdf?rev=dc11374ede384f609c1d47f324238a66&hash=E626B9139F196AD72554206C309E5499",
@@ -28,8 +26,6 @@
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-3.pdf?rev=02651e4c86fe426480346684a1703102&hash=3FEDAA47D8A65821C11757BC1DC1275A",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-4.pdf?rev=ef28836ca1d64917b6ad9a0e0f73e3a4&hash=0B9245A51E4B90CA2B64DE7C31EBEAC1",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-5-FERC-45480-LKH.pdf?rev=e2d29581e92a443096cda5b4f580773e&hash=C7334BD6FDE9D78B4C769DAD046284A0",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-600.pdf?rev=0eb6bf1289ff4e8dae0b43a0c455bc21&hash=B49790732EDC39F17A65069BCE43EBA0",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-601-FERC-45470-LKH.pdf?rev=f86edada9b834d588884b790748cebe9&hash=DBB22CCF25EED5B60C0FD408F59D7391",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-RT-26-2.pdf?rev=3168756bbe164128a15005628b37e597&hash=2E2977412E03753CBC6F4509D8ACFB12",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-RT-26.pdf?rev=fbec2a07da814ea69a5ec415a1e7dfc4&hash=5CB195E44EE53082F586A3529ABEFF7E",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-RT-26-1.pdf?rev=678028be205641c6ab2832d92d42a5ab&hash=A651700C22689631ED53A0FFD8D016A6",
@@ -37,7 +33,6 @@
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDN-Mainline-CER-IJT-Tariff-No-11-Posting.pdf?rev=284f29462f604fb08d72227f51d17ced&hash=9DB0A492484088782EB11297E7FA6D24",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Destination-Verification-Procedure-July-24-2013.pdf?rev=4249da9f21c74fe086a8175a27792b11&hash=5D2287B099C23B8C2629DA0C57B9679F",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-6-FERC-3590.pdf?rev=a665fdddae7f409d8b7062874b6a035e&hash=993FC29AB7A3A2023ADE2FF54E6C1DFD",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-602-FERC-3580.pdf?rev=d91a86f23fa149589e1b1be5905fd7b9&hash=51CCD93E03A1307943D38F1DDCE4D15A",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-IJT-CER-12-FERC-3600.pdf?rev=0fa5dcca3f2346b593429d0c45f33867&hash=71696F8C0CE3E890C8E1A47E5C3CB6DC",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Supply-Exception-Procedure-July--2--2026.pdf?rev=51ef53b3c7fe47a490bc25715b60c523&hash=82456236872DFC96F14D5A4527D372EE",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/TOL-CER-7-FERC-37240.pdf?rev=d9c0943979c145a9b45f00c0e1d6f83c&hash=7085EC6E2E0FB463AC8F4A43DEA33452",
@@ -46,9 +41,9 @@
       ],
       "comparison_basis": "observed_source",
       "observation_baseline": "fb0d5ad088b3de5aebf6de89cd2dbe63948154e91ef40086c47269aff37e7766",
-      "review_required": false,
-      "status": "unchanged",
-      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+      "review_required": true,
+      "status": "review_required",
+      "reason": "Source fingerprint differs from its baseline; published facts have been preserved."
     },
     {
       "id": "express_tariff_index",
@@ -88,7 +83,7 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "01ad4decfd4b56ab14c85776e622fa1fea09b68be504e1b49134def1aca90098",
+      "fingerprint": "ef49bcf8dad5aeb1a77ee3e010777fd3477c6269ddc5313b91a71f855368d23b",
       "document_links": [
         "https://www.southbow.com/wp-content/uploads/2026/03/C37492-1_South_Bow_CER_Tariff_No._78_-_A9R3W7.pdf",
         "https://www.southbow.com/wp-content/uploads/2026/03/FERC-5.7.0-South-Bow-FERC-Rules-and-Regulations.pdf",
@@ -103,14 +98,14 @@
         "https://www.southbow.com/wp-content/uploads/2026/06/FERC-6.112.0-Keystone-Rate-Schedule.pdf",
         "https://www.southbow.com/wp-content/uploads/2026/07/CER-No.-84-South-Bow-IJT-Rates-Tariff.pdf",
         "https://www.southbow.com/wp-content/uploads/2026/07/FERC-7.44.0-South-Bow-IJT-Rate-Schedule.pdf",
-        "https://www.southbow.com/wp-content/uploads/2026/07/FERC-South-Bow-Tariff-Index-August-1-2026.pdf",
-        "https://www.southbow.com/wp-content/uploads/2026/07/Historical-CER-Tariffs.pdf"
+        "https://www.southbow.com/wp-content/uploads/2026/07/Historical-CER-Tariffs.pdf",
+        "https://www.southbow.com/wp-content/uploads/2026/09/FERC-South-Bow-Tariff-Index-October-1-2026.pdf"
       ],
       "comparison_basis": "observed_source",
       "observation_baseline": "01ad4decfd4b56ab14c85776e622fa1fea09b68be504e1b49134def1aca90098",
-      "review_required": false,
-      "status": "unchanged",
-      "reason": "Availability/change monitoring only; source facts are not automatically re-verified."
+      "review_required": true,
+      "status": "review_required",
+      "reason": "Source fingerprint differs from its baseline; published facts have been preserved."
     },
     {
       "id": "transmountain_tariff_index",
@@ -564,7 +559,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-09-29T07:42:22+00:00",
+      "checked_at": "2026-10-04T14:21:14+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
@@ -578,6 +573,14 @@
       "bytes": 159911,
       "content_changed": false,
       "reason": "Official annual observations imported separately; integration with map identities and later statuses requires review."
+    },
+    {
+      "id": "tariff_effective_date",
+      "name": "Scheduled tariff change",
+      "status": "review_required",
+      "review_required": true,
+      "effective_date": "2026-10-01",
+      "reason": "A known replacement effective date has arrived; current published rates remain on their original verification date."
     }
   ],
   "tariffs_last_verified": "2026-09-10",
@@ -589,7 +592,7 @@
     "Operator webpages and tariff publication indexes are checked for availability and change, not automatically interpreted as verified capacity, operating status or effective toll changes.",
     "An unchanged old PDF does not establish that it is still the current filing; publication indexes and scheduled effective-date warnings are checked separately."
   ],
-  "review_required_count": 6,
+  "review_required_count": 9,
   "failure_count": 3,
   "failures": [
     "transmountain_tariff_index",
