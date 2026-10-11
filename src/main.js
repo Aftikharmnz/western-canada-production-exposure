@@ -189,20 +189,38 @@ const RAILWAY_CATEGORY_META = {
   },
   "crude-rail-terminal": {
     label: "Crude rail terminals",
-    detail: "EIA U.S. crude-by-rail points plus reviewed Canadian rail/transload facilities",
+    detail: "EIA-derived crude-by-rail inventory plus Canadian rail/transload facilities; source dates vary",
     color: "#111827",
     kind: "point",
   },
   "crude-terminal": {
     label: "Crude storage / marine terminals",
-    detail: "Reviewed Canadian pipeline, storage, and marine crude terminals; not necessarily rail-served",
+    detail: "Crude pipeline and marine terminals; source location and operating status vary",
     color: "#9a5546",
     kind: "point",
   },
   "product-terminal": {
-    label: "Refined-product terminals",
-    detail: "EIA U.S. bulk-terminal snapshot plus reviewed Canadian operator/NPRI facilities; transport mode varies",
+    label: "Fuel / petroleum product terminals",
+    detail: "Operator maps and EIA-derived inventory plus Canadian facilities; source dates and operators vary",
     color: "#0f766e",
+    kind: "point",
+  },
+  "crude-storage": {
+    label: "Crude oil storage",
+    detail: "Storage sites identified by an operator or regulator; capacity is shown only when sourced",
+    color: "#b45309",
+    kind: "point",
+  },
+  "product-storage": {
+    label: "Refined-product storage",
+    detail: "Verified storage service for gasoline, diesel, jet fuel or other refined products",
+    color: "#0369a1",
+    kind: "point",
+  },
+  "ngl-storage": {
+    label: "NGL / LPG storage",
+    detail: "Storage facilities for natural gas liquids; distinct from crude and refined products",
+    color: "#7c3aed",
     kind: "point",
   },
   "inactive-terminal": {
@@ -213,7 +231,7 @@ const RAILWAY_CATEGORY_META = {
   },
 };
 
-const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "crude-terminal", "product-terminal"];
+const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "crude-terminal", "product-terminal", "crude-storage", "product-storage", "ngl-storage"];
 
 // Rail line colour = owning railroad (first listed NARN owner, RROWNER1).
 // Class I systems get distinct colours; passenger/commuter and regional/short
@@ -242,6 +260,9 @@ const RAIL_TERMINAL_DARK_COLORS = {
   "crude-rail-terminal": "#fb923c",
   "crude-terminal": "#fb7185",
   "product-terminal": "#2dd4bf",
+  "crude-storage": "#fbbf24",
+  "product-storage": "#38bdf8",
+  "ngl-storage": "#c084fc",
   "inactive-terminal": "#cbd5e1",
 };
 const RAIL_OWNER_BY_CODE = new Map(
@@ -376,13 +397,19 @@ const state = {
   selectedMarketPipelineIds: new Set(),
   marketHubsEnabled: true,
   marketPipelineMenuOpen: false,
+  marketPipelineSearch: "",
   railwayEnabled: false,
   railwayData: null,
   railwayLoading: false,
   railwayError: null,
   railwayLayer: null,
+  railwayLineLayer: null,
+  railwayLineData: null,
+  railwayLineSelection: '',
   selectedRailwayCategories: new Set(DEFAULT_RAILWAY_CATEGORIES),
   railwayMenuOpen: false,
+  railwaySearch: "",
+  railwaySearchTimer: null,
   // Seasonality index (lazy-loaded from asset_seasonality.json)
   seasonalityIndex: null,
   seasonalityIndexLoading: false,
@@ -934,6 +961,7 @@ function initControls() {
   if (marketPipelineMenu) {
     marketPipelineMenu.addEventListener("change", handleMarketPipelineMenuChange);
     marketPipelineMenu.addEventListener("click", handleMarketPipelineMenuClick);
+    marketPipelineMenu.addEventListener("input", handleInfrastructureSearchInput);
   }
   if (els.railwayToggle) {
     els.railwayToggle.addEventListener("click", toggleRailways);
@@ -942,7 +970,9 @@ function initControls() {
   if (railwayMenu) {
     railwayMenu.addEventListener("change", handleRailwayMenuChange);
     railwayMenu.addEventListener("click", handleRailwayMenuClick);
+    railwayMenu.addEventListener("input", handleInfrastructureSearchInput);
     buildRailwayMenu();
+    updateRailwayToggleUI();
   }
   document.addEventListener("click", (event) => {
     const control = document.getElementById("marketPipelineControl");
@@ -4262,6 +4292,7 @@ function marketHubFeatures() {
         hub_id: hubId,
         name: hub.name,
         hub_type: hub.hub_type,
+        geometry_confidence: 'Approximate market-area reference',
         source_summary: 'Tariff document route-node reference and public geographic coordinates',
       },
       geometry: { type: 'Point', coordinates: hub.coordinates },
@@ -4459,6 +4490,9 @@ function renderMarketHubTooltip(p) {
     `${p.hub_type ? `<div class="pt-sub">${escapeHtml(p.hub_type)}</div>` : ''}` +
     `</div>`;
 
+  html += `<div class="pt-sub">Area reference: ${escapeHtml(p.geometry_confidence || 'Approximate market-area location')}. This marker identifies a market hub, not a specific storage facility.</div>`;
+  if (p.source_summary) html += `<div class="pt-sub">${escapeHtml(p.source_summary)}</div>`;
+
   const tariffMeta = state.marketTariffData?.metadata || {};
   if (tariffMeta.last_verified) {
     const stale = tariffMeta.next_known_change && new Date().toISOString().slice(0, 10) >= tariffMeta.next_known_change;
@@ -4522,7 +4556,8 @@ function renderMarketPipelineTooltip(p) {
     : ['operating', 'available', 'initial'].includes(details.capacity_basis)
       ? `Published ${basis} capacity` : 'Nameplate / rated capacity';
   const source = safeHttpUrl(details.source_url);
-  const routeSource = safeHttpUrl(details.route_source_url);
+  const inventorySource = safeHttpUrl(details.route_source_url);
+  const routeSource = safeHttpUrl(p.geometry_source_url) || inventorySource;
   return `<div class="pipeline-card">` +
     `<div class="pipeline-card-kind">Market access pipeline</div>` +
     `<strong class="pipeline-card-title">${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
@@ -4533,8 +4568,11 @@ function renderMarketPipelineTooltip(p) {
     `${details.capacity_note ? `<div class="pipeline-card-note">${escapeHtml(details.capacity_note)}</div>` : ''}` +
     `${p.status_note ? `<div class="pipeline-card-note">${escapeHtml(p.status_note)}</div>` : ''}` +
     `${p.geometry_note || p.coverage_note ? `<div class="pipeline-card-note">${escapeHtml(p.geometry_note || p.coverage_note)}</div>` : ''}` +
+    `${p.network_identity_basis ? `<div class="pipeline-card-note">${escapeHtml(p.network_identity_basis)}</div>` : ''}` +
+    `${p.geometry_source_date_note || p.source_as_of ? `<div class="pipeline-card-note">Route source timing: ${escapeHtml(p.geometry_source_date_note || p.source_as_of)}. Source timing does not confirm current operation or ownership of every segment.</div>` : ''}` +
     `<div class="pipeline-card-source">${source ? `<a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(details.source_name || 'Capacity source')}</a>` : 'Capacity not provided by the mapped GIS layer'}` +
-    `${routeSource && routeSource !== source ? ` · <a href="${escapeHtml(routeSource)}" target="_blank" rel="noopener noreferrer">Route source</a>` : ''}` +
+    `${routeSource && routeSource !== source ? ` · <a href="${escapeHtml(routeSource)}" target="_blank" rel="noopener noreferrer">Displayed geometry source</a>` : ''}` +
+    `${inventorySource && inventorySource !== routeSource && inventorySource !== source ? ` · <a href="${escapeHtml(inventorySource)}" target="_blank" rel="noopener noreferrer">Archived inventory reference</a>` : ''}` +
     `${details.as_of ? `<br>Source basis: ${escapeHtml(details.as_of)}` : ''}` +
     `${details.verified_at ? `<br>Reviewed ${escapeHtml(details.verified_at)}` : ''}</div>` +
     `<div class="pipeline-card-footer">${escapeHtml(p.geometry_confidence || 'Route-level map')}. Products describe service, not the current batch. Click or tap to keep this card open.</div></div>`;
@@ -4542,7 +4580,8 @@ function renderMarketPipelineTooltip(p) {
 
 function bindPipelineCard(layer, html) {
   layer.bindTooltip(html, { sticky: true, opacity: 1, className: 'pipeline-tip pipeline-detail-tip' });
-  layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true });
+  layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true,
+    autoPanPaddingTopLeft: [12, 80], autoPanPaddingBottomRight: [12, 12] });
   layer.on('popupopen', () => layer.closeTooltip());
   layer.on('mouseover', () => { if (layer.isPopupOpen()) layer.closeTooltip(); });
 }
@@ -4651,10 +4690,12 @@ function setMarketPipelineMenuOpen(open) {
 function buildMarketPipelineMenu() {
   const options = document.getElementById('marketPipelineOptions');
   if (!options || !state.marketPipelineData) return;
+  ensureInfrastructureSearch('marketPipelineOptions', 'marketPipelineSearch', 'Find a pipeline or operator', state.marketPipelineSearch);
   let html = '';
   let currentSection = '';
   const sections = new Map();
   for (const feature of marketPipelineFeatures()) {
+    if (!infrastructureMatchesSearch(feature.properties, state.marketPipelineSearch)) continue;
     const section = feature.properties?.menu_section || 'Core Market Access Pipelines';
     if (!sections.has(section)) sections.set(section, []);
     sections.get(section).push(feature);
@@ -4669,18 +4710,21 @@ function buildMarketPipelineMenu() {
     const checked = state.selectedMarketPipelineIds.has(p.route_id);
     const color = safeCssColor(p.color);
     html += `
-      <label class="market-pipeline-option" title="${escapeHtml(p.flow_role || p.route_name)}">
+      <label class="market-pipeline-option" title="${escapeHtml([p.route_name, p.operator, p.flow_role].filter(Boolean).join(' · '))}">
         <input type="checkbox" data-market-pipeline-id="${escapeHtml(p.route_id)}" ${checked ? 'checked' : ''} />
         <span class="market-pipeline-swatch" style="background:${escapeHtml(color)}"></span>
         <span class="market-pipeline-option-text">
           <strong>${escapeHtml(p.route_name || p.route_id)}</strong>
-          <em>${escapeHtml(p.commodity || '')}</em>
+          <em>${escapeHtml(p.operator || p.commodity || '')}</em>
         </span>
       </label>`;
   }
-  options.innerHTML = html;
+  options.innerHTML = (html || '<div class="infrastructure-search-note">No pipelines match this search.</div>') +
+    '<div class="infrastructure-search-note">Search narrows this list. Selected routes remain visible on the map. Route locations and source dates vary; open a line for details.</div>';
   const hubsToggle = document.getElementById('marketHubToggle');
   if (hubsToggle) hubsToggle.checked = state.marketHubsEnabled;
+  const hubDescription = document.querySelector?.('#marketPipelineMenu .hub-option em');
+  if (hubDescription) hubDescription.textContent = 'Approximate market areas and route nodes';
 }
 
 function handleMarketPipelineMenuChange(event) {
@@ -4734,13 +4778,56 @@ function refreshMarketPipelineLayers() {
 // RAILWAYS LAYER - BTS/FRA NARN + EIA petroleum terminals
 // ============================================================
 
+function infrastructureMatchesSearch(props, query) {
+  const normalize = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const tokens = normalize(query).trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  const p = props || {};
+  const text = normalize([
+    p.name, p.reported_name, p.operator, p.reported_operator, p.city, p.state, p.province,
+    p.country, p.address, p.facility_id, p.route_name, p.route_id, p.commodity,
+    p.search_aliases,
+    ...(Array.isArray(p.source_pipeline_names) ? p.source_pipeline_names : []),
+    ...(Array.isArray(p.source_operator_names) ? p.source_operator_names : []),
+  ].filter(Boolean).join(' '));
+  return tokens.every((token) => text.includes(token));
+}
+
+function ensureInfrastructureSearch(optionsId, inputId, label, value) {
+  const options = document.getElementById(optionsId);
+  if (!options || !document.createElement) return;
+  let input = document.getElementById(inputId);
+  if (!input) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'infrastructure-search';
+    wrapper.innerHTML = `<label for="${inputId}">${escapeHtml(label)}</label><input id="${inputId}" type="search" placeholder="Name, operator or place" autocomplete="off" />`;
+    options.before(wrapper);
+    input = document.getElementById(inputId);
+  }
+  if (input && input.value !== value) input.value = value;
+}
+
+function handleInfrastructureSearchInput(event) {
+  if (event.target.id === 'marketPipelineSearch') {
+    state.marketPipelineSearch = event.target.value;
+    buildMarketPipelineMenu();
+  } else if (event.target.id === 'railwaySearch') {
+    state.railwaySearch = event.target.value;
+    buildRailwayMenu();
+    clearTimeout(state.railwaySearchTimer);
+    state.railwaySearchTimer = setTimeout(renderRailwayLayer, 200);
+  }
+}
+
 function railwayFeatures() {
   return state.railwayData?.features || [];
 }
 
 function selectedRailwayFeatures() {
   return railwayFeatures()
-    .filter((feature) => state.selectedRailwayCategories.has(feature.properties?.category));
+    .filter((feature) => state.selectedRailwayCategories.has(feature.properties?.category))
+    .filter((feature) => feature.properties?.feature_kind === 'rail_line'
+      || infrastructureMatchesSearch(feature.properties, state.railwaySearch));
 }
 
 function railwaySelectedCount() {
@@ -4781,12 +4868,13 @@ function railwayStyle(feature) {
 
 function railwayTerminalStyle(feature) {
   const category = feature.properties?.category || "product-terminal";
+  const reviewed = feature.properties?.review_status === 'operator_verified';
   return {
-    radius: category === "crude-rail-terminal" || category === "crude-terminal" ? 4.4 : 3.7,
-    color: "#ffffff",
-    weight: 1.15,
+    radius: category.endsWith('-storage') ? 5 : category === "crude-rail-terminal" || category === "crude-terminal" ? 4.4 : 3.7,
+    color: reviewed ? '#ffffff' : railwayCategoryColor(category),
+    weight: reviewed ? 1.15 : 1.6,
     fillColor: railwayCategoryColor(category),
-    fillOpacity: 0.9,
+    fillOpacity: reviewed ? 0.9 : 0.3,
     opacity: 0.95,
   };
 }
@@ -4796,20 +4884,23 @@ function railwayTerminalMarker(feature, latlng) {
 }
 
 function refreshRailwayStyles() {
-  if (!state.railwayLayer) return;
-  state.railwayLayer.eachLayer((layer) => {
+  for (const group of [state.railwayLineLayer, state.railwayLayer]) {
+    if (!group) continue;
+    group.eachLayer((layer) => {
     const feature = layer.feature;
     if (!feature || typeof layer.setStyle !== "function") return;
     const isLine = feature.properties?.feature_kind === "rail_line"
       || feature.geometry?.type === "LineString"
       || feature.geometry?.type === "MultiLineString";
     layer.setStyle(isLine ? railwayStyle(feature) : railwayTerminalStyle(feature));
-  });
+    });
+  }
 }
 
 function railwayTooltipHtml(p) {
   const meta = RAILWAY_CATEGORY_META[p.category] || {};
   const title = p.name || meta.label || "Railway feature";
+  if (p.feature_kind !== 'rail_line') return terminalCardHtml(p);
   const rows = [
     ["Type", p.category_label || meta.label],
     ["Status", p.status],
@@ -4837,6 +4928,60 @@ function railwayTooltipHtml(p) {
     `<div class="pt-route">${rows}</div>` +
     `</div>`
   );
+}
+
+function terminalCardHtml(p) {
+  const meta = RAILWAY_CATEGORY_META[p.category] || {};
+  const reviewLabels = {
+    operator_verified: 'Identity reviewed against an official operator source',
+    inventory_only: 'Official inventory record; current identity and operating status not independently verified',
+    historical_unverified: 'Historical record; current identity and operating status not verified',
+  };
+  const locationLabels = {
+    exact: 'Official facility point; not a surveyed boundary',
+    high: 'Facility location from a published source; not a surveyed boundary',
+    medium: 'Approximate facility location',
+    low: 'Approximate location',
+    unknown: 'Location accuracy not specified by source',
+  };
+  const rows = [
+    ['Type', p.facility_type || meta.label || p.category],
+    ['Operator', p.operator || 'Not identified in source'],
+    ['Location', [p.city, p.state || p.province, p.country].filter(Boolean).join(', ')],
+    ['Address', p.address],
+    ['Commodity', p.commodity || 'Not identified in source'],
+    ['Storage capacity', typeof p.storage_capacity_bbl === 'number' && Number.isFinite(p.storage_capacity_bbl) && p.storage_capacity_bbl >= 0 && p.storage_capacity_note
+      ? `${p.storage_capacity_bbl.toLocaleString('en-CA', { maximumFractionDigits: 0 })} bbl` : ''],
+    ['Transport', p.modes || p.rail_connection || 'Not specified in source'],
+    [p.review_status === 'operator_verified' ? 'Status' : 'Inventory status', p.status || 'Current operating status not verified'],
+    ['Pipeline connections', p.pipeline_connections],
+    ['Facility ID', p.facility_id],
+    ['Source date', p.source_as_of || 'Not published in record'],
+    ['Source timing', p.source_date_note],
+    ['Coordinate source/check date', p.coordinate_as_of],
+    ['Identity reviewed', p.review_status === 'operator_verified' ? (p.reviewed_at || p.last_verified) : ''],
+    ['Coordinate record', p.coordinate_source_id],
+    ['Location accuracy', p.location_accuracy || locationLabels[p.location_confidence] || p.location_confidence || locationLabels.unknown],
+  ].filter(([, value]) => value);
+  if (p.reported_name && p.reported_name !== p.name) rows.push(['Inventory name', p.reported_name]);
+  if (p.reported_operator && p.reported_operator !== p.operator) rows.push(['Inventory operator', p.reported_operator]);
+  const sourceLinks = [
+    ['Identity / inventory source', p.source_url],
+    ['Coordinate source', p.coordinate_source_url],
+  ].flatMap(([label, url]) => {
+    const safe = safeHttpUrl(url);
+    return safe ? [`<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`] : [];
+  });
+  return `<div class="pipeline-card terminal-card">` +
+    `<div class="pipeline-card-kind">${escapeHtml(meta.label || 'Petroleum facility')}</div>` +
+    `<strong class="pipeline-card-title">${escapeHtml(p.name || 'Unnamed inventory facility')}</strong>` +
+    pipelineCardRows(rows) +
+    `<div class="pipeline-card-note">${escapeHtml(reviewLabels[p.review_status] || 'Source record; current identity and operating status not independently verified')}</div>` +
+    `${p.location_note ? `<div class="pipeline-card-note">${escapeHtml(p.location_note)}</div>` : ''}` +
+    `${p.storage_capacity_note && typeof p.storage_capacity_bbl === 'number' ? `<div class="pipeline-card-note">${escapeHtml(p.storage_capacity_note)}</div>` : ''}` +
+    `${p.facility_scope ? `<div class="pipeline-card-note">${escapeHtml(p.facility_scope)}</div>` : ''}` +
+    `<div class="pipeline-card-source">${sourceLinks.join(' · ') || escapeHtml(p.source || 'Source link not available')}</div>` +
+    `<div class="pipeline-card-footer">Operator ownership does not establish a connection to a particular pipeline. Click or tap to keep this card open.</div></div>`;
 }
 
 async function fetchRailwayData() {
@@ -4870,22 +5015,42 @@ function renderRailwayLayer() {
     state.map.removeLayer(state.railwayLayer);
     state.railwayLayer = null;
   }
-  if (!state.railwayEnabled || !state.railwayData?.features?.length || !railwaySelectedCount()) return;
+  if (!state.railwayEnabled || !state.railwayData?.features?.length || !railwaySelectedCount()) {
+    if (state.railwayLineLayer) state.map.removeLayer(state.railwayLineLayer);
+    state.railwayLineLayer = null;
+    state.railwayLineData = null;
+    state.railwayLineSelection = '';
+    return;
+  }
 
   const features = selectedRailwayFeatures();
-  if (!features.length) return;
-  state.railwayLayer = L.geoJSON({ type: "FeatureCollection", features }, {
-    style: railwayStyle,
-    pointToLayer: railwayTerminalMarker,
-    onEachFeature(feature, layer) {
-      layer.bindTooltip(
-        railwayTooltipHtml(feature.properties || {}),
-        { sticky: true, opacity: 0.96, className: "pipeline-tip railway-tip" }
-      );
-    },
-  }).addTo(state.map);
+  const lineSelection = [...state.selectedRailwayCategories].filter((key) => RAILWAY_CATEGORY_META[key]?.kind === 'line').sort().join('|');
+  // A facility search changes only point features. Keep the 110,000-segment
+  // rail context intact rather than recreating it for every query or locator.
+  if (state.railwayLineData !== state.railwayData || state.railwayLineSelection !== lineSelection) {
+    if (state.railwayLineLayer) state.map.removeLayer(state.railwayLineLayer);
+    state.railwayLineLayer = null;
+    const lines = features.filter((feature) => feature.properties?.feature_kind === 'rail_line');
+    if (lines.length) {
+      state.railwayLineLayer = L.geoJSON({ type: 'FeatureCollection', features: lines }, {
+        style: railwayStyle,
+        onEachFeature(feature, layer) {
+          layer.bindTooltip(railwayTooltipHtml(feature.properties || {}), { sticky: true, opacity: 0.96, className: 'pipeline-tip railway-tip' });
+        },
+      }).addTo(state.map);
+    }
+    state.railwayLineData = state.railwayData;
+    state.railwayLineSelection = lineSelection;
+  }
+  const points = features.filter((feature) => feature.properties?.feature_kind !== 'rail_line');
+  if (points.length) {
+    state.railwayLayer = L.geoJSON({ type: 'FeatureCollection', features: points }, {
+      pointToLayer: railwayTerminalMarker,
+      onEachFeature(feature, layer) { bindPipelineCard(layer, railwayTooltipHtml(feature.properties || {})); },
+    }).addTo(state.map);
+  }
 
-  if (typeof state.railwayLayer.bringToBack === "function") state.railwayLayer.bringToBack();
+  state.railwayLineLayer?.bringToBack?.();
   bringPipelineLayersToBack();
   if (state.formationLayer) state.formationLayer.bringToBack();
 }
@@ -4908,13 +5073,13 @@ function updateRailwayToggleUI() {
     btn.className = "railway-toggle-btn loading";
     btn.setAttribute("aria-expanded", "false");
   } else if (state.railwayEnabled && selectedCount) {
-    btn.textContent = `Rail & Terminals (${selectedCount})`;
-    btn.title = `${selectedCount.toLocaleString("en-CA")} railway categories selected`;
+    btn.textContent = `Rail & Storage (${selectedCount})`;
+    btn.title = `${selectedCount.toLocaleString("en-CA")} rail, terminal and storage categories selected`;
     btn.className = "railway-toggle-btn active";
     btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
   } else {
-    btn.textContent = "Rail & Terminals";
-    btn.title = "Rail context plus crude and refined-product terminal overlays";
+    btn.textContent = "Rail & Storage";
+    btn.title = "Rail context, petroleum terminals and storage facilities";
     btn.className = "railway-toggle-btn";
     btn.setAttribute("aria-expanded", state.railwayMenuOpen ? "true" : "false");
   }
@@ -4930,8 +5095,15 @@ function setRailwayMenuOpen(open) {
 function buildRailwayMenu() {
   const options = document.getElementById("railwayOptions");
   if (!options) return;
+  ensureInfrastructureSearch('railwayOptions', 'railwaySearch', 'Find a terminal or storage facility', state.railwaySearch);
+  const header = document.querySelector?.('#railwayMenu .railway-menu-header strong');
+  if (header) header.textContent = 'Rail, terminals & storage';
+  const subtitle = document.querySelector?.('#railwayMenu .railway-menu-header span');
+  if (subtitle) subtitle.textContent = 'Source dates vary';
+  const sourceNote = document.querySelector?.('#railwayMenu .layer-source-note');
+  if (sourceNote) sourceNote.textContent = 'Rail geometry is refreshed weekly. Terminal and storage source dates vary, and facility coverage is incomplete. Minor tracks and private spurs may be missing.';
   const counts = {};
-  for (const feature of railwayFeatures()) {
+  for (const feature of railwayFeatures().filter((f) => f.properties?.feature_kind === 'rail_line' || infrastructureMatchesSearch(f.properties, state.railwaySearch))) {
     const category = feature.properties?.category;
     if (!category) continue;
     const increment = feature.properties?.feature_kind === "rail_line"
@@ -4962,7 +5134,7 @@ function buildRailwayMenu() {
         }).join("")}
       </div>`
     : "";
-  options.innerHTML = Object.entries(RAILWAY_CATEGORY_META)
+  options.innerHTML = (state.railwaySearch.trim() ? terminalSearchResultsHtml() : '') + Object.entries(RAILWAY_CATEGORY_META)
     .map(([key, meta]) => {
       const checked = state.selectedRailwayCategories.has(key);
       const swatch = meta.kind === "point"
@@ -4979,7 +5151,21 @@ function buildRailwayMenu() {
           </span>
         </label>`;
     })
-    .join("") + ownerLegend;
+    .join("") + (state.railwaySearch.trim() ? '' : terminalSearchResultsHtml()) + ownerLegend;
+}
+
+function terminalSearchResultsHtml() {
+  if (!state.railwaySearch.trim()) return '<div class="infrastructure-search-note">Solid points have an identity reviewed against an operator source. Faint points retain inventory records awaiting current verification. Facility coverage is incomplete; open a point for dates and location accuracy.</div>';
+  const matches = railwayFeatures().map((feature, index) => ({ feature, index }))
+    .filter(({ feature }) => feature.properties?.feature_kind === 'terminal' && infrastructureMatchesSearch(feature.properties, state.railwaySearch))
+    .sort((a, b) => Number(b.feature.properties.review_status === 'operator_verified') - Number(a.feature.properties.review_status === 'operator_verified')
+      || String(a.feature.properties.name).localeCompare(String(b.feature.properties.name))
+      || String(a.feature.properties.facility_id).localeCompare(String(b.feature.properties.facility_id)));
+  return `<div class="infrastructure-search-note" role="status">${matches.length} matching facility records${matches.length > 20 ? ' · first 20 shown' : ''}. Source records may overlap at one site. Search filters facility points; rail context stays visible.</div>` +
+    `<div class="terminal-search-results">${matches.slice(0, 20).map(({ feature, index }) => {
+      const p = feature.properties;
+      return `<button type="button" data-terminal-index="${index}" title="Locate ${escapeHtml(p.name)}"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml([p.operator, p.city, p.state || p.province, p.country].filter(Boolean).join(' · '))}</span><span>${escapeHtml(p.address || p.facility_id || '')}</span></button>`;
+    }).join('')}</div>`;
 }
 
 function handleRailwayMenuChange(event) {
@@ -4994,6 +5180,21 @@ function handleRailwayMenuChange(event) {
 }
 
 function handleRailwayMenuClick(event) {
+  const facilityButton = event.target.closest('[data-terminal-index]');
+  if (facilityButton) {
+    const feature = railwayFeatures()[Number(facilityButton.dataset.terminalIndex)];
+    if (!feature || feature.geometry?.type !== 'Point') return;
+    state.selectedRailwayCategories.add(feature.properties.category);
+    state.railwayEnabled = true;
+    renderRailwayLayer();
+    const [lon, lat] = feature.geometry.coordinates;
+    state.map?.setView([lat, lon], Math.max(10, state.map.getZoom?.() || 5));
+    state.railwayLayer?.eachLayer((layer) => { if (layer.feature === feature) layer.openPopup?.(); });
+    buildRailwayMenu();
+    updateRailwayToggleUI();
+    setRailwayMenuOpen(false);
+    return;
+  }
   const action = event.target.closest("[data-railway-action]")?.dataset.railwayAction;
   if (!action) return;
   if (action === "all") {

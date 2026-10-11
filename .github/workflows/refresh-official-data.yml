@@ -86,7 +86,7 @@ jobs:
       - name: Check parsers and release boundaries
         run: |
           node --check src/main.js
-          node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs scripts/test_production_reporting.cjs
+          node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs scripts/test_production_reporting.cjs scripts/test_infrastructure_ui.cjs
           python -m unittest discover -s scripts -p 'test_*.py'
 
       - name: Stage and validate official updates

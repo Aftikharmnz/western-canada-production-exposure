@@ -15,7 +15,9 @@ import json
 import argparse
 import math
 import sys
+import urllib.parse
 from collections import Counter
+from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -86,6 +88,93 @@ def validate_geometries(name: str, data: dict[str, Any]) -> list[str]:
     return errors
 
 
+def validate_terminal_inventory(data: dict[str, Any]) -> list[str]:
+    """Do not publish ambiguous IDs or unsupported location/identity claims."""
+    errors: list[str] = []
+    seen: set[str] = set()
+    categories = {"crude-rail-terminal", "crude-terminal", "product-terminal", "inactive-terminal",
+                  "crude-storage", "product-storage", "ngl-storage"}
+    for index, feature in enumerate(data.get("features", [])):
+        props = feature.get("properties") or {}
+        if props.get("feature_kind") != "terminal":
+            continue
+        label = f"railways.geojson terminal {index} ({props.get('name', 'unnamed')})"
+        facility_id = props.get("facility_id")
+        if not isinstance(facility_id, str) or not facility_id.strip() or facility_id in seen:
+            errors.append(f"{label}: missing or duplicate facility ID")
+        else:
+            seen.add(facility_id)
+        if feature.get("geometry", {}).get("type") != "Point":
+            errors.append(f"{label}: facility must have point geometry")
+        if props.get("category") not in categories:
+            errors.append(f"{label}: unsupported terminal/storage category")
+        if props.get("review_status") not in {"operator_verified", "inventory_only", "historical_unverified"}:
+            errors.append(f"{label}: missing or unsupported identity review status")
+        for field in ("source_url", "coordinate_source_url"):
+            value = props.get(field)
+            try:
+                parsed = urllib.parse.urlsplit(value) if isinstance(value, str) else None
+            except ValueError:
+                parsed = None
+            if not parsed or parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+                errors.append(f"{label}: {field} must identify a public HTTP(S) source")
+        if not props.get("location_note") or props.get("location_confidence") not in {"exact", "high", "medium", "low", "unknown"}:
+            errors.append(f"{label}: location evidence and accuracy label required")
+        if props.get("source_as_of") is not None and not isinstance(props["source_as_of"], str):
+            errors.append(f"{label}: source date must be a published string or null")
+        if props.get("review_status") == "operator_verified":
+            try:
+                reviewed = props.get("reviewed_at") or ""
+                if date.fromisoformat(reviewed).isoformat() != reviewed:
+                    raise ValueError("Use YYYY-MM-DD")
+            except (ValueError, TypeError):
+                errors.append(f"{label}: operator review requires a calendar date")
+            if not props.get("operator"):
+                errors.append(f"{label}: operator review requires an identified operator")
+        capacity = props.get("storage_capacity_bbl")
+        if capacity is not None and (type(capacity) not in (int, float) or not math.isfinite(capacity) or capacity < 0):
+            errors.append(f"{label}: barrel storage capacity must be finite, nonnegative and numeric")
+        if capacity is not None and not props.get("storage_capacity_note"):
+            errors.append(f"{label}: storage capacity requires a source/basis note")
+    return errors
+
+
+def validate_product_networks(data: dict[str, Any]) -> list[str]:
+    errors = []
+    rows = [feature.get("properties", {}) for feature in data.get("features", [])
+            if str(feature.get("properties", {}).get("route_id", "")).startswith("us-products-")]
+    if any(row.get("route_id") == "us-products-reference" for row in rows):
+        errors.append("market_access_pipelines.geojson: aggregate products reference must not be selectable")
+    metadata = data.get("metadata", {}).get("product_networks") or {}
+    expected = metadata.get("source_feature_count")
+    if type(expected) is not int or expected <= 0:
+        errors.append("market_access_pipelines.geojson: missing EIA product source count")
+    if metadata.get("network_count") != len(rows):
+        errors.append("market_access_pipelines.geojson: named product group count does not match metadata")
+    source_ids = []
+    for row in rows:
+        label = row.get("route_id")
+        ids = row.get("source_feature_ids")
+        if not isinstance(ids, list) or not ids or any(type(value) is not int for value in ids):
+            errors.append(f"market_access_pipelines.geojson: {label} requires source FIDs")
+            continue
+        source_ids.extend(ids)
+        if row.get("source_feature_count") != len(ids):
+            errors.append(f"market_access_pipelines.geojson: {label} source feature count mismatch")
+        if row.get("default_visible") is not False or row.get("menu_section") != "U.S. refined-product networks":
+            errors.append(f"market_access_pipelines.geojson: {label} must be a separate optional product selection")
+        for key in ("source_operator_names", "source_pipeline_names"):
+            if not isinstance(row.get(key), list):
+                errors.append(f"market_access_pipelines.geojson: {label} missing {key}")
+        if not row.get("source_as_of") or not row.get("network_identity_basis") or not row.get("review_status"):
+            errors.append(f"market_access_pipelines.geojson: {label} missing identity/date limitations")
+    if len(source_ids) != len(set(source_ids)):
+        errors.append("market_access_pipelines.geojson: EIA product FIDs assigned more than once")
+    if len(source_ids) != expected:
+        errors.append(f"market_access_pipelines.geojson: named product groups retain {len(source_ids)} source FIDs; expected {expected}")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
@@ -116,6 +205,7 @@ def main() -> int:
 
     rail_lines = [f for f in rail["features"] if f.get("properties", {}).get("feature_kind") == "rail_line"]
     terminals = [f for f in rail["features"] if f.get("properties", {}).get("feature_kind") == "terminal"]
+    errors.extend(validate_terminal_inventory(rail))
     raw_segments = sum(int(f.get("properties", {}).get("segment_count") or 1) for f in rail_lines)
     metadata_raw = int(rail.get("metadata", {}).get("raw_rail_segment_count") or 0)
     if metadata_raw and raw_segments != metadata_raw:
@@ -128,7 +218,7 @@ def main() -> int:
     category_counts = Counter(f.get("properties", {}).get("category") for f in terminals)
     canadian_terminal_count = sum(f.get("properties", {}).get("country") == "CA" for f in terminals)
     if canadian_terminal_count < 70:
-        errors.append(f"railways.geojson: only {canadian_terminal_count} reviewed Canadian terminal records (expected at least 70)")
+        errors.append(f"railways.geojson: only {canadian_terminal_count} Canadian inventory records (expected at least 70)")
     scope = str(rail.get("metadata", {}).get("scope") or "").lower()
     if "all canada and all u.s. rail lines" in scope:
         errors.append("railways.geojson: metadata still makes a literal all-rail-lines claim")
@@ -145,12 +235,14 @@ def main() -> int:
         "vantage",
         "norman-wells",
         "us-crude-trunk-reference",
-        "us-products-reference",
+        "us-products-buckeye",
+        "us-products-colonial",
         "us-hgl-reference",
     }
     missing_routes = sorted(required_routes - set(route_ids))
     if missing_routes:
         errors.append(f"market_access_pipelines.geojson: missing required routes {missing_routes}")
+    errors.extend(validate_product_networks(pipeline))
     for feature in route_features:
         props = feature.get("properties", {})
         if props.get("route_id", "").endswith("-reference") and props.get("default_visible") is not False:

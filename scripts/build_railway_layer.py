@@ -21,6 +21,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
+import terminal_inventory
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "public" / "data" / "railways.geojson"
@@ -939,6 +941,8 @@ def normalize_crude_terminal(feature: dict[str, Any]) -> dict[str, Any] | None:
             "commodity": "Crude oil",
             "source": "EIA Crude Oil Rail Terminals",
             "source_url": EIA_CRUDE_RAIL_TERMINALS_URL,
+            "coordinate_source_url": EIA_CRUDE_RAIL_TERMINALS_URL,
+            **terminal_inventory.archive_properties("crude-rail", props),
         },
         "geometry": geometry,
     }
@@ -969,6 +973,8 @@ def normalize_product_terminal(feature: dict[str, Any]) -> dict[str, Any] | None
             "commodity": "Refined products / petroleum liquids",
             "source": "EIA Petroleum Product Terminals",
             "source_url": EIA_PRODUCT_TERMINALS_URL,
+            "coordinate_source_url": EIA_PRODUCT_TERMINALS_URL,
+            **terminal_inventory.archive_properties("products", props),
         },
         "geometry": geometry,
     }
@@ -1017,7 +1023,7 @@ def canadian_terminal_features() -> list[dict[str, Any]]:
                 },
             }
         )
-    return features
+    return terminal_inventory.reviewed_canadian_features(features)
 
 
 def compact_props(props: dict[str, Any]) -> dict[str, Any]:
@@ -1029,18 +1035,30 @@ def build_layer(
     rail_where: str,
     crude_terminal_where: str,
     product_terminal_where: str,
+    existing_rail: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    print("Fetching North American rail lines...")
-    raw_lines = query_rail_geojson(bbox, rail_where)
-    lines = [feature for feature in (normalize_rail_feature(f) for f in raw_lines) if feature]
-    for feature in lines:
-        feature["properties"] = compact_props(feature["properties"])
-    raw_rail_segment_count = len(lines)
-    lines = aggregate_rail_features(lines)
-    print(f"  {raw_rail_segment_count:,} rail line segments grouped into {len(lines):,} render features")
+    if crude_terminal_where != DEFAULT_CRUDE_TERMINAL_WHERE or product_terminal_where != DEFAULT_PRODUCT_TERMINAL_WHERE:
+        raise ValueError("Terminal SQL filters cannot be applied to reviewed archival snapshots; update and review the source inventory instead")
+    if existing_rail is not None:
+        print("Retaining existing rail geometry while rebuilding terminal observations...")
+        lines = [f for f in existing_rail["features"] if f["properties"].get("feature_kind") == "rail_line"]
+        if not lines or existing_rail["metadata"].get("rail_where") != rail_where or existing_rail["metadata"].get("bbox") != list(bbox):
+            raise ValueError("Cached rail geometry is empty or does not match the requested extent/filter")
+        raw_rail_segment_count = existing_rail["metadata"]["raw_rail_segment_count"]
+        raw_rail_source_count = existing_rail["metadata"].get("raw_rail_source_row_count", raw_rail_segment_count)
+    else:
+        print("Fetching North American rail lines...")
+        raw_lines = query_rail_geojson(bbox, rail_where)
+        lines = [feature for feature in (normalize_rail_feature(f) for f in raw_lines) if feature]
+        for feature in lines:
+            feature["properties"] = compact_props(feature["properties"])
+        raw_rail_segment_count = len(lines)
+        raw_rail_source_count = len(raw_lines)
+        lines = aggregate_rail_features(lines)
+        print(f"  {raw_rail_segment_count:,} rail line segments grouped into {len(lines):,} render features")
 
-    print("Fetching EIA crude-by-rail terminals...")
-    raw_crude = query_arcgis_geojson(EIA_CRUDE_RAIL_TERMINALS_URL, where=crude_terminal_where, bbox=None)
+    print("Reading the reviewed archival EIA crude-by-rail snapshot...")
+    raw_crude = terminal_inventory.snapshot("eia_crude_rail_archive")["data"]["features"]
     if crude_terminal_where == DEFAULT_CRUDE_TERMINAL_WHERE and not raw_crude:
         raise ValueError("EIA crude terminal service returned an empty inventory; preserving existing output")
     crude = [feature for feature in (normalize_crude_terminal(f) for f in raw_crude) if feature]
@@ -1048,8 +1066,8 @@ def build_layer(
         feature["properties"] = compact_props(feature["properties"])
     print(f"  {len(crude):,} crude rail terminals")
 
-    print("Fetching EIA petroleum product terminals...")
-    raw_products = query_arcgis_geojson(EIA_PRODUCT_TERMINALS_URL, where=product_terminal_where, bbox=None)
+    print("Reading the reviewed January 2020 EIA petroleum product inventory snapshot...")
+    raw_products = terminal_inventory.snapshot("eia_products_archive")["data"]["features"]
     if product_terminal_where == DEFAULT_PRODUCT_TERMINAL_WHERE and not raw_products:
         raise ValueError("EIA product terminal service returned an empty inventory; preserving existing output")
     products = [feature for feature in (normalize_product_terminal(f) for f in raw_products) if feature]
@@ -1059,9 +1077,14 @@ def build_layer(
 
     canadian = canadian_terminal_features()
     print(f"  {len(canadian):,} Canadian curated petroleum rail terminals")
+    buckeye, excluded = terminal_inventory.buckeye_features()
+    colonial = terminal_inventory.colonial_features()
+    us_storage = terminal_inventory.us_storage_features()
+    print(f"  {len(buckeye):,} Buckeye operator-map points; {excluded} out-of-scope points omitted")
+    print(f"  {len(colonial):,} Colonial storage sites with explicitly interpolated street locations")
 
     features = sorted(
-        [*lines, *crude, *products, *canadian],
+        [*lines, *crude, *products, *canadian, *buckeye, *colonial, *us_storage],
         key=lambda f: (
             f["properties"].get("feature_kind") != "rail_line",
             f["properties"].get("category") or "",
@@ -1077,22 +1100,20 @@ def build_layer(
             "rail_where": rail_where,
             "crude_terminal_where": crude_terminal_where,
             "product_terminal_where": product_terminal_where,
-            "scope": "Canada/U.S. BTS/FRA main rail network and major industrial leads, all EIA terminal service points, and a curated Canadian terminal set. Minor tracks, yards, sidings, and private spurs are not represented as complete coverage.",
+            "scope": "Canada/U.S. BTS/FRA main rail network and major industrial leads; archival EIA terminal observations from university-hosted copies, reviewed Buckeye operator-map points, Colonial street-address locations, Cushing Grandstaff regulator office location, and a curated Canadian terminal/storage set. Neither the terminal set nor minor tracks, yards, sidings, and private spurs represents complete national coverage.",
             "rail_detail": "BTS/FRA NET=M main network and NET=I major industrial leads, grouped by category, country, and owner for browser performance.",
             "raw_rail_segment_count": raw_rail_segment_count,
-            "raw_rail_source_row_count": len(raw_lines),
-            "omitted_invalid_rail_geometry_count": len(raw_lines) - raw_rail_segment_count,
+            "raw_rail_source_row_count": raw_rail_source_count,
+            "omitted_invalid_rail_geometry_count": raw_rail_source_count - raw_rail_segment_count,
+            "rail_geometry_generated_at": existing_rail["metadata"].get("rail_geometry_generated_at", existing_rail["metadata"].get("generated_at")) if existing_rail else datetime.now(timezone.utc).isoformat(),
             "raw_crude_terminal_source_row_count": len(raw_crude),
             "omitted_invalid_crude_terminal_geometry_count": len(raw_crude) - len(crude),
             "raw_product_terminal_source_row_count": len(raw_products),
             "omitted_invalid_product_terminal_geometry_count": len(raw_products) - len(products),
             "geometry_precision_note": "Rail coordinates are rounded to 0.001 degree for display (up to about 111 m per grid step); facility points retain 0.00001 degree. Source precision is not survey accuracy.",
             "grouped_rail_feature_count": len(lines),
-            "curated_canadian_terminal_count": len(canadian),
-            "curated_canadian_terminal_categories": {
-                category: sum(feature["properties"].get("category") == category for feature in canadian)
-                for category in ("product-terminal", "crude-terminal", "crude-rail-terminal", "inactive-terminal")
-            },
+            **terminal_inventory.inventory_metadata(canadian, buckeye, colonial, excluded),
+            "reviewed_us_crude_storage_facility_count": len(us_storage) + sum(f["properties"]["category"] == "crude-storage" for f in buckeye),
             "sources": [
                 {
                     "name": "BTS/FRA North American Rail Network Lines",
@@ -1100,20 +1121,23 @@ def build_layer(
                     "coverage": "Canada/U.S. main network and major industrial leads clipped to the requested rail extent; not every local track, siding, yard, or private spur",
                 },
                 {
-                    "name": "EIA Crude Oil Rail Terminals",
+                    "name": "Archived EIA Crude Oil Rail Terminals (University of Minnesota copy)",
                     "url": EIA_CRUDE_RAIL_TERMINALS_URL,
-                    "coverage": "All points returned by the EIA service, without the rail-line bounding-box filter",
+                    "coverage": "94 valid points from a 99-record public copy snapshot; underlying inventory date unavailable. Canonical EIA origin requires a token; university copy edits do not certify current operations.",
                 },
                 {
-                    "name": "EIA Petroleum Product Terminals",
+                    "name": "January 2020 EIA Petroleum Product Terminals (UC Merced copy)",
                     "url": EIA_PRODUCT_TERMINALS_URL,
-                    "coverage": "All points returned by the EIA service, without the rail-line bounding-box filter",
+                    "coverage": "1,476 archived EIA-815 observations as of January 2020, from a public UC Merced-hosted copy. Canonical EIA origin requires a token. Historical operator names are preserved separately from reviewed identities.",
                 },
                 {
                     "name": "Reviewed Canadian petroleum terminals",
                     "url": "See per-feature source_url values",
-                    "coverage": "Curated high-confidence Canadian crude, diluent, transload, and refined-product terminals from public operator/regulator pages; not a complete national registry",
+                    "coverage": "88 curated Canadian terminal/storage observations with individual coordinate provenance and review status, including 2024 NPRI points; unresolved legacy points remain explicitly unverified. Not a complete national registry.",
                 },
+                {"name": "Buckeye operator public asset map", "url": terminal_inventory.BUCKEYE_MAP, "coverage": "128 U.S. terminal observations including two propane terminals and Puerto Rico; Bahamas and Saint Lucia omitted. Operator GIS source edited March 2023; identity review does not certify operation or survey accuracy."},
+                {"name": "Colonial Pipeline own terminals", "url": "https://www.colpipe.com/our-operations/terminals/", "coverage": "Three operator-listed storage sites placed at Census street-address interpolations, explicitly low confidence. Fredericksburg held out because source postal codes conflict. The approximately 270 connected third-party sites are not assumed Colonial-owned."},
+                {"name": "Oklahoma DEQ Cushing Grandstaff storage facility", "url": "https://applications.deq.ok.gov/permitspublic/storedpermits/8122.pdf", "coverage": "One dated regulator office-location point, not a surveyed tank centroid or a current permit-status claim. No capacity is assigned to the entire complex from a commercial subset fact sheet."},
             ],
         },
         "features": features,
@@ -1127,11 +1151,13 @@ def main() -> None:
     parser.add_argument("--rail-where", default=DEFAULT_RAIL_WHERE)
     parser.add_argument("--crude-terminal-where", default=DEFAULT_CRUDE_TERMINAL_WHERE)
     parser.add_argument("--product-terminal-where", default=DEFAULT_PRODUCT_TERMINAL_WHERE)
+    parser.add_argument("--terminals-only", action="store_true", help="Rebuild terminal observations from reviewed snapshots while preserving the output's matching rail geometry")
     args = parser.parse_args()
 
     output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-    data = build_layer(tuple(args.bbox), args.rail_where, args.crude_terminal_where, args.product_terminal_where)
+    existing_rail = json.loads(output.read_text(encoding="utf-8")) if args.terminals_only else None
+    data = build_layer(tuple(args.bbox), args.rail_where, args.crude_terminal_where, args.product_terminal_where, existing_rail) if existing_rail is not None else build_layer(tuple(args.bbox), args.rail_where, args.crude_terminal_where, args.product_terminal_where)
     if not data["metadata"]["raw_rail_segment_count"]:
         raise ValueError("Refusing to replace the railway layer with an empty rail network")
     temporary = output.with_suffix(output.suffix + ".tmp")

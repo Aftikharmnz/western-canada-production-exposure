@@ -15,8 +15,10 @@ Run:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import re
 import sys
 import time
 import urllib.parse
@@ -33,6 +35,10 @@ DEFAULT_ROUTE_FACTS = ROOT / "data" / "pipeline_route_facts.json"
 CER_PIPELINES_URL = "https://services5.arcgis.com/vNzamREXvX2WcX6d/arcgis/rest/services/CER_Pipeline_Systems_WGS84_WM_v/FeatureServer/0"
 EIA_CRUDE_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0"
 EIA_PRODUCTS_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0"
+EIA_CANONICAL_PRODUCTS_URL = "https://services7.arcgis.com/FGr1D95XCGALKXqM/arcgis/rest/services/PetroleumProduct_Pipelines_US_EIA/FeatureServer/0"
+EIA_PRODUCTS_COPY_ITEM_URL = "https://www.arcgis.com/sharing/rest/content/items/c745d9f4b81e42f3a54aee7aaa396975?f=json"
+BUCKEYE_PRODUCTS_URL = "https://gis.buckeye.com/hosting/rest/services/Hosted/PublicWebsiteData_PublicView/FeatureServer/2"
+BUCKEYE_MAP_URL = "https://www.buckeye.com/map"
 EIA_HGL_URL = "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0"
 CAPP_MAP_URL = "https://www.capp.ca/wp-content/uploads/2024/03/CAPP-2023-Pipeline-and-Refinery-Map-36x22-wall-size.pdf"
 TM_PUGET_URL = "https://www.transmountain.com/news/2019/trans-mountains-puget-sound-pipeline-shipping-products-to-washington-state-refineries-since-1954"
@@ -533,30 +539,6 @@ ROUTES: list[dict[str, Any]] = [
         ],
     },
     {
-        "route_id": "us-products-reference",
-        "route_name": "U.S. petroleum-products pipeline reference",
-        "operator": "Various",
-        "commodity": "Refined petroleum products",
-        "flow_role": "National context for U.S. product trunk and selected intrastate corridors",
-        "direction": "Various U.S. corridors",
-        "color": "#f59e0b",
-        "display_order": 201,
-        "default_visible": False,
-        "menu_section": "U.S. National Reference Networks",
-        "geometry_confidence": (
-            "official EIA public GIS linework, route-level display; coverage represents major/trunk "
-            "and selected intrastate pipelines, not every pipe"
-        ),
-        "coverage_scope": "EIA petroleum-products pipeline layer; not a complete inventory of every pipe.",
-        "parts": [
-            {
-                "source": "EIA Energy Atlas petroleum-products pipeline reference layer",
-                "url": EIA_PRODUCTS_URL,
-                "where": "1=1",
-            }
-        ],
-    },
-    {
         "route_id": "us-hgl-reference",
         "route_name": "U.S. hydrocarbon-gas-liquids pipeline reference",
         "operator": "Various",
@@ -852,7 +834,9 @@ def load_route_facts(path: Path) -> dict[str, dict[str, Any]]:
             result[key] = value
         return result
     payload = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
-    if not isinstance(payload, dict) or set(payload) != {"schema_version", "routes"} or type(payload["schema_version"]) is not int or payload["schema_version"] != 1:
+    if (not isinstance(payload, dict) or not {"schema_version", "routes"} <= set(payload)
+            or set(payload) - {"schema_version", "routes", "product_networks"}
+            or type(payload["schema_version"]) is not int or payload["schema_version"] != 1):
         raise ValueError("Pipeline route facts require schema_version 1 and routes")
     facts = payload["routes"]
     expected = {route["route_id"] for route in ROUTES}
@@ -860,8 +844,13 @@ def load_route_facts(path: Path) -> dict[str, dict[str, Any]]:
         missing = sorted(expected - set(facts)) if isinstance(facts, dict) else sorted(expected)
         extra = sorted(set(facts) - expected) if isinstance(facts, dict) else []
         raise ValueError(f"Pipeline route facts do not match shipped route IDs; missing={missing}, extra={extra}")
+    product_facts = payload.get("product_networks", {})
+    if (not isinstance(product_facts, dict) or any(not key.startswith("us-products-")
+            or key == "us-products-reference" for key in product_facts)):
+        raise ValueError("Product network reviews require stable us-products-* IDs")
+    facts = {**facts, **product_facts}
     required = {"origin", "destination", "product", "capacity_kbbl_d", "capacity_basis", "capacity_note", "source_url", "source_name", "verified_at"}
-    optional = {"capacity_label", "as_of", "route_source_url"}
+    optional = {"capacity_label", "as_of", "route_source_url", "operator"}
     for route_id, fact in facts.items():
         if not isinstance(fact, dict) or not required <= set(fact) or set(fact) - required - optional:
             raise ValueError(f"{route_id}: unsupported or missing pipeline fact fields")
@@ -885,11 +874,217 @@ def load_route_facts(path: Path) -> dict[str, dict[str, Any]]:
     return facts
 
 
+def product_network_id(operator: str | None, pipeline: str | None) -> str:
+    """Identifiers depend on publisher identity, never position or feature order."""
+    identity = (operator or "", pipeline or "")
+    known = {
+        ("BUCKEYE PARTNERS", "Buckeye"): "us-products-buckeye",
+        ("COLONIALPIPELINE CO", "Colonial"): "us-products-colonial",
+        ("MIDSTREAM PARTNERS", "Magellan"): "us-products-magellan",
+    }
+    if identity in known:
+        return known[identity]
+    label = re.sub(r"[^a-z0-9]+", "-", "-".join(identity).lower()).strip("-") or "unknown"
+    digest = hashlib.sha256(json.dumps(identity, separators=(",", ":")).encode()).hexdigest()[:10]
+    return f"us-products-{label[:96]}-{digest}"
+
+
+def fetch_product_inventory() -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Prefer the canonical publisher; identify a public copy explicitly when unavailable."""
+    canonical_error = None
+    try:
+        metadata = request_json(f"{EIA_CANONICAL_PRODUCTS_URL}?f=json")
+        source_url = EIA_CANONICAL_PRODUCTS_URL
+        publisher = "U.S. Energy Information Administration (canonical EIA organization)"
+    except (ValueError, RuntimeError) as exc:
+        canonical_error = str(exc)
+        metadata = request_json(f"{EIA_PRODUCTS_URL}?f=json")
+        source_url = EIA_PRODUCTS_URL
+        publisher = request_json(EIA_PRODUCTS_COPY_ITEM_URL).get("owner") or "Publisher owner unavailable"
+    count = request_json(f"{source_url}/query?where=1%3D1&returnCountOnly=true&f=json").get("count")
+    features = query_arcgis_geojson(source_url, "1=1")
+    if type(count) is not int or count <= 0 or len(features) != count:
+        raise ValueError(f"EIA product query count mismatch: expected {count}, received {len(features)}")
+    metadata.update(_source_url=source_url, _publisher=publisher,
+                    _is_hosted_copy=source_url == EIA_PRODUCTS_URL, _canonical_access_error=canonical_error)
+    return features, metadata
+
+
+def build_product_network_features(source_features: list[dict[str, Any]], source_metadata: dict[str, Any],
+                                   facts: dict[str, dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Partition every EIA product record exactly once using its two name fields."""
+    groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    source_ids: set[int] = set()
+    for feature in source_features:
+        properties = feature.get("properties") or {}
+        fid = properties.get("FID", feature.get("id"))
+        if type(fid) is not int or fid in source_ids:
+            raise ValueError("EIA product features require unique integer FIDs")
+        if not feature_lines(feature) or any(len(line) < 2 for line in feature_lines(feature)):
+            raise ValueError(f"EIA product feature {fid} has no usable line geometry")
+        source_ids.add(fid)
+        operator = properties.get("Opername") or ""
+        pipeline = properties.get("Pipename") or ""
+        if not isinstance(operator, str) or not isinstance(pipeline, str):
+            raise ValueError(f"EIA product feature {fid} has invalid identity fields")
+        groups.setdefault((operator, pipeline), []).append(feature)
+
+    editing = source_metadata.get("editingInfo") or {}
+    timestamp = editing.get("dataLastEditDate")
+    data_edit = datetime.fromtimestamp(timestamp / 1000, timezone.utc).isoformat() if timestamp is not None else None
+    schema_timestamp = editing.get("schemaLastEditDate")
+    schema_edit = datetime.fromtimestamp(schema_timestamp / 1000, timezone.utc).isoformat() if schema_timestamp is not None else None
+    checked_at = datetime.now(timezone.utc).isoformat()
+    is_copy = source_metadata.get("_is_hosted_copy", True)
+    source_url = source_metadata.get("_source_url", EIA_PRODUCTS_URL)
+    source_label = "Archived EIA-attributed public copy" if is_copy else "Canonical EIA published service"
+    edit_label = "hosted-copy service" if is_copy else "EIA publisher service"
+    palette = ["#0891b2", "#16a34a", "#d97706", "#be123c", "#7c3aed", "#0369a1", "#0f766e", "#9333ea"]
+    colors = {"us-products-buckeye": "#ca8a04", "us-products-colonial": "#ea580c", "us-products-magellan": "#7c3aed"}
+    output = []
+    for number, ((operator, pipeline), members) in enumerate(sorted(groups.items())):
+        route_id = product_network_id(operator, pipeline)
+        details = facts.get(route_id)
+        name = pipeline or "Unknown pipeline name"
+        if operator not in {"BUCKEYE PARTNERS", "COLONIALPIPELINE CO", "MIDSTREAM PARTNERS"}:
+            name = f"{name} ({operator or 'Unknown source operator'})"
+        published_operator = operator or "Unknown source operator"
+        if details is None:
+            details = {
+                "product": "Petroleum products (EIA layer classification; current service unverified)",
+                "origin": "Not supplied by the EIA source",
+                "destination": "Not supplied by the EIA source",
+                "capacity_kbbl_d": None, "capacity_basis": "unavailable",
+                "capacity_label": "Not published / not verified",
+                "capacity_note": "EIA supplies operator/name labels and geometry, not capacities, endpoints, current batch contents or operating status. No flow direction or ownership is inferred from geometry.",
+                "source_url": source_url, "source_name": f"{source_label} — petroleum-products pipeline identity snapshot",
+                "as_of": "Underlying EIA inventory date unavailable; hosted service edit is not an inventory/survey date",
+            }
+        member_ids = sorted(member.get("properties", {}).get("FID", member.get("id")) for member in members)
+        lines = [line for member in members for line in feature_lines(member)]
+        properties = {
+            "feature_kind": "pipeline", "route_id": route_id, "route_name": name,
+            "operator": details.get("operator", f"{published_operator} (EIA source label)"),
+            "operator_source_url": details["source_url"] if "operator" in details else None,
+            "commodity": details["product"], "flow_role": "Named EIA petroleum-products network snapshot",
+            "direction": "Not inferred from coordinate order",
+            "color": colors.get(route_id, palette[int(hashlib.sha256(route_id.encode()).hexdigest()[:4], 16) % len(palette)]),
+            "display_order": 300 + number, "default_visible": False,
+            "menu_section": "U.S. refined-product networks",
+            "source_summary": f"{source_label} ({len(members)} source features); published operator: {published_operator}",
+            "source_urls": sorted({source_url, details["source_url"]}),
+            "source_operator_names": [operator] if operator else [],
+            "source_pipeline_names": [pipeline] if pipeline else [],
+            "source_feature_ids": member_ids, "source_feature_count": len(member_ids),
+            "source_as_of": f"Underlying inventory date unavailable; {edit_label} data edit {data_edit[:10] if data_edit else 'unavailable'}",
+            "review_status": "reviewed_operator_identity" if "operator" in details else "publisher_snapshot_only",
+            "network_identity_basis": "EIA Opername + Pipename; source names are historical labels. Current identities are used only where separately reviewed.",
+            "geometry_confidence": f"{source_label}; underlying inventory date unavailable; not survey-grade or evidence of current service",
+            "coverage_scope": "Exactly one published operator/pipeline identity. No terminal connection, capacity or flow direction is inferred by proximity.",
+            "pipeline_details": details,
+        }
+        output.append({"type": "Feature", "properties": properties, "geometry": geometry_from_lines(lines)})
+    return output, {
+        "source_url": source_url, "source_feature_count": len(source_ids), "network_count": len(output),
+        "grouping_fields": ["Opername", "Pipename"], "hosted_copy_data_edit_at": data_edit if is_copy else None,
+        "hosted_copy_schema_edit_at": schema_edit if is_copy else None, "publisher_service_data_edit_at": data_edit,
+        "publisher_service_schema_edit_at": schema_edit, "checked_at": checked_at,
+        "canonical_source_url": EIA_CANONICAL_PRODUCTS_URL, "underlying_inventory_date": None,
+        "source_publisher": source_metadata.get("_publisher", "Federal_User_Community (Esri-hosted public EIA-attributed copy)"),
+        "is_hosted_copy": is_copy, "canonical_access_error": source_metadata.get("_canonical_access_error"),
+        "source_item_url": EIA_PRODUCTS_COPY_ITEM_URL if is_copy else None,
+        "coverage_note": "Every fetched source FID belongs to exactly one named product group; source labels and edit dates do not establish current ownership or operating status.",
+    }
+
+
+def apply_buckeye_operator_geometry(features: list[dict[str, Any]], operator_features: list[dict[str, Any]],
+                                    source_metadata: dict[str, Any]) -> dict[str, Any]:
+    """Use exact reviewed name mappings; archived IDs are reconciliation, not geometry IDs."""
+    matches = {
+        "BUCKEYE PIPE LINE": product_network_id("BUCKEYE PARTNERS", "Buckeye"),
+        "LAUREL PIPE LINE": product_network_id("BUCKEYE PARTNERS", "Laurel Pipeline"),
+        "WEST SHORE PIPE LINE": product_network_id("WEST SHORE PIPELINE CO", "West Shore Pipeine"),
+    }
+    by_id = {row["properties"]["route_id"]: row for row in features}
+    timestamp = (source_metadata.get("editingInfo") or {}).get("lastEditDate")
+    edit_date = datetime.fromtimestamp(timestamp / 1000, timezone.utc).isoformat() if timestamp is not None else None
+    grouped = {}
+    seen_ids = set()
+    for source in operator_features:
+        properties = source.get("properties") or {}
+        oid = properties.get("objectid", source.get("id"))
+        name = properties.get("name")
+        if (type(oid) is not int or oid in seen_ids or not isinstance(name, str) or not name
+                or not feature_lines(source) or any(len(line) < 2 for line in feature_lines(source))):
+            raise ValueError("Buckeye published geometry requires unique IDs, explicit names and usable lines")
+        seen_ids.add(oid)
+        grouped.setdefault(name, []).append(source)
+    mapped_count = 0
+    additional_count = 0
+    for name, sources in sorted(grouped.items()):
+        route_id = matches.get(name)
+        target = by_id.get(route_id)
+        if route_id and target is None:
+            raise ValueError(f"Reviewed Buckeye identity {name} is absent from archived reference")
+        source_ids = sorted(source.get("properties", {}).get("objectid", source.get("id")) for source in sources)
+        products = sorted({source.get("properties", {}).get("products") for source in sources
+                           if source.get("properties", {}).get("products")})
+        descriptions = sorted({source.get("properties", {}).get("description") for source in sources
+                               if source.get("properties", {}).get("description")})
+        if target is None:
+            # No proximity crosswalk to a differently named historical pipe.
+            route_id = "operator-products-buckeye-" + re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+            target = {"type": "Feature", "properties": {
+                "feature_kind": "pipeline", "route_id": route_id, "route_name": name.title(),
+                "operator": "Buckeye Partners (operator-published network; ownership shares unspecified)",
+                "operator_source_url": BUCKEYE_MAP_URL, "default_visible": False,
+                "display_order": 600 + additional_count, "color": "#a16207",
+                "menu_section": "Other Liquids / Products" if name == "BUCKEYE TEXAS PARTNERS" else "U.S. refined-product networks",
+                "source_operator_names": ["Buckeye Partners"], "source_pipeline_names": [name],
+                "source_feature_ids": [], "source_feature_count": 0,
+                "pipeline_details": {
+                    "product": "; ".join(products) or "Product not specified",
+                    "origin": "Individual endpoints not supplied by operator GIS attributes",
+                    "destination": "Individual endpoints not supplied by operator GIS attributes",
+                    "capacity_kbbl_d": None, "capacity_basis": "unavailable", "capacity_label": "Not published / not verified",
+                    "capacity_note": "An operator map record establishes a published named corridor, not installed capacity, current throughput or ownership percentages.",
+                    "source_url": BUCKEYE_MAP_URL, "source_name": "Buckeye Partners — official public pipeline map",
+                    "as_of": "Operator-published GIS; underlying inventory/survey date not supplied",
+                },
+            }}
+            features.append(target)
+            additional_count += 1
+        else:
+            mapped_count += 1
+        props = target["properties"]
+        props.update(
+            commodity="; ".join(products) or props.get("commodity", "Product not specified"),
+            direction="Not inferred from coordinate order",
+            source_summary=f"Buckeye official map ({len(sources)} operator records); archived EIA IDs retained only for reconciliation",
+            source_urls=sorted(set(props.get("source_urls", [])) | {BUCKEYE_MAP_URL, BUCKEYE_PRODUCTS_URL}),
+            source_pipeline_names=sorted(set(props.get("source_pipeline_names", [])) | {name}),
+            geometry_source_url=BUCKEYE_PRODUCTS_URL, geometry_source_feature_ids=source_ids,
+            source_as_of=f"Operator-published map; inventory date not supplied (service last edit {edit_date[:10] if edit_date else 'unavailable'})",
+            review_status="operator_published_geometry",
+            network_identity_basis="Operator-published named pipeline geometry; archived EIA identities are matched only by reviewed exact names and retained as reconciliation IDs, never by proximity.",
+            geometry_confidence="Buckeye official public map linework, general route location; underlying survey date unavailable; not survey-grade",
+            coverage_scope="Operator-published network description; map geometry does not establish terminal ownership, commercial connection or current throughput.",
+            operator_description=" ".join(descriptions),
+        )
+        target["geometry"] = geometry_from_lines([line for source in sources for line in feature_lines(source)])
+    return {"source_url": BUCKEYE_PRODUCTS_URL, "official_map_url": BUCKEYE_MAP_URL,
+            "source_feature_count": len(seen_ids), "operator_network_count": len(grouped),
+            "replaced_archived_group_count": mapped_count, "additional_network_count": additional_count,
+            "service_last_edit_at": edit_date, "underlying_inventory_date": None,
+            "identity_note": "Reviewed exact-name matches only; additional operator names are emitted separately without guessed archived associations."}
+
+
 def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_FEEDER_PIPELINES,
                              route_facts: Path = DEFAULT_ROUTE_FACTS) -> dict[str, Any]:
     facts = load_route_facts(route_facts)
     features: list[dict[str, Any]] = []
     warnings: list[str] = []
+    products_metadata = None
 
     for route in ROUTES:
         feature, route_warnings = route_feature(route, include_remote=include_remote, aer_feeder_input=aer_feeder_input)
@@ -900,6 +1095,20 @@ def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_
                                          direction=f"{details['origin']} → {details['destination']}")
             features.append(feature)
             print(f"{route['route_name']}: {feature['properties']['source_summary']}", file=sys.stderr)
+
+    if include_remote:
+        try:
+            product_sources, source_metadata = fetch_product_inventory()
+            product_features, products_metadata = build_product_network_features(product_sources, source_metadata, facts)
+            buckeye_metadata = request_json(f"{BUCKEYE_PRODUCTS_URL}?f=json")
+            buckeye_count = request_json(f"{BUCKEYE_PRODUCTS_URL}/query?where=1%3D1&returnCountOnly=true&f=json").get("count")
+            buckeye_sources = query_arcgis_geojson(BUCKEYE_PRODUCTS_URL, "1=1")
+            if type(buckeye_count) is not int or buckeye_count <= 0 or len(buckeye_sources) != buckeye_count:
+                raise ValueError("Buckeye operator query did not return its complete published inventory")
+            products_metadata["operator_geometry"] = apply_buckeye_operator_geometry(product_features, buckeye_sources, buckeye_metadata)
+            features.extend(product_features)
+        except Exception as exc:  # noqa: BLE001
+            warnings.append(f"Named EIA product networks: refresh failed: {exc}")
 
     features.extend(hub_feature(*hub) for hub in MARKET_HUBS)
 
@@ -918,7 +1127,9 @@ def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_
                 "Canadian federally regulated liquid linework is selected from the public CER pipeline systems FeatureServer.",
                 "Alberta Rangeland/Aurora corridor linework uses local AER feeder pipeline features where public licences identify operating Plains/Aurora segments.",
                 "U.S. continuations are selected from EIA Energy Atlas FeatureServers where available; coarse EIA chords that duplicate Canadian CER linework are filtered out.",
-                "Three hidden U.S. reference features aggregate the EIA crude-oil trunk, petroleum-products, and HGL public layers. Those layers provide major/trunk and selected intrastate context, not every pipe, connector, gathering line, or plant line.",
+                "Two hidden U.S. reference features aggregate the EIA crude-oil trunk and HGL public layers. The products layer is partitioned by published Opername + Pipename into separate named selections; no catch-all products geometry is emitted.",
+                "EIA product attributes can retain old operator names. Geometry data edit dates are reported separately from later schema edits and current operator reviews; nearby terminals are not inferred connections.",
+                "The public EIA-attributed product service is an Esri-hosted copy, not the canonical EIA publisher. Its service edit dates are not underlying inventory/survey dates. Buckeye, Laurel and West Shore use direct operator map geometry by reviewed exact-name matches; other operator-only networks remain separate.",
                 "Imperial's Sarnia Products Pipeline, Sun-Canadian Pipe Line, and Valero's Pipeline Saint-Laurent are hidden by default and rendered as curated approximate corridors from current operator route descriptions because these provincially regulated systems are not in the federal CER layer.",
                 "The Trans Mountain Puget Sound leg (Sumas to Ferndale/Cherry Point and Anacortes/March Point) is a curated approximate corridor: EIA does not expose the line under any Trans Mountain name, and without it the route stopped at the border while the Washington refinery hubs floated unconnected.",
                 "Other route-level manual connectors are intentionally excluded to avoid unsupported straight-line artifacts over water or across border gaps.",
@@ -938,6 +1149,7 @@ def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_
                 "valero_saint_laurent_reference": VALERO_SAINT_LAURENT_URL,
             },
             "warnings": warnings,
+            "product_networks": products_metadata,
         },
         "features": features,
     }

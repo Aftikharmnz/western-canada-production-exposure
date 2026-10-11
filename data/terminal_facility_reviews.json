@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-10",
+  "canadian": [
+    {
+      "npri_id": 698,
+      "name": "Keyera Fort Saskatchewan Fractionation and Storage",
+      "operator": "Keyera",
+      "category": "ngl-storage",
+      "commodity": "NGLs",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.keyera.com/assets/Attachments/KEY-2025-Annual-Information-Form.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Fractionation / underground NGL storage complex; point does not map individual caverns"
+    },
+    {
+      "npri_id": 5287,
+      "name": "Pembina Redwater Fractionation and Storage",
+      "operator": "Pembina",
+      "category": "ngl-storage",
+      "commodity": "NGLs",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Fractionation / cavern storage complex"
+    },
+    {
+      "npri_id": 11890,
+      "name": "Pembina Corunna Hydrocarbon Storage",
+      "operator": "Pembina",
+      "category": "ngl-storage",
+      "commodity": "Hydrocarbons / NGLs",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "East NGL System storage facility",
+      "search_aliases": "Sarnia Corunna"
+    },
+    {
+      "npri_id": 18972,
+      "name": "Keyera Edmonton NGL Terminal",
+      "operator": "Keyera",
+      "category": "ngl-storage",
+      "commodity": "Propane / butane / condensate",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.keyera.com/what-we-do/featured-assets/edmonton-terminal/",
+      "review_status": "operator_verified",
+      "storage_capacity_bbl": 264000,
+      "storage_capacity_note": "Operator-published site storage capacity in barrels; page undated, reviewed 2026-10-10. Not throughput or currently available capacity.",
+      "facility_scope": "NGL storage / rail and truck distribution terminal"
+    },
+    {
+      "npri_id": 29517,
+      "name": "Keyera Josephburg Terminal",
+      "operator": "Keyera",
+      "category": "ngl-storage",
+      "commodity": "Propane / high and low vapour pressure products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.keyera.com/what-we-do/featured-assets/josephburg-terminal/",
+      "review_status": "operator_verified",
+      "facility_scope": "Rail loading terminal with above-ground product storage",
+      "modes": "Rail"
+    },
+    {
+      "npri_id": 33002,
+      "name": "Pembina Prince Rupert Propane Terminal",
+      "operator": "Pembina",
+      "category": "ngl-storage",
+      "commodity": "Propane",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Rail-to-marine propane export terminal with pressurized storage spheres",
+      "modes": "Rail / marine"
+    },
+    {
+      "npri_id": 26384,
+      "name": "Pembina Edmonton North Terminal",
+      "operator": "Pembina",
+      "category": "crude-storage",
+      "commodity": "Crude oil / condensate",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Above-ground crude / condensate storage terminal",
+      "modes": "Pipeline"
+    },
+    {
+      "npri_id": 22904,
+      "name": "Pembina North 40 Terminal",
+      "operator": "Pembina",
+      "category": "crude-storage",
+      "commodity": "Crude oil",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Merchant tank storage terminal",
+      "modes": "Pipeline"
+    },
+    {
+      "npri_id": 30905,
+      "name": "Base Line Crude Oil Storage Terminal",
+      "operator": "Pembina (operator); Pembina / Keyera JV",
+      "category": "crude-storage",
+      "commodity": "Crude oil",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "facility_scope": "Merchant tank storage terminal",
+      "modes": "Pipeline"
+    },
+    {
+      "npri_id": 6902,
+      "name": "Enbridge Athabasca Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "facility_scope": "Regulator-listed terminal; current operator identity not separately verified"
+    },
+    {
+      "npri_id": 21263,
+      "name": "Enbridge Cheecham Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "facility_scope": "Regulator-listed terminal; current operator identity not separately verified"
+    },
+    {
+      "npri_id": 6915,
+      "name": "Enbridge Kirby Lake Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "facility_scope": "Regulator-listed terminal; current operator identity not separately verified"
+    },
+    {
+      "npri_id": 6909,
+      "name": "Enbridge Gretna Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "facility_scope": "Regulator-listed terminal; current operator identity not separately verified"
+    },
+    {
+      "npri_id": 23575,
+      "name": "Keyera Alberta Diluent Terminal (ADT)",
+      "operator": "Keyera",
+      "category": "ngl-storage",
+      "commodity": "Condensate / solvent",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.keyera.com/assets/Attachments/KEY-2025-Annual-Information-Form.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-12-31",
+      "replace_name": "Keyera Edmonton Terminal / Alberta Diluent & Crude Terminals (ADT/ACT)",
+      "facility_scope": "Diluent handling and storage terminal",
+      "location_note": "2024 NPRI coordinates for the combined ADT/ACT reported facility. The 2025 operator AIF identifies ADT; the historical combined report name is retained separately. This point does not establish current ACT operations."
+    },
+    {
+      "npri_id": 32940,
+      "name": "Gibson Hardisty DRU / Rail Terminal",
+      "operator": "Gibson Energy / USD Group",
+      "category": "crude-rail-terminal",
+      "commodity": "Heavy crude / recovered diluent",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.gibsonenergy.com/operations/dru-at-hardisty/",
+      "review_status": "operator_verified",
+      "replace_name": "Hardisty Rail Terminal / DRU",
+      "facility_scope": "Diluent recovery unit / rail terminal; NPRI facility point, not the full Hardisty terminal complex"
+    },
+    {
+      "npri_id": 21534,
+      "name": "Gibson Hardisty Terminal",
+      "operator": "Gibson Energy",
+      "category": "crude-storage",
+      "commodity": "Crude oil",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.gibsonenergy.com/wp-content/uploads/2025/05/2025.05.05-Investor-Presentation-Q2-2025.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-05-05",
+      "replace_name": "Gibson Hardisty Terminal",
+      "facility_scope": "Crude storage terminal"
+    },
+    {
+      "npri_id": 21533,
+      "name": "Gibson Edmonton South Terminal",
+      "operator": "Gibson Energy",
+      "category": "crude-storage",
+      "commodity": "Crude oil",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.gibsonenergy.com/wp-content/uploads/2025/05/2025.05.05-Investor-Presentation-Q2-2025.pdf",
+      "review_status": "operator_verified",
+      "source_as_of": "2025-05-05",
+      "replace_name": "Gibson Edmonton South Terminal",
+      "facility_scope": "Crude storage terminal"
+    },
+    {
+      "npri_id": 6910,
+      "name": "Enbridge Hardisty Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Hardisty Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 34753,
+      "name": "Enbridge Kerrobert Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Kerrobert Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 6905,
+      "name": "Enbridge Cromer Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Cromer Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 6924,
+      "name": "Enbridge Regina Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Regina Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 6925,
+      "name": "Enbridge Sarnia Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Sarnia Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 6929,
+      "name": "Enbridge Westover Terminal",
+      "operator": "Enbridge",
+      "category": "crude-terminal",
+      "commodity": "Crude oil",
+      "source": "ECCC NPRI 2024 facility inventory",
+      "replace_name": "Enbridge Westover Terminal",
+      "facility_scope": "Regulator-listed terminal; current identity not separately reviewed"
+    },
+    {
+      "npri_id": 3905,
+      "name": "Suncor Burrard Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Burrard Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6566,
+      "name": "Suncor Edmonton Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Edmonton Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6612,
+      "name": "Suncor Saskatoon Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Saskatoon Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6614,
+      "name": "Suncor Milden Tank Farm",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Milden Tank Farm",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6610,
+      "name": "Suncor Terrace Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Terrace Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6604,
+      "name": "Suncor Thunder Bay Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Thunder Bay Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 7278,
+      "name": "Suncor London Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor London Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 3901,
+      "name": "Suncor Oakville South Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Oakville South Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6600,
+      "name": "Suncor Ottawa Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Ottawa Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 34554,
+      "name": "Suncor Montreal East Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Montreal East Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6616,
+      "name": "Suncor Kamloops Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Kamloops Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6606,
+      "name": "Suncor Nanaimo Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Nanaimo Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    },
+    {
+      "npri_id": 6602,
+      "name": "Suncor Rimouski Products Terminal",
+      "operator": "Suncor",
+      "category": "product-storage",
+      "commodity": "Refined petroleum products",
+      "source": "Operator identity and storage description; ECCC NPRI 2024 point",
+      "source_url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals",
+      "review_status": "operator_verified",
+      "replace_name": "Suncor Rimouski Products Terminal",
+      "facility_scope": "Operator-listed refined product terminal with tank storage"
+    }
+  ],
+  "colonial": [
+    {
+      "facility_id": "colonial:austell",
+      "name": "Colonial Austell Terminal",
+      "reported_name": "Austell Terminal",
+      "address": "3804 Tramore Pointe Parkway",
+      "city": "Austell",
+      "state": "GA",
+      "postal_code": "30106",
+      "coordinates": [
+        -84.62361956341,
+        33.861555002471
+      ],
+      "coordinate_source_id": "Census TIGER line 629752427",
+      "commodity": "Gasoline / diesel / ethanol",
+      "storage_capacity_bbl": 160000,
+      "facility_scope": "Operator-listed terminal with site-specific storage capacity; point is a street-address interpolation",
+      "coordinate_source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=3804%20Tramore%20Pointe%20Parkway%2C%20Austell%2C%20GA%2030106"
+    },
+    {
+      "facility_id": "colonial:charlotte",
+      "name": "Colonial Charlotte Terminal",
+      "reported_name": "Charlotte Terminal",
+      "address": "7720 Mount Holly Road",
+      "city": "Charlotte",
+      "state": "NC",
+      "postal_code": "28214",
+      "coordinates": [
+        -80.935683240806,
+        35.27967969821
+      ],
+      "coordinate_source_id": "Census TIGER line 70549791",
+      "commodity": "Gasoline / diesel / biodiesel / ethanol",
+      "storage_capacity_bbl": 125000,
+      "facility_scope": "Operator-listed terminal with site-specific storage capacity; point is a street-address interpolation",
+      "coordinate_source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=7720%20Mount%20Holly%20Road%2C%20Charlotte%2C%20NC%2028214"
+    },
+    {
+      "facility_id": "colonial:chattanooga",
+      "name": "Colonial Chattanooga Terminal",
+      "reported_name": "Chattanooga Terminal",
+      "address": "4227 Cromwell Road",
+      "city": "Chattanooga",
+      "state": "TN",
+      "postal_code": "37421",
+      "coordinates": [
+        -85.199900767803,
+        35.066540133219
+      ],
+      "coordinate_source_id": "Census TIGER line 605434353",
+      "commodity": "Gasoline / diesel / biodiesel / ethanol / kerosene",
+      "storage_capacity_bbl": 175000,
+      "facility_scope": "Operator-listed terminal with site-specific storage capacity; point is a street-address interpolation",
+      "coordinate_source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=4227%20Cromwell%20Road%2C%20Chattanooga%2C%20TN%2037421"
+    }
+  ],
+  "buckeye_overrides": {
+    "321": {
+      "category": "crude-storage",
+      "source_url": "https://records.tceq.texas.gov/cs/idcplg?IdcService=TCEQ_EXTERNAL_SEARCH_GET_FILE&Rendition=Web&dID=8196830",
+      "source": "Buckeye public asset map and Texas TCEQ storage-facility technical review",
+      "source_as_of": "2024",
+      "source_date_note": "TCEQ project received September 10, 2024; operator-map coordinates edited March 2023",
+      "facility_scope": "Petroleum storage / marine terminal; mixed crude, NGL and fuel products",
+      "facility_type": "Crude / petroleum liquids storage and marine terminal"
+    }
+  },
+  "us_storage": [
+    {
+      "facility_id": "ok-deq:1105",
+      "name": "Cushing Grandstaff Crude Storage Terminal",
+      "reported_name": "Grandstaff Terminal (formerly Cushing North and Central Tank Farms)",
+      "operator": "Enbridge (reported in 2022 regulator record and 2024 fact sheet; current operator not reverified)",
+      "reported_operator": "Enbridge Storage Cushing LLC",
+      "country": "US",
+      "city": "Cushing",
+      "state": "OK",
+      "address": "2110 N. Linwood Avenue",
+      "postal_code": "74023",
+      "coordinates": [-96.75041, 36.00081],
+      "category": "crude-storage",
+      "commodity": "Crude oil",
+      "facility_scope": "Grandstaff crude tank storage complex; office-location point, not tank centroid or mapped boundary",
+      "source": "Oklahoma DEQ draft memorandum; TransMontaigne current facility listing and 2024 fact sheet corroborate address",
+      "source_url": "https://www.transmontaignepartners.com/operations/",
+      "source_as_of": "2022-11-02",
+      "source_date_note": "Regulator draft memorandum dated November 2, 2022; fact-sheet source hosted in 2024. These do not establish current permit or operating status.",
+      "additional_source_urls": ["https://www.transmontaignepartners.com/wp-content/uploads/2024/01/Cushing-.pdf"],
+      "coordinate_source_url": "https://applications.deq.ok.gov/permitspublic/storedpermits/8122.pdf",
+      "coordinate_source_id": "Oklahoma DEQ FAC ID 1105; page 1 office-location coordinates",
+      "coordinate_as_of": "2022-11-02",
+      "review_status": "inventory_only",
+      "reviewed_at": "2026-10-10",
+      "status": "Unknown — dated regulator facility; current operation and permit status not reverified",
+      "location_confidence": "medium",
+      "location_accuracy": "Regulator-reported facility office point; not a tank centroid or surveyed boundary",
+      "location_note": "Office-location coordinates explicitly published in a 2022 Oklahoma DEQ DRAFT memorandum. Exact street address is corroborated by TransMontaigne's facility page. The draft does not prove current permit status; the publisher is not assumed to own or operate the entire complex. The fact-sheet commercial storage capacity is not applied to the larger Grandstaff site."
+    }
+  ],
+  "holdouts": [
+    {
+      "name": "Colonial Fredericksburg Terminal",
+      "reason": "Official address postal code 22401 differs from Census match 22408; coordinate withheld pending corroboration."
+    },
+    {
+      "name": "Enbridge Edmonton Terminal",
+      "npri_id": 6907,
+      "reason": "NPRI 2024 longitude -117.7979 conflicts with Edmonton location by approximately 300 km; coordinate withheld."
+    },
+    {
+      "name": "SPR storage sites",
+      "reason": "Facility coordinates not independently verified; outfall / water-monitoring points are not substituted."
+    }
+  ]
+}
