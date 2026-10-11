@@ -138,7 +138,41 @@ class ReleaseBoundaryTests(unittest.TestCase):
                 self.assertEqual(pipeline.main(), 1)
             self.assertEqual((baseline / "assets.json").read_text(), '"last-good"')
             self.assertEqual(json.loads((baseline / "elt_status.json").read_text())["production"]["status"], "failed")
-            self.assertEqual(json.loads((work / "pipeline_result.json").read_text())["changed_paths"], ["public/data/elt_status.json"])
+            result = json.loads((work / "pipeline_result.json").read_text())
+            self.assertEqual(result["changed_paths"], ["public/data/elt_status.json"])
+            self.assertEqual(result["errors"], ["Rejected schema"])
+            self.assertIn("Rejected schema", (work / "summary.md").read_text())
+
+    def test_ingestion_source_errors_reach_summary_without_promoting_bad_data(self):
+        details = ["Failed official inputs: bcer_well_production : The read operation timed out",
+                   "Official current coverage regressed for bcer_well_production: 2026-07-31 -> 2015-12-31"]
+        for detail in details:
+            with self.subTest(error=detail), tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:
+                root = Path(directory)
+                baseline, work = root / "published", root / "work"
+                pipeline.write_json(baseline / "manifest.json", {"latest_actual_date": "2026-07-31"})
+                pipeline.write_json(baseline / "assets.json", "last-good")
+                pipeline.write_json(baseline / "elt_status.json", {"production": {"last_data_update": "2026-09-01"}})
+                original_manifest = (baseline / "manifest.json").read_bytes()
+                def fail(_script, _arguments, _logs, timeout):
+                    pipeline.write_json(work / "candidate/assets.json", "bad-candidate")
+                    pipeline.write_json(work / "ingestion.json", {"status": "failed", "errors": [detail]})
+                    raise RuntimeError("run_etl.py did not complete successfully; see its run log")
+                arguments = ["elt_pipeline", "--baseline-dir", str(baseline), "--work-dir", str(work), "--offline", "--promote"]
+                with patch("sys.argv", arguments), patch.object(pipeline, "run_script", side_effect=fail), \
+                     patch.object(pipeline.subprocess, "check_output", return_value="abc123"):
+                    self.assertEqual(pipeline.main(), 1)
+                result = pipeline.read_json(work / "pipeline_result.json")
+                self.assertEqual(result["status"], "failed")
+                self.assertEqual(result["errors"], [detail])
+                self.assertEqual(result["changed_paths"], ["public/data/elt_status.json"])
+                self.assertFalse(result["data_changed"])
+                self.assertIn(detail, (work / "summary.md").read_text())
+                self.assertEqual(pipeline.read_json(baseline / "assets.json"), "last-good")
+                self.assertEqual((baseline / "manifest.json").read_bytes(), original_manifest)
+                status = pipeline.read_json(baseline / "elt_status.json")["production"]
+                self.assertEqual(status["status"], "failed")
+                self.assertEqual(status["last_data_update"], "2026-09-01")
 
     def test_raw_archive_requires_checksum_and_stays_within_raw_root(self):
         with tempfile.TemporaryDirectory(prefix="elt-test-", dir=pipeline.ROOT) as directory:
