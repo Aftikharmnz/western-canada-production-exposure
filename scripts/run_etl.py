@@ -12,17 +12,20 @@ import argparse
 import calendar
 import csv
 import datetime as dt
+import errno
 import io
 import hashlib
 import json
 import math
 import re
 import shutil
+import socket
 import sqlite3
 import struct
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile as _zipfile
@@ -94,6 +97,9 @@ PRODUCTION_GEOJSON_EXCLUDED_SOURCES = {
     "montana_bogc_well_production",
 }
 PETRINEX_AB_EARLIEST_PUBLIC_PERIOD = "2022-01"
+DOWNLOAD_MAX_ATTEMPTS = 3
+DOWNLOAD_TIMEOUT_SECONDS = 180
+DOWNLOAD_RETRY_DELAY_SECONDS = 2
 
 CUTOFF = dt.date(2015, 1, 1)
 RUN_DATE = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
@@ -502,6 +508,23 @@ def petrinex_sk_vol_path(period: str) -> Path:
     return PETRINEX_SK_VOL_DIR / f"Vol_{period}-SK.zip"
 
 
+def retryable_download_error(exc: Exception) -> bool:
+    """Only retry temporary HTTP/transport failures, never bad data or disk errors."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code in {408, 429} or 500 <= exc.code < 600
+    if isinstance(exc, urllib.error.URLError):
+        reason = exc.reason
+        if isinstance(reason, socket.gaierror):
+            return reason.errno == socket.EAI_AGAIN
+        if isinstance(reason, (TimeoutError, ConnectionError, socket.herror)):
+            return True
+        return isinstance(reason, OSError) and reason.errno in {
+            errno.ETIMEDOUT, errno.ECONNRESET, errno.ECONNREFUSED, errno.ECONNABORTED,
+            errno.ENETDOWN, errno.ENETUNREACH, errno.EHOSTUNREACH, errno.EPIPE,
+        }
+    return isinstance(exc, (TimeoutError, ConnectionError))
+
+
 def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
@@ -512,16 +535,28 @@ def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
             "error": None,
             "bytes": target.stat().st_size,
         }
+    attempts = 0
     try:
-        log(f"Downloading {url} -> {target}")
         req = urllib.request.Request(
             url,
             headers={"User-Agent": "western-canada-production-etl/1.0"},
         )
-        with urllib.request.urlopen(req, timeout=120) as response:
-            payload = response.read()
-            headers = getattr(response, "headers", {})
-            etag, last_modified = headers.get("ETag"), headers.get("Last-Modified")
+        for attempts in range(1, DOWNLOAD_MAX_ATTEMPTS + 1):
+            try:
+                log(f"Downloading {url} -> {target} (attempt {attempts}/{DOWNLOAD_MAX_ATTEMPTS})")
+                with urllib.request.urlopen(req, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response:
+                    payload = response.read()
+                    headers = getattr(response, "headers", {})
+                    etag, last_modified = headers.get("ETag"), headers.get("Last-Modified")
+                break
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+                if isinstance(exc, urllib.error.HTTPError):
+                    exc.close()
+                if attempts == DOWNLOAD_MAX_ATTEMPTS or not retryable_download_error(exc):
+                    raise
+                delay = DOWNLOAD_RETRY_DELAY_SECONDS * 2 ** (attempts - 1)
+                log(f"Temporary download failure: {exc}; retrying in {delay}s")
+                time.sleep(delay)
         validate_download_payload(payload, target.suffix)
         temporary = target.with_suffix(target.suffix + ".tmp")
         temporary.write_bytes(payload)
@@ -530,6 +565,7 @@ def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
             "url": url,
             "local_path": str(target.relative_to(ROOT)),
             "status": "downloaded",
+            "attempts": attempts,
             "error": None,
             "retrieved_at": dt.datetime.now(dt.timezone.utc).isoformat(),
             "bytes": len(payload),
@@ -543,6 +579,7 @@ def download_url(url: str, target: Path, force: bool = False) -> dict[str, Any]:
             "url": url,
             "local_path": str(target.relative_to(ROOT)),
             "status": "failed",
+            "attempts": attempts,
             "error": str(exc),
             "cached_fallback": target.exists(),
             "http_status": getattr(exc, "code", None),
@@ -2715,10 +2752,12 @@ def load_bcer_surface_locations() -> dict[str, dict[str, Any]]:
 
 def bcer_production_members(zf: _zipfile.ZipFile) -> list[str]:
     names = [name for name in zf.namelist() if name.lower().endswith(".csv")]
+    # BCER periodically splits the archive into new year ranges. Prefer those
+    # partitions over zone_prd.csv, which repeats their combined observations.
     preferred = [
         name
         for name in names
-        if any(token in name.lower() for token in ("2007_to_2015", "2016_to_present"))
+        if re.fullmatch(r"zone_prd_\d{4}_to_(?:\d{4}|present)\.csv", Path(name).name, re.I)
     ]
     return preferred or [name for name in names if Path(name).name.lower() == "zone_prd.csv"]
 

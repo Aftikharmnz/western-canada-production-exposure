@@ -240,8 +240,8 @@ def main() -> int:
             if ingestion.get("errors"):
                 warnings.append("Some official sources could not refresh; their previously validated observations are retained.")
         except (RuntimeError, subprocess.TimeoutExpired) as error:
-            errors.append(str(error))
             ingestion = read_json(work / "ingestion.json", {})
+            errors.extend(ingestion.get("errors") or [str(error)])
     else:
         try:
             run_script("build_aer_infrastructure.py", ["--data-dir", str(candidate), "--baseline-dir", str(baseline),
