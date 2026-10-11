@@ -3225,12 +3225,14 @@ def append_manitoba_well_production(add_asset: Any, add_record: Any, start_perio
     for ws in wb.worksheets:
         rows = ws.iter_rows(values_only=True)
         try:
-            # The regulator changed WELL_NAME / FLUID_TYPE to spaced headers
-            # in its current workbook; accept both without dropping Manitoba.
+            # Current workbooks use spaced headers and FLUID CODE; retain
+            # support for earlier FLUID_TYPE workbooks as well.
             headers = [re.sub(r"\s+", "_", clean_text(value).upper()) for value in next(rows)]
         except StopIteration:
             continue
         header_index = {name: idx for idx, name in enumerate(headers) if name}
+        if "FLUID_TYPE" not in header_index and "FLUID_CODE" in header_index:
+            header_index["FLUID_TYPE"] = header_index["FLUID_CODE"]
         if not {"LICENCE", "WELL_NAME", "UWI", "NAME", "FLUID_TYPE", "YEAR"}.issubset(header_index):
             continue
         month_indexes = [(i + 1, header_index[name]) for i, name in enumerate(month_headers) if name in header_index]
