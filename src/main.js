@@ -4580,7 +4580,8 @@ function renderMarketPipelineTooltip(p) {
 
 function bindPipelineCard(layer, html) {
   layer.bindTooltip(html, { sticky: true, opacity: 1, className: 'pipeline-tip pipeline-detail-tip' });
-  layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true });
+  layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true,
+    autoPanPaddingTopLeft: [12, 80], autoPanPaddingBottomRight: [12, 12] });
   layer.on('popupopen', () => layer.closeTooltip());
   layer.on('mouseover', () => { if (layer.isPopupOpen()) layer.closeTooltip(); });
 }

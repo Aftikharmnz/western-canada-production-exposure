@@ -2532,7 +2532,6 @@ select {
 .pipeline-card-footer { margin-top: 7px; color: #64748b; font-size: 9px; }
 .pipeline-detail-popup .leaflet-popup-content-wrapper { border: 1px solid #cbd5e1; border-radius: 10px; }
 .pipeline-detail-popup .leaflet-popup-content { width: min(340px, calc(100vw - 72px)) !important; margin: 15px 17px; max-height: min(640px, 72vh); overflow-y: auto; }
-.leaflet-popup-pane { z-index: 1100; }
 
 .market-hub-tip {
   pointer-events: auto;
