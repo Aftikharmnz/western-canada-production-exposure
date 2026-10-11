@@ -3413,3 +3413,36 @@ button:focus-visible, summary:focus-visible, a:focus-visible {
 #refCoverage { padding: 0 14px; }
 .layer-source-note { margin: 10px 12px; color: #52636a; font-size: 11px; line-height: 1.5; }
 .timeline-bar.unloaded { background: transparent; border: 1px dashed #94a3b8; opacity: .7; }
+
+/* Reported production: source gaps and subtotals stay visible as distinct states. */
+.timeline-bar.partial { background: transparent; border: 1.5px solid #64748b; opacity: .85; }
+.timeline-bar.missing { background: transparent; border: 1px dashed #94a3b8; opacity: .55; }
+.timeline-bar.partial.selected, .timeline-bar.missing.selected { border-color: #008b8b; box-shadow: 0 0 0 1px #008b8b; }
+#seasonalityPanel { max-height: calc(100% - 48px); overflow-y: auto; overscroll-behavior: contain; }
+#seasonalityPanel .sea-header { position: sticky; top: 0; z-index: 3; background: #fff; }
+.sea-chart-wrap { position: relative; }
+.sea-legend .sea-legend-partial { width: 9px; height: 9px; border: 1.5px solid #64748b; border-radius: 50%; background: transparent; }
+.sea-legend-note { flex-basis: 100%; line-height: 1.5; }
+.sea-month-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 12px; }
+.sea-month-controls select { max-width: 100%; padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: 5px; background: #fff; color: var(--ink); font-size: 12px; }
+.sea-month-controls select:focus-visible { outline: 3px solid #008b8b; outline-offset: 2px; }
+.sea-month-detail { padding: 0 14px 12px; font-size: 12px; line-height: 1.5; }
+.sea-detail-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.sea-status { border: 1px solid #cbd5e1; border-radius: 12px; padding: 2px 7px; font-size: 10px; color: #475569; background: #f8fafc; }
+.sea-status.complete { color: #166534; background: #f0fdf4; border-color: #bbd8c2; }
+.sea-status.partial, .sea-status.unverified { color: #475569; background: #f1f5f9; }
+.sea-detail-value { margin: 7px 0 4px; }
+.sea-detail-note { margin: 4px 0; color: var(--muted); }
+.sea-missing-sources, .sea-warnings { margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: #f1f5f9; color: #475569; }
+.sea-warnings { background: #fff3db; color: #854d0e; }
+.sea-missing-sources ul, .sea-warnings ul { margin: 4px 0 0; padding-left: 17px; }
+.sea-missing-sources li, .sea-warnings li { margin: 4px 0; overflow-wrap: anywhere; }
+.sea-tooltip { position: absolute; z-index: 2; width: 300px; max-width: calc(100% - 16px); max-height: 220px; padding: 10px; overflow: hidden; background: #fff; border: 1px solid var(--line-strong); border-radius: 8px; box-shadow: 0 4px 14px rgba(20,26,29,.18); pointer-events: none; font-size: 11px; line-height: 1.4; }
+.sea-monthly-values { padding: 0 14px 12px; border-top: 1px solid var(--line); font-size: 12px; }
+.sea-monthly-values summary { padding: 10px 0; color: var(--ink); cursor: pointer; }
+.sea-history-table-scroll { max-height: 210px; overflow: auto; }
+.sea-history-table caption { padding: 0 0 8px; color: var(--muted); text-align: left; font-size: 11px; line-height: 1.4; }
+.sea-history-table thead th { position: sticky; top: 0; background: #f5f8f8; z-index: 1; }
+.sea-history-table tbody th { padding: 5px 6px; border-bottom: 1px solid #f0f2f2; text-align: left; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--ink); }
+.sea-month-button { min-height: 30px; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 5px; background: #fff; color: #166b85; cursor: pointer; font-size: 11px; }
+.sea-month-button:hover { background: #eef5f4; }

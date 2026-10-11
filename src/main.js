@@ -1436,6 +1436,53 @@ function selectedDateSummaryRows(date = state.selectedDate) {
   );
 }
 
+function matchingReportedRecords(date = state.selectedDate) {
+  return recordsForDate(date).filter(record => {
+    if (record.scenario !== "actual" || typeof record.volume_kbbl_d !== "number"
+      || !Number.isFinite(record.volume_kbbl_d) || record.volume_kbbl_d < 0) return false;
+    const asset = state.assetById.get(record.asset_id);
+    if (!asset || asset.is_rollup || ["province", "province_refinery", "region"].includes(asset.asset_kind)) return false;
+    if (!state.selectedSources.has(record.source_id) || !state.selectedStreams.has(record.stream)
+      || !state.selectedLocationConfidence.has(locationConfidenceKey(asset))) return false;
+    if (!legendVisible(STREAM_LEGEND_KEYS[record.stream] || systemMeta(asset.production_system).className)) return false;
+    return !state.search || `${asset.display_name} ${asset.company} ${asset.province} ${record.stream}`.toLowerCase().includes(state.search);
+  });
+}
+
+function productionGroupsForActiveFilters(catalog) {
+  const active = new Set();
+  for (const date of Object.keys(state.manifest?.date_filter_totals || {})) {
+    for (const row of selectedDateSummaryRows(date)) if (row.scenario === "actual") active.add(productionGroupKey(row.source_id, row.stream));
+  }
+  const searchSources = new Set();
+  if (state.search) {
+    for (const asset of state.assetById.values()) {
+      if (`${asset.display_name} ${asset.company} ${asset.province}`.toLowerCase().includes(state.search)) searchSources.add(asset.source_id);
+    }
+  }
+  return catalog.filter(group => state.selectedSources.has(group.source_id) && state.selectedStreams.has(group.stream)
+    && (!active.size || active.has(group.key))
+    && (!state.search || searchSources.has(group.source_id) || group.stream.toLowerCase().includes(state.search)));
+}
+
+function productionReportingForDate(date, total, catalogInfo = productionReportingCatalog(), groups = productionGroupsForActiveFilters(catalogInfo.catalog)) {
+  // A source-wide summary cannot establish an observation for a name search.
+  const rows = state.search ? [] : selectedDateSummaryRows(date).filter(row => row.scenario === "actual");
+  const records = matchingReportedRecords(date);
+  const present = new Set([...rows, ...records].map(row => productionGroupKey(row.source_id, row.stream)));
+  const loading = state.dateRecordLoading.has(date) || state.dateRecordErrors.has(date)
+    || (state.search && state.manifest?.monthly_record_files?.[date] && !state.dateRecordCache.has(date));
+  const hasAmount = total > 0 || records.some(record => record.volume_kbbl_d === 0) || rows.some(row => row.kbbl_d === 0);
+  const point = classifyProductionMonth(date, groups, present, hasAmount ? total : null,
+    !loading && groups.length > 0);
+  if (loading && point.reportedTotal !== null) {
+    point.status = "unverified";
+    point.value = null;
+    point.note = "Monthly records have not finished loading. The displayed amount is an incomplete subtotal.";
+  }
+  return applyProductionQuality(point, groups);
+}
+
 // Sources that stopped reporting before this date while other sources continue.
 // The ETL's stored date_warnings only compare each source-stream's own last two
 // months, so a source that simply drops out (e.g. Petrinex AB after its final
@@ -1696,7 +1743,9 @@ function renderMetrics(aggregated) {
     .reduce((s, p) => s + p.kbbl, 0);
   const allTotal = total + unmappedTotal;
   const largest = points.reduce((best, p) => (!best || p.kbbl > best.kbbl ? p : best), null);
-  els.totalShown.textContent = kbbl(total);
+  const reporting = productionReportingForDate(state.selectedDate, total);
+  els.totalShown.textContent = reporting.reportedTotal === null ? "--" : `${kbbl(total)}${reporting.status === "complete" ? "" : " · partial"}`;
+  els.totalShown.title = reporting.note;
   els.mappedCount.textContent = formatNumber(points.length);
   if (els.unmappedVolume) els.unmappedVolume.textContent = kbbl(unmappedTotal);
   els.largestPoint.textContent = largest ? kbbl(largest.kbbl) : "--";
@@ -1774,7 +1823,30 @@ function renderMetrics(aggregated) {
 function renderDetails(aggregated) {
   const { byAsset } = aggregated || aggregateForDate();
   let selected = state.selectedAssetId ? byAsset.get(state.selectedAssetId) : null;
-  if (!selected) selected = [...byAsset.values()].sort((a, b) => b.kbbl - a.kbbl)[0] || null;
+  if (!selected && state.selectedAssetId) {
+    const asset = state.assetById.get(state.selectedAssetId);
+    if (asset) {
+      const reported = matchingReportedRecords().filter(record => record.asset_id === asset.asset_id);
+      if (reported.length) {
+        selected = { asset, kbbl: reported.reduce((sum, record) => sum + record.volume_kbbl_d, 0),
+          sources: new Set(reported.map(record => record.source_id)), scenarios: new Set(["actual"]),
+          streams: new Map(), records: reported };
+        for (const record of reported) selected.streams.set(record.stream, (selected.streams.get(record.stream) || 0) + record.volume_kbbl_d);
+      } else {
+        els.detailTitle.textContent = asset.display_name;
+        els.detailSubtitle.textContent = "No reported observation for this asset at the selected date.";
+        els.detailVolume.textContent = "--";
+        els.detailSource.textContent = SOURCE_SHORT[asset.source_id] || asset.source_id;
+        els.detailStatus.textContent = "Unavailable · missing records are not zero";
+        if (els.detailLocationQuality) els.detailLocationQuality.textContent = locationQualityText(asset);
+        if (els.streamBreakdown) els.streamBreakdown.innerHTML = '<p class="empty">Production is unavailable for this month.</p>';
+        if (els.fireRiskSection) els.fireRiskSection.hidden = true;
+        renderTopAssets(aggregated);
+        return;
+      }
+    }
+  }
+  if (!selected && !state.selectedAssetId) selected = [...byAsset.values()].sort((a, b) => b.kbbl - a.kbbl)[0] || null;
 
   if (!selected) {
     els.detailTitle.textContent = "No matching production";
@@ -1937,6 +2009,9 @@ function renderTimeline() {
   // state.timelineCache is set to null whenever filters change.
   if (!state.timelineCache) {
     const cache = new Map();
+    const reportingCache = new Map();
+    const catalog = productionReportingCatalog();
+    const groups = productionGroupsForActiveFilters(catalog.catalog);
     for (const date of state.dates) {
       let total;
       const hasOnDemandFile = Boolean(state.manifest?.monthly_record_files?.[date]);
@@ -1944,6 +2019,7 @@ function renderTimeline() {
       // unloaded month from only its base records without understating it.
       if (hasOnDemandFile && !state.dateRecordCache.has(date) && state.search) {
         cache.set(date, null);
+        reportingCache.set(date, { status: "unloaded", note: "Search total not loaded; select this month to load records." });
         continue;
       }
       // Manifest summaries already include both base and on-demand records.
@@ -1954,26 +2030,37 @@ function renderTimeline() {
         const { byAsset } = aggregateForDate(date);
         total = [...byAsset.values()].reduce((s, p) => s + p.kbbl, 0);
       }
-      cache.set(date, total || 0);
+      const point = productionReportingForDate(date, total, catalog, groups);
+      cache.set(date, point.reportedTotal);
+      reportingCache.set(date, point);
     }
     state.timelineCache = cache;
+    state.timelineReportingCache = reportingCache;
   }
-  const rows = state.dates.map((date) => ({ date, total: state.timelineCache.get(date) ?? null }));
+  const rows = state.dates.map((date) => ({ date, total: state.timelineCache.get(date) ?? null,
+    reporting: state.timelineReportingCache?.get(date) || { status: "unverified", note: "Reporting coverage unavailable." } }));
   const max = Math.max(...rows.map((r) => r.total), 1);
   const selectedIndex = rows.findIndex((r) => r.date === state.selectedDate);
   const windowStart = Math.max(0, selectedIndex - 30);
   const visible = rows.slice(windowStart, Math.min(rows.length, windowStart + 72));
   if (els.timelineLabel) {
-    const unloaded = visible.filter((row) => row.total === null).length;
-    els.timelineLabel.textContent = `${visible.length} months in view${unloaded ? ` · ${unloaded} search totals not loaded; select a month to load` : ''}`;
+    const unloaded = visible.filter(row => row.reporting.status === "unloaded").length;
+    const partial = visible.filter(row => ["partial", "unverified"].includes(row.reporting.status) && row.total !== null).length;
+    const missing = visible.filter(row => row.reporting.status !== "unloaded" && row.total === null).length;
+    els.timelineLabel.textContent = `${visible.length} months in view${unloaded ? ` · ${unloaded} search totals not loaded; select a month to load` : ''}${partial ? ` · ${partial} partial reporting` : ''}${missing ? ` · ${missing} without reported observations` : ''}`;
   }
   if (els.timelineBars) {
     els.timelineBars.innerHTML = visible.map((row) => {
       const height = Math.max(3, (row.total / max) * 72);
       const sel = row.date === state.selectedDate;
-      const unloaded = row.total === null;
-      const label = `${dateLabel(row.date)} ${unloaded ? 'search total not loaded; select to load' : kbbl(row.total)}`;
-      return `<button class="timeline-bar ${sel ? "selected" : ""} ${unloaded ? "unloaded" : ""}" style="height:${unloaded ? 7 : height}px" title="${label}" data-date="${row.date}" aria-label="${label}"></button>`;
+      const unavailable = row.total === null;
+      const status = row.reporting.status;
+      const partial = status === "partial" || status === "unverified";
+      const amount = unavailable ? (status === "unloaded" ? "search total not loaded; select to load" : "No reported observation; production unavailable")
+        : `${kbbl(row.total)}${partial ? " reported subtotal · partial reporting" : " reported production"}`;
+      const label = `${dateLabel(row.date)} — ${amount}. ${row.reporting.note || ""}`;
+      const cssStatus = unavailable ? (status === "unloaded" ? "unloaded" : "missing") : partial ? "partial" : "";
+      return `<button class="timeline-bar ${sel ? "selected" : ""} ${cssStatus}" style="height:${unavailable ? 7 : height}px" title="${escapeHtml(label)}" data-date="${row.date}" aria-label="${escapeHtml(label)}"></button>`;
     }).join("");
     els.timelineBars.querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -5686,48 +5773,180 @@ function initRubberBand() {
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const SEA_COLORS   = { band: "#d1d5db", y0: "#2563eb", y1: "#16a34a", yCur: "#dc2626" };
 
-function computeSeasonality(assetIds) {
-  const ym = {};
-  const assetSet = new Set(assetIds); // O(1) lookup instead of O(n) includes()
-  const indexedAssetMonths = new Set();
+function productionGroupKey(sourceId, stream) {
+  return JSON.stringify([sourceId, stream]);
+}
 
-  const addYmValue = (aid, date, vol, markIndexed = false) => {
-    if (!assetSet.has(aid)) return;
-    const value = Number(vol || 0);
-    if (!Number.isFinite(value) || value < 0) return;
-    const ymStr = date.slice(0, 7);
-    const year = Number(ymStr.slice(0, 4));
-    const month = Number(ymStr.slice(5, 7));
-    if (!year || !month) return;
-    const assetMonthKey = `${aid}:${ymStr}`;
-    if (!markIndexed && indexedAssetMonths.has(assetMonthKey)) return;
-    if (markIndexed) indexedAssetMonths.add(assetMonthKey);
-    if (!ym[year]) ym[year] = {};
-    ym[year][month] = (ym[year][month] || 0) + value;
-  };
+function productionMonthEnd(month) {
+  const [year, number] = month.split("-").map(Number);
+  return `${month}-${String(new Date(Date.UTC(year, number, 0)).getUTCDate()).padStart(2, "0")}`;
+}
 
-  // Historical index (pre-aggregated; covers base records plus on-demand AB/BC/NDIC/SK/MB wells).
-  if (state.seasonalityIndex) {
-    for (const aid of assetIds) {
-      const entry = state.seasonalityIndex[aid];
-      if (!entry) continue;
-      for (const [ym_str, vol] of Object.entries(entry)) {
-        addYmValue(aid, `${ym_str}-01`, vol, true);
+function productionReportingCatalog() {
+  const metadata = state.seasonalityIndex?.__reporting;
+  const verified = metadata?.schema_version === 1 && Array.isArray(metadata.groups)
+    && metadata.groups.every(g => g && typeof g.source_id === "string" && typeof g.stream === "string"
+      && Array.isArray(g.months) && g.months.every(m => /^\d{4}-(0[1-9]|1[0-2])$/.test(m)));
+  const sourceGroups = verified ? metadata.groups : (state.manifest?.source_coverage || []).filter(g => g.scenario === "actual");
+  const catalog = sourceGroups.map(g => {
+    const months = new Set(verified ? g.months : []);
+    if (!verified) {
+      for (const [date, rows] of Object.entries(state.manifest?.date_filter_totals || {})) {
+        if (rows.some(r => r.scenario === "actual" && r.source_id === g.source_id && r.stream === g.stream)) months.add(date.slice(0, 7));
+      }
+      for (const r of state.baseRecords || []) {
+        if (r.scenario === "actual" && r.source_id === g.source_id && r.stream === g.stream
+          && typeof r.volume_kbbl_d === "number" && Number.isFinite(r.volume_kbbl_d) && r.volume_kbbl_d >= 0) months.add(r.date.slice(0, 7));
       }
     }
-  }
+    const ordered = [...months].sort();
+    return { ...g, key: productionGroupKey(g.source_id, g.stream), months,
+      first_date: ordered.length ? productionMonthEnd(ordered[0]) : g.first_date,
+      last_date: ordered.length ? productionMonthEnd(ordered.at(-1)) : g.last_date };
+  });
+  return { catalog, verified };
+}
 
-  // Fallbacks for local data if the seasonality index is unavailable or missing an asset-month.
-  for (const r of state.baseRecords) if (r.scenario === "actual") addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
-  if (state.dateRecordCache) {
-    for (const records of state.dateRecordCache.values()) {
-      for (const r of records) if (r.scenario === "actual") addYmValue(r.asset_id, r.date, r.volume_kbbl_d);
+function classifyProductionMonth(date, groups, reportedGroups, reportedTotal, reliable = true, extraMissing = []) {
+  const month = date.slice(0, 7);
+  const missing = new Map();
+  for (const group of groups) {
+    const available = group.months.has(month);
+    if (!available || !reportedGroups.has(group.key)) {
+      const reason = !available
+        ? (group.last_date && month > group.last_date.slice(0, 7) ? "Not yet reported"
+          : group.first_date && month < group.first_date.slice(0, 7) ? "Earlier history unavailable" : "Report unavailable")
+        : "No observation for the selected assets";
+      missing.set(group.key, { source_id: group.source_id, stream: group.stream, last_date: group.last_date, reason });
     }
   }
-  const years = Object.keys(ym).map(Number).sort();
+  for (const group of extraMissing) missing.set(group.key, { source_id: group.source_id, stream: group.stream,
+    last_date: group.last_date, reason: "A selected asset has no observation for this product stream" });
+  const hasAmount = typeof reportedTotal === "number" && Number.isFinite(reportedTotal) && reportedTotal >= 0;
+  const status = !hasAmount ? "missing" : !reliable || !groups.length ? "unverified" : missing.size ? "partial" : "complete";
+  const missingSources = [...missing.values()];
+  const names = [...new Set(missingSources.map(g => SOURCE_SHORT[g.source_id] || g.source_id))];
+  const note = status === "complete" ? "All selected reporting sources cover this month. Values sum reported observations; omitted asset records are not assumed to be zero."
+    : status === "partial" ? `Partial reporting${names.length ? ` — ${names.join(", ")}` : ""}. The full selection total is unavailable.`
+    : status === "unverified" ? "Reporting coverage could not be verified. Showing available records only."
+    : "No reported observation for this selection. Missing records do not confirm zero production.";
+  return { date, status, reportedTotal: hasAmount ? reportedTotal : null, value: status === "complete" ? reportedTotal : null,
+    missingSources, expectedGroupsCount: groups.length, reportingGroupsCount: groups.filter(g => g.months.has(month) && reportedGroups.has(g.key)).length,
+    warnings: [], note };
+}
+
+function applyProductionQuality(point, groups) {
+  const month = point.date.slice(0, 7);
+  const warnings = Object.entries(state.manifest?.data_quality?.date_warnings || {})
+    .filter(([date]) => date.startsWith(month)).flatMap(([, rows]) => rows)
+    .filter(warning => groups.some(group => group.source_id === warning.source_id && (!warning.stream || group.stream === warning.stream)));
+  point.warnings = warnings.filter(warning => warning.message).map(warning => {
+    const name = SOURCE_SHORT[warning.source_id] || warning.source_id;
+    const message = warning.message.replaceAll(warning.source_id, name);
+    return message.includes(name) ? message : `${name}: ${message}`;
+  });
+  const needsReview = warnings.some(warning => warning.severity === "high"
+    && !groups.filter(group => group.source_id === warning.source_id && (!warning.stream || group.stream === warning.stream))
+      .every(group => (state.manifest?.source_reconciliation || []).some(observation => observation.source_id === group.source_id
+        && observation.stream === group.stream && observation.period === month)));
+  if (point.status === "complete" && needsReview) {
+    point.status = "unverified";
+    point.value = null;
+    point.note = "Source reporting requires review. The reported amount remains visible, but complete reporting has not been verified.";
+  }
+  return point;
+}
+
+function computeSeasonality(assetIds) {
+  const ym = {}, observations = new Map(), expected = new Map(), multiStreamMissing = new Map();
+  const assetSet = new Set(assetIds);
+  const { catalog, verified } = productionReportingCatalog();
+  let reliable = verified;
+  const assetGroups = new Map();
+  for (const aid of assetSet) {
+    const entry = state.seasonalityIndex?.[aid];
+    const refs = entry?.__groups;
+    let groups = verified && Array.isArray(refs) && refs.length && refs.every(i => Number.isInteger(i) && catalog[i])
+      ? refs.map(i => catalog[i]) : [];
+    if (!groups.length) {
+      reliable = false;
+      const asset = state.assetById.get(aid);
+      groups = catalog.filter(g => g.source_id === asset?.source_id);
+    }
+    assetGroups.set(aid, groups);
+    for (const group of groups) expected.set(group.key, group);
+  }
+  const addValue = (aid, date, value, groups, indexed = false) => {
+    const month = String(date || "").slice(0, 7);
+    if (!assetSet.has(aid) || !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)
+      || typeof value !== "number" || !Number.isFinite(value) || value < 0) return;
+    const indexedValue = state.seasonalityIndex?.[aid]?.[month];
+    if (!indexed && typeof indexedValue === "number" && Number.isFinite(indexedValue) && indexedValue >= 0) return;
+    const year = Number(month.slice(0, 4)), number = Number(month.slice(5));
+    if (!ym[year]) ym[year] = {};
+    ym[year][number] = (ym[year][number] || 0) + value;
+    if (!observations.has(month)) observations.set(month, { assetCount: 0, fallbackAssets: new Set(), groups: new Set() });
+    const observation = observations.get(month);
+    if (indexed) observation.assetCount++;
+    else if (!observation.fallbackAssets.has(aid)) {
+      observation.fallbackAssets.add(aid);
+      observation.assetCount++;
+    }
+    for (const group of groups) observation.groups.add(group.key);
+  };
+  for (const aid of assetSet) {
+    const entry = state.seasonalityIndex?.[aid];
+    if (!entry) continue;
+    const groups = assetGroups.get(aid);
+    for (const [month, amount] of Object.entries(entry)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) continue;
+      let present = groups;
+      if (groups.length > 1) {
+        const refs = entry.__month_groups?.[month];
+        present = Array.isArray(refs) ? refs.filter(i => Number.isInteger(i) && catalog[i]).map(i => catalog[i]) : [];
+        const absent = groups.filter(g => !present.some(p => p.key === g.key));
+        if (absent.length && typeof amount === "number" && Number.isFinite(amount) && amount >= 0) {
+          const missing = multiStreamMissing.get(month) || [];
+          missing.push(...absent);
+          multiStreamMissing.set(month, missing);
+        }
+      }
+      addValue(aid, month, amount, present, true);
+    }
+  }
+  const fallbackKeys = new Set();
+  const addFallback = record => {
+    if (record.scenario !== "actual" || !assetSet.has(record.asset_id)) return;
+    const key = JSON.stringify([record.asset_id, record.date, record.source_id, record.stream]);
+    if (fallbackKeys.has(key)) return;
+    fallbackKeys.add(key);
+    const group = catalog.find(g => g.source_id === record.source_id && g.stream === record.stream);
+    if (group) expected.set(group.key, group);
+    addValue(record.asset_id, record.date, record.volume_kbbl_d, group ? [group] : []);
+  };
+  for (const record of state.baseRecords || []) addFallback(record);
+  for (const records of state.dateRecordCache?.values() || []) for (const record of records) addFallback(record);
+  const years = Object.keys(ym).map(Number).sort((a, b) => a - b);
   if (!years.length) return null;
-  const currentYear = years[years.length - 1];
-  return { ym, years, currentYear };
+  const datasetYear = Number(state.manifest?.latest_actual_date?.slice(0, 4));
+  const currentYear = Math.max(years.at(-1), Number.isInteger(datasetYear) ? datasetYear : years.at(-1));
+  if (!years.includes(currentYear)) years.push(currentYear);
+  const months = {}, groups = [...expected.values()];
+  for (const year of years) {
+    months[year] = {};
+    for (let number = 1; number <= 12; number++) {
+      const month = `${year}-${String(number).padStart(2, "0")}`;
+      const observation = observations.get(month);
+      const point = classifyProductionMonth(`${month}-01`, groups, observation?.groups || new Set(), ym[year]?.[number], reliable, multiStreamMissing.get(month) || []);
+      point.observedAssets = observation?.assetCount || 0;
+      point.selectedAssetCount = assetSet.size;
+      point.unavailableAssetsCount = assetSet.size - point.observedAssets;
+      months[year][number] = applyProductionQuality(point, groups);
+    }
+  }
+  const lastObservationMonth = [...observations.keys()].sort().at(-1);
+  return { ym, years, currentYear, months, partialHistory: !reliable,
+    latestDate: state.manifest?.latest_actual_date || `${lastObservationMonth}-01`, lastObservationDate: `${lastObservationMonth}-01` };
 }
 
 const SELECTION_GROUP_DIMS = [
@@ -5775,9 +5994,44 @@ function computeSelectionBreakdown(assetIds, dim) {
   return [...groups.values()].sort((x, y) => y.kbbl - x.kbbl);
 }
 
+function seasonalityStatusLabel(month) {
+  return { complete: "Complete source coverage", partial: "Partial source coverage", missing: "Missing", unverified: "Coverage unverified" }[month?.status] || "Missing";
+}
+
+function seasonalityMonthLabel(month) {
+  return `${MONTH_LABELS[Number(month.date.slice(5, 7)) - 1]} ${month.date.slice(0, 4)}`;
+}
+
+function renderSeasonalityDetails(month, compact = false) {
+  if (!month) return '<p class="sea-empty">Select a month to inspect its reported production and source coverage.</p>';
+  const complete = month.status === "complete" && Number.isFinite(month.value);
+  const amount = complete ? month.value : month.reportedTotal;
+  const missing = month.missingSources || [];
+  const sourceText = missing.map((source) => {
+    const name = SOURCE_SHORT[source.source_id] || source.source_id || "Unknown source";
+    const stream = source.stream ? ` · ${source.stream}` : "";
+    const latest = source.last_date ? `latest available ${dateLabel(source.last_date)}` : "latest date unavailable";
+    return `<li><strong>${escapeHtml(name + stream)}</strong> — ${escapeHtml(latest)}${source.reason ? ` · ${escapeHtml(source.reason)}` : ""}</li>`;
+  }).join("");
+  const warnings = (month.warnings || []).map((warning) => `<li>${escapeHtml(warning)}</li>`).join("");
+  const coverage = Number.isFinite(month.expectedGroupsCount) && month.expectedGroupsCount > 0
+    ? `${month.reportingGroupsCount} of ${month.expectedGroupsCount} relevant source streams reporting.`
+    : "Source coverage is unavailable.";
+  const assetCoverage = Number.isFinite(month.observedAssets) && Number.isFinite(month.selectedAssetCount)
+    ? ` Observations for ${month.observedAssets} of ${month.selectedAssetCount} selected assets.` : "";
+  const assetNote = Number.isFinite(month.unavailableAssetsCount) && month.unavailableAssetsCount > 0
+    ? ` No observation for ${month.unavailableAssetsCount} selected asset${month.unavailableAssetsCount === 1 ? "" : "s"}; missing observations are not treated as zero.` : "";
+  return `<div class="sea-detail-heading"><strong>${escapeHtml(seasonalityMonthLabel(month))}</strong><span class="sea-status ${escapeHtml(month.status)}">${escapeHtml(seasonalityStatusLabel(month))}</span></div>
+    <p class="sea-detail-value">${complete ? "Reported production" : "Reported subtotal"}: <strong>${Number.isFinite(amount) ? kbbl(amount) : "Unavailable"}</strong></p>
+    <p class="sea-detail-note">${escapeHtml(coverage + (compact ? "" : assetCoverage + assetNote))}</p>
+    ${month.note && !compact ? `<p class="sea-detail-note">${escapeHtml(month.note)}</p>` : ""}
+    ${missing.length ? `<div class="sea-missing-sources"><strong>Unavailable sources</strong><ul>${sourceText}</ul></div>` : ""}
+    ${warnings && !compact ? `<div class="sea-warnings"><strong>Review notes</strong><ul>${warnings}</ul></div>` : ""}`;
+}
+
 async function showSeasonalityPanel(assetIds) {
   const existing = document.getElementById("seasonalityPanel");
-  if (existing) existing.remove();
+  if (existing) { existing._seaResizeObserver?.disconnect(); existing.remove(); }
 
   if (!state.seasonalityIndex && !state.seasonalityIndexLoading) {
     state.seasonalityIndexLoading = true;
@@ -5810,21 +6064,23 @@ async function showSeasonalityPanel(assetIds) {
   const { byAsset } = aggregateForDate();
 
   const names = assetIds.slice(0, 3).map(id => {
-    const hit = byAsset.get(id);
-    return hit ? hit.asset.display_name : id;
+    const asset = state.assetById.get(id) || byAsset.get(id)?.asset;
+    return asset ? asset.display_name : id;
   });
   const titleStr = names.join(", ") + (assetIds.length > 3 ? ` +${assetIds.length - 3} more` : "");
 
   const panel = document.createElement("div");
   panel.id = "seasonalityPanel";
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "Reported production history");
   const dims = SELECTION_GROUP_DIMS;
   panel.innerHTML = `
     <div class="sea-header">
       <div>
         <strong class="sea-title">${escapeHtml(titleStr)}</strong>
-        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · actual history, all streams per selected asset${state.seasonalityIndex ? "" : " · PARTIAL HISTORY"}</span>
+        <span class="sea-sub">${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} · reported production, all streams per selected asset${data?.partialHistory ? " · partial history available" : ""}</span>
       </div>
-      <button id="closeSeasonality" class="sea-close" title="Close">&#x2715;</button>
+      <button id="closeSeasonality" class="sea-close" title="Close" aria-label="Close production history">&#x2715;</button>
     </div>
     <div class="sea-controls">
       <div class="sea-tabs" id="seaTabs">
@@ -5838,14 +6094,26 @@ async function showSeasonalityPanel(assetIds) {
       </label>
     </div>
     <div id="seaTrend">
-      <canvas id="seasonalityCanvas" width="580" height="240"></canvas>
+      <div class="sea-chart-wrap">
+        <canvas id="seasonalityCanvas" width="580" height="240" role="img" aria-label="Reported production by calendar month. Solid lines show complete source coverage; hollow points show partial or unverified subtotals; missing months leave gaps. Monthly values and source details are available below."></canvas>
+        <div id="seaTooltip" class="sea-tooltip" role="tooltip" hidden></div>
+      </div>
       <div class="sea-legend" id="seaLegend"></div>
+      <div id="seaMonthControls" class="sea-month-controls" hidden>
+        <label for="seaMonthSelect">Inspect a month</label><select id="seaMonthSelect"></select>
+      </div>
+      <div id="seaMonthDetail" class="sea-month-detail" aria-live="polite"></div>
+      <details id="seaMonthlyValues" class="sea-monthly-values" hidden>
+        <summary>View monthly values and source coverage</summary>
+        <div id="seaHistoryTable" class="sea-history-table-scroll"></div>
+      </details>
     </div>
     <div id="seaBreakdown" class="sea-breakdown" hidden></div>
   `;
   document.getElementById("map").appendChild(panel);
 
   document.getElementById("closeSeasonality").addEventListener("click", () => {
+    panel._seaResizeObserver?.disconnect();
     panel.remove();
     state.selectedAssets = [];
   });
@@ -5858,8 +6126,11 @@ async function showSeasonalityPanel(assetIds) {
   function renderBreakdown() {
     const groups = computeSelectionBreakdown(assetIds, view.dim);
     const dimLabel = dims.find((dd) => dd.key === view.dim).label;
+    const point = data?.months[Number(state.selectedDate?.slice(0, 4))]?.[Number(state.selectedDate?.slice(5, 7))];
     if (!groups.length) {
-      bdEl.innerHTML = '<p class="sea-empty">No production at the selected date for this selection.</p>';
+      bdEl.innerHTML = point?.status === "complete" && point.reportedTotal === 0
+        ? '<p class="sea-empty">Reported production is zero for this month.</p>'
+        : '<p class="sea-empty">No reported observations for this selection at the selected date. Missing records do not confirm zero production.</p>';
       return;
     }
     const total = groups.reduce((a, g) => a + g.kbbl, 0) || 1;
@@ -5873,7 +6144,8 @@ async function showSeasonalityPanel(assetIds) {
       <td class="barcell"><span class="sea-bar"><span class="sea-bar-fill" style="width:${Math.max(2, g.kbbl / maxV * 100)}%;background:${g.color}"></span></span></td>
     </tr>`).join("");
     bdEl.innerHTML = `
-      <p class="sea-section-note">${groups.length} ${escapeHtml(dimLabel.toLowerCase())} group${groups.length > 1 ? "s" : ""} · ${kbbl(total)} total at ${escapeHtml(state.selectedDate || "selected date")}.</p>
+      <p class="sea-section-note">${groups.length} ${escapeHtml(dimLabel.toLowerCase())} group${groups.length > 1 ? "s" : ""} · ${kbbl(total)} reported ${point?.status === "complete" ? "production" : "subtotal · partial reporting"} at ${escapeHtml(state.selectedDate || "selected date")}.</p>
+      ${point && point.status !== "complete" ? `<p class="sea-section-note">${escapeHtml(point.note)}</p>` : ""}
       <div class="sea-table-scroll"><table class="sea-table">
         <thead><tr><th>#</th><th>${escapeHtml(dimLabel)}</th><th class="num">kbbl/d</th><th class="num">Share</th><th class="num">Assets</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
@@ -5895,47 +6167,63 @@ async function showSeasonalityPanel(assetIds) {
       '<p style="padding:10px 12px;color:#6b7280;font-size:12px">No monthly history for this selection — use the Breakdown tab for current-date splits.</p>');
   } else {
     drawSeasonalityChart(data, assetIds.length);
+    if (typeof ResizeObserver === "function") {
+      const canvas = panel.querySelector("#seasonalityCanvas");
+      panel._seaResizeObserver = new ResizeObserver(() => {
+        if (!panel.isConnected) { panel._seaResizeObserver.disconnect(); return; }
+        const pixelRatio = Number(window.devicePixelRatio) || 1;
+        if (canvas.clientWidth > 0 && Math.round(canvas.clientWidth) !== Math.round(canvas.width / pixelRatio)) drawSeasonalityChart(data, assetIds.length);
+      });
+      panel._seaResizeObserver.observe(canvas);
+    }
   }
 }
 
 function drawSeasonalityChart(data, assetCount) {
   const canvas = document.getElementById("seasonalityCanvas");
   if (!canvas) return;
+  const previousMonth = document.getElementById("seaMonthSelect")?.value;
+  // Keep axis labels legible on narrow panels and sharp on high-density screens.
+  const W = Math.round(canvas.clientWidth) || canvas.width;
+  const H = W < 480 ? 220 : 240;
+  const pixelRatio = Number(window.devicePixelRatio) || 1;
+  canvas.width = Math.round(W * pixelRatio);
+  canvas.height = Math.round(H * pixelRatio);
   const ctx = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height;
+  ctx.setTransform?.(pixelRatio, 0, 0, pixelRatio, 0, 0);
   const pad = { top: 16, right: 20, bottom: 36, left: 58 };
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
 
-  const { ym, years, currentYear } = data;
+  const { months, years, currentYear } = data;
+  const monthAt = (year, month) => months[year]?.[month];
+  const completeValue = (year, month) => {
+    const observation = monthAt(year, month);
+    return observation?.status === "complete" && Number.isFinite(observation.value) ? observation.value : null;
+  };
 
   const priorYears = years.filter(y => y < currentYear);
-  const fullPriorYears = priorYears.filter(y => Object.keys(ym[y] || {}).length === 12);
+  const fullPriorYears = priorYears.filter(y => Array.from({ length: 12 }, (_, i) => completeValue(y, i + 1)).every(Number.isFinite));
   const rangeYears = fullPriorYears.length >= 2 ? fullPriorYears : priorYears;
   const lineYears = priorYears.slice(-2);
 
-  const envMin = new Array(12).fill(Infinity);
-  const envMax = new Array(12).fill(-Infinity);
-  for (const y of rangeYears) {
-    for (let m = 1; m <= 12; m++) {
-      const v = ym[y]?.[m] ?? 0;
-      if (v < envMin[m-1]) envMin[m-1] = v;
-      if (v > envMax[m-1]) envMax[m-1] = v;
-    }
-  }
-  for (let i = 0; i < 12; i++) {
-    if (envMin[i] === Infinity)  envMin[i] = 0;
-    if (envMax[i] === -Infinity) envMax[i] = 0;
-  }
-
+  // A range also needs continuous complete coverage; absent observations never
+  // establish a zero bound or join the complete months on either side.
+  const envelope = Array.from({ length: 12 }, (_, i) => {
+    const values = rangeYears.map(year => completeValue(year, i + 1));
+    return values.length && values.every(Number.isFinite) ? { min: Math.min(...values), max: Math.max(...values) } : null;
+  });
+  const plottedYears = [...lineYears, currentYear];
   let globalMax = 0;
-  for (const y of [...rangeYears, ...lineYears, currentYear]) {
-    for (let m = 1; m <= 12; m++) {
-      const v = ym[y]?.[m] ?? 0;
-      if (v > globalMax) globalMax = v;
+  for (const year of plottedYears) {
+    for (let month = 1; month <= 12; month++) {
+      const observation = monthAt(year, month);
+      const value = observation?.status === "complete" ? observation.value : observation?.reportedTotal;
+      if (Number.isFinite(value)) globalMax = Math.max(globalMax, value);
     }
   }
-  if (globalMax === 0) globalMax = 1;
+  for (const bounds of envelope) if (bounds) globalMax = Math.max(globalMax, bounds.max);
+  globalMax = globalMax > 0 ? globalMax * 1.08 : 1;
 
   const xPos = (m) => pad.left + ((m - 0.5) / 12) * cW;
   const yPos = (v) => pad.top + cH - (v / globalMax) * cH;
@@ -5954,7 +6242,7 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.fillStyle = "#9ca3af";
     ctx.font = "10px Inter, sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText(Math.round(v).toLocaleString(), pad.left - 5, y + 3);
+    ctx.fillText(formatNumber(v, v < 10 ? 1 : 0), pad.left - 5, y + 3);
   }
 
   ctx.save();
@@ -5973,70 +6261,134 @@ function drawSeasonalityChart(data, assetCount) {
     ctx.fillText(MONTH_LABELS[m-1], xPos(m), H - pad.bottom + 14);
   }
 
-  if (rangeYears.length > 0) {
+  let envelopeRun = [];
+  const fillEnvelopeRun = () => {
+    if (!envelopeRun.length) return;
     ctx.beginPath();
-    for (let m = 1; m <= 12; m++) ctx.lineTo(xPos(m), yPos(envMax[m-1]));
-    for (let m = 12; m >= 1; m--) ctx.lineTo(xPos(m), yPos(envMin[m-1]));
+    envelopeRun.forEach((month, i) => {
+      const x = xPos(month), y = yPos(envelope[month - 1].max);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    [...envelopeRun].reverse().forEach(month => ctx.lineTo(xPos(month), yPos(envelope[month - 1].min)));
     ctx.closePath();
     ctx.fillStyle = "rgba(156,163,175,0.28)";
     ctx.fill();
-    ctx.beginPath();
-    for (let m = 1; m <= 12; m++) {
-      m === 1 ? ctx.moveTo(xPos(m), yPos(envMax[m-1])) : ctx.lineTo(xPos(m), yPos(envMax[m-1]));
-    }
-    ctx.strokeStyle = "rgba(156,163,175,0.5)";
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.stroke();
-    ctx.beginPath();
-    for (let m = 1; m <= 12; m++) {
-      m === 1 ? ctx.moveTo(xPos(m), yPos(envMin[m-1])) : ctx.lineTo(xPos(m), yPos(envMin[m-1]));
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
+    envelopeRun = [];
+  };
+  for (let month = 1; month <= 12; month++) {
+    if (envelope[month - 1]) envelopeRun.push(month);
+    else fillEnvelopeRun();
   }
+  fillEnvelopeRun();
 
   const lineColors = [SEA_COLORS.y0, SEA_COLORS.y1];
-  lineYears.forEach((yr, i) => {
+  const plotPoints = [];
+  plottedYears.forEach((year, i) => {
+    const current = year === currentYear;
+    const color = current ? SEA_COLORS.yCur : lineColors[i % 2];
     ctx.beginPath();
-    for (let m = 1; m <= 12; m++) {
-      const v = ym[yr]?.[m] ?? 0;
-      m === 1 ? ctx.moveTo(xPos(m), yPos(v)) : ctx.lineTo(xPos(m), yPos(v));
+    let continuing = false;
+    for (let month = 1; month <= 12; month++) {
+      const value = completeValue(year, month);
+      if (!Number.isFinite(value)) { continuing = false; continue; }
+      const x = xPos(month), y = yPos(value);
+      continuing ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      continuing = true;
     }
-    ctx.strokeStyle = lineColors[i % 2];
-    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = current ? 2.2 : 1.8;
     ctx.stroke();
-  });
-
-  const curMonths = Object.keys(ym[currentYear] || {}).map(Number);
-  if (curMonths.length) {
-    ctx.strokeStyle = SEA_COLORS.yCur;
-    ctx.fillStyle = SEA_COLORS.yCur;
-    ctx.lineWidth = 2;
-    const sorted = curMonths.sort((a,b) => a-b);
-    ctx.beginPath();
-    sorted.forEach((m, i) => {
-      const v = ym[currentYear][m] ?? 0;
-      i === 0 ? ctx.moveTo(xPos(m), yPos(v)) : ctx.lineTo(xPos(m), yPos(v));
-    });
-    ctx.stroke();
-    sorted.forEach(m => {
-      const v = ym[currentYear][m] ?? 0;
+    for (let month = 1; month <= 12; month++) {
+      const observation = monthAt(year, month);
+      if (!observation) continue;
+      const complete = Number.isFinite(completeValue(year, month));
+      const subtotal = ["partial", "unverified"].includes(observation.status) && Number.isFinite(observation.reportedTotal);
+      if (!complete && !subtotal) continue;
+      const value = complete ? observation.value : observation.reportedTotal;
+      const point = { year, month, x: xPos(month), y: yPos(value), observation };
+      plotPoints.push(point);
       ctx.beginPath();
-      ctx.arc(xPos(m), yPos(v), 3.5, 0, Math.PI * 2);
+      ctx.arc(point.x, point.y, subtotal ? 4 : current ? 3.5 : 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = subtotal ? "#f9fafb" : color;
       ctx.fill();
-    });
-  }
+      if (subtotal) { ctx.strokeStyle = "#64748b"; ctx.lineWidth = 1.6; ctx.stroke(); }
+    }
+  });
 
   const legEl = document.getElementById("seaLegend");
   if (legEl) {
-    const enStr = rangeYears.length ? `${rangeYears[0]}-${rangeYears[rangeYears.length-1]} high/low range` : "";
+    const enStr = rangeYears.length ? `${rangeYears[0]}–${rangeYears[rangeYears.length - 1]} complete-month range` : "";
     legEl.innerHTML = [
-      rangeYears.length ? `<span><i style="background:rgba(156,163,175,0.45)"></i>${enStr}</span>` : "",
+      envelope.some(Boolean) ? `<span><i style="background:rgba(156,163,175,0.45)"></i>${enStr}</span>` : "",
       ...lineYears.map((y, i) => `<span><i style="background:${lineColors[i]}"></i>${y}</span>`),
-      curMonths.length ? `<span><i style="background:${SEA_COLORS.yCur};border-radius:50%"></i>${currentYear} (known months)</span>` : "",
+      `<span><i style="background:${SEA_COLORS.yCur};border-radius:50%"></i>${currentYear}</span>`,
+      '<span><i class="sea-legend-partial"></i>Partial / unverified subtotal</span>',
+      '<span class="sea-legend-note">Solid lines: complete source coverage · gaps: no complete observation</span>',
     ].filter(Boolean).join("");
   }
+
+  const entries = years.flatMap(year => Array.from({ length: 12 }, (_, i) => monthAt(year, i + 1)).filter(Boolean)).reverse();
+  const selector = document.getElementById("seaMonthSelect");
+  const detail = document.getElementById("seaMonthDetail");
+  const controls = document.getElementById("seaMonthControls");
+  const table = document.getElementById("seaHistoryTable");
+  const monthlyValues = document.getElementById("seaMonthlyValues");
+  const tooltip = document.getElementById("seaTooltip");
+  const showMonth = (observation) => {
+    if (!observation) return;
+    if (selector) selector.value = observation.date.slice(0, 7);
+    if (detail) detail.innerHTML = renderSeasonalityDetails(observation);
+  };
+  if (selector) {
+    selector.innerHTML = entries.map(observation => `<option value="${escapeHtml(observation.date.slice(0, 7))}">${escapeHtml(seasonalityMonthLabel(observation))} · ${escapeHtml(seasonalityStatusLabel(observation))}</option>`).join("");
+    selector.onchange = () => showMonth(entries.find(observation => observation.date.slice(0, 7) === selector.value));
+  }
+  if (controls) controls.hidden = false;
+  if (table) {
+    table.innerHTML = `<table class="sea-table sea-history-table"><caption>Reported monthly production for ${assetCount} selected asset${assetCount === 1 ? "" : "s"}. Incomplete amounts are reported subtotals.</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Reported amount</th><th scope="col">Source coverage</th><th scope="col">Details</th></tr></thead><tbody>${entries.map(observation => {
+        const complete = observation.status === "complete" && Number.isFinite(observation.value);
+        const amount = complete ? observation.value : observation.reportedTotal;
+        return `<tr><th scope="row">${escapeHtml(seasonalityMonthLabel(observation))}</th><td class="num">${Number.isFinite(amount) ? kbbl(amount) + (complete ? "" : " subtotal") : "Unavailable"}</td>
+          <td>${escapeHtml(seasonalityStatusLabel(observation))}${observation.warnings?.length ? " · review note" : ""}</td><td><button class="sea-month-button" data-sea-month="${escapeHtml(observation.date.slice(0, 7))}" aria-label="View ${escapeHtml(seasonalityMonthLabel(observation))} source details">View</button></td></tr>`;
+      }).join("")}</tbody></table>`;
+    table.onclick = (event) => {
+      const button = event.target.closest("[data-sea-month]");
+      if (button) showMonth(entries.find(observation => observation.date.slice(0, 7) === button.dataset.seaMonth));
+    };
+  }
+  if (monthlyValues) monthlyValues.hidden = false;
+  showMonth(entries.find(observation => observation.date.slice(0, 7) === previousMonth)
+    || entries.find(observation => observation.date.slice(0, 7) === data.latestDate?.slice(0, 7))
+    || entries.find(observation => Number(observation.date.slice(0, 4)) === currentYear && Number.isFinite(observation.reportedTotal)) || entries[0]);
+
+  const pointerPoint = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) * W / rect.width;
+    const y = (event.clientY - rect.top) * H / rect.height;
+    const nearest = plotPoints.reduce((best, point) => {
+      const distance = Math.hypot(point.x - x, point.y - y);
+      return !best || distance < best.distance ? { point, distance } : best;
+    }, null);
+    return { rect, x, y, nearest };
+  };
+  canvas.onpointermove = (event) => {
+    if (!tooltip) return;
+    const { rect, nearest } = pointerPoint(event);
+    if (!nearest || nearest.distance > 16) { tooltip.hidden = true; canvas.style.cursor = "crosshair"; return; }
+    canvas.style.cursor = "pointer";
+    tooltip.innerHTML = renderSeasonalityDetails(nearest.point.observation, true);
+    tooltip.hidden = false;
+    tooltip.style.left = `${Math.max(8, Math.min(rect.width - tooltip.offsetWidth - 8, event.clientX - rect.left + 12))}px`;
+    tooltip.style.top = `${Math.max(8, Math.min(rect.height - tooltip.offsetHeight - 8, event.clientY - rect.top + 12))}px`;
+  };
+  canvas.onpointerleave = () => { if (tooltip) tooltip.hidden = true; };
+  canvas.onclick = (event) => {
+    const { x, nearest } = pointerPoint(event);
+    const month = Math.max(1, Math.min(12, Math.floor((x - pad.left) / cW * 12) + 1));
+    showMonth(nearest?.distance <= 16 ? nearest.point.observation : monthAt(currentYear, month));
+    if (tooltip) tooltip.hidden = true;
+  };
 }
 
 // ============================================================
