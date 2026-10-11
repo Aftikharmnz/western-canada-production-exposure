@@ -23,17 +23,18 @@
     "last_attempt_at": "2026-10-11T07:36:57+00:00"
   },
   "infrastructure": {
-    "checked_at": "2026-10-04T14:19:33+00:00",
-    "raw_archive_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/releases/tag/elt-raw-37208720056-1",
-    "last_data_update": "2026-10-04T14:19:33+00:00",
+    "checked_at": "2026-10-11T08:49:57+00:00",
+    "raw_archive_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/releases/tag/elt-raw-38126102063-1",
+    "last_data_update": "2026-10-11T08:49:57+00:00",
     "status": "degraded",
-    "run_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/37208720056",
+    "run_url": "https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/38126102063",
     "warnings": [
+      "railways.geojson: upstream refresh unavailable; validated existing layer retained.",
       "9 reference sources need review; reviewed facts retain their original verification dates."
     ],
     "latest_actual_date": "2026-08-31",
     "default_date": "2026-06-30",
     "execution_mode": "online",
-    "last_attempt_at": "2026-10-04T14:19:33+00:00"
+    "last_attempt_at": "2026-10-11T08:49:57+00:00"
   }
 }
