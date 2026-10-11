@@ -1,0 +1,143 @@
+{
+  "retrieved_at": "2026-10-11T05:24:18.880795+00:00",
+  "records": [
+    {
+      "address": "3804 Tramore Pointe Parkway, Austell, GA 30106",
+      "source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=3804+Tramore+Pointe+Parkway%2C+Austell%2C+GA+30106",
+      "response": {
+        "result": {
+          "input": {
+            "address": {
+              "address": "3804 Tramore Pointe Parkway, Austell, GA 30106"
+            },
+            "benchmark": {
+              "isDefault": true,
+              "benchmarkDescription": "Public Address Ranges - Current Benchmark",
+              "id": "4",
+              "benchmarkName": "Public_AR_Current"
+            }
+          },
+          "addressMatches": [
+            {
+              "tigerLine": {
+                "side": "R",
+                "tigerLineId": "629752427"
+              },
+              "coordinates": {
+                "x": -84.62361956341,
+                "y": 33.861555002471
+              },
+              "addressComponents": {
+                "zip": "30106",
+                "streetName": "TRAMORE POINTE",
+                "preType": "",
+                "city": "AUSTELL",
+                "preDirection": "",
+                "suffixDirection": "",
+                "fromAddress": "3800",
+                "state": "GA",
+                "suffixType": "PKWY",
+                "toAddress": "3898",
+                "suffixQualifier": "",
+                "preQualifier": ""
+              },
+              "matchedAddress": "3804 TRAMORE POINTE PKWY, AUSTELL, GA, 30106"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "7720 Mount Holly Road, Charlotte, NC 28214",
+      "source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=7720+Mount+Holly+Road%2C+Charlotte%2C+NC+28214",
+      "response": {
+        "result": {
+          "input": {
+            "address": {
+              "address": "7720 Mount Holly Road, Charlotte, NC 28214"
+            },
+            "benchmark": {
+              "isDefault": true,
+              "benchmarkDescription": "Public Address Ranges - Current Benchmark",
+              "id": "4",
+              "benchmarkName": "Public_AR_Current"
+            }
+          },
+          "addressMatches": [
+            {
+              "tigerLine": {
+                "side": "L",
+                "tigerLineId": "70549791"
+              },
+              "coordinates": {
+                "x": -80.935683240806,
+                "y": 35.27967969821
+              },
+              "addressComponents": {
+                "zip": "28214",
+                "streetName": "MOUNT HOLLY",
+                "preType": "",
+                "city": "CHARLOTTE",
+                "preDirection": "",
+                "suffixDirection": "",
+                "fromAddress": "7898",
+                "state": "NC",
+                "suffixType": "RD",
+                "toAddress": "7700",
+                "suffixQualifier": "",
+                "preQualifier": ""
+              },
+              "matchedAddress": "7720 MOUNT HOLLY RD, CHARLOTTE, NC, 28214"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "4227 Cromwell Road, Chattanooga, TN 37421",
+      "source_url": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=Public_AR_Current&format=json&address=4227+Cromwell+Road%2C+Chattanooga%2C+TN+37421",
+      "response": {
+        "result": {
+          "input": {
+            "address": {
+              "address": "4227 Cromwell Road, Chattanooga, TN 37421"
+            },
+            "benchmark": {
+              "isDefault": true,
+              "benchmarkDescription": "Public Address Ranges - Current Benchmark",
+              "id": "4",
+              "benchmarkName": "Public_AR_Current"
+            }
+          },
+          "addressMatches": [
+            {
+              "tigerLine": {
+                "side": "L",
+                "tigerLineId": "605434353"
+              },
+              "coordinates": {
+                "x": -85.199900767803,
+                "y": 35.066540133219
+              },
+              "addressComponents": {
+                "zip": "37421",
+                "streetName": "CROMWELL",
+                "preType": "",
+                "city": "CHATTANOOGA",
+                "preDirection": "",
+                "suffixDirection": "",
+                "fromAddress": "4117",
+                "state": "TN",
+                "suffixType": "RD",
+                "toAddress": "4253",
+                "suffixQualifier": "",
+                "preQualifier": ""
+              },
+              "matchedAddress": "4227 CROMWELL RD, CHATTANOOGA, TN, 37421"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

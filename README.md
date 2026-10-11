@@ -4,6 +4,10 @@ An interactive map of production, pipelines, rail and terminals, refineries, wil
 
 Hover over a pipeline for its name or regulatory identifier, product types, published capacity, origin, and destination. Click or tap to keep the card open and follow its source links. Grouped routes list component capacities separately; AER feeders show when capacity or a commercial name is not published. Product types describe the pipeline's service, not a live batch. See the [reviewed pipeline facts](docs/PIPELINE_ROUTE_FACTS.md) for dates, capacity definitions, and source limitations.
 
+**Market Pipes** separates U.S. refined-product networks by their published operator and pipeline names, including Buckeye and Colonial. Search narrows the route menu while preserving selected routes on the map. Original inventory identities, operator reviews and route-geometry sources are separate; a hosted service edit does not prove a new pipeline survey.
+
+**Rail & Storage** includes terminal and crude, refined-product and NGL storage filters. Search by facility, operator or place, then choose a result to locate it and open its source card. Solid points have an identity reviewed against an operator source; faint points retain inventory records awaiting current verification. Each card distinguishes source dates, identity reviews and coordinate evidence. Market-hub markers identify approximate areas rather than individual tank farms. Facility coverage remains incomplete. See the [terminal and storage audit](docs/TERMINAL_STORAGE_AUDIT_2026_10.md) for inventory scope and exclusions.
+
 Production history separates reported amounts from reporting availability. Solid lines show months covered by the selected sources and product streams; hollow grey points show partial or unverified reported subtotals. Missing observations leave gaps in current and previous years and in the historical range. Inspect a month by clicking a point, using the month selector, or opening the monthly table to see unavailable sources and their latest reporting dates. The main timeline and current-date breakdown also label partial reporting.
 
 A missing asset record does not establish zero production. Explicit reported zeros remain zero; the app does not estimate missing production or carry older amounts forward. Source coverage and asset observation counts are separate: some official well imports omit zero rows, so a source can cover a month while individual selected assets have no observation. Historical amounts remain available with an unverified label if their reporting metadata cannot load.
@@ -73,7 +77,7 @@ Open `http://localhost:8766/index.src.html` for the source interface, or `/` to 
 
 ```powershell
 node --check src/main.js
-node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs scripts/test_production_reporting.cjs
+node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs scripts/test_production_reporting.cjs scripts/test_infrastructure_ui.cjs
 python -m unittest discover -s scripts -p 'test_*.py'
 python scripts/validate_production_data.py
 python scripts/validate_infrastructure_layers.py
@@ -93,7 +97,7 @@ GitHub Pages deploys encrypted `index.html` from `main`. For HTML changes, edit 
 - Compact monthly files reference the matching `assets.json`. The asset table, month shards, manifest, seasonality, and geometry must be published together.
 - Gross stream sums can include the same material at multiple processing stages, such as bitumen and synthetic crude, or raw and finished NGLs. They measure selected activity, not net regional supply.
 - Refinery product outputs are utilization scenarios using supported configurations and reviewed capacities. Missing inputs remain unavailable. The independent EIA January 1 survey is not automatically joined to IIR plant identities or substituted for more recent operating-status evidence.
-- Named market-access routes use CER/EIA geometry where available and labelled approximations elsewhere. Optional EIA reference switches expose crude, product, and HGL networks. Railway service failures preserve the last validated geometry and remain visible as a limitation.
+- Named market-access routes use operator or regulator geometry where available and labelled approximations elsewhere. U.S. product routes retain individual published network identities; optional national references expose crude and HGL networks. Source-derived copies are labelled separately from original operator publications. Railway service failures preserve the last validated geometry and remain visible as a limitation.
 - Tariff rows preserve operator currencies, effective dates, included/additive charges, and document links. New or changed tariff/operator publications require factual review before their rates, ownership, or status replace the reviewed values. Rebuilding `scripts/build_market_access_tariffs.py` exports the reviewed snapshot; it does not by itself verify a new tariff document.
 
 The [production audit](docs/PRODUCTION_AUDIT.md), [infrastructure audit](docs/INFRASTRUCTURE_AUDIT_2026_09.md), [refinery methodology](docs/REFINERY_PRODUCTS_MODEL.md), and [application audit](docs/APP_AUDIT_2026_09.md) document the earlier audit and its corrections. Historical workbook descriptions in those audit reports are superseded by the ELT design above.

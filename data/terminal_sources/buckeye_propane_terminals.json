@@ -1,0 +1,168 @@
+{
+  "source_url": "https://gis.buckeye.com/hosting/rest/services/Hosted/PublicWebsiteData_PublicView/FeatureServer/4",
+  "retrieved_at": "2026-10-11T05:11:32.973023+00:00",
+  "metadata": {
+    "name": "BDL_Terminals",
+    "description": "",
+    "copyrightText": "",
+    "editingInfo": {
+      "lastEditDate": 1678121618310
+    },
+    "fields": [
+      {
+        "nullable": false,
+        "defaultValue": null,
+        "editable": false,
+        "length": 4,
+        "type": "esriFieldTypeOID",
+        "modelName": "OBJECTID",
+        "domain": null,
+        "name": "objectid",
+        "alias": "OBJECTID"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 38,
+        "type": "esriFieldTypeString",
+        "modelName": "eventid",
+        "domain": null,
+        "name": "eventid",
+        "alias": "EventID"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "name",
+        "domain": null,
+        "name": "name",
+        "alias": "Name"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 50,
+        "type": "esriFieldTypeString",
+        "modelName": "address",
+        "domain": null,
+        "name": "address",
+        "alias": "Address"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 50,
+        "type": "esriFieldTypeString",
+        "modelName": "address2",
+        "domain": null,
+        "name": "address2",
+        "alias": "Address2"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 50,
+        "type": "esriFieldTypeString",
+        "modelName": "city",
+        "domain": null,
+        "name": "city",
+        "alias": "City"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 10,
+        "type": "esriFieldTypeString",
+        "modelName": "state",
+        "domain": null,
+        "name": "state",
+        "alias": "State"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 10,
+        "type": "esriFieldTypeString",
+        "modelName": "zipcode",
+        "domain": null,
+        "name": "zipcode",
+        "alias": "Zipcode"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "products",
+        "domain": null,
+        "name": "products",
+        "alias": "Products"
+      }
+    ],
+    "serviceItemId": "d8f185cac65e4f219ca8e226b35c514e"
+  },
+  "data": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.44808199549149,
+            40.889924532646916
+          ],
+          "crs": null
+        },
+        "id": 6,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46750",
+          "eventid": "{30572fdb-1c42-449b-ab1a-82834f724e0e}",
+          "address": "226 E Hosler Rd",
+          "address2": null,
+          "city": "Huntington",
+          "name": "Huntington (BDL)",
+          "state": "IN",
+          "objectid": 6,
+          "products": "Propane"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.35443332798923,
+            39.79537866376514
+          ],
+          "crs": null
+        },
+        "id": 7,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "61953",
+          "eventid": "{6c552287-1acf-4085-967d-e1f3d0bd39f5}",
+          "address": "965 N Country Rd, Hwy 610 East",
+          "address2": null,
+          "city": "Tuscola",
+          "name": "Tuscola (BDL)",
+          "state": "IL",
+          "objectid": 7,
+          "products": "Propane"
+        }
+      }
+    ],
+    "type": "FeatureCollection",
+    "properties": {
+      "exceededTransferLimit": false
+    }
+  }
+}

@@ -1,0 +1,1019 @@
+{
+  "source_url": "https://maps-cartes.ec.gc.ca/arcgis/rest/services/STB_DGST/NPRI/MapServer/0",
+  "retrieved_at": "2026-10-11T05:11:32.973023+00:00",
+  "metadata": {
+    "name": "Location of 2024 NPRI facilities",
+    "description": "",
+    "copyrightText": "",
+    "editingInfo": null,
+    "fields": [
+      {
+        "name": "ReportYear",
+        "type": "esriFieldTypeInteger",
+        "alias": "Report Year",
+        "domain": null
+      },
+      {
+        "name": "NpriID",
+        "type": "esriFieldTypeInteger",
+        "alias": "Npri ID",
+        "domain": null
+      },
+      {
+        "name": "CompanyName",
+        "type": "esriFieldTypeString",
+        "alias": "Company Name",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "FacilityName",
+        "type": "esriFieldTypeString",
+        "alias": "Facility Name",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "Address1",
+        "type": "esriFieldTypeString",
+        "alias": "Address",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "City",
+        "type": "esriFieldTypeString",
+        "alias": "City",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "ProvinceCode",
+        "type": "esriFieldTypeString",
+        "alias": "Province",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "PostalZip",
+        "type": "esriFieldTypeString",
+        "alias": "Postal/Zip",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "Latitude",
+        "type": "esriFieldTypeDouble",
+        "alias": "Latitude",
+        "domain": null
+      },
+      {
+        "name": "Longitude",
+        "type": "esriFieldTypeDouble",
+        "alias": "Longitude",
+        "domain": null
+      },
+      {
+        "name": "NAICS__Code_SCIAN",
+        "type": "esriFieldTypeInteger",
+        "alias": "NAICS",
+        "domain": null
+      },
+      {
+        "name": "SectorDescriptionEn",
+        "type": "esriFieldTypeString",
+        "alias": "Sector",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "CensusDivisionEn",
+        "type": "esriFieldTypeString",
+        "alias": "Census Division",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "CensusSubdivisionEn",
+        "type": "esriFieldTypeString",
+        "alias": "Census Subdivision",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "CensusMetropolitanAreaEn",
+        "type": "esriFieldTypeString",
+        "alias": "Census Metropolitan Area",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "EconomicRegionEn",
+        "type": "esriFieldTypeString",
+        "alias": "Economic Region",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "ForwardSortationArea",
+        "type": "esriFieldTypeString",
+        "alias": "Forward Sortation Area",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "EcozoneEnglish",
+        "type": "esriFieldTypeString",
+        "alias": "Ecozone",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "NameEN",
+        "type": "esriFieldTypeString",
+        "alias": "Major Drainage Area",
+        "length": 8000,
+        "domain": null
+      },
+      {
+        "name": "OBJECTID_1",
+        "type": "esriFieldTypeOID",
+        "alias": "OBJECTID",
+        "domain": null
+      },
+      {
+        "name": "SHAPE",
+        "type": "esriFieldTypeGeometry",
+        "alias": "SHAPE",
+        "domain": null
+      }
+    ],
+    "serviceItemId": null
+  },
+  "data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.13361490967529,
+            53.81720702781412
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 5287,
+          "CompanyName": "Pembina Pipeline Corporation",
+          "FacilityName": "Redwater Fractionation and Storage Facility",
+          "Address1": null,
+          "City": "Redwater",
+          "ProvinceCode": "AB",
+          "Latitude": 53.8172,
+          "Longitude": -113.1336
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.16451489311916,
+            53.746907020586974
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 698,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Fort Saskatchewan Plant",
+          "Address1": null,
+          "City": "Fort Saskatchewan",
+          "ProvinceCode": "AB",
+          "Latitude": 53.7469,
+          "Longitude": -113.1645
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.14991489326867,
+            53.75750702274047
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 4142,
+          "CompanyName": "Plains Midstream Canada ULC",
+          "FacilityName": "Fort Saskatchewan Storage and Fractionation",
+          "Address1": "11010 125 Street",
+          "City": "Fort Saskatchewan",
+          "ProvinceCode": "AB",
+          "Latitude": 53.7575,
+          "Longitude": -113.1499
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.12132488615677,
+            53.75791702596597
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 35422,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Keyera KAPS-FSCS Terminal 13-18",
+          "Address1": null,
+          "City": "Fort Saskatchewan",
+          "ProvinceCode": "AB",
+          "Latitude": 53.75791,
+          "Longitude": -113.12131
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -130.29596810834053,
+            54.2355648258752
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 33002,
+          "CompanyName": "Pembina Pipeline Corporation",
+          "FacilityName": "Prince Rupert Terminal",
+          "Address1": null,
+          "City": "Prince Rupert",
+          "ProvinceCode": "BC",
+          "Latitude": 54.23556,
+          "Longitude": -130.29595
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.49181486503466,
+            53.44410696367557
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 18972,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Edmonton Terminal",
+          "Address1": "1680 102nd Avenue",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.4441,
+          "Longitude": -113.4918
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.34841487564323,
+            53.57370698866028
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 23575,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Alberta Diluent / Crude Terminal (ADT/ACT)",
+          "Address1": "850 Hayter Road",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.5737,
+          "Longitude": -113.3484
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -116.87345593432013,
+            54.41237660152889
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 24183,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Fox Creek Terminal",
+          "Address1": "144 4th Avenue Southwest",
+          "City": "Calgary",
+          "ProvinceCode": "AB",
+          "Latitude": 54.41237,
+          "Longitude": -116.87344
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.24560705728786,
+            48.37100875564424
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6604,
+          "CompanyName": "Suncor Energy Products Partnership",
+          "FacilityName": "Thunder Bay Terminal",
+          "Address1": "300 106th Street",
+          "City": "Thunder Bay",
+          "ProvinceCode": "ON",
+          "Latitude": 48.371,
+          "Longitude": -89.2456
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -123.94974555050713,
+            49.18639550888197
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6606,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Nanaimo Terminal",
+          "Address1": "1605 Stewart Avenue",
+          "City": "Nanaimo",
+          "ProvinceCode": "BC",
+          "Latitude": 49.18639,
+          "Longitude": -123.94973
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.34961486826,
+            53.55069698648842
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6566,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Edmonton Terminal",
+          "Address1": "801 Petroleum Way",
+          "City": "Sherwood Park",
+          "ProvinceCode": "AB",
+          "Latitude": 53.55069,
+          "Longitude": -113.3496
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.3716448741545,
+            53.5516769844898
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 21533,
+          "CompanyName": "Gibson Energy Inc.",
+          "FacilityName": "Edmonton South Terminal",
+          "Address1": "10534 17 Street Northwest",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.55167,
+          "Longitude": -113.37163
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -106.7058128334189,
+            52.11460763247658
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6612,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Saskatoon Terminal",
+          "Address1": "2230 11th Street West",
+          "City": "Saskatoon",
+          "ProvinceCode": "SK",
+          "Latitude": 52.1146,
+          "Longitude": -106.7058
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -128.58031799602492,
+            54.513005063715646
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6610,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Terrace Terminal",
+          "Address1": "4420 Keith Avenue",
+          "City": "Terrace",
+          "ProvinceCode": "BC",
+          "Latitude": 54.513,
+          "Longitude": -128.5803
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -107.52281286484933,
+            51.48360749328948
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6614,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Milden Pipeline Terminal",
+          "Address1": null,
+          "City": "Milden",
+          "ProvinceCode": "SK",
+          "Latitude": 51.4836,
+          "Longitude": -107.5228
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -120.43151539802703,
+            50.71130599045352
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6616,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Kamloops Terminal",
+          "Address1": "2955 Tranquille Road",
+          "City": "Kamloops",
+          "ProvinceCode": "BC",
+          "Latitude": 50.7113,
+          "Longitude": -120.4315
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -68.51001011261097,
+            48.47524982313448
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6602,
+          "CompanyName": "Suncor Enery Products Partenership ",
+          "FacilityName": "Rimouski Terminal",
+          "Address1": "9 Lebrun",
+          "City": "Rimouski",
+          "ProvinceCode": "QC",
+          "Latitude": 48.47524,
+          "Longitude": -68.51001
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.73000347093999,
+            43.390108522480595
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 3901,
+          "CompanyName": "Suncor Energy Products Partnership",
+          "FacilityName": "Oakville South Terminal",
+          "Address1": "3275 Rebecca Street",
+          "City": "Oakville",
+          "ProvinceCode": "ON",
+          "Latitude": 43.3901,
+          "Longitude": -79.73
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.1658038917097,
+            43.02120838941888
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 7278,
+          "CompanyName": "Suncor Energy Products Partnership",
+          "FacilityName": "London Terminal",
+          "Address1": "2080 Oxford Street East",
+          "City": "London",
+          "ProvinceCode": "ON",
+          "Latitude": 43.0212,
+          "Longitude": -81.1658
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.71900233709466,
+            45.326609038067396
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6600,
+          "CompanyName": "Suncor Energy Products Partnership",
+          "FacilityName": "Ottawa Terminal",
+          "Address1": "1985 Merivale Road",
+          "City": "Nepean",
+          "ProvinceCode": "ON",
+          "Latitude": 45.3266,
+          "Longitude": -75.719
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.31703486882792,
+            53.57214699194014
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 26384,
+          "CompanyName": "Pembina Pipeline Corporation",
+          "FacilityName": "Edmonton N. Terminal",
+          "Address1": "1704-2004 Yellowhead Trail NE",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.57214,
+          "Longitude": -113.31702
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.41635427097611,
+            42.89978830629662
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 11890,
+          "CompanyName": "Pembina Pipeline Corporation",
+          "FacilityName": "Corunna Storage Facility",
+          "Address1": "4391 40 Highway",
+          "City": "Corunna",
+          "ProvinceCode": "ON",
+          "Latitude": 42.89978,
+          "Longitude": -82.41635
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.50813162341431,
+            45.61264917619946
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 34554,
+          "CompanyName": "Suncor Energy Products Partnership",
+          "FacilityName": "Terminal Montreal-Est (TME)",
+          "Address1": "9980 Notre-Dame Street East",
+          "City": "Montreal",
+          "ProvinceCode": "QC",
+          "Latitude": 45.61264,
+          "Longitude": -73.50813
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.36141486822656,
+            53.542806984737126
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 22904,
+          "CompanyName": "PKM Canada Terminals GP ULC",
+          "FacilityName": "Edmonton North 40 Terminal",
+          "Address1": "1680 101A Highway",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.5428,
+          "Longitude": -113.3614
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.36303486470828,
+            53.53021698373348
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 30905,
+          "CompanyName": "PKM Canada Rail Holdings GP Limited",
+          "FacilityName": "Base Line Terminal",
+          "Address1": "1155 92nd Avenue",
+          "City": "Sherwood Park",
+          "ProvinceCode": "AB",
+          "Latitude": 53.53021,
+          "Longitude": -113.36302
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.35076488003286,
+            53.5840769885113
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 26389,
+          "CompanyName": "Pembina Pipeline Corporation",
+          "FacilityName": "Cloverbar Terminal NE/4 17",
+          "Address1": "Meridian Street Northeast",
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.58407,
+          "Longitude": -113.35075
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -117.79791581177444,
+            53.54310644571771
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6907,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Edmonton Terminal",
+          "Address1": null,
+          "City": "Edmonton",
+          "ProvinceCode": "AB",
+          "Latitude": 53.5431,
+          "Longitude": -117.7979
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -111.47581571066804,
+            56.98140740391276
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6902,
+          "CompanyName": "Enbridge Pipelines (Athabasca) Inc.",
+          "FacilityName": "Athabasca Terminal",
+          "Address1": "63 Highway",
+          "City": "Fort McMurray",
+          "ProvinceCode": "AB",
+          "Latitude": 56.9814,
+          "Longitude": -111.4758
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -111.20611406891332,
+            52.58810717439226
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6910,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Hardisty Terminal",
+          "Address1": null,
+          "City": "Hardisty",
+          "ProvinceCode": "AB",
+          "Latitude": 52.5881,
+          "Longitude": -111.2061
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -98.11170981473111,
+            49.116408159195686
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6909,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Gretna Terminal (Tanks 113 and 116)",
+          "Address1": null,
+          "City": "Gretna",
+          "ProvinceCode": "MB",
+          "Latitude": 49.1164,
+          "Longitude": -98.1117
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.59771186611816,
+            50.476907702845985
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6924,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Regina Terminal",
+          "Address1": "439 9 Avenue North",
+          "City": "Regina",
+          "ProvinceCode": "SK",
+          "Latitude": 50.4769,
+          "Longitude": -104.5977
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -110.93821528858456,
+            56.272707433320825
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 21263,
+          "CompanyName": "Enbridge Pipelines (Athabasca) Inc.",
+          "FacilityName": "Cheecham Terminal",
+          "Address1": null,
+          "City": "Fort McMurray",
+          "ProvinceCode": "AB",
+          "Latitude": 56.2727,
+          "Longitude": -110.9382
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -110.73831490149018,
+            55.39310740738894
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6915,
+          "CompanyName": "Enbridge Pipelines (Athabasca) Inc.",
+          "FacilityName": "Kirby Lake Terminal",
+          "Address1": null,
+          "City": "Conklin",
+          "ProvinceCode": "AB",
+          "Latitude": 55.3931,
+          "Longitude": -110.7383
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -101.0810107641394,
+            49.73330796315695
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6905,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Cromer Terminal",
+          "Address1": null,
+          "City": "Cromer",
+          "ProvinceCode": "MB",
+          "Latitude": 49.7333,
+          "Longitude": -101.081
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.35250425456248,
+            42.94050831740391
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6925,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Sarnia Terminal",
+          "Address1": "1010 Plank Road",
+          "City": "Sarnia",
+          "ProvinceCode": "ON",
+          "Latitude": 42.9405,
+          "Longitude": -82.3525
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.09100358037377,
+            43.3285084949728
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 6929,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Westover Terminal",
+          "Address1": null,
+          "City": "Westover",
+          "ProvinceCode": "ON",
+          "Latitude": 43.3285,
+          "Longitude": -80.091
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -113.12063488415704,
+            53.749337025669355
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 29517,
+          "CompanyName": "Keyera Corp",
+          "FacilityName": "Josephburg Rail Terminal",
+          "Address1": "12310 River Road",
+          "City": "Fort Saskatchewan",
+          "ProvinceCode": "AB",
+          "Latitude": 53.74933,
+          "Longitude": -113.12062
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.88436840849137,
+            49.27958563646885
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 3905,
+          "CompanyName": "Suncor Energy Inc.",
+          "FacilityName": "Burrard Products Terminal",
+          "Address1": "1155 Glenayre Drive",
+          "City": "Port Moody",
+          "ProvinceCode": "BC",
+          "Latitude": 49.27958,
+          "Longitude": -122.884353
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -109.03139334070968,
+            51.86884736340912
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 34753,
+          "CompanyName": "Enbridge Pipelines Inc.",
+          "FacilityName": "Kerrobert Terminal",
+          "Address1": "1 Pipeline RD Road",
+          "City": "Kerrobert",
+          "ProvinceCode": "SK",
+          "Latitude": 51.86884,
+          "Longitude": -109.03138
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -111.27351410108868,
+            52.63990717015712
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 21534,
+          "CompanyName": "Gibson Energy Inc.",
+          "FacilityName": "Hardisty Terminal",
+          "Address1": null,
+          "City": "Hardisty",
+          "ProvinceCode": "AB",
+          "Latitude": 52.6399,
+          "Longitude": -111.2735
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -111.18359007907542,
+            52.63960918013304
+          ]
+        },
+        "properties": {
+          "ReportYear": 2024,
+          "NpriID": 32940,
+          "CompanyName": "Gibson Energy Inc.",
+          "FacilityName": "Hardisty Diluent Recovery Unit",
+          "Address1": "5040 49 Street",
+          "City": "Hardisty",
+          "ProvinceCode": "AB",
+          "Latitude": 52.639602,
+          "Longitude": -111.183576
+        }
+      }
+    ]
+  }
+}

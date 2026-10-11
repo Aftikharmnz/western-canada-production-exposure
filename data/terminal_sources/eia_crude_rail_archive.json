@@ -1,0 +1,2251 @@
+{
+  "source_url": "https://services.arcgis.com/8df8p0NlLFEShl0r/ArcGIS/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer/0",
+  "retrieved_at": "2026-10-11T05:11:32.973023+00:00",
+  "metadata": {
+    "name": "CrudeOil_RailTerminals_US_EIA",
+    "description": "",
+    "copyrightText": "",
+    "editingInfo": {
+      "lastEditDate": 1776266350641,
+      "schemaLastEditDate": 1776266350641,
+      "dataLastEditDate": 1768411563500
+    },
+    "fields": [
+      {
+        "name": "FID",
+        "type": "esriFieldTypeOID",
+        "actualType": "int",
+        "alias": "FID",
+        "sqlType": "sqlTypeInteger",
+        "nullable": false,
+        "editable": false,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "Site_Name",
+        "type": "esriFieldTypeString",
+        "actualType": "nvarchar",
+        "alias": "Site_Name",
+        "sqlType": "sqlTypeNVarchar",
+        "length": 254,
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "CITY",
+        "type": "esriFieldTypeString",
+        "actualType": "nvarchar",
+        "alias": "CITY",
+        "sqlType": "sqlTypeNVarchar",
+        "length": 254,
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "STATE",
+        "type": "esriFieldTypeString",
+        "actualType": "nvarchar",
+        "alias": "STATE",
+        "sqlType": "sqlTypeNVarchar",
+        "length": 254,
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "FACILITY_T",
+        "type": "esriFieldTypeString",
+        "actualType": "nvarchar",
+        "alias": "FACILITY_T",
+        "sqlType": "sqlTypeNVarchar",
+        "length": 254,
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "HANDLING",
+        "type": "esriFieldTypeString",
+        "actualType": "nvarchar",
+        "alias": "HANDLING",
+        "sqlType": "sqlTypeNVarchar",
+        "length": 254,
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "LONGITUDE",
+        "type": "esriFieldTypeDouble",
+        "actualType": "float",
+        "alias": "LONGITUDE",
+        "sqlType": "sqlTypeFloat",
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      },
+      {
+        "name": "LATITUDE",
+        "type": "esriFieldTypeDouble",
+        "actualType": "float",
+        "alias": "LATITUDE",
+        "sqlType": "sqlTypeFloat",
+        "nullable": true,
+        "editable": true,
+        "domain": null,
+        "defaultValue": null
+      }
+    ],
+    "serviceItemId": "6dc1c02ed2e44d72805848a2faef9493"
+  },
+  "data": {
+    "type": "FeatureCollection",
+    "crs": {
+      "type": "name",
+      "properties": {
+        "name": "EPSG:4326"
+      }
+    },
+    "features": [
+      {
+        "type": "Feature",
+        "id": 1,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.558467,
+            35.452639
+          ]
+        },
+        "properties": {
+          "FID": 1,
+          "Site_Name": "Agnew Crude Terminal",
+          "CITY": "Oklahoma City",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -97.558467,
+          "LATITUDE": 35.452639
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 2,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.763952,
+            42.6180160000001
+          ]
+        },
+        "properties": {
+          "FID": 2,
+          "Site_Name": "Albany Terminal",
+          "CITY": "Albany",
+          "STATE": "NY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -73.763952,
+          "LATITUDE": 42.618016
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 3,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -118.923088,
+            35.2939860000001
+          ]
+        },
+        "properties": {
+          "FID": 3,
+          "Site_Name": "Bakersfield Refinery",
+          "CITY": "Bakersfield",
+          "STATE": "CA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -118.923088,
+          "LATITUDE": 35.293986
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 4,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.87868,
+            46.865796
+          ]
+        },
+        "properties": {
+          "FID": 4,
+          "Site_Name": "Bakken Oil Express",
+          "CITY": "Dickinson",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.87868,
+          "LATITUDE": 46.865796
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 5,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.301703,
+            46.871807
+          ]
+        },
+        "properties": {
+          "FID": 5,
+          "Site_Name": "BakkenLink Rail Hub",
+          "CITY": "Fryburg",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.301703,
+          "LATITUDE": 46.871807
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 6,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.5661059999999,
+            39.229793
+          ]
+        },
+        "properties": {
+          "FID": 6,
+          "Site_Name": "Baltimore Transload Terminal",
+          "CITY": "Baltimore",
+          "STATE": "MD",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -76.566106,
+          "LATITUDE": 39.229793
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 7,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -101.168489,
+            31.128338
+          ]
+        },
+        "properties": {
+          "FID": 7,
+          "Site_Name": "Barnhart Terminal",
+          "CITY": "Barnhart",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -101.168489,
+          "LATITUDE": 31.128338
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 8,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -101.747016,
+            47.2661350000001
+          ]
+        },
+        "properties": {
+          "FID": 8,
+          "Site_Name": "Basin Transload (aka Zap Terminal)",
+          "CITY": "Beulah",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -101.747016,
+          "LATITUDE": 47.266135
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 9,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -91.1786549999999,
+            30.4826790000001
+          ]
+        },
+        "properties": {
+          "FID": 9,
+          "Site_Name": "Baton Rouge Refinery",
+          "CITY": "Baton Rouge",
+          "STATE": "LA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -91.178655,
+          "LATITUDE": 30.482679
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 10,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.2144489999999,
+            40.637193
+          ]
+        },
+        "properties": {
+          "FID": 10,
+          "Site_Name": "Bayway Refinery",
+          "CITY": "Bayway",
+          "STATE": "NJ",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -74.214449,
+          "LATITUDE": 40.637193
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 11,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.222349,
+            40.8260770000001
+          ]
+        },
+        "properties": {
+          "FID": 11,
+          "Site_Name": "Bayway Refinery",
+          "CITY": "Linden",
+          "STATE": "NJ",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -74.222349,
+          "LATITUDE": 40.826077
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 12,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.119383,
+            40.119106
+          ]
+        },
+        "properties": {
+          "FID": 12,
+          "Site_Name": "Black Run Rail Facility",
+          "CITY": "Frazeysburg",
+          "STATE": "OH",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -82.119383,
+          "LATITUDE": 40.119106
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 13,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -105.235549,
+            43.7053370000001
+          ]
+        },
+        "properties": {
+          "FID": 13,
+          "Site_Name": "Black Thunder Terminal",
+          "CITY": "Gillette",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -105.235549,
+          "LATITUDE": 43.705337
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 14,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.3876459999999,
+            25.9582290000001
+          ]
+        },
+        "properties": {
+          "FID": 14,
+          "Site_Name": "Brownsville Terminal",
+          "CITY": "Brownsville",
+          "STATE": "TX",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -97.387646,
+          "LATITUDE": 25.958229
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 15,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -106.439314,
+            42.933343
+          ]
+        },
+        "properties": {
+          "FID": 15,
+          "Site_Name": "Casper Crude to Rail Terminal",
+          "CITY": "Casper",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -106.439314,
+          "LATITUDE": 42.933343
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 16,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.224586,
+            32.421656
+          ]
+        },
+        "properties": {
+          "FID": 16,
+          "Site_Name": "Centane Rail Loading Terminal",
+          "CITY": "Carlsbad",
+          "STATE": "NM",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.224586,
+          "LATITUDE": 32.421656
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 17,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.1964179999999,
+            41.4078050000001
+          ]
+        },
+        "properties": {
+          "FID": 17,
+          "Site_Name": "Channahon Terminal",
+          "CITY": "Lorenzo",
+          "STATE": "IL",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Loading",
+          "LONGITUDE": -88.196418,
+          "LATITUDE": 41.407805
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 18,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.720725,
+            48.8873150000001
+          ]
+        },
+        "properties": {
+          "FID": 18,
+          "Site_Name": "Cherry Point Terminal",
+          "CITY": "Ferndale",
+          "STATE": "WA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -122.720725,
+          "LATITUDE": 48.887315
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 19,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.795326,
+            41.1325120000001
+          ]
+        },
+        "properties": {
+          "FID": 19,
+          "Site_Name": "Cheyenne Crude Terminal",
+          "CITY": "Cheyenne",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.795326,
+          "LATITUDE": 41.132512
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 20,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.853452,
+            41.0952160000001
+          ]
+        },
+        "properties": {
+          "FID": 20,
+          "Site_Name": "Cheyenne Logistics Hub",
+          "CITY": "Cheyenne",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.853452,
+          "LATITUDE": 41.095216
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 21,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.060509,
+            30.770067
+          ]
+        },
+        "properties": {
+          "FID": 21,
+          "Site_Name": "Chickasaw Terminal",
+          "CITY": "Chickasaw",
+          "STATE": "AL",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -88.060509,
+          "LATITUDE": 30.770067
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 22,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.349807,
+            48.276864
+          ]
+        },
+        "properties": {
+          "FID": 22,
+          "Site_Name": "COLT Hub",
+          "CITY": "Epping",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.349807,
+          "LATITUDE": 48.276864
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 23,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.741362,
+            48.8884560000001
+          ]
+        },
+        "properties": {
+          "FID": 23,
+          "Site_Name": "Columbus Terminal",
+          "CITY": "Columbus",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.741362,
+          "LATITUDE": 48.888456
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 24,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.454215,
+            27.8118680000001
+          ]
+        },
+        "properties": {
+          "FID": 24,
+          "Site_Name": "Corpus Christi Refinery",
+          "CITY": "Corpus Christi",
+          "STATE": "TX",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -97.454215,
+          "LATITUDE": 27.811868
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 25,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -109.914496,
+            40.3055820000001
+          ]
+        },
+        "properties": {
+          "FID": 25,
+          "Site_Name": "Crescent Point - Unita",
+          "CITY": "Uinta Basin",
+          "STATE": "UT",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -109.914496,
+          "LATITUDE": 40.305582
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 26,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.628877,
+            39.591123
+          ]
+        },
+        "properties": {
+          "FID": 26,
+          "Site_Name": "Delaware City Refinery",
+          "CITY": "Delaware City",
+          "STATE": "DE",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -75.628877,
+          "LATITUDE": 39.591123
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 27,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -105.335841,
+            42.677872
+          ]
+        },
+        "properties": {
+          "FID": 27,
+          "Site_Name": "Douglas Rail Facility",
+          "CITY": "Douglas",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -105.335841,
+          "LATITUDE": 42.677872
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 28,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.2206839999999,
+            28.523877
+          ]
+        },
+        "properties": {
+          "FID": 28,
+          "Site_Name": "Eagle Ford Crude Terminal",
+          "CITY": "Cotulla",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -99.220684,
+          "LATITUDE": 28.523877
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 29,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.625037,
+            40.2362620000001
+          ]
+        },
+        "properties": {
+          "FID": 29,
+          "Site_Name": "Eddystone Rail Facility",
+          "CITY": "Eddystone",
+          "STATE": "PA",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -75.625037,
+          "LATITUDE": 40.236262
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 30,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -92.675744,
+            33.198787
+          ]
+        },
+        "properties": {
+          "FID": 30,
+          "Site_Name": "El Dorado Refinery",
+          "CITY": "El Dorado",
+          "STATE": "AR",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -92.675744,
+          "LATITUDE": 33.198787
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 31,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -101.737007,
+            48.313384
+          ]
+        },
+        "properties": {
+          "FID": 31,
+          "Site_Name": "Enbridge Berthold",
+          "CITY": "Berthold",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -101.737007,
+          "LATITUDE": 48.313384
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 32,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.079956,
+            46.1186740000001
+          ]
+        },
+        "properties": {
+          "FID": 32,
+          "Site_Name": "Enserco Gascoyne",
+          "CITY": "Gascoyne",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.079956,
+          "LATITUDE": 46.118674
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 33,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.698848,
+            48.8313660000001
+          ]
+        },
+        "properties": {
+          "FID": 33,
+          "Site_Name": "Ferndale Refinery",
+          "CITY": "Ferndale",
+          "STATE": "WA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -122.698848,
+          "LATITUDE": 48.831366
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 34,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -108.426332,
+            35.490332
+          ]
+        },
+        "properties": {
+          "FID": 34,
+          "Site_Name": "Gallup Refinery",
+          "CITY": "Gallup",
+          "STATE": "NM",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -108.426332,
+          "LATITUDE": 35.490332
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 35,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -91.037095,
+            30.2117010000001
+          ]
+        },
+        "properties": {
+          "FID": 35,
+          "Site_Name": "Geismar Facility",
+          "CITY": "Riverside",
+          "STATE": "LA",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -91.037095,
+          "LATITUDE": 30.211701
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 36,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -95.193123,
+            29.7552900000001
+          ]
+        },
+        "properties": {
+          "FID": 36,
+          "Site_Name": "Greens Port Industrial Park",
+          "CITY": "Houston",
+          "STATE": "TX",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -95.193123,
+          "LATITUDE": 29.75529
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 37,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.736957,
+            42.27095
+          ]
+        },
+        "properties": {
+          "FID": 37,
+          "Site_Name": "Guernsey Terminal",
+          "CITY": "Guernsey",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.736957,
+          "LATITUDE": 42.27095
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 38,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.749473,
+            36.234581
+          ]
+        },
+        "properties": {
+          "FID": 38,
+          "Site_Name": "Hayti Terminal",
+          "CITY": "Hayti",
+          "STATE": "MO",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Loading",
+          "LONGITUDE": -89.749473,
+          "LATITUDE": 36.234581
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 39,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -110.871,
+            39.7040000000001
+          ]
+        },
+        "properties": {
+          "FID": 39,
+          "Site_Name": "Helper Crude Terminal",
+          "CITY": "Helper",
+          "STATE": "UT",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -110.871,
+          "LATITUDE": 39.704
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 40,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.611,
+            33.2005
+          ]
+        },
+        "properties": {
+          "FID": 40,
+          "Site_Name": "Hunt Refinery",
+          "CITY": "Tuscaloosa",
+          "STATE": "AL",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -87.611,
+          "LATITUDE": 33.2005
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 41,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -94.07773,
+            30.0755560000001
+          ]
+        },
+        "properties": {
+          "FID": 41,
+          "Site_Name": "Jefferson Transload Railport",
+          "CITY": "Beaumont",
+          "STATE": "TX",
+          "FACILITY_T": "Barge, Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -94.07773,
+          "LATITUDE": 30.075556
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 42,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.821151,
+            26.160445
+          ]
+        },
+        "properties": {
+          "FID": 42,
+          "Site_Name": "La Feria Terminal",
+          "CITY": "La Feria",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -97.821151,
+          "LATITUDE": 26.160445
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 43,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -92.943711,
+            30.2397050000001
+          ]
+        },
+        "properties": {
+          "FID": 43,
+          "Site_Name": "Lacassine Rail Facility",
+          "CITY": "Lacassine",
+          "STATE": "LA",
+          "FACILITY_T": "Barge, Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -92.943711,
+          "LATITUDE": 30.239705
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 44,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.2702849999999,
+            30.2425740000001
+          ]
+        },
+        "properties": {
+          "FID": 44,
+          "Site_Name": "Lake Charles Refinery",
+          "CITY": "Lake Charles",
+          "STATE": "LA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -93.270285,
+          "LATITUDE": 30.242574
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 45,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -118.257706,
+            33.745255
+          ]
+        },
+        "properties": {
+          "FID": 45,
+          "Site_Name": "Long Beach Refinery",
+          "CITY": "Long Beach",
+          "STATE": "CA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -118.257706,
+          "LATITUDE": 33.745255
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 46,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.549802,
+            48.313998
+          ]
+        },
+        "properties": {
+          "FID": 46,
+          "Site_Name": "Manitou Rail Facility",
+          "CITY": "Ross",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.549802,
+          "LATITUDE": 48.313998
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 47,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -98.3030229999999,
+            29.233296
+          ]
+        },
+        "properties": {
+          "FID": 47,
+          "Site_Name": "Mission Rail Park",
+          "CITY": "Elmendorf",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -98.303023,
+          "LATITUDE": 29.233296
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 48,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0344879999999,
+            30.708428
+          ]
+        },
+        "properties": {
+          "FID": 48,
+          "Site_Name": "Mobile Terminal",
+          "CITY": "Mobile",
+          "STATE": "AL",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -88.034488,
+          "LATITUDE": 30.708428
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 49,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.915443,
+            31.5910870000001
+          ]
+        },
+        "properties": {
+          "FID": 49,
+          "Site_Name": "Monahans Terminal",
+          "CITY": "Monahans",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.915443,
+          "LATITUDE": 31.591087
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 50,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.23232,
+            48.3372820000001
+          ]
+        },
+        "properties": {
+          "FID": 50,
+          "Site_Name": "Mountrail Terminal",
+          "CITY": "Palermo",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.23232,
+          "LATITUDE": 48.337282
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 51,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.0306,
+            47.9194340000001
+          ]
+        },
+        "properties": {
+          "FID": 51,
+          "Site_Name": "Musket Terminal",
+          "CITY": "Dore",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.0306,
+          "LATITUDE": 47.919434
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 52,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -91.4348239999999,
+            31.532582
+          ]
+        },
+        "properties": {
+          "FID": 52,
+          "Site_Name": "Natchez Terminal",
+          "CITY": "Natchez",
+          "STATE": "MS",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading, Unloading",
+          "LONGITUDE": -91.434824,
+          "LATITUDE": 31.532582
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 53,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.395908,
+            32.8435900000001
+          ]
+        },
+        "properties": {
+          "FID": 53,
+          "Site_Name": "Navajo Refinery",
+          "CITY": "Artesia",
+          "STATE": "NM",
+          "FACILITY_T": "Rail, Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -104.395908,
+          "LATITUDE": 32.84359
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 54,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -94.004262,
+            29.9886910000001
+          ]
+        },
+        "properties": {
+          "FID": 54,
+          "Site_Name": "Nederland Terminal",
+          "CITY": "Nederland",
+          "STATE": "TX",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -94.004262,
+          "LATITUDE": 29.988691
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 55,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.870771,
+            40.885405
+          ]
+        },
+        "properties": {
+          "FID": 55,
+          "Site_Name": "Niobrara Crude Terminal",
+          "CITY": "Carr",
+          "STATE": "CO",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.870771,
+          "LATITUDE": 40.885405
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 56,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.035518,
+            47.859342
+          ]
+        },
+        "properties": {
+          "FID": 56,
+          "Site_Name": "Northstar Transloading",
+          "CITY": "Fairview",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.035518,
+          "LATITUDE": 47.859342
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 57,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.311385,
+            31.8712310000001
+          ]
+        },
+        "properties": {
+          "FID": 57,
+          "Site_Name": "Odessa Railport",
+          "CITY": "Odessa",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.311385,
+          "LATITUDE": 31.871231
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 58,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.335074,
+            31.832931
+          ]
+        },
+        "properties": {
+          "FID": 58,
+          "Site_Name": "Odessa Terminal",
+          "CITY": "Odessa",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.335074,
+          "LATITUDE": 31.832931
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 59,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -98.3124549999999,
+            36.120776
+          ]
+        },
+        "properties": {
+          "FID": 59,
+          "Site_Name": "Okeene Terminal",
+          "CITY": "Okeene",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading, Unloading",
+          "LONGITUDE": -98.312455,
+          "LATITUDE": 36.120776
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 60,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.396399,
+            35.450183
+          ]
+        },
+        "properties": {
+          "FID": 60,
+          "Site_Name": "Oklahoma City Terminal",
+          "CITY": "Midwest City",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -97.396399,
+          "LATITUDE": 35.450183
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 61,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.962455,
+            29.8484950000001
+          ]
+        },
+        "properties": {
+          "FID": 61,
+          "Site_Name": "Omniport",
+          "CITY": "Port Arthur",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -93.962455,
+          "LATITUDE": 29.848495
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 62,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.2277779999999,
+            39.846389
+          ]
+        },
+        "properties": {
+          "FID": 62,
+          "Site_Name": "Paulsboro Asphalt Refinery",
+          "CITY": "Paulsboro",
+          "STATE": "NJ",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -75.227778,
+          "LATITUDE": 39.846389
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 63,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.518388,
+            31.4167130000001
+          ]
+        },
+        "properties": {
+          "FID": 63,
+          "Site_Name": "Pecos Valley Terminal",
+          "CITY": "Pecos",
+          "STATE": "TX",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.518388,
+          "LATITUDE": 31.416713
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 64,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.198889,
+            39.9200000000001
+          ]
+        },
+        "properties": {
+          "FID": 64,
+          "Site_Name": "Philadelphia Energy Solutions Refinery",
+          "CITY": "Philadelphia",
+          "STATE": "PA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -75.198889,
+          "LATITUDE": 39.92
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 65,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.473219,
+            47.977584
+          ]
+        },
+        "properties": {
+          "FID": 65,
+          "Site_Name": "Pioneer Terminal",
+          "CITY": "New Town",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.473219,
+          "LATITUDE": 47.977584
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 66,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.405496,
+            30.3140480000001
+          ]
+        },
+        "properties": {
+          "FID": 66,
+          "Site_Name": "Port Manchac Terminal",
+          "CITY": "Port Manchac",
+          "STATE": "LA",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -90.405496,
+          "LATITUDE": 30.314048
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 67,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -101.301316,
+            48.234156
+          ]
+        },
+        "properties": {
+          "FID": 67,
+          "Site_Name": "Port of Minot",
+          "CITY": "Minot",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -101.301316,
+          "LATITUDE": 48.234156
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 68,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.9975689999999,
+            30.001138
+          ]
+        },
+        "properties": {
+          "FID": 68,
+          "Site_Name": "Port of New Orleans",
+          "CITY": "New Orleans",
+          "STATE": "LA",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -89.997569,
+          "LATITUDE": 30.001138
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 69,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.689374,
+            45.661305
+          ]
+        },
+        "properties": {
+          "FID": 69,
+          "Site_Name": "Port of Vancouver",
+          "CITY": "Port of Vancouver",
+          "STATE": "WA",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -122.689374,
+          "LATITUDE": 45.661305
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 70,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -70.285835,
+            43.6391640000001
+          ]
+        },
+        "properties": {
+          "FID": 70,
+          "Site_Name": "Portland Maine Terminal",
+          "CITY": "Portland",
+          "STATE": "ME",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -70.285835,
+          "LATITUDE": 43.639164
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 71,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.513559,
+            32.589793
+          ]
+        },
+        "properties": {
+          "FID": 71,
+          "Site_Name": "Princeton Refinery",
+          "CITY": "Princeton",
+          "STATE": "LA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -93.513559,
+          "LATITUDE": 32.589793
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 72,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.601216,
+            48.145883
+          ]
+        },
+        "properties": {
+          "FID": 72,
+          "Site_Name": "Red River Terminal",
+          "CITY": "Williston",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.601216,
+          "LATITUDE": 48.145883
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 73,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.008883,
+            31.816832
+          ]
+        },
+        "properties": {
+          "FID": 73,
+          "Site_Name": "Rogers Lacy Refinery",
+          "CITY": "Sandersville",
+          "STATE": "MS",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -89.008883,
+          "LATITUDE": 31.816832
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 74,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -110.789599,
+            39.5891330000001
+          ]
+        },
+        "properties": {
+          "FID": 74,
+          "Site_Name": "Savage Energy Terminal",
+          "CITY": "Price",
+          "STATE": "UT",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -110.789599,
+          "LATITUDE": 39.589133
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 75,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -111.908821,
+            40.7895750000001
+          ]
+        },
+        "properties": {
+          "FID": 75,
+          "Site_Name": "Savage Energy Terminal",
+          "CITY": "Salt Lake City",
+          "STATE": "UT",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -111.908821,
+          "LATITUDE": 40.789575
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 76,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -103.83397,
+            48.0700640000001
+          ]
+        },
+        "properties": {
+          "FID": 76,
+          "Site_Name": "Savage Terminal",
+          "CITY": "Trenton",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -103.83397,
+          "LATITUDE": 48.070064
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 77,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.6508039999999,
+            35.289969
+          ]
+        },
+        "properties": {
+          "FID": 77,
+          "Site_Name": "Sayre Terminal",
+          "CITY": "Sayre",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -99.650804,
+          "LATITUDE": 35.289969
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 78,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.7896239999999,
+            32.4627870000001
+          ]
+        },
+        "properties": {
+          "FID": 78,
+          "Site_Name": "Shreveport Refinery",
+          "CITY": "Shreveport",
+          "STATE": "LA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -93.789624,
+          "LATITUDE": 32.462787
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 79,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -118.186185,
+            33.956311
+          ]
+        },
+        "properties": {
+          "FID": 79,
+          "Site_Name": "South Gate Refinery",
+          "CITY": "South Gate",
+          "STATE": "CA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -118.186185,
+          "LATITUDE": 33.956311
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 80,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.331739,
+            29.938517
+          ]
+        },
+        "properties": {
+          "FID": 80,
+          "Site_Name": "St Rose Terminal",
+          "CITY": "St Rose",
+          "STATE": "LA",
+          "FACILITY_T": "Barge",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -90.331739,
+          "LATITUDE": 29.938517
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 81,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.3897249999999,
+            29.998515
+          ]
+        },
+        "properties": {
+          "FID": 81,
+          "Site_Name": "St. Charles Refinery",
+          "CITY": "Norco",
+          "STATE": "LA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -90.389725,
+          "LATITUDE": 29.998515
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 82,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.846796,
+            30.0286370000001
+          ]
+        },
+        "properties": {
+          "FID": 82,
+          "Site_Name": "St. James Rail Terminal",
+          "CITY": "St. James",
+          "STATE": "LA",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading, Unloading",
+          "LONGITUDE": -90.846796,
+          "LATITUDE": 30.028637
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 83,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -92.998339,
+            44.851278
+          ]
+        },
+        "properties": {
+          "FID": 83,
+          "Site_Name": "St. Paul Park Refining Co",
+          "CITY": "St. Paul",
+          "STATE": "MN",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -92.998339,
+          "LATITUDE": 44.851278
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 84,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.347177,
+            48.3352850000001
+          ]
+        },
+        "properties": {
+          "FID": 84,
+          "Site_Name": "Stanley Terminal",
+          "CITY": "Stanley",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.347177,
+          "LATITUDE": 48.335285
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 85,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -96.651551,
+            35.7410580000001
+          ]
+        },
+        "properties": {
+          "FID": 85,
+          "Site_Name": "Stroud Terminal",
+          "CITY": "Stroud",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -96.651551,
+          "LATITUDE": 35.741058
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 86,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.44163,
+            35.471575
+          ]
+        },
+        "properties": {
+          "FID": 86,
+          "Site_Name": "Sunnylane Crude Terminal",
+          "CITY": "Oklahoma City",
+          "STATE": "OK",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -97.44163,
+          "LATITUDE": 35.471575
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 87,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -122.405871,
+            47.263564
+          ]
+        },
+        "properties": {
+          "FID": 87,
+          "Site_Name": "Tacoma Refinery",
+          "CITY": "Tacoma",
+          "STATE": "WA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -122.405871,
+          "LATITUDE": 47.263564
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 88,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.45896,
+            40.136038
+          ]
+        },
+        "properties": {
+          "FID": 88,
+          "Site_Name": "Tampa Rail Facility",
+          "CITY": "Tampa",
+          "STATE": "CO",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.45896,
+          "LATITUDE": 40.136038
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 89,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.91642,
+            48.3946950000001
+          ]
+        },
+        "properties": {
+          "FID": 89,
+          "Site_Name": "Tioga Rail Terminal",
+          "CITY": "Tioga",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.91642,
+          "LATITUDE": 48.394695
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 90,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.506722,
+            41.63061
+          ]
+        },
+        "properties": {
+          "FID": 90,
+          "Site_Name": "Toledo Refinery",
+          "CITY": "Toledo",
+          "STATE": "OH",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -83.506722,
+          "LATITUDE": 41.63061
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 91,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.628369,
+            44.0975100000001
+          ]
+        },
+        "properties": {
+          "FID": 91,
+          "Site_Name": "Upton Logistic Center",
+          "CITY": "Upton",
+          "STATE": "WY",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -104.628369,
+          "LATITUDE": 44.09751
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 92,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -102.490128,
+            47.981391
+          ]
+        },
+        "properties": {
+          "FID": 92,
+          "Site_Name": "Van Hook Crude Terminal",
+          "CITY": "New Town",
+          "STATE": "ND",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Loading",
+          "LONGITUDE": -102.490128,
+          "LATITUDE": 47.981391
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 93,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.506558,
+            30.8792720000001
+          ]
+        },
+        "properties": {
+          "FID": 93,
+          "Site_Name": "Walnut Hill Crude Oil Rail Unloading Facility",
+          "CITY": "Walnut Hill",
+          "STATE": "FL",
+          "FACILITY_T": "Terminal",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -87.506558,
+          "LATITUDE": 30.879272
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 94,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -118.233836,
+            33.7798770000001
+          ]
+        },
+        "properties": {
+          "FID": 94,
+          "Site_Name": "Wilmington Refinery",
+          "CITY": "Wilmington",
+          "STATE": "CA",
+          "FACILITY_T": "Refinery",
+          "HANDLING": "Unloading",
+          "LONGITUDE": -118.233836,
+          "LATITUDE": 33.779877
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 95,
+        "geometry": null,
+        "properties": {
+          "FID": 95,
+          "Site_Name": " ",
+          "CITY": " ",
+          "STATE": " ",
+          "FACILITY_T": " ",
+          "HANDLING": " ",
+          "LONGITUDE": 0,
+          "LATITUDE": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 96,
+        "geometry": null,
+        "properties": {
+          "FID": 96,
+          "Site_Name": " ",
+          "CITY": " ",
+          "STATE": " ",
+          "FACILITY_T": " ",
+          "HANDLING": " ",
+          "LONGITUDE": 0,
+          "LATITUDE": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 97,
+        "geometry": null,
+        "properties": {
+          "FID": 97,
+          "Site_Name": " ",
+          "CITY": " ",
+          "STATE": " ",
+          "FACILITY_T": " ",
+          "HANDLING": " ",
+          "LONGITUDE": 0,
+          "LATITUDE": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 98,
+        "geometry": null,
+        "properties": {
+          "FID": 98,
+          "Site_Name": " ",
+          "CITY": " ",
+          "STATE": " ",
+          "FACILITY_T": " ",
+          "HANDLING": " ",
+          "LONGITUDE": 0,
+          "LATITUDE": 0
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 99,
+        "geometry": null,
+        "properties": {
+          "FID": 99,
+          "Site_Name": " ",
+          "CITY": " ",
+          "STATE": " ",
+          "FACILITY_T": " ",
+          "HANDLING": " ",
+          "LONGITUDE": 0,
+          "LATITUDE": 0
+        }
+      }
+    ]
+  },
+  "item_metadata": {
+    "id": "6dc1c02ed2e44d72805848a2faef9493",
+    "owner": "priho011_UMN",
+    "ownerId": "43bdf1fa7c18451384953b247989d639",
+    "orgId": "8df8p0NlLFEShl0r",
+    "created": 1740753147000,
+    "modified": 1776266352000,
+    "guid": null,
+    "name": null,
+    "title": "CrudeOil_RailTerminals_US_EIA_3340393128070186484",
+    "type": "Feature Service",
+    "typeKeywords": [
+      "ArcGIS Server",
+      "Data",
+      "Feature Access",
+      "Feature Service",
+      "Metadata",
+      "Service",
+      "Singlelayer",
+      "Hosted Service"
+    ],
+    "description": null,
+    "tags": [
+      "crude oil",
+      "rail",
+      "terminals",
+      "petroleum",
+      "energy",
+      "infrastructure",
+      "United States"
+    ],
+    "snippet": "Rail terminals that handle loading and unloading of crude oil. Created by EIA using publicly available data. Includes all rail terminals with activity between 2017 and 2018.",
+    "thumbnail": "thumbnail/thumbnail.JPEG",
+    "documentation": null,
+    "extent": [
+      [
+        -122.72072499999996,
+        25.95822900000007
+      ],
+      [
+        -70.28583499999996,
+        48.888456000000076
+      ]
+    ],
+    "categories": [],
+    "spatialReference": "102100",
+    "accessInformation": null,
+    "classification": null,
+    "licenseInfo": "<DIV STYLE=\"text-align:Left;\"><DIV><DIV><P><SPAN><SPAN>The U.S. Energy Information Administration shall not be held liable for improper or incorrect use of the data described and/or contained herein. These data and related graphics, if available, are not legal documents and are not intended to be used as such. The information contained in these data is dynamic and may change over time. The U.S. Energy Information Administration gives no warranty, expressed or implied, as to the accuracy, reliability, or completeness of these data.</SPAN></SPAN></P><P><SPAN /></P></DIV></DIV></DIV>",
+    "culture": "en-us",
+    "properties": null,
+    "advancedSettings": null,
+    "url": "https://services.arcgis.com/8df8p0NlLFEShl0r/arcgis/rest/services/CrudeOil_RailTerminals_US_EIA_3340393128070186484/FeatureServer",
+    "proxyFilter": null,
+    "access": "public",
+    "size": 81920,
+    "subInfo": 0,
+    "appCategories": [],
+    "industries": [],
+    "languages": [],
+    "largeThumbnail": null,
+    "banner": null,
+    "screenshots": [],
+    "listed": false,
+    "commentsEnabled": true,
+    "numComments": 0,
+    "numRatings": 0,
+    "avgRating": 0,
+    "numViews": 662,
+    "scoreCompleteness": 83,
+    "groupDesignations": null,
+    "apiToken1ExpirationDate": -1,
+    "apiToken2ExpirationDate": -1,
+    "lastViewed": 1791694800000
+  },
+  "query_parameters": {
+    "where": "1=1",
+    "outFields": "*",
+    "outSR": 4326,
+    "f": "geojson"
+  }
+}

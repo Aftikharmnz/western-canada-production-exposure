@@ -1,10 +1,10 @@
 # Reviewed pipeline hover facts
 
-Reviewed **11 September 2026**. `data/pipeline_route_facts.json` covers the exact 24 market-route IDs in `scripts/build_market_access_pipelines.py`. The builder validates the file and joins each record as `properties.pipeline_details`; it does not derive capacities from map geometry.
+Core route facts reviewed **11 September 2026**; named U.S. product identities reviewed **10 October 2026**. `data/pipeline_route_facts.json` covers the 23 core market-route IDs in `scripts/build_market_access_pipelines.py`, plus a separate `product_networks` section of reviewed named-product overrides. The builder validates the file and joins these records as `properties.pipeline_details`; it does not derive capacities from map geometry. Unreviewed dynamic product identities retain explicit unknown capacities/endpoints and no invented human review date. [The October network review](REFINED_PRODUCT_NETWORKS_2026_10.md) documents grouping, source copies and operator geometry.
 
 The records contain product, origin, destination, capacity value/basis/note, primary source links and review dates. Product describes the published transportation service, not a live batch. `capacity_kbbl_d` is thousands of barrels per day; the client multiplies by 1,000 for bbl/d. Null means unavailable or inapplicable, never zero.
 
-Eight records have a sourced numeric capacity, thirteen represent multiple lines or systems, and three have no verified current capacity in the reviewed primary sources. A grouped route can contain interconnected, parallel or unrelated lines; summing their ratings would be misleading. Component ratings are explained in the note where available.
+Eight core records have a sourced numeric capacity, twelve represent multiple lines or systems, and three have no verified current capacity in the reviewed primary sources. The separate Colonial override retains an explicitly dated 2025 system capacity. A grouped route can contain interconnected, parallel or unrelated lines; summing their ratings would be misleading. Component ratings are explained in the note where available.
 
 ## Capacity interpretation
 
@@ -32,7 +32,7 @@ Eight records have a sourced numeric capacity, thirteen represent multiple lines
 | Norman Wells / Zama | Historical 15 kbbl/d annual-average rating; no claim of current availability. | [Enbridge factsheet, page 26](https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6), [Imperial closure update](https://www.imperialoil.ca/en-ca/company/operations/norman-wells) |
 | Other CER liquid systems | Genesis and Montréal are unrelated networks with different products and capacities. | [CER Genesis](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/genesis), [CER Montréal](https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/montreal) |
 | U.S. crude-oil reference | National collection; capacity and endpoint fields absent. | [EIA crude GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Crude_Oil_Trunk_Pipelines_1/FeatureServer/0) |
-| U.S. products reference | National collection; capacity and endpoint fields absent. | [EIA products GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0) |
+| Named U.S. product networks | Exact publisher identities; unknown capacities/endpoints remain unknown. Operator-published Buckeye geometry and dated Colonial system disclosure are separately attributed. | [October identity/source review](REFINED_PRODUCT_NETWORKS_2026_10.md) |
 | U.S. HGL reference | National collection; capacity and endpoint fields absent. | [EIA HGL GIS schema](https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/Hydrocarbon_Gas_Liquids_Pipelines_1/FeatureServer/0) |
 
 ## Review decisions and source differences

@@ -1,0 +1,3343 @@
+{
+  "source_url": "https://gis.buckeye.com/hosting/rest/services/Hosted/PublicWebsiteData_PublicView/FeatureServer/1",
+  "retrieved_at": "2026-10-11T05:11:32.973023+00:00",
+  "metadata": {
+    "name": "Terminal",
+    "description": "",
+    "copyrightText": "",
+    "editingInfo": {
+      "lastEditDate": 1678121616231
+    },
+    "fields": [
+      {
+        "nullable": false,
+        "defaultValue": null,
+        "editable": false,
+        "length": 4,
+        "type": "esriFieldTypeOID",
+        "modelName": "OBJECTID",
+        "domain": null,
+        "name": "objectid",
+        "alias": "OBJECTID"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 50,
+        "type": "esriFieldTypeString",
+        "modelName": "eventid",
+        "domain": null,
+        "name": "eventid",
+        "alias": "EventID"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 50,
+        "type": "esriFieldTypeString",
+        "modelName": "name",
+        "domain": null,
+        "name": "name",
+        "alias": "Name"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "address",
+        "domain": null,
+        "name": "address",
+        "alias": "Address"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "address2",
+        "domain": null,
+        "name": "address2",
+        "alias": "Address2"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "city",
+        "domain": null,
+        "name": "city",
+        "alias": "City"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 6,
+        "type": "esriFieldTypeString",
+        "modelName": "state",
+        "domain": null,
+        "name": "state",
+        "alias": "State"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "zipcode",
+        "domain": null,
+        "name": "zipcode",
+        "alias": "Zipcode"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "type": "esriFieldTypeDouble",
+        "modelName": "capacity",
+        "domain": null,
+        "name": "capacity",
+        "alias": "Capacity"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "modality",
+        "domain": null,
+        "name": "modality",
+        "alias": "Modality"
+      },
+      {
+        "nullable": true,
+        "editable": true,
+        "defaultValue": null,
+        "length": 200,
+        "type": "esriFieldTypeString",
+        "modelName": "products",
+        "domain": null,
+        "name": "products",
+        "alias": "Products"
+      }
+    ],
+    "serviceItemId": "d8f185cac65e4f219ca8e226b35c514e"
+  },
+  "data": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.18048611249424,
+            40.52603747654799
+          ],
+          "crs": null
+        },
+        "id": 434,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "15108",
+          "eventid": null,
+          "address": "3324 University Blvd",
+          "modality": "Pipe, Truck",
+          "address2": null,
+          "city": "Coraopolis",
+          "name": "Coraopolis Terminal",
+          "state": "PA",
+          "objectid": 434,
+          "capacity": 702295,
+          "products": "ULSD, GASOLINE, JET FUEL, TRANSMIX, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.20812487642479,
+            31.54818882269186
+          ],
+          "crs": null
+        },
+        "id": 308,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "31707",
+          "eventid": "{e4e5447c-28cc-4e21-b959-a64464a08104}",
+          "address": "1722 W. Oakridge Drive",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Albany",
+          "name": "Albany Georgia Terminal",
+          "state": "GA",
+          "objectid": 308,
+          "capacity": 337500,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.83595541285769,
+            41.7628867672018
+          ],
+          "crs": null
+        },
+        "id": 309,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "60501",
+          "eventid": "{b48e91ac-1e5f-46e2-af29-6ef68064976b}",
+          "address": "8600 West 71st St",
+          "modality": "Rail, Truck, Pipe",
+          "address2": null,
+          "city": "Bedford Park",
+          "name": "Argo Terminal",
+          "state": "IL",
+          "objectid": 309,
+          "capacity": 993000,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.48518214267905,
+            33.80807618771893
+          ],
+          "crs": null
+        },
+        "id": 310,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "30318",
+          "eventid": "{f9111985-3b10-4795-9d24-c0ae6e9490d0}",
+          "address": "2970 Parrott Avenue NW",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Atlanta",
+          "name": "Atlanta Terminal",
+          "state": "GA",
+          "objectid": 310,
+          "capacity": 283000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.5848197125884,
+            39.21238793523484
+          ],
+          "crs": null
+        },
+        "id": 311,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "21226",
+          "eventid": "{9a441ea4-da56-4fce-8ab7-3232ced0963c}",
+          "address": "6200 Pennington Ave",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Baltimore",
+          "name": "Baltimore Terminal",
+          "state": "MD",
+          "objectid": 311,
+          "capacity": 3232000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, FUEL OIL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -68.78004997182977,
+            44.78152318996243
+          ],
+          "crs": null
+        },
+        "id": 312,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "04401",
+          "eventid": "{cb5c16f7-2346-4473-a661-f76c3f1355a1}",
+          "address": "730 Lower Main St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Bangor",
+          "name": "Bangor Terminal",
+          "state": "ME",
+          "objectid": 312,
+          "capacity": 140000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09296004970929,
+            40.65227549655447
+          ],
+          "crs": null
+        },
+        "id": 313,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "07002",
+          "eventid": "{d8f9358f-578a-402f-b1a3-3fbc75f30768}",
+          "address": "420 Hook Rd",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Bayonne",
+          "name": "Bayonne Terminal",
+          "state": "NJ",
+          "objectid": 313,
+          "capacity": 1686000,
+          "products": "ULSD, #6 OIL BLENDSTOCK, DISTILLATE BLENDSTOCK"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -78.75951612985432,
+            26.513813375231248
+          ],
+          "crs": null
+        },
+        "id": 314,
+        "type": "Feature",
+        "properties": {
+          "zipcode": null,
+          "eventid": "{d35dde75-fa80-4675-9a13-ad451d606da2}",
+          "address": "West Sunrise Highway",
+          "modality": "Marine",
+          "address2": null,
+          "city": "Freeport",
+          "name": "BBH Terminal",
+          "state": "GB",
+          "objectid": 314,
+          "capacity": 26176000,
+          "products": "GASOLINE, GASOLINE COMPONENTS, DISTILLATE, CRUDE, FUEL OIL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.49212044864005,
+            34.554466807534716
+          ],
+          "crs": null
+        },
+        "id": 315,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "29627",
+          "eventid": "{fc8d0114-2714-4310-b1d7-39598649e93a}",
+          "address": "14033 Hwy 20",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Belton",
+          "name": "Belton Terminal",
+          "state": "SC",
+          "objectid": 315,
+          "capacity": 298000,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.48875435036275,
+            41.523302897848176
+          ],
+          "crs": null
+        },
+        "id": 316,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "52722",
+          "eventid": "{9f5303a1-08bb-4349-bcfa-c0ec25c03efc}",
+          "address": "75 South 31st St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Bettendorf",
+          "name": "Bettendorf Terminal",
+          "state": "IA",
+          "objectid": 316,
+          "capacity": 237000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.85131597084344,
+            33.475596740788866
+          ],
+          "crs": null
+        },
+        "id": 317,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "35211",
+          "eventid": "{01163c76-8b98-4668-8426-95bb1d076dd8}",
+          "address": "1600 Mims Ave SW",
+          "modality": "Truck Pipe",
+          "address2": null,
+          "city": "Birmingham",
+          "name": "Birmingham Terminal",
+          "state": "AL",
+          "objectid": 317,
+          "capacity": 438000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.87264923317761,
+            33.45905100350867
+          ],
+          "crs": null
+        },
+        "id": 318,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "35211",
+          "eventid": "{2a4bd194-19f5-4ac1-8c25-489c49c8c42f}",
+          "address": "2400 Nabors Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Birmingham",
+          "name": "Birmingham South Terminal",
+          "state": "AL",
+          "objectid": 318,
+          "capacity": 290000,
+          "products": "GASOLINE, ULSD, ETHANOL , JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.14436730887543,
+            43.24378165312482
+          ],
+          "crs": null
+        },
+        "id": 319,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "13029",
+          "eventid": "{82c81616-6aea-48ad-9c8b-f3720441698b}",
+          "address": "777 River Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Brewerton",
+          "name": "Brewerton Terminal",
+          "state": "NY",
+          "objectid": 319,
+          "capacity": 388000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.90354042112729,
+            40.80441227767852
+          ],
+          "crs": null
+        },
+        "id": 320,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "10455",
+          "eventid": "{bc604556-5b99-4149-8926-849ed3ec5c7b}",
+          "address": "1040 E 149th St",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Bronx",
+          "name": "Bronx Terminal",
+          "state": "NY",
+          "objectid": 320,
+          "capacity": 537000,
+          "products": "ULSD, ULSHO, BIODIESEL, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.35630945634219,
+            40.78961946053292
+          ],
+          "crs": null
+        },
+        "id": 323,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "44707",
+          "eventid": "{60d08d2e-7fb5-41cf-bb7d-ad0cf8a73bdb}",
+          "address": "807 Hartford Ave SE",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Canton",
+          "name": "Canton Terminal",
+          "state": "OH",
+          "objectid": 323,
+          "capacity": 179000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -91.63341934830666,
+            41.78307272885337
+          ],
+          "crs": null
+        },
+        "id": 324,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "52317",
+          "eventid": "{09d225c8-ed81-4ea5-9b5d-a96c23ecc137}",
+          "address": "2092 Hwy 965 NE",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "North Liberty",
+          "name": "Cedar Rapids Terminal",
+          "state": "IA",
+          "objectid": 324,
+          "capacity": 52000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.97037386590269,
+            32.88960939856425
+          ],
+          "crs": null
+        },
+        "id": 325,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "29405",
+          "eventid": "{536f20b7-075d-4698-8123-d79824dbc6be}",
+          "address": "5150 Virginia Ave",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "North Charleston",
+          "name": "Charleston Terminal",
+          "state": "SC",
+          "objectid": 325,
+          "capacity": 1169000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.92538853711984,
+            35.27940977923216
+          ],
+          "crs": null
+        },
+        "id": 326,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "28130",
+          "eventid": "{993538fd-889e-45f3-a49c-e79c0cbae4f8}",
+          "address": "7145 Old Mt. Holly Road",
+          "modality": "Truck , Pipe",
+          "address2": null,
+          "city": "Paw Creek",
+          "name": "Charlotte I Terminal",
+          "state": "NC",
+          "objectid": 326,
+          "capacity": 145126.47619,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.93981469725189,
+            35.28314440002317
+          ],
+          "crs": null
+        },
+        "id": 327,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "28214",
+          "eventid": "{bdd91f05-8ec7-41cb-8638-0956a3611a3b}",
+          "address": "7924 Mt. Holly Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Charlotte",
+          "name": "Charlotte II Terminal",
+          "state": "NC",
+          "objectid": 327,
+          "capacity": 298750.2619,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.19335368513065,
+            35.06902610808256
+          ],
+          "crs": null
+        },
+        "id": 328,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37416",
+          "eventid": "{9716d0d0-75a9-483d-99a4-91c962ecc8e0}",
+          "address": "4235 Jersey Pike",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Chattanooga",
+          "name": "Chattanooga I Terminal",
+          "state": "TN",
+          "objectid": 328,
+          "capacity": 146223.85714,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.19107662836194,
+            35.0710134438941
+          ],
+          "crs": null
+        },
+        "id": 329,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37416",
+          "eventid": "{c90bad2f-07f1-4358-8b52-e8e497d01213}",
+          "address": "4236 Jersey Pike",
+          "modality": "Truck, Pipe ",
+          "address2": null,
+          "city": "Chattanooga",
+          "name": "Chattanooga II Terminal",
+          "state": "TN",
+          "objectid": 329,
+          "capacity": 327005.66667,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.3001269469805,
+            36.78503637389051
+          ],
+          "crs": null
+        },
+        "id": 330,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "23324",
+          "eventid": "{2e4dbca3-bc4d-46a7-9023-1e2cdd53979a}",
+          "address": "4030 Buell St, Port Lock Station",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Chesapeake",
+          "name": "Chesapeake Terminal",
+          "state": "VA",
+          "objectid": 330,
+          "capacity": 1024000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.6433992399231,
+            39.090652628928254
+          ],
+          "crs": null
+        },
+        "id": 331,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "45233",
+          "eventid": "{5b9ac4aa-62c3-4f39-8161-7ad02f0b43ff}",
+          "address": "5150 River Rd",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Cincinnati",
+          "name": "Cincinnati Terminal",
+          "state": "OH",
+          "objectid": 331,
+          "capacity": 396000,
+          "products": "GASOLINE, ULSD, ETHANOL, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.68351000891785,
+            41.48768547151946
+          ],
+          "crs": null
+        },
+        "id": 332,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "44113",
+          "eventid": "{bd831703-e7c4-4ae5-85a4-2deea5c79c3a}",
+          "address": "2201 West 3rd St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Cleveland",
+          "name": "Cleveland Terminal",
+          "state": "OH",
+          "objectid": 332,
+          "capacity": 154000,
+          "products": "GASOLINE, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -78.83243914128883,
+            42.861956469542896
+          ],
+          "crs": null
+        },
+        "id": 322,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "14210",
+          "eventid": "{4de4f27e-3432-4ea8-9c75-27733ade4c3a}",
+          "address": "625 Elk St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Buffalo",
+          "name": "Buffalo Terminal",
+          "state": "NY",
+          "objectid": 322,
+          "capacity": 359000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL "
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.0947672108731,
+            39.96096754544288
+          ],
+          "crs": null
+        },
+        "id": 334,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "43204",
+          "eventid": "{c83c689f-9c34-4a71-a61f-c70314bee636}",
+          "address": "303 North Wilson Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Columbus",
+          "name": "Columbus South Terminal",
+          "state": "OH",
+          "objectid": 334,
+          "capacity": 309000,
+          "products": "GASOLINE, ULSD, ETHANOL , JET FUEL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -95.8312959894046,
+            41.21580125148773
+          ],
+          "crs": null
+        },
+        "id": 335,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "51501",
+          "eventid": "{fc9ac107-a8dc-4b86-835c-4c7b8fde90b2}",
+          "address": "829 Tank Farm Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Council Bluffs",
+          "name": "Council Bluffs Terminal",
+          "state": "IA",
+          "objectid": 335,
+          "capacity": 544000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.66033127910501,
+            41.42757393862401
+          ],
+          "crs": null
+        },
+        "id": 336,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "44125",
+          "eventid": "{b470f731-42ee-4e18-bbc3-d0d87783ed0d}",
+          "address": "4800 East 49th St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Cuyahoga Heights",
+          "name": "Cuyahoga Terminal",
+          "state": "OH",
+          "objectid": 336,
+          "capacity": 185000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.1605369377606,
+            39.78910062521025
+          ],
+          "crs": null
+        },
+        "id": 337,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "45404",
+          "eventid": "{69ff26ef-b18b-4d21-8dff-66398493acb1}",
+          "address": "801 Brandt Pike",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Dayton",
+          "name": "Dayton Terminal",
+          "state": "OH",
+          "objectid": 337,
+          "capacity": 162000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.30287884644484,
+            42.24484104550563
+          ],
+          "crs": null
+        },
+        "id": 338,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48180",
+          "eventid": "{a30721ab-6d52-42f9-871e-c150fbe02650}",
+          "address": "8503 Inkster Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Taylor",
+          "name": "Dearborn Terminal",
+          "state": "MI",
+          "objectid": 338,
+          "capacity": 258000,
+          "products": "JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.73364005389875,
+            41.60264322693844
+          ],
+          "crs": null
+        },
+        "id": 339,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "50325",
+          "eventid": "{fc49602f-fce5-4689-a800-6226ae360ed6}",
+          "address": "1501 NW 86th St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Des Moines",
+          "name": "Des Moines Terminal",
+          "state": "IA",
+          "objectid": 339,
+          "capacity": 381000,
+          "products": "GASOLINE, ULSD, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.14147117226344,
+            42.283631839191806
+          ],
+          "crs": null
+        },
+        "id": 340,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48217",
+          "eventid": "{d4787881-ea1a-4cbe-89e8-2d4246c3ef16}",
+          "address": "700 South Deacon St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Detroit",
+          "name": "Detroit Terminal",
+          "state": "MI",
+          "objectid": 340,
+          "capacity": 592000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.26377241357984,
+            33.917234764604615
+          ],
+          "crs": null
+        },
+        "id": 341,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "30360",
+          "eventid": "{a09a4b36-f418-4c88-b709-97a285ce63e5}",
+          "address": "4149 Winters Chapel Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Doraville",
+          "name": "Doraville I  Terminal",
+          "state": "GA",
+          "objectid": 341,
+          "capacity": 433185.66667,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.27304522728608,
+            33.91563824442559
+          ],
+          "crs": null
+        },
+        "id": 342,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "30360",
+          "eventid": "{1b6fe930-1ab8-4d32-9d43-42cecc87bd72}",
+          "address": "2797 Woodwin Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Doraville",
+          "name": "Doraville II Terminal",
+          "state": "GA",
+          "objectid": 342,
+          "capacity": 267052.19048,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.46635356679458,
+            41.64257825601276
+          ],
+          "crs": null
+        },
+        "id": 343,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46312",
+          "eventid": "{1f04c533-e338-4c5a-95e4-bf911a1c6721}",
+          "address": "400 East Columbus Dr",
+          "modality": "Truck, Pipe, Rail",
+          "address2": null,
+          "city": "East Chicago",
+          "name": "East Chicago Terminal",
+          "state": "IN",
+          "objectid": 343,
+          "capacity": 2558000,
+          "products": "RFG GASOLINE, CONV GASOLINE, ETHANOL, ULSD, JET, BIODIESEL, DILUENT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.51883356077494,
+            39.175452840787436
+          ],
+          "crs": null
+        },
+        "id": 344,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "62401",
+          "eventid": "{a5f237c0-f7e1-4be3-b5b6-9767e3ec3f2f}",
+          "address": "18264 US Hwy 45",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Effingham",
+          "name": "Effingham Terminal",
+          "state": "IL",
+          "objectid": 344,
+          "capacity": 113000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.2777030634765,
+            38.84744657814633
+          ],
+          "crs": null
+        },
+        "id": 345,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "22031",
+          "eventid": "{df8640f6-9c93-49d8-b819-7c40006ce08b}",
+          "address": "9601 Colonial Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Fairfax",
+          "name": "Fairfax Terminal",
+          "state": "VA",
+          "objectid": 345,
+          "capacity": 113000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.23165433828979,
+            43.08291710117519
+          ],
+          "crs": null
+        },
+        "id": 346,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "49456",
+          "eventid": "{26742e34-1b07-4cbb-8dd8-958139057350}",
+          "address": "17806 North Shore Drive",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Spring Lake",
+          "name": "Ferrysburg Terminal",
+          "state": "MI",
+          "objectid": 346,
+          "capacity": 315000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.67274696483626,
+            43.086248767441845
+          ],
+          "crs": null
+        },
+        "id": 347,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48505",
+          "eventid": "{87944595-8f60-4091-847a-edb7644aa6c9}",
+          "address": "5340 N Dort Hwy",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Flint",
+          "name": "Flint Terminal",
+          "state": "MI",
+          "objectid": 347,
+          "capacity": 273000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.12737666995304,
+            26.09768876953673
+          ],
+          "crs": null
+        },
+        "id": 348,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "33316",
+          "eventid": "{38b42177-6389-4c7d-bdda-b16c5d6da75f}",
+          "address": "1501 SE 20th Street",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Fort Lauderdale",
+          "name": "Fort Lauderdale Terminal",
+          "state": "FL",
+          "objectid": 348,
+          "capacity": 377000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.11531218645538,
+            41.75163486053702
+          ],
+          "crs": null
+        },
+        "id": 349,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46530",
+          "eventid": "{93097e2a-26fc-4947-a8c5-3a3c14bab3fd}",
+          "address": "12694 Adams Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Granger",
+          "name": "Granger Terminal",
+          "state": "IN",
+          "objectid": 349,
+          "capacity": 265000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.04651332444148,
+            43.182516334519036
+          ],
+          "crs": null
+        },
+        "id": 350,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "53224",
+          "eventid": "{7a6ed9ee-0f81-4349-b359-38cca0ec0484}",
+          "address": "9101 North 107th St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Milwaukee",
+          "name": "Granville Terminal",
+          "state": "WI",
+          "objectid": 350,
+          "capacity": 494000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.91934028445603,
+            36.072969065792016
+          ],
+          "crs": null
+        },
+        "id": 351,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "27409",
+          "eventid": "{4c874770-f858-4ca8-bbfe-0ec0322ca634}",
+          "address": "115-S Chimney Rock Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Greensboro",
+          "name": "Greensboro I Terminal",
+          "state": "NC",
+          "objectid": 351,
+          "capacity": 235371.07143,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.93280395815161,
+            36.08111156463032
+          ],
+          "crs": null
+        },
+        "id": 352,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "27409",
+          "eventid": "{92f581cb-6be0-4d0a-bcd7-5af95c6d8bda}",
+          "address": "7109 W. Market Street",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Greensboro",
+          "name": "Greensboro II Terminal",
+          "state": "NC",
+          "objectid": 352,
+          "capacity": 242703.97619,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.58300944128383,
+            40.28918275072081
+          ],
+          "crs": null
+        },
+        "id": 353,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "15601",
+          "eventid": "{0c5b79a8-a2be-494b-89ec-bbee752a8b22}",
+          "address": "134 BP Tank Lane",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Greensburg",
+          "name": "Greensburg Terminal",
+          "state": "PA",
+          "objectid": 353,
+          "capacity": 212000,
+          "products": "GASOLINE, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.07769186440463,
+            41.33686544393751
+          ],
+          "crs": null
+        },
+        "id": 354,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06340",
+          "eventid": "{93476832-f817-477a-bcdc-6f02ca939e26}",
+          "address": "443 Eastern Point Rd",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Groton",
+          "name": "Groton Terminal",
+          "state": "CT",
+          "objectid": 354,
+          "capacity": 867000,
+          "products": "ULSD, ULSHO"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.46667445669217,
+            41.60758176367643
+          ],
+          "crs": null
+        },
+        "id": 355,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46320",
+          "eventid": "{6dd47ce6-5ab4-4b0c-81c0-0e61d1d93ca4}",
+          "address": "2400 Michigan St",
+          "modality": "Rail, Truck, Pipe",
+          "address2": null,
+          "city": "Hammond",
+          "name": "Hammond Terminal",
+          "state": "IN",
+          "objectid": 355,
+          "capacity": 1700000,
+          "products": "Canadian Blendstock, Diluent, SUB,ULSD, P91,RBOB"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.10495724886445,
+            39.8515014040297
+          ],
+          "crs": null
+        },
+        "id": 356,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "62537",
+          "eventid": "{c3296a20-715c-427d-a8af-ffdff47aca39}",
+          "address": "600 East Lincoln Memorial Pkwy",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Harristown",
+          "name": "Harristown Terminal",
+          "state": "IL",
+          "objectid": 356,
+          "capacity": 136000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.4499908688787,
+            41.50615401167245
+          ],
+          "crs": null
+        },
+        "id": 357,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46375",
+          "eventid": "{8ab09ffd-e0b8-4b7f-87f8-a650a70f3759}",
+          "address": "36 Division St",
+          "modality": "Pipe",
+          "address2": null,
+          "city": "Schererville",
+          "name": "Hartsdale Terminal",
+          "state": "IN",
+          "objectid": 357,
+          "capacity": 1142000,
+          "products": "RFG GASOLINE, CONV GASOLINE, ETHANOL, ULSD"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.3331819568538,
+            39.809184032499594
+          ],
+          "crs": null
+        },
+        "id": 358,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46234",
+          "eventid": "{2d98f0cb-4d29-4449-a526-f256c06a00e5}",
+          "address": "10700 East County Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Indianapolis",
+          "name": "Indianapolis Terminal",
+          "state": "IN",
+          "objectid": 358,
+          "capacity": 190000,
+          "products": "JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.59672123966321,
+            30.418469781697283
+          ],
+          "crs": null
+        },
+        "id": 360,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "32226",
+          "eventid": "{35bdd932-57ee-4fe5-aa57-f6abcfdbc17f}",
+          "address": "2617 Zoo Pkwy",
+          "modality": "Rail, Truck, Marine",
+          "address2": null,
+          "city": "Jacksonville",
+          "name": "Jacksonville Terminal",
+          "state": "FL",
+          "objectid": 360,
+          "capacity": 646000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.92515699049014,
+            41.12241993815087
+          ],
+          "crs": null
+        },
+        "id": 361,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "60901",
+          "eventid": "{77e0adc6-c7cf-4b34-80cf-33fff5b1f11d}",
+          "address": "275 N 2750 West Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Kankakee",
+          "name": "Kankakee Terminal",
+          "state": "IL",
+          "objectid": 361,
+          "capacity": 177000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.00048931112272,
+            35.95987003452637
+          ],
+          "crs": null
+        },
+        "id": 362,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37921",
+          "eventid": "{776e76a0-9129-4ae6-8db6-fd1bc3bb7ef5}",
+          "address": "5101 Middlebrook Pike",
+          "modality": "Truck, Pipeline",
+          "address2": null,
+          "city": "Knoxville",
+          "name": "Knoxville I Terminal",
+          "state": "TN",
+          "objectid": 362,
+          "capacity": 114670.71429,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.99387140176336,
+            35.96202814160051
+          ],
+          "crs": null
+        },
+        "id": 363,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37921",
+          "eventid": "{03094881-3aa6-4109-b125-fcd4186062ca}",
+          "address": "4801 Middlebrook Pike",
+          "modality": "Truck, Pipeline",
+          "address2": null,
+          "city": "Knoxville",
+          "name": "Knoxville II Terminal",
+          "state": "TN",
+          "objectid": 363,
+          "capacity": 250651.28571,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.11839738639746,
+            40.72516180459394
+          ],
+          "crs": null
+        },
+        "id": 364,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "45804",
+          "eventid": "{d5719ed4-f973-441e-b25c-54b10e80f9d8}",
+          "address": "817 W Vine St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Lima",
+          "name": "Lima North Terminal",
+          "state": "OH",
+          "objectid": 364,
+          "capacity": 25000,
+          "products": "GASOLINE, ULSD, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.1314233694456,
+            40.71021382301052
+          ],
+          "crs": null
+        },
+        "id": 365,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "45804",
+          "eventid": "{95455343-eff4-4401-88c9-df5d2c443f25}",
+          "address": "1500 West Buckeye Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Lima",
+          "name": "Lima South Terminal",
+          "state": "OH",
+          "objectid": 365,
+          "capacity": 1165000,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.01980725599672,
+            41.305558110849404
+          ],
+          "crs": null
+        },
+        "id": 366,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "44044",
+          "eventid": "{eabd3cf4-a435-4207-804a-999e5ef3dbf4}",
+          "address": "12545 S Avon-Beldon Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Grafton",
+          "name": "Lorain Terminal",
+          "state": "OH",
+          "objectid": 366,
+          "capacity": 150000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.8321786248895,
+            38.23213019402202
+          ],
+          "crs": null
+        },
+        "id": 367,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "40211",
+          "eventid": "{fb627635-c195-41b7-8970-90edc02093a6}",
+          "address": "1500 Southwestern Pkwy",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Louisville",
+          "name": "Louisville Terminal",
+          "state": "KY",
+          "objectid": 367,
+          "capacity": 214000,
+          "products": "RFG GASOLINE, CONV GASOLINE, ETHANOL, ULSD"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.49854969501581,
+            42.187895085596416
+          ],
+          "crs": null
+        },
+        "id": 368,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "01056",
+          "eventid": "{d283d1b6-3c69-42d2-a391-a65f441e3880}",
+          "address": "99 Tank Farm Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Ludlow",
+          "name": "Ludlow Terminal",
+          "state": "MA",
+          "objectid": 368,
+          "capacity": 106000,
+          "products": "JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.66105260663608,
+            32.74291362144945
+          ],
+          "crs": null
+        },
+        "id": 369,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "31216",
+          "eventid": "{31fcf8d2-5631-402c-a10b-00f8aa3f1bf9}",
+          "address": "2505 Allen Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Macon",
+          "name": "Macon Terminal",
+          "state": "GA",
+          "objectid": 369,
+          "capacity": 61898.33333,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.53694800325204,
+            40.51663234988881
+          ],
+          "crs": null
+        },
+        "id": 370,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "18049",
+          "eventid": "{194c8b00-8a6e-4b02-92b0-a1d059b7241e}",
+          "address": "5198 Buckeye Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Emmaus",
+          "name": "Macungie South Terminal",
+          "state": "PA",
+          "objectid": 370,
+          "capacity": 528000,
+          "products": "RFG GASOLINE, CONV GASOLINE, ETHANOL, ULSD"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.53829494707051,
+            40.519118143460254
+          ],
+          "crs": null
+        },
+        "id": 371,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "18062",
+          "eventid": "{2b072d81-9d94-4dc4-95ee-c1bf7b4faf8e}",
+          "address": "5285 Shipper Rd",
+          "modality": "Rail, Truck, Pipe",
+          "address2": null,
+          "city": "Macungie",
+          "name": "Macungie North Terminal",
+          "state": "PA",
+          "objectid": 371,
+          "capacity": 93000,
+          "products": "GASOLINE, ULSD, ULSHO, ULSK, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.54171689588905,
+            40.038350068281886
+          ],
+          "crs": null
+        },
+        "id": 372,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "19355",
+          "eventid": "{15431fae-f4fc-4455-a621-29a64b97d7d1}",
+          "address": "8 S Malin Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Malvern",
+          "name": "Malvern Terminal",
+          "state": "PA",
+          "objectid": 372,
+          "capacity": 143000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.25370996761862,
+            43.131662990279416
+          ],
+          "crs": null
+        },
+        "id": 373,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "13403",
+          "eventid": "{03c3b8dc-c5db-43a4-a9ea-f608f8cd2cfa}",
+          "address": "9586 River Rd, Rt 49",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Marcy",
+          "name": "Marcy Terminal",
+          "state": "NY",
+          "objectid": 373,
+          "capacity": 252000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.10473503985955,
+            29.9028865300332
+          ],
+          "crs": null
+        },
+        "id": 374,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "70072",
+          "eventid": "{1f09b700-c308-41f5-83f8-685c6c284df3}",
+          "address": "5200 River Road",
+          "modality": "Marine, Truck , Rial",
+          "address2": null,
+          "city": "Marrero",
+          "name": "Marrero Terminal",
+          "state": "LA",
+          "objectid": 374,
+          "capacity": 3166000,
+          "products": "FUEL OIL, VGO, MGO, CONDENSAT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.96530540338685,
+            42.2496566511416
+          ],
+          "crs": null
+        },
+        "id": 375,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "49068",
+          "eventid": "{b8e437df-945f-4c23-99a1-7534f73253ad}",
+          "address": "12451 17 MILE RD",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Marshall",
+          "name": "Marshall Terminal",
+          "state": "MI",
+          "objectid": 375,
+          "capacity": 281000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.40246879822396,
+            32.401887176462886
+          ],
+          "crs": null
+        },
+        "id": 376,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "36108",
+          "eventid": "{97876782-eee6-41d2-a4bf-12b5f1bda29e}",
+          "address": "4951 Birmingham Hwy",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Montgomery",
+          "name": "Montgomery Terminal",
+          "state": "AL",
+          "objectid": 376,
+          "capacity": 167000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -85.36338622718701,
+            40.27830418813596
+          ],
+          "crs": null
+        },
+        "id": 377,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "47303",
+          "eventid": "{560ef02e-539e-4c6a-8946-f63b10f00a22}",
+          "address": "200 East State Route 28",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Muncie",
+          "name": "Muncie Terminal",
+          "state": "IN",
+          "objectid": 377,
+          "capacity": 188000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.26054948291923,
+            42.165355850362864
+          ],
+          "crs": null
+        },
+        "id": 378,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "49261",
+          "eventid": "{d55140e7-ed81-4bbd-aa25-ae689fdd0965}",
+          "address": "6777 Brooklyn Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Napoleon",
+          "name": "Napoleon Terminal",
+          "state": "MI",
+          "objectid": 378,
+          "capacity": 196000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.8631617302033,
+            36.16908249005209
+          ],
+          "crs": null
+        },
+        "id": 379,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37209",
+          "eventid": "{f5efc324-57cf-4de0-90ae-84acc834f987}",
+          "address": "1609 63rd Avenue N",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Nashville",
+          "name": "Nashville I Terminal",
+          "state": "TN",
+          "objectid": 379,
+          "capacity": 310425.80952,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.8510449545121,
+            36.16709137826332
+          ],
+          "crs": null
+        },
+        "id": 380,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "37209",
+          "eventid": "{5a6b696f-2885-4e77-bbac-c28ee912a8a1}",
+          "address": "1441 51st Avenue N",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Nashville",
+          "name": "Nashville II Terminal",
+          "state": "TN",
+          "objectid": 380,
+          "capacity": 196371.47619,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.90001907006888,
+            41.297823060177436
+          ],
+          "crs": null
+        },
+        "id": 381,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06511",
+          "eventid": "{b4397a6c-055e-4e6d-9e9b-5c31caf919a1}",
+          "address": "134 Forbes Avenue",
+          "modality": "Truck, Pipe (Outbound), Marine",
+          "address2": null,
+          "city": "New Haven",
+          "name": "New Haven 85 E Terminal",
+          "state": "CT",
+          "objectid": 381,
+          "capacity": 1185000,
+          "products": "ULSD, ULSHO, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.90001907006888,
+            41.297823060177436
+          ],
+          "crs": null
+        },
+        "id": 382,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06511",
+          "eventid": "{b4397a6c-055e-4e6d-9e9b-5c31caf919a1}",
+          "address": "134 Forbes Avenue",
+          "modality": "Truck, Pipe (Outbound), Marine",
+          "address2": null,
+          "city": "New Haven",
+          "name": "New Haven Forbes Terminal",
+          "state": "CT",
+          "objectid": 382,
+          "capacity": 771000,
+          "products": "ULSD, ULSHO, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.90001907006888,
+            41.297823060177436
+          ],
+          "crs": null
+        },
+        "id": 383,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06511",
+          "eventid": "{b4397a6c-055e-4e6d-9e9b-5c31caf919a1}",
+          "address": "134 Forbes Avenue",
+          "modality": "Truck, Pipe (Outbound), Marine",
+          "address2": null,
+          "city": "New Haven",
+          "name": "New Haven Hamden Terminal",
+          "state": "CT",
+          "objectid": 383,
+          "capacity": 933000,
+          "products": "ULSD, ULSHO, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.90001907006888,
+            41.297823060177436
+          ],
+          "crs": null
+        },
+        "id": 384,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06511",
+          "eventid": "{b4397a6c-055e-4e6d-9e9b-5c31caf919a1}",
+          "address": "134 Forbes Avenue",
+          "modality": "Truck, Pipe (Outbound), Marine",
+          "address2": null,
+          "city": "New Haven",
+          "name": "New Haven Waterfront Terminal",
+          "state": "CT",
+          "objectid": 384,
+          "capacity": 764000,
+          "products": "ULSD, ULSHO, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.2583925157535,
+            41.79005537200108
+          ],
+          "crs": null
+        },
+        "id": 386,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "49120",
+          "eventid": "{b77ccbed-fbe5-4546-ad8a-ec6567ff6e52}",
+          "address": "2150 S Third St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Niles",
+          "name": "Niles West Terminal",
+          "state": "MI",
+          "objectid": 386,
+          "capacity": 126000,
+          "products": "ULSD"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.95378401830828,
+            33.59821937790228
+          ],
+          "crs": null
+        },
+        "id": 387,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "29860",
+          "eventid": "{193c42bf-efb3-450f-b290-94ecef54e23d}",
+          "address": "221 Sweetwater Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "North Augusta",
+          "name": "North Augusta Terminal",
+          "state": "SC",
+          "objectid": 387,
+          "capacity": 269000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -92.09526131716254,
+            30.48220445061493
+          ],
+          "crs": null
+        },
+        "id": 388,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "70570",
+          "eventid": "{a189b9ea-06f6-4d37-834e-a0a553831380}",
+          "address": "5507 Hwy 182",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Opelousas",
+          "name": "Opelousas Terminal",
+          "state": "LA",
+          "objectid": 388,
+          "capacity": 304000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -92.4827736772407,
+            41.011706407843874
+          ],
+          "crs": null
+        },
+        "id": 389,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "52501",
+          "eventid": "{06da26dd-55ff-4f5c-8db1-43dc09ce6764}",
+          "address": "16848 87th St (County Road H35)",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Ottumwa",
+          "name": "Ottumwa Terminal",
+          "state": "IA",
+          "objectid": 389,
+          "capacity": 88000,
+          "products": "GASOLINE, ULSD, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.06748587287768,
+            39.97786139434714
+          ],
+          "crs": null
+        },
+        "id": 390,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "08110",
+          "eventid": "{82ade747-80a3-4ffd-96c5-0c3413d9a391}",
+          "address": "1 Derousse Ave",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Pennsauken",
+          "name": "Pennsauken Terminal",
+          "state": "NJ",
+          "objectid": 390,
+          "capacity": 2580000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, FUEL OIL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.7452047273487,
+            41.298937747033705
+          ],
+          "crs": null
+        },
+        "id": 391,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "60468",
+          "eventid": "{49c914b4-8b20-4582-a42f-45d4cc4e971a}",
+          "address": "32545 S Egyptian Trail",
+          "modality": "Pipe",
+          "address2": null,
+          "city": "Peotone",
+          "name": "Peotone Terminal",
+          "state": "IL",
+          "objectid": 391,
+          "capacity": 620000,
+          "products": "RBOB, CBOB, ULSD"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.26230483260099,
+            40.53718422482227
+          ],
+          "crs": null
+        },
+        "id": 392,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "08861",
+          "eventid": "{c833b06c-df00-4ac0-83eb-f7209e5ab52a}",
+          "address": "1200 State St",
+          "modality": "Marine, Pipe, Rail, Truck",
+          "address2": null,
+          "city": "Perth Amboy",
+          "name": "Perth Amboy Terminal",
+          "state": "NJ",
+          "objectid": 392,
+          "capacity": 4025000,
+          "products": "GASOLINE, GASOLINE BLENDSTOCK, ULSD, ETHANOL, JET FUEL, BUTANE"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.251327305743,
+            40.561913433926534
+          ],
+          "crs": null
+        },
+        "id": 393,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "07064",
+          "eventid": "{0f9133ee-89d5-48d4-b1d1-d74b703e64e4}",
+          "address": "750 Cliff Rd",
+          "modality": "Marine, Pipe, Rail, Truck",
+          "address2": null,
+          "city": "Port Reading",
+          "name": "Port Reading Terminal",
+          "state": "NJ",
+          "objectid": 393,
+          "capacity": 6129000,
+          "products": "GASOLINE, GASOLINE BLENDSTOCK, ULSD, ETHANOL, JET FUEL, BUTANE"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.52972291001574,
+            39.71077377018579
+          ],
+          "crs": null
+        },
+        "id": 394,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "19801",
+          "eventid": "{f9d79773-d6a4-431c-ac94-c980c28bf43e}",
+          "address": "1050 Christiana Avenue",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Wilmington",
+          "name": "Port Wilmington Terminal",
+          "state": "DE",
+          "objectid": 394,
+          "capacity": 2907939,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, FUEL OIL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.3304014734201,
+            39.81315904630968
+          ],
+          "crs": null
+        },
+        "id": 395,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46234",
+          "eventid": "{fd394b88-9e30-4960-9b41-d2827f8ac7c0}",
+          "address": "3230 N Raceway Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Indianapolis",
+          "name": "Raceway Terminal",
+          "state": "IN",
+          "objectid": 395,
+          "capacity": 409000,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.289872334735,
+            40.51407197991469
+          ],
+          "crs": null
+        },
+        "id": 396,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "08861",
+          "eventid": "{12a51868-66a9-46db-ade7-8bb76dfcd3e3}",
+          "address": "577 Smith St",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Perth Amboy",
+          "name": "Raritan Bay Terminal",
+          "state": "NJ",
+          "objectid": 396,
+          "capacity": 5032000,
+          "products": "GASOLINE, GASOLINE BLENDSTOCK, ULSD, ULSK, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.75212448686558,
+            42.61098062890225
+          ],
+          "crs": null
+        },
+        "id": 397,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "12144",
+          "eventid": "{89fb452e-ecd3-4015-979c-c36807965f52}",
+          "address": "367 American Oil Rd",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Rensselaer",
+          "name": "Rensselaer Terminal",
+          "state": "NY",
+          "objectid": 397,
+          "capacity": 867000,
+          "products": "ULSD, ULSHO, ULSK, CBOB, PCBOB, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.42932479098998,
+            37.50365395103716
+          ],
+          "crs": null
+        },
+        "id": 398,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "23224",
+          "eventid": "{5b0d7a45-a23c-42d1-9a4d-ab67c6228fa6}",
+          "address": "1636 Commerce Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Richmond",
+          "name": "Richmond Terminal",
+          "state": "VA",
+          "objectid": 398,
+          "capacity": 213000,
+          "products": "RFG GASOLINE, CONV GASOLINE, ETHANOL, ULSD, ULSHO"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.43267932933131,
+            37.52416604165129
+          ],
+          "crs": null
+        },
+        "id": 399,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "23224",
+          "eventid": "{c8b04785-1a5f-47df-91d4-be538b7e9914}",
+          "address": "204 E. First St.",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Richmond",
+          "name": "Richmond North Terminal",
+          "state": "VA",
+          "objectid": 399,
+          "capacity": 163596.90476,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.1245868774593,
+            42.276625228181615
+          ],
+          "crs": null
+        },
+        "id": 400,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48218",
+          "eventid": "{132fedeb-1025-44fe-ba06-21a781202dca}",
+          "address": "205 Marion Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "River Rouge",
+          "name": "River Rouge Terminal",
+          "state": "MI",
+          "objectid": 400,
+          "capacity": 1008000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.98941742408726,
+            37.21379298334537
+          ],
+          "crs": null
+        },
+        "id": 401,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "24018",
+          "eventid": "{f7c362cc-bc87-4d08-a93f-0af90121ba25}",
+          "address": "5287 Terminal Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Roanoke",
+          "name": "Roanoke I Terminal",
+          "state": "VA",
+          "objectid": 401,
+          "capacity": 278758.61905,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.66095955787809,
+            43.13563302696509
+          ],
+          "crs": null
+        },
+        "id": 402,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "14619",
+          "eventid": "{aa54ba89-d89a-429c-96b0-38bed499452a}",
+          "address": "754 Brooks Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Rochester",
+          "name": "Rochester North Terminal",
+          "state": "NY",
+          "objectid": 402,
+          "capacity": 170000,
+          "products": "ULSD, ULSHO, ULSK"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.65387615141996,
+            43.12834475354259
+          ],
+          "crs": null
+        },
+        "id": 403,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "14619",
+          "eventid": "{968cc2e0-3085-44b8-8418-1e8572abb68b}",
+          "address": "675 Brooks Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Rochester",
+          "name": "Rochester South Terminal",
+          "state": "NY",
+          "objectid": 403,
+          "capacity": 266000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.6791008832256,
+            43.16308823413458
+          ],
+          "crs": null
+        },
+        "id": 404,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "14606",
+          "eventid": "{678e1db5-3cb9-4b69-9c0e-99ee6f99e15a}",
+          "address": "1975 Lyell Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Rochester",
+          "name": "Rochester West Terminal",
+          "state": "NY",
+          "objectid": 404,
+          "capacity": 197000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -89.17553507619739,
+            42.26184445600268
+          ],
+          "crs": null
+        },
+        "id": 405,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "61102",
+          "eventid": "{b29d4d66-8e07-4f7b-b8a1-10c028755654}",
+          "address": "1511 South Meridian Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Rockford",
+          "name": "Rockford Terminal",
+          "state": "IL",
+          "objectid": 405,
+          "capacity": 148000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.98207711077343,
+            41.56090973931059
+          ],
+          "crs": null
+        },
+        "id": 406,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "12250",
+          "eventid": "{9906d198-2463-489a-b5b0-7907b5fb5190}",
+          "address": "924 River Rd",
+          "modality": "Rail, Truck, Marine",
+          "address2": null,
+          "city": "Newburgh",
+          "name": "Roseton Terminal",
+          "state": "NY",
+          "objectid": 406,
+          "capacity": 1462000,
+          "products": "ULSD, ULSHO, ULSK, ULSD1"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -78.29724459651104,
+            35.55521933627112
+          ],
+          "crs": null
+        },
+        "id": 407,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "27576",
+          "eventid": "{e4325eda-fb29-4d1b-976a-2ef92bc9474b}",
+          "address": "4414 Buffalo Road",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Selma",
+          "name": "Selma Terminal",
+          "state": "NC",
+          "objectid": 407,
+          "capacity": 328282.28571,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -81.86452796504038,
+            34.92541089751496
+          ],
+          "crs": null
+        },
+        "id": 409,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "29302",
+          "eventid": "{c52d5de5-0951-41ba-9da0-117c60d91532}",
+          "address": "680 Delmar Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Spartanburg",
+          "name": "Spartanburg Terminal",
+          "state": "SC",
+          "objectid": 409,
+          "capacity": 455000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.57718173903275,
+            42.11790431583846
+          ],
+          "crs": null
+        },
+        "id": 410,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "01105",
+          "eventid": "{0084b78f-8765-425b-8338-35d28a2e5154}",
+          "address": "145 Albany St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Springfield",
+          "name": "Springfield Terminal",
+          "state": "MA",
+          "objectid": 410,
+          "capacity": 327000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.76316519583075,
+            42.61677646116733
+          ],
+          "crs": null
+        },
+        "id": 307,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "12202",
+          "eventid": "{1ea0b804-6651-4997-9dc6-e2eb1eca9081}",
+          "address": "301 Normanskill St",
+          "modality": "Rail, Truck, Marine",
+          "address2": null,
+          "city": "Albany",
+          "name": "Albany Terminal",
+          "state": "NY",
+          "objectid": 307,
+          "capacity": 1800000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -97.49952137093159,
+            27.829394946558374
+          ],
+          "crs": null
+        },
+        "id": 321,
+        "type": "Feature",
+        "properties": {
+          "zipcode": null,
+          "eventid": "{f2319245-20a4-464c-8ac7-9b04bb0e0fef}",
+          "address": "7002 Marvin L Berry Road",
+          "modality": "Rail, Truck, Marine, Pipe",
+          "address2": null,
+          "city": "Corpus Christi",
+          "name": "Buckeye Texas Terminal",
+          "state": "TX",
+          "objectid": 321,
+          "capacity": 6893000,
+          "products": "Crude, Naphtha, Butane, Bunker Fuel, Asphalt, 6 Oil (Cutter Stock)"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.09929499029798,
+            39.96622772073346
+          ],
+          "crs": null
+        },
+        "id": 333,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "43228",
+          "eventid": "{469bf0a1-a072-4884-8cfd-a44843509b81}",
+          "address": "3651 Fisher Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Columbus",
+          "name": "Columbus Terminal",
+          "state": "OH",
+          "objectid": 333,
+          "capacity": 143000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -79.86229404075918,
+            40.57182847889753
+          ],
+          "crs": null
+        },
+        "id": 359,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "15051-1012",
+          "eventid": "{ad4a42a4-4d22-4876-8b85-689c71ffcca2}",
+          "address": "918 State Route 910",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Indianola",
+          "name": "Indianola Terminal",
+          "state": "PA",
+          "objectid": 359,
+          "capacity": 491000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.2010629750988,
+            38.680712656844925
+          ],
+          "crs": null
+        },
+        "id": 412,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "63147",
+          "eventid": "{52ab2581-87f1-4f58-af40-836c8225d752}",
+          "address": "239 East Prairie St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "St. Louis",
+          "name": "St. Louis North Terminal",
+          "state": "MO",
+          "objectid": 412,
+          "capacity": 85000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.22246317359973,
+            38.57998811414907
+          ],
+          "crs": null
+        },
+        "id": 413,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "63118",
+          "eventid": "{0d1c4456-b0ca-49bc-b631-04b7e09ecec3}",
+          "address": "4070 South First St",
+          "modality": "Truck, Marine, Pipe, Rail",
+          "address2": null,
+          "city": "South St. Louis",
+          "name": "St. Louis South Terminal",
+          "state": "MO",
+          "objectid": 413,
+          "capacity": 260000,
+          "products": "ASPHALT"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -61.01658860813279,
+            13.980783648088053
+          ],
+          "crs": null
+        },
+        "id": 414,
+        "type": "Feature",
+        "properties": {
+          "zipcode": null,
+          "eventid": "{5d61ce1b-9451-402c-9634-a769af09a064}",
+          "address": "Cul-de-Sac Bay",
+          "modality": "Marine",
+          "address2": null,
+          "city": "Ciceron",
+          "name": "St. Lucia Terminal",
+          "state": null,
+          "objectid": 414,
+          "capacity": 10238000,
+          "products": "CRUDE"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -94.43840739914015,
+            39.12200799508629
+          ],
+          "crs": null
+        },
+        "id": 415,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "64054",
+          "eventid": "{aa20e3ab-d1f7-4b87-9b87-ff89ecfe4b1a}",
+          "address": "1315 N Sterling Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Sugar Creek",
+          "name": "Sugar Creek Terminal",
+          "state": "MO",
+          "objectid": 415,
+          "capacity": 1422000,
+          "products": "ULSD1, ULSD,     Ethanol"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.30113034898316,
+            43.09935162058142
+          ],
+          "crs": null
+        },
+        "id": 416,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "13164",
+          "eventid": "{e89f1e6b-d797-48d7-9198-36d072c8e6a5}",
+          "address": "2951 Energy Dr",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Warners",
+          "name": "Syracuse Terminal",
+          "state": "NY",
+          "objectid": 416,
+          "capacity": 577000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.44003516726944,
+            27.951207362194996
+          ],
+          "crs": null
+        },
+        "id": 418,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "33605",
+          "eventid": "{48fa9930-7b9d-40a5-b620-4e453b10acd0}",
+          "address": "504 N 19th St",
+          "modality": "Truck, Marine and Pipe Out",
+          "address2": null,
+          "city": "Tampa",
+          "name": "Tampa North Terminal",
+          "state": "FL",
+          "objectid": 418,
+          "capacity": 472000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.27769803866333,
+            42.253709092226956
+          ],
+          "crs": null
+        },
+        "id": 419,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48180",
+          "eventid": "{01c166b9-bade-49a1-b624-f79c437d24c1}",
+          "address": "24801 Ecorse Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Taylor",
+          "name": "Taylor Terminal",
+          "state": "MI",
+          "objectid": 419,
+          "capacity": 260000,
+          "products": "JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.2751491660627,
+            42.254312138253525
+          ],
+          "crs": null
+        },
+        "id": 420,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48180",
+          "eventid": "{011e06b6-d0ac-4eb9-aaa0-bd921a1997fb}",
+          "address": "24501 Ecorse Rd",
+          "modality": "Rail, Truck, Pipe",
+          "address2": null,
+          "city": "Taylor",
+          "name": "Taylor East Terminal",
+          "state": "MI",
+          "objectid": 420,
+          "capacity": 260000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.31868856213308,
+            42.23985599060339
+          ],
+          "crs": null
+        },
+        "id": 421,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48174",
+          "eventid": "{874a69a3-ca50-4fff-a00c-b3b270004cad}",
+          "address": "28432 Wick Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Romulus",
+          "name": "Taylor-Metro Terminal",
+          "state": "MI",
+          "objectid": 421,
+          "capacity": 97000,
+          "products": "JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.72948734960134,
+            40.1772077556955
+          ],
+          "crs": null
+        },
+        "id": 422,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "08611",
+          "eventid": "{616d9ed8-e955-4484-b7fe-916bbc80ece2}",
+          "address": "1463 Lamberton Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Trenton",
+          "name": "Trenton Terminal",
+          "state": "NJ",
+          "objectid": 422,
+          "capacity": 393000,
+          "products": "ULSHO, ULSD, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.93162304162057,
+            40.39639312458204
+          ],
+          "crs": null
+        },
+        "id": 423,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "19605",
+          "eventid": "{ab716672-f31d-4f73-b8d1-a5508906b78a}",
+          "address": "130 Witman Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Reading",
+          "name": "Tuckerton Terminal",
+          "state": "PA",
+          "objectid": 423,
+          "capacity": 238000,
+          "products": "ULSHO, ULSD, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -75.21592099760068,
+            43.10821866547936
+          ],
+          "crs": null
+        },
+        "id": 424,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "13502",
+          "eventid": "{72d17ef9-996a-49c5-9e61-e4f28e395627}",
+          "address": "37 Wurz Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Utica",
+          "name": "Utica Terminal",
+          "state": "NY",
+          "objectid": 424,
+          "capacity": 200000,
+          "products": "ULSD, ULSHO, ULSK"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.00201522401521,
+            42.10101623942125
+          ],
+          "crs": null
+        },
+        "id": 425,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "13851",
+          "eventid": "{d601eb7b-4b1d-4f7d-a779-96b550e4c979}",
+          "address": "3113 Shippers Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Vestal",
+          "name": "Vestal Terminal",
+          "state": "NY",
+          "objectid": 425,
+          "capacity": 466000,
+          "products": "GASOLINE, ULSD, ULSHO, ULSK, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -80.7308453745014,
+            41.202213651731945
+          ],
+          "crs": null
+        },
+        "id": 426,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "44446",
+          "eventid": "{a57cae78-b467-42b2-b868-de0637c11ff1}",
+          "address": "1001 Youngstown Warren Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Niles",
+          "name": "Warren Terminal",
+          "state": "OH",
+          "objectid": 426,
+          "capacity": 180000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.60352921019968,
+            41.639602670605626
+          ],
+          "crs": null
+        },
+        "id": 427,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "43607",
+          "eventid": "{e065393d-c8f6-489a-9d2b-3a610880f807}",
+          "address": "2450 Hill Ave",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Toledo",
+          "name": "West Toledo Terminal",
+          "state": "OH",
+          "objectid": 427,
+          "capacity": 129000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -72.64757247873305,
+            41.71738826830859
+          ],
+          "crs": null
+        },
+        "id": 428,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "06109",
+          "eventid": "{8f0945e1-7792-4722-b2c9-b9aada486346}",
+          "address": "50 Burbank Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Wethersfiled",
+          "name": "Wethersfield Terminal",
+          "state": "CT",
+          "objectid": 428,
+          "capacity": 345000,
+          "products": "ULSD, ULSHO, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.96228736178949,
+            41.239977550450234
+          ],
+          "crs": null
+        },
+        "id": 429,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "17702",
+          "eventid": "{1ecfaabd-91f6-48aa-91e1-01c5fb7671c3}",
+          "address": "1466 Sylvan Dell Rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "South Williamsport",
+          "name": "Williamsport Terminal",
+          "state": "PA",
+          "objectid": 429,
+          "capacity": 124000,
+          "products": "ULSD, ULSHO, ULSK, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.94869056681237,
+            34.2187222068975
+          ],
+          "crs": null
+        },
+        "id": 430,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "28401",
+          "eventid": "{783eab6a-f4d3-4d8a-9ccc-833aa9783771}",
+          "address": "1312 S Front St",
+          "modality": "Truck, Marine",
+          "address2": null,
+          "city": "Wilmington",
+          "name": "Wilmington Terminal",
+          "state": "NC",
+          "objectid": 430,
+          "capacity": 572000,
+          "products": "GASOLINE, ULSD, ETHANOL, FUEL OIL, BIODIESEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -83.23548621334403,
+            42.13878511043553
+          ],
+          "crs": null
+        },
+        "id": 431,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "48183",
+          "eventid": "{3698548c-3109-4191-87d6-c3ce18653c1f}",
+          "address": "20755 West Rd",
+          "modality": "Rail, Truck, Pipe",
+          "address2": null,
+          "city": "Woodhaven",
+          "name": "Woodhaven Terminal",
+          "state": "MI",
+          "objectid": 431,
+          "capacity": 990000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -65.84191391794329,
+            18.04799393576289
+          ],
+          "crs": null
+        },
+        "id": 432,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "00767",
+          "eventid": "{6e413b39-ff1a-4bb7-81ef-9c37938808e0}",
+          "address": "PR-9914",
+          "modality": "Marine",
+          "address2": null,
+          "city": "Yabucoa",
+          "name": "Yabucoa Terminal",
+          "state": "PR",
+          "objectid": 432,
+          "capacity": 3941000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.2531699370671,
+            39.92377908594314
+          ],
+          "crs": null
+        },
+        "id": 433,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "46268",
+          "eventid": "{2141fe70-c480-49cb-bca0-9957ad5b980d}",
+          "address": "5405 West 96th St",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Indianapolis",
+          "name": "Zionsville Terminal",
+          "state": "IN",
+          "objectid": 433,
+          "capacity": 627000,
+          "products": "GASOLINE, ULSD, ETHANOL, JET FUEL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -86.25580858729721,
+            41.785824540211145
+          ],
+          "crs": null
+        },
+        "id": 385,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "49120",
+          "eventid": "{a431d9a7-ed20-46fc-87a5-99b72bc05338}",
+          "address": "2303 South 3rd",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "Niles",
+          "name": "Niles Terminal",
+          "state": "MI",
+          "objectid": 385,
+          "capacity": 630000,
+          "products": "GASOLINE, ULSD, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -70.28439340986245,
+            43.63534193620922
+          ],
+          "crs": null
+        },
+        "id": 408,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "04106",
+          "eventid": "{41efb23c-90ef-49bb-805f-ddf24949ac8f}",
+          "address": "170 Lincoln St",
+          "modality": "Truck, Marine, Pipe",
+          "address2": null,
+          "city": "South Portland",
+          "name": "South Portland Terminal",
+          "state": "ME",
+          "objectid": 408,
+          "capacity": 725000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -90.5869582769357,
+            38.797359555732264
+          ],
+          "crs": null
+        },
+        "id": 411,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "63376",
+          "eventid": "{ae6d7efb-b324-43dc-a1a4-eb3958dbd86f}",
+          "address": "4751 Veterans Memorial Parkway",
+          "modality": "Truck, Pipe",
+          "address2": null,
+          "city": "St. Charles",
+          "name": "St. Charles Terminal",
+          "state": "MO",
+          "objectid": 411,
+          "capacity": 196925.33333,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -82.44287888042105,
+            27.93024861014263
+          ],
+          "crs": null
+        },
+        "id": 417,
+        "type": "Feature",
+        "properties": {
+          "zipcode": "33605",
+          "eventid": "{5616eccb-8325-488f-b5a6-c1066cc05c56}",
+          "address": "848 McCloskey Blvd.",
+          "modality": "Truck, Marine and Pipe Out",
+          "address2": null,
+          "city": "Tampa",
+          "name": "Tampa Terminal",
+          "state": "FL",
+          "objectid": 417,
+          "capacity": 606000,
+          "products": "GASOLINE, ULSD, ULSHO, ETHANOL"
+        }
+      }
+    ],
+    "type": "FeatureCollection",
+    "properties": {
+      "exceededTransferLimit": false
+    }
+  }
+}
