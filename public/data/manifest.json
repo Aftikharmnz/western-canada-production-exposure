@@ -1,7 +1,7 @@
 {
   "dataset_mode": "official_actuals",
   "pipeline_version": 3,
-  "generated_at": "2026-09-28T15:33:02+00:00",
+  "generated_at": "2026-10-11T02:55:32+00:00",
   "latest_actual_date": "2026-08-31",
   "cutoff_date": "2015-01-01",
   "source_state": {
@@ -15,7 +15,7 @@
         "bytes": 238592,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD11886A140F08",
         "last_modified": "Sat, 30 Nov 2024 21:46:14 GMT"
@@ -28,7 +28,7 @@
         "bytes": 244224,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118869AFA3BC",
         "last_modified": "Sat, 30 Nov 2024 21:46:14 GMT"
@@ -41,7 +41,7 @@
         "bytes": 253952,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD11886F9D7991",
         "last_modified": "Sat, 30 Nov 2024 21:46:24 GMT"
@@ -54,7 +54,7 @@
         "bytes": 284160,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD11886FCA7175",
         "last_modified": "Sat, 30 Nov 2024 21:46:24 GMT"
@@ -67,7 +67,7 @@
         "bytes": 263680,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118870FFE798",
         "last_modified": "Sat, 30 Nov 2024 21:46:26 GMT"
@@ -80,7 +80,7 @@
         "bytes": 314880,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD11886E5B4086",
         "last_modified": "Sat, 30 Nov 2024 21:46:22 GMT"
@@ -93,7 +93,7 @@
         "bytes": 298496,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118870CAE278",
         "last_modified": "Sat, 30 Nov 2024 21:46:26 GMT"
@@ -106,7 +106,7 @@
         "bytes": 316416,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD4612E97A9BCB",
         "last_modified": "Wed, 05 Feb 2025 18:28:39 GMT"
@@ -119,7 +119,7 @@
         "bytes": 340480,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DE64F088368A17",
         "last_modified": "Thu, 05 Feb 2026 19:55:37 GMT"
@@ -128,14 +128,14 @@
         "source_id": "aer_st53",
         "url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
         "raw_path": "aer_st53_current.xls",
-        "sha256": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd",
-        "bytes": 314368,
-        "checked_at": "2026-09-26T12:16:37+00:00",
+        "sha256": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f",
+        "bytes": 326656,
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
-        "etag": "0x8DF0AB9E0082FE1",
-        "last_modified": "Fri, 04 Sep 2026 19:22:35 GMT"
+        "etag": "0x8DF24950A6B1A97",
+        "last_modified": "Wed, 07 Oct 2026 17:04:25 GMT"
       },
       "aer_st39_2017.xls": {
         "source_id": "aer_st39",
@@ -145,7 +145,7 @@
         "bytes": 219648,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118867C56489",
         "last_modified": "Sat, 30 Nov 2024 21:46:11 GMT"
@@ -158,7 +158,7 @@
         "bytes": 236544,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD11886863D873",
         "last_modified": "Sat, 30 Nov 2024 21:46:12 GMT"
@@ -171,7 +171,7 @@
         "bytes": 230400,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD1188673D6C90",
         "last_modified": "Sat, 30 Nov 2024 21:46:10 GMT"
@@ -184,7 +184,7 @@
         "bytes": 237504,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD1188675090E3",
         "last_modified": "Sat, 30 Nov 2024 21:46:10 GMT"
@@ -197,7 +197,7 @@
         "bytes": 241152,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118867DEEA50",
         "last_modified": "Sat, 30 Nov 2024 21:46:11 GMT"
@@ -210,7 +210,7 @@
         "bytes": 253888,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118868DFF6E8",
         "last_modified": "Sat, 30 Nov 2024 21:46:12 GMT"
@@ -223,7 +223,7 @@
         "bytes": 253888,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD118866AFAEB2",
         "last_modified": "Sat, 30 Nov 2024 21:46:09 GMT"
@@ -236,7 +236,7 @@
         "bytes": 253888,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DD6BD8564ECD25",
         "last_modified": "Tue, 25 Mar 2025 20:05:06 GMT"
@@ -249,7 +249,7 @@
         "bytes": 253888,
         "checked_at": "2026-09-11T04:38:05+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DEA22F725332A5",
         "last_modified": "Fri, 24 Apr 2026 18:29:39 GMT"
@@ -260,9 +260,9 @@
         "raw_path": "aer_st39_current.xls",
         "sha256": "d8898eb97e51dfb536f9217f728eeb0f80dfc522f2c96d889cbe6d44563920ca",
         "bytes": 245696,
-        "checked_at": "2026-09-26T12:16:37+00:00",
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
         "etag": "0x8DF1B41E1CE46B5",
         "last_modified": "Fri, 25 Sep 2026 20:16:28 GMT"
@@ -283,25 +283,25 @@
         "source_id": "aer_st102_facility_spatial",
         "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
         "raw_path": "aer_st102_facility_list_shapefile.zip",
-        "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
-        "bytes": 14060144,
-        "checked_at": "2026-09-26T12:16:37+00:00",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "sha256": "a93ff8ec910d1c93a4dac728abc5305e5ce0b2f7e1bf8dc27cba323f02910387",
+        "bytes": 13827742,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
-        "etag": "0x8DF0AA12CD61BDE",
-        "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT"
+        "etag": "0x8DF20B79D346E98",
+        "last_modified": "Fri, 02 Oct 2026 19:01:49 GMT"
       },
       "aer_scheme_approval_spatial.zip": {
         "source_id": "aer_scheme_spatial",
         "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
         "raw_path": "aer_scheme_approval_spatial.zip",
-        "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
-        "bytes": 2237505,
-        "checked_at": "2026-09-26T12:16:37+00:00",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "sha256": "3636350cf0978d117e4c76a9ddb2b77e47c145b7eef7de9310f26ffe0fda6920",
+        "bytes": 2240838,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online",
-        "etag": "0x8DEF2F741E5782C",
-        "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT"
+        "etag": "0x8DF20A638A6ED01",
+        "last_modified": "Fri, 02 Oct 2026 16:57:19 GMT"
       },
       "aer_st44_current.xlsx": {
         "source_id": "aer_st44",
@@ -309,58 +309,58 @@
         "raw_path": "aer_st44_current.xlsx",
         "sha256": "e3fb46ba1bec7544dddc1deb62bad5682b2292ca139c1c9d9ffc3d5f080adb60",
         "bytes": 75470,
-        "checked_at": "2026-09-26T12:16:37+00:00",
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "etag": "0x8DEFFA327967FD4",
         "last_modified": "Fri, 21 Aug 2026 16:42:14 GMT",
         "publication_period": "2026-Q2",
         "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
-        "ingested_at": "2026-09-26T12:16:37+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "bcer/well_surface_locations.geojson": {
         "source_id": "bcer_well_surface_locations",
         "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/PASR/PASR_WELL_SURFACE_STATE_FA_PT/MapServer/0/query",
         "raw_path": "bcer/well_surface_locations.geojson",
-        "sha256": "e699a3e7290b72eabb629d1b101abb6d41fab92636d86066df8c1d018df892e5",
-        "bytes": 9453869,
-        "checked_at": "2026-09-28T15:33:02+00:00",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "0d6950766de583adcccf3b4e86510dd2d5600ac86872abe447b90047c945f1f8",
+        "bytes": 9453835,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "bcer/well_index.csv": {
         "source_id": "bcer_well_index",
         "url": "https://iris.bcogc.ca/download/well_index.csv",
         "raw_path": "bcer/well_index.csv",
-        "sha256": "3fa702538430cdf25c0c7e5f74f5160b8c2e2b7e4893b00dfbe174003f67d3ed",
+        "sha256": "9d4690e876f6325a20b539ec610e36b61e83ce93d53d93789f1f9f01a7dbd084",
         "bytes": 14847126,
-        "checked_at": "2026-09-28T15:33:02+00:00",
-        "etag": "\"e28c96-65c8963686736\"",
-        "last_modified": "Mon, 28 Sep 2026 11:30:08 GMT",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "etag": "\"e28c96-65d66ab86c821\"",
+        "last_modified": "Fri, 09 Oct 2026 11:30:06 GMT",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "bcer/prod_csv.zip": {
         "source_id": "bcer_well_production",
         "url": "https://iris.bcogc.ca/download/prod_csv.zip",
         "raw_path": "bcer/prod_csv.zip",
-        "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
-        "bytes": 123407266,
-        "checked_at": "2026-09-28T15:33:02+00:00",
-        "etag": "\"75b0ba2-65a691977cb24\"",
-        "last_modified": "Tue, 01 Sep 2026 10:08:25 GMT",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "cbd4029dadf936b427af2cde52c9d62f88adc24c89b38453ae82d8c50a0f91b4",
+        "bytes": 123635016,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "etag": "\"75e8548-65cc4b35f587b\"",
+        "last_modified": "Thu, 01 Oct 2026 10:15:52 GMT",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "manitoba/wmp_2023_2026_excel.zip": {
         "source_id": "manitoba_well_production",
         "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
         "raw_path": "manitoba/wmp_2023_2026_excel.zip",
-        "sha256": "fb3e70d727e86e6655b4dd84b02144e182d93c1d3a82a791307df01169870171",
-        "bytes": 12550692,
-        "checked_at": "2026-09-15T12:43:11+00:00",
-        "last_modified": "Mon, 14 Sep 2026 14:40:14 GMT",
+        "sha256": "93cdd3f74dfae311d1185c9161652d85a777be3d4be59aa6d3481d8274152504",
+        "bytes": 11527048,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "last_modified": "Fri, 09 Oct 2026 13:32:04 GMT",
         "discovery_url": "https://www.gov.mb.ca/iem/petroleum/reports/index.html",
-        "ingested_at": "2026-09-15T12:43:11+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "montana/MT_CompleteWellList.zip": {
@@ -430,10 +430,10 @@
         "source_id": "petrinex_ab_well_facility_link",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
         "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-        "sha256": "4d24fdb560b50b9a19008ca2e9d93e20ff4dee975f2a9baa82c3f2d05c1c0e82",
-        "bytes": 14938134,
-        "checked_at": "2026-09-28T15:33:02+00:00",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "0a7095dfe59195d76e27199f16d8099b56361298ccffe6f8d2362e8c2657a7d9",
+        "bytes": 14928652,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-05-AB.zip": {
@@ -454,32 +454,32 @@
         "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
         "sha256": "c7381c319e1b6a52d5fd8a606b1f2e9b6bad2d46554687145d0d4609873f829b",
         "bytes": 7629857,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-06",
         "updated_at": "2026-09-25 02:40:06",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2026-07-AB.zip": {
         "source_id": "petrinex_ab_conventional_vol",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
         "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
-        "sha256": "b1d2e5b0f21a4aa8af84c51d3a15b8034996353920e636b31a11174f14ee6b89",
-        "bytes": 7704526,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "638d88ef1613d286f7b939689fd1aca68fa45ec8ecf390691c80272537d18804",
+        "bytes": 7704816,
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-07",
-        "updated_at": "2026-09-25 02:30:39",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "updated_at": "2026-10-01 02:26:32",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/infra/well_infrastructure_sk.zip": {
         "source_id": "petrinex_sk_well_infrastructure",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
         "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-        "sha256": "8e41738e1236c2b41270c5a41a70455f9815f0d3f97899efbbca25506609b74a",
-        "bytes": 13424241,
-        "checked_at": "2026-09-28T15:33:02+00:00",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "c06580cc73f77f118ba3b6f39f04907067dee88baccb0a736611e2d7596dd5c2",
+        "bytes": 13428117,
+        "checked_at": "2026-10-11T02:55:32+00:00",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-05-SK.zip": {
@@ -498,24 +498,24 @@
         "source_id": "petrinex_sk_well_production",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
         "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
-        "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
-        "bytes": 2864429,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "8631ac6bd92272ed5f41b29c7f483c23678b575cbfd9bc052a05cdd3f3945b3a",
+        "bytes": 2864422,
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-06",
-        "updated_at": "2026-09-21 21:16:16",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "updated_at": "2026-10-10 11:09:26",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-07-SK.zip": {
         "source_id": "petrinex_sk_well_production",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
         "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
-        "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
+        "sha256": "ad1975891196000630d529963d87186e47f5427c78484e75de4bdfc916cecb3e",
         "bytes": 2891160,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-07",
-        "updated_at": "2026-09-21 21:13:33",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "updated_at": "2026-10-10 11:05:13",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2023-03-SK.zip": {
@@ -1171,24 +1171,24 @@
         "source_id": "petrinex_ab_conventional_vol",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
         "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
-        "sha256": "135776b9d47987733663fceeea2693d880e6967810d0da860b3adb67f0890b26",
-        "bytes": 7658440,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "adea4bad98031247f69e079f3c2779e42622ef794247bb235bb3aca8c72f4bd4",
+        "bytes": 7657565,
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-08",
-        "updated_at": "2026-09-25 02:23:45",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "updated_at": "2026-10-10 02:26:13",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/sk/vol/Vol_2026-08-SK.zip": {
         "source_id": "petrinex_sk_well_production",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
         "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
-        "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
-        "bytes": 2876971,
-        "checked_at": "2026-09-28T15:33:02+00:00",
+        "sha256": "064528d4b59c5115cfcd621e309f561bdbb3cfae0e9f0625257913ab7a6b4fa5",
+        "bytes": 2876959,
+        "checked_at": "2026-10-11T02:55:32+00:00",
         "period": "2026-08",
-        "updated_at": "2026-09-21 21:08:34",
-        "ingested_at": "2026-09-28T15:33:02+00:00",
+        "updated_at": "2026-10-10 11:00:59",
+        "ingested_at": "2026-10-11T02:55:32+00:00",
         "ingestion_mode": "online"
       },
       "petrinex/ab/vol/Vol_2022-01-AB.zip": {
@@ -2180,14 +2180,14 @@
         "updated_at": "2026-09-25 02:40:06",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-07": {
-        "updated_at": "2026-09-25 02:30:39",
+        "updated_at": "2026-10-01 02:26:32",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2022-01": {
@@ -2562,31 +2562,31 @@
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-06": {
-        "updated_at": "2026-09-21 21:16:16",
+        "updated_at": "2026-10-10 11:09:26",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-07": {
-        "updated_at": "2026-09-21 21:13:33",
+        "updated_at": "2026-10-10 11:05:13",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       },
       "petrinex_ab_conventional_vol:2026-08": {
-        "updated_at": "2026-09-25 02:23:45",
+        "updated_at": "2026-10-10 02:26:13",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       },
       "petrinex_sk_well_production:2026-08": {
-        "updated_at": "2026-09-21 21:08:34",
+        "updated_at": "2026-10-10 11:00:59",
         "timestamp_timezone": "not specified by source",
         "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
-        "observed_at": "2026-09-28T15:33:02+00:00",
+        "observed_at": "2026-10-11T02:55:32+00:00",
         "catalog_only": false
       }
     }
@@ -2610,7 +2610,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2629,7 +2629,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2648,7 +2648,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2667,7 +2667,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2686,7 +2686,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2705,7 +2705,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2724,7 +2724,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2743,7 +2743,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2762,7 +2762,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2781,7 +2781,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2800,7 +2800,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2819,7 +2819,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2838,7 +2838,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2857,7 +2857,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2876,7 +2876,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2895,7 +2895,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2914,7 +2914,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2933,7 +2933,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2952,7 +2952,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2971,7 +2971,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -2990,7 +2990,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3009,7 +3009,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3028,7 +3028,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3047,7 +3047,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3066,7 +3066,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3085,7 +3085,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3104,7 +3104,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3123,7 +3123,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3142,7 +3142,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3161,7 +3161,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3180,7 +3180,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3199,7 +3199,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3218,7 +3218,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3237,7 +3237,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3256,7 +3256,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3275,7 +3275,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3294,7 +3294,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3313,7 +3313,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3332,7 +3332,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3351,7 +3351,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3370,7 +3370,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3389,7 +3389,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3408,7 +3408,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3427,7 +3427,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3446,7 +3446,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3465,7 +3465,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3484,7 +3484,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3503,7 +3503,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3522,7 +3522,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3541,7 +3541,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3560,7 +3560,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3579,7 +3579,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3598,7 +3598,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3617,7 +3617,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3636,7 +3636,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3655,7 +3655,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3674,7 +3674,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3693,7 +3693,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3712,7 +3712,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3731,7 +3731,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3750,7 +3750,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3769,7 +3769,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3788,7 +3788,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3807,7 +3807,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3826,7 +3826,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3845,7 +3845,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3864,7 +3864,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3883,7 +3883,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3902,7 +3902,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3921,7 +3921,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3940,7 +3940,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3959,7 +3959,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3978,7 +3978,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -3997,7 +3997,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4016,7 +4016,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4035,7 +4035,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4054,7 +4054,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4073,7 +4073,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4092,7 +4092,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4111,7 +4111,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4130,7 +4130,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4149,7 +4149,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4168,7 +4168,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4187,7 +4187,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4206,7 +4206,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4225,7 +4225,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4244,7 +4244,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4263,7 +4263,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4282,7 +4282,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4301,7 +4301,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4320,7 +4320,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4339,7 +4339,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4358,7 +4358,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4377,7 +4377,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4396,7 +4396,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4415,7 +4415,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4434,7 +4434,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4453,7 +4453,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4472,7 +4472,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4491,7 +4491,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4510,7 +4510,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4529,7 +4529,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4548,7 +4548,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4567,7 +4567,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4586,7 +4586,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4605,7 +4605,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4624,7 +4624,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4643,7 +4643,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4651,7 +4651,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-01",
       "units": "m3/d",
-      "source_unit_total": 316017.58999999985,
+      "source_unit_total": 315491.8799999997,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4662,7 +4662,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4670,7 +4670,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-02",
       "units": "m3/d",
-      "source_unit_total": 317783.09,
+      "source_unit_total": 317284.64999999997,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4681,7 +4681,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4689,7 +4689,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-03",
       "units": "m3/d",
-      "source_unit_total": 316861.4099999995,
+      "source_unit_total": 316341.32999999955,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4700,7 +4700,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4708,7 +4708,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-04",
       "units": "m3/d",
-      "source_unit_total": 309042.97000000015,
+      "source_unit_total": 308508.2400000001,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4719,7 +4719,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4727,7 +4727,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-05",
       "units": "m3/d",
-      "source_unit_total": 291216.20000000007,
+      "source_unit_total": 290775.4400000001,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4738,7 +4738,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4746,7 +4746,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-06",
       "units": "m3/d",
-      "source_unit_total": 311308.2600000004,
+      "source_unit_total": 311019.47000000055,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4757,7 +4757,7 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -4765,7 +4765,7 @@
       "stream": "In-situ bitumen",
       "period": "2026-07",
       "units": "m3/d",
-      "source_unit_total": 326921.1400000002,
+      "source_unit_total": 327094.1800000001,
       "input_sha256": {
         "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
         "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
@@ -4776,7 +4776,26 @@
         "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
         "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
         "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
-        "aer_st53_current.xls": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd"
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
+      }
+    },
+    {
+      "source_id": "aer_st53",
+      "stream": "In-situ bitumen",
+      "period": "2026-08",
+      "units": "m3/d",
+      "source_unit_total": 331568.21000000014,
+      "input_sha256": {
+        "aer_st53_2017.xls": "86171b577cd7c77421822f24869841ffa1f85057731e9a980a28be1e48ee339b",
+        "aer_st53_2018.xls": "9142b4da464fe70992d7950304a3cc4f03a6f81127681737df627c2f2e3cc15e",
+        "aer_st53_2019.xls": "2537b8a1fc9a511355e1d6e48fe1a2a0621e097898871a29f15ece2c32bfbc52",
+        "aer_st53_2020.xls": "561ba2cb8553878342b804cc1901ff68f23ad916a37f9885faeb215135d1227d",
+        "aer_st53_2021.xls": "0791ebdfdfb290b6ed90f9a532e2e5fce3d112da8d6f571fb40246c5b4fb1e87",
+        "aer_st53_2022.xls": "82f02255cee2f95fd30f841f51e43a0a895b3a42b70569f84c74a1ebed578d99",
+        "aer_st53_2023.xls": "dec5004a173c787f906cafc3057c61032e312be22383ef10c92d8eebf46c11e9",
+        "aer_st53_2024.xls": "5d4cdd338229c71482bc17b4db6b21daa234243423cee4e985759a195d8915b5",
+        "aer_st53_2025.xls": "7d2d3a5fd75e4dc3c9f684243dd5c0b5262ff12aecda1a639944d5bdfed02344",
+        "aer_st53_current.xls": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f"
       }
     },
     {
@@ -9112,22 +9131,25 @@
       }
     }
   ],
-  "record_count": 4482096,
-  "base_record_count": 56900,
-  "on_demand_record_count": 4425196,
-  "asset_count": 125709,
-  "mapped_asset_count": 125701,
-  "asset_geometry_feature_count": 341,
+  "record_count": 4489535,
+  "base_record_count": 57186,
+  "on_demand_record_count": 4432349,
+  "asset_count": 125748,
+  "mapped_asset_count": 125741,
+  "asset_geometry_feature_count": 343,
   "location_quality_asset_count": {
-    "exact": 10459,
-    "high": 326,
-    "low": 91058,
+    "exact": 10472,
+    "high": 330,
+    "low": 91081,
     "medium": 23858,
-    "unmapped": 8
+    "unmapped": 7
   },
   "location_quality_latest_actual_kbbl_d": {
-    "low": 1569.4747,
-    "medium": 197.8715
+    "exact": 48.1283,
+    "high": 2048.3802,
+    "low": 1601.9448,
+    "medium": 234.9512,
+    "unmapped": 0.0413
   },
   "periods": [
     "2015-01-31",
@@ -9527,7 +9549,7 @@
     "2024-01-31": 7483.4972,
     "2024-02-29": 7791.1668,
     "2024-03-31": 7875.2948,
-    "2024-04-30": 7690.2149,
+    "2024-04-30": 7690.215,
     "2024-05-31": 7097.764,
     "2024-06-30": 7482.8702,
     "2024-07-31": 7726.9355,
@@ -9536,26 +9558,26 @@
     "2024-10-31": 7831.6633,
     "2024-11-30": 8111.7573,
     "2024-12-31": 8180.7714,
-    "2025-01-31": 8117.4814,
-    "2025-02-28": 7799.4422,
-    "2025-03-31": 8078.3063,
-    "2025-04-30": 7669.944,
+    "2025-01-31": 8117.4813,
+    "2025-02-28": 7799.4423,
+    "2025-03-31": 8078.3084,
+    "2025-04-30": 7669.9439,
     "2025-05-31": 6912.1852,
-    "2025-06-30": 7620.0698,
+    "2025-06-30": 7620.0593,
     "2025-07-31": 8089.5597,
-    "2025-08-31": 8020.8169,
+    "2025-08-31": 8020.7145,
     "2025-09-30": 7980.53,
     "2025-10-31": 7977.0741,
     "2025-11-30": 8387.2468,
     "2025-12-31": 8246.7784,
-    "2026-01-31": 7987.3854,
-    "2026-02-28": 7900.3605,
-    "2026-03-31": 7924.6906,
-    "2026-04-30": 7976.688,
-    "2026-05-31": 7599.2663,
-    "2026-06-30": 7851.4085,
-    "2026-07-31": 4939.9822,
-    "2026-08-31": 1767.3462
+    "2026-01-31": 7984.0788,
+    "2026-02-28": 7897.0115,
+    "2026-03-31": 7921.3645,
+    "2026-04-30": 7973.3997,
+    "2026-05-31": 7596.4939,
+    "2026-06-30": 7849.7258,
+    "2026-07-31": 4941.1871,
+    "2026-08-31": 3933.4459
   },
   "date_filter_totals": {
     "2015-01-31": [
@@ -19051,7 +19073,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 38.9249
+        "kbbl_d": 38.925
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -20189,7 +20211,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 40.8838
+        "kbbl_d": 40.8837
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -20641,7 +20663,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 41.8789
+        "kbbl_d": 41.8788
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -21319,7 +21341,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 39.9665
+        "kbbl_d": 39.9666
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -21529,7 +21551,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.3798
+        "kbbl_d": 41.3819
       },
       {
         "source_id": "bcer_well_production",
@@ -21545,7 +21567,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 42.8629
+        "kbbl_d": 42.8628
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -22005,7 +22027,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 39.9519
+        "kbbl_d": 39.9518
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -22223,7 +22245,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.7893
+        "kbbl_d": 41.7788
       },
       {
         "source_id": "bcer_well_production",
@@ -22239,7 +22261,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 39.1847
+        "kbbl_d": 39.1846
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -22675,7 +22697,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 39.1289
+        "kbbl_d": 39.0265
       },
       {
         "source_id": "bcer_well_production",
@@ -22917,7 +22939,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 41.5755
+        "kbbl_d": 41.5754
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -23789,7 +23811,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1957.7354
+        "kbbl_d": 1953.0073
       },
       {
         "source_id": "aer_st53",
@@ -23797,7 +23819,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 29.8543
+        "kbbl_d": 31.3004
       },
       {
         "source_id": "aer_st53",
@@ -23805,7 +23827,7 @@
         "scenario": "actual",
         "location_confidence": "unmapped",
         "legend_key": "in-situ",
-        "kbbl_d": 0.1011
+        "kbbl_d": 0.0765
       },
       {
         "source_id": "bcer_well_production",
@@ -24015,7 +24037,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1969.1589
+        "kbbl_d": 1964.5965
       },
       {
         "source_id": "aer_st53",
@@ -24023,7 +24045,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 29.5588
+        "kbbl_d": 30.9861
       },
       {
         "source_id": "aer_st53",
@@ -24039,7 +24061,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 41.7441
+        "kbbl_d": 41.5301
       },
       {
         "source_id": "bcer_well_production",
@@ -24241,7 +24263,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1962.2348
+        "kbbl_d": 1957.2838
       },
       {
         "source_id": "aer_st53",
@@ -24249,7 +24271,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 30.6741
+        "kbbl_d": 32.354
       },
       {
         "source_id": "aer_st53",
@@ -24265,7 +24287,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 38.9825
+        "kbbl_d": 38.9277
       },
       {
         "source_id": "bcer_well_production",
@@ -24475,7 +24497,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1912.5915
+        "kbbl_d": 1907.9848
       },
       {
         "source_id": "aer_st53",
@@ -24483,7 +24505,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 31.1456
+        "kbbl_d": 32.389
       },
       {
         "source_id": "aer_st53",
@@ -24499,7 +24521,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 44.1324
+        "kbbl_d": 44.2075
       },
       {
         "source_id": "bcer_well_production",
@@ -24709,7 +24731,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1799.8346
+        "kbbl_d": 1795.9065
       },
       {
         "source_id": "aer_st53",
@@ -24717,7 +24739,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 31.7814
+        "kbbl_d": 32.9372
       },
       {
         "source_id": "aer_st53",
@@ -24749,7 +24771,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 35.1372
+        "kbbl_d": 35.1371
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -24943,7 +24965,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 1924.069
+        "kbbl_d": 1920.8716
       },
       {
         "source_id": "aer_st53",
@@ -24951,7 +24973,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 33.9604
+        "kbbl_d": 35.3414
       },
       {
         "source_id": "aer_st53",
@@ -25023,7 +25045,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 501.5882
+        "kbbl_d": 501.7219
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -25145,7 +25167,7 @@
         "scenario": "actual",
         "location_confidence": "high",
         "legend_key": "in-situ",
-        "kbbl_d": 2021.6512
+        "kbbl_d": 2020.5081
       },
       {
         "source_id": "aer_st53",
@@ -25153,7 +25175,7 @@
         "scenario": "actual",
         "location_confidence": "medium",
         "legend_key": "in-situ",
-        "kbbl_d": 34.5514
+        "kbbl_d": 36.7829
       },
       {
         "source_id": "aer_st53",
@@ -25169,7 +25191,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "condensate",
-        "kbbl_d": 37.2723
+        "kbbl_d": 37.2229
       },
       {
         "source_id": "bcer_well_production",
@@ -25177,7 +25199,7 @@
         "scenario": "actual",
         "location_confidence": "exact",
         "legend_key": "conventional",
-        "kbbl_d": 11.0199
+        "kbbl_d": 11.0988
       },
       {
         "source_id": "manitoba_well_production",
@@ -25185,7 +25207,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 33.5388
+        "kbbl_d": 33.5566
       },
       {
         "source_id": "montana_bogc_well_production",
@@ -25225,7 +25247,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 508.6041
+        "kbbl_d": 508.6733
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -25342,6 +25364,54 @@
     ],
     "2026-08-31": [
       {
+        "source_id": "aer_st53",
+        "stream": "In-situ bitumen",
+        "scenario": "actual",
+        "location_confidence": "high",
+        "legend_key": "in-situ",
+        "kbbl_d": 2048.3802
+      },
+      {
+        "source_id": "aer_st53",
+        "stream": "In-situ bitumen",
+        "scenario": "actual",
+        "location_confidence": "medium",
+        "legend_key": "in-situ",
+        "kbbl_d": 37.0798
+      },
+      {
+        "source_id": "aer_st53",
+        "stream": "In-situ bitumen",
+        "scenario": "actual",
+        "location_confidence": "unmapped",
+        "legend_key": "in-situ",
+        "kbbl_d": 0.0413
+      },
+      {
+        "source_id": "bcer_well_production",
+        "stream": "Condensate production",
+        "scenario": "actual",
+        "location_confidence": "exact",
+        "legend_key": "condensate",
+        "kbbl_d": 37.2406
+      },
+      {
+        "source_id": "bcer_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "exact",
+        "legend_key": "conventional",
+        "kbbl_d": 10.8876
+      },
+      {
+        "source_id": "manitoba_well_production",
+        "stream": "Conventional crude oil",
+        "scenario": "actual",
+        "location_confidence": "low",
+        "legend_key": "conventional",
+        "kbbl_d": 32.4673
+      },
+      {
         "source_id": "montana_bogc_well_production",
         "stream": "Conventional crude oil",
         "scenario": "actual",
@@ -25371,7 +25441,7 @@
         "scenario": "actual",
         "location_confidence": "low",
         "legend_key": "conventional",
-        "kbbl_d": 516.6802
+        "kbbl_d": 516.6831
       },
       {
         "source_id": "petrinex_ab_conventional_vol",
@@ -25516,10 +25586,10 @@
       "stream": "In-situ bitumen",
       "scenario": "actual",
       "first_date": "2017-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 21785,
-      "asset_count": 356,
-      "sum_kbbl_d_observations": 193993.7116
+      "last_date": "2026-08-31",
+      "record_count": 22071,
+      "asset_count": 359,
+      "sum_kbbl_d_observations": 196062.6363
     },
     {
       "source_id": "bcer_well_production",
@@ -25527,10 +25597,10 @@
       "stream": "Condensate production",
       "scenario": "actual",
       "first_date": "2015-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 430538,
-      "asset_count": 9127,
-      "sum_kbbl_d_observations": 4750.7735
+      "last_date": "2026-08-31",
+      "record_count": 433017,
+      "asset_count": 9140,
+      "sum_kbbl_d_observations": 4787.6601
     },
     {
       "source_id": "bcer_well_production",
@@ -25538,10 +25608,10 @@
       "stream": "Conventional crude oil",
       "scenario": "actual",
       "first_date": "2015-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 107562,
+      "last_date": "2026-08-31",
+      "record_count": 108279,
       "asset_count": 1326,
-      "sum_kbbl_d_observations": 2131.3791
+      "sum_kbbl_d_observations": 2142.3457
     },
     {
       "source_id": "manitoba_well_production",
@@ -25549,10 +25619,10 @@
       "stream": "Conventional crude oil",
       "scenario": "actual",
       "first_date": "2024-01-31",
-      "last_date": "2026-07-31",
-      "record_count": 127654,
-      "asset_count": 4626,
-      "sum_kbbl_d_observations": 1214.5457
+      "last_date": "2026-08-31",
+      "record_count": 131607,
+      "asset_count": 4630,
+      "sum_kbbl_d_observations": 1247.0305
     },
     {
       "source_id": "montana_bogc_well_production",
@@ -25594,9 +25664,9 @@
       "scenario": "actual",
       "first_date": "2022-01-31",
       "last_date": "2026-08-31",
-      "record_count": 1462100,
-      "asset_count": 45545,
-      "sum_kbbl_d_observations": 30045.9457
+      "record_count": 1462104,
+      "asset_count": 45564,
+      "sum_kbbl_d_observations": 30046.1515
     },
     {
       "source_id": "petrinex_ab_ngl_vol",
@@ -25666,7 +25736,7 @@
     }
   ],
   "data_quality": {
-    "zero_or_negative_record_count": 2331,
+    "zero_or_negative_record_count": 2387,
     "duplicate_asset_date_stream_group_count": 0,
     "duplicate_examples": [],
     "source_provenance": [
@@ -25686,6 +25756,13 @@
         "stream": "Conventional crude oil",
         "date": "2026-08-31",
         "message": "Conventional crude oil total is 0.0 kbbl/d on 2026-08-31, down from 52.7 kbbl/d on 2026-07-31. Treat this month as incomplete until source reconciliation passes."
+      },
+      {
+        "severity": "high",
+        "source_id": "ndic_well_production",
+        "stream": "Conventional crude oil",
+        "date": "2026-08-31",
+        "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
       },
       {
         "severity": "high",
@@ -25714,41 +25791,6 @@
         "stream": "Synthetic crude oil",
         "date": "2026-08-31",
         "message": "aer_st39 has no Synthetic crude oil data for 2026-08-31; last reported month is 2026-06-30. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "aer_st53",
-        "stream": "In-situ bitumen",
-        "date": "2026-08-31",
-        "message": "aer_st53 has no In-situ bitumen data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "manitoba_well_production",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "manitoba_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "ndic_well_production",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "bcer_well_production",
-        "stream": "Condensate production",
-        "date": "2026-08-31",
-        "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-      },
-      {
-        "severity": "high",
-        "source_id": "bcer_well_production",
-        "stream": "Conventional crude oil",
-        "date": "2026-08-31",
-        "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
       }
     ],
     "date_warnings": {
@@ -25778,6 +25820,13 @@
         },
         {
           "severity": "high",
+          "source_id": "ndic_well_production",
+          "stream": "Conventional crude oil",
+          "date": "2026-08-31",
+          "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
+        },
+        {
+          "severity": "high",
           "source_id": "aer_st39",
           "stream": "Mined bitumen gross",
           "date": "2026-08-31",
@@ -25789,41 +25838,6 @@
           "stream": "Synthetic crude oil",
           "date": "2026-08-31",
           "message": "aer_st39 has no Synthetic crude oil data for 2026-08-31; last reported month is 2026-06-30. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "aer_st53",
-          "stream": "In-situ bitumen",
-          "date": "2026-08-31",
-          "message": "aer_st53 has no In-situ bitumen data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "manitoba_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "manitoba_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "ndic_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "ndic_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "bcer_well_production",
-          "stream": "Condensate production",
-          "date": "2026-08-31",
-          "message": "bcer_well_production has no Condensate production data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
-        },
-        {
-          "severity": "high",
-          "source_id": "bcer_well_production",
-          "stream": "Conventional crude oil",
-          "date": "2026-08-31",
-          "message": "bcer_well_production has no Conventional crude oil data for 2026-08-31; last reported month is 2026-07-31. Totals for this month are partial."
         }
       ]
     },
@@ -25934,13 +25948,14 @@
       "2025-10-31": 0.0679,
       "2025-11-30": 0.0979,
       "2025-12-31": 0.0812,
-      "2026-01-31": 0.1011,
+      "2026-01-31": 0.0765,
       "2026-02-28": 0.0778,
       "2026-03-31": 0.0893,
       "2026-04-30": 0.0847,
       "2026-05-31": 0.0787,
       "2026-06-30": 0.0406,
-      "2026-07-31": 0.0695
+      "2026-07-31": 0.0695,
+      "2026-08-31": 0.0413
     },
     "low_confidence_kbbl_d_by_date": {
       "2022-01-31": 1373.7489,
@@ -25976,7 +25991,7 @@
       "2024-07-31": 1500.1555,
       "2024-08-31": 1530.8866,
       "2024-09-30": 1470.7893,
-      "2024-10-31": 1561.8338,
+      "2024-10-31": 1561.8337,
       "2024-11-30": 1582.7545,
       "2024-12-31": 1586.1253,
       "2025-01-31": 1567.8227,
@@ -25984,21 +25999,21 @@
       "2025-03-31": 1604.4818,
       "2025-04-30": 1590.5573,
       "2025-05-31": 1532.2031,
-      "2025-06-30": 1504.3228,
+      "2025-06-30": 1504.3227,
       "2025-07-31": 1536.6476,
       "2025-08-31": 1538.4848,
       "2025-09-30": 1531.5657,
       "2025-10-31": 1550.4033,
       "2025-11-30": 1593.3688,
-      "2025-12-31": 1560.0238,
+      "2025-12-31": 1560.0237,
       "2026-01-31": 1556.5846,
       "2026-02-28": 1568.0655,
       "2026-03-31": 1575.3492,
       "2026-04-30": 1577.8668,
       "2026-05-31": 1533.5082,
-      "2026-06-30": 1571.5994,
-      "2026-07-31": 1580.4108,
-      "2026-08-31": 1569.4747
+      "2026-06-30": 1571.7332,
+      "2026-07-31": 1580.4979,
+      "2026-08-31": 1601.9448
     }
   },
   "source_manifest": [
@@ -26350,20 +26365,21 @@
     {
       "url": "https://www.aer.ca/documents/sts/ST53/ST53_Current.xls",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:07.275975+00:00",
-      "bytes": 314368,
-      "sha256": "8fe507023a03178b09ed21093dac048074c13e343a0fe7c256def4f592da0fdd",
-      "etag": "0x8DF0AB9E0082FE1",
-      "last_modified": "Fri, 04 Sep 2026 19:22:35 GMT",
+      "retrieved_at": "2026-10-11T02:55:37.800741+00:00",
+      "bytes": 326656,
+      "sha256": "37db2e8aba8ffc8547612e9a35be58e7053b6ac653a6f5a440a85aae84e9c99f",
+      "etag": "0x8DF24950A6B1A97",
+      "last_modified": "Wed, 07 Oct 2026 17:04:25 GMT",
       "http_status": 200,
       "current": true,
       "source_id": "aer_st53",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st53",
       "raw_path": "aer_st53_current.xls",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
       "url": "https://www.aer.ca/documents/sts/ST39-2017.xls",
@@ -26503,8 +26519,9 @@
     {
       "url": "https://www.aer.ca/documents/sts/ST39.xls",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:08.153893+00:00",
+      "retrieved_at": "2026-10-11T02:55:38.192049+00:00",
       "bytes": 245696,
       "sha256": "d8898eb97e51dfb536f9217f728eeb0f80dfc522f2c96d889cbe6d44563920ca",
       "etag": "0x8DF1B41E1CE46B5",
@@ -26514,15 +26531,16 @@
       "source_id": "aer_st39",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st39",
       "raw_path": "aer_st39_current.xls",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.aer.ca/prd/documents/sts/ST44_2026-Q2.xlsx",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:08.923929+00:00",
+      "retrieved_at": "2026-10-11T02:55:38.576147+00:00",
       "bytes": 75470,
       "sha256": "e3fb46ba1bec7544dddc1deb62bad5682b2292ca139c1c9d9ffc3d5f080adb60",
       "etag": "0x8DEFFA327967FD4",
@@ -26533,50 +26551,53 @@
       "source_id": "aer_st44",
       "discovery_url": "https://www.aer.ca/data-and-performance-reports/statistical-reports/st44",
       "raw_path": "aer_st44_current.xlsx",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.gov.mb.ca/iem/petroleum/reports/wmp_2023_2026_excel.zip",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:15.391199+00:00",
-      "bytes": 12550692,
-      "sha256": "fb3e70d727e86e6655b4dd84b02144e182d93c1d3a82a791307df01169870171",
+      "retrieved_at": "2026-10-11T02:55:45.915361+00:00",
+      "bytes": 11527048,
+      "sha256": "93cdd3f74dfae311d1185c9161652d85a777be3d4be59aa6d3481d8274152504",
       "etag": null,
-      "last_modified": "Mon, 14 Sep 2026 14:40:14 GMT",
+      "last_modified": "Fri, 09 Oct 2026 13:32:04 GMT",
       "http_status": 200,
       "start_year": 2023,
       "end_year": 2026,
       "source_id": "manitoba_well_production",
       "discovery_url": "https://www.gov.mb.ca/iem/petroleum/reports/index.html",
       "raw_path": "manitoba/wmp_2023_2026_excel.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Infra/Well%20to%20Facility%20Link/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:20.141147+00:00",
-      "bytes": 14938134,
-      "sha256": "4d24fdb560b50b9a19008ca2e9d93e20ff4dee975f2a9baa82c3f2d05c1c0e82",
+      "retrieved_at": "2026-10-11T02:55:52.823512+00:00",
+      "bytes": 14928652,
+      "sha256": "0a7095dfe59195d76e27199f16d8099b56361298ccffe6f8d2362e8c2657a7d9",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_well_facility_link",
       "raw_path": "petrinex/ab/infra/well_to_facility_link_ab.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": true
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-06/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:22.823570+00:00",
+      "retrieved_at": "2026-10-11T02:55:55.571732+00:00",
       "bytes": 7629857,
       "sha256": "c7381c319e1b6a52d5fd8a606b1f2e9b6bad2d46554687145d0d4609873f829b",
       "etag": null,
@@ -26588,55 +26609,58 @@
       "updated_at": "2026-09-25 02:40:06",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-06-AB.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-07/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:25.801139+00:00",
-      "bytes": 7704526,
-      "sha256": "b1d2e5b0f21a4aa8af84c51d3a15b8034996353920e636b31a11174f14ee6b89",
+      "retrieved_at": "2026-10-11T02:55:58.718410+00:00",
+      "bytes": 7704816,
+      "sha256": "638d88ef1613d286f7b939689fd1aca68fa45ec8ecf390691c80272537d18804",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_conventional_vol",
       "period": "2026-07",
       "current": true,
-      "updated_at": "2026-09-25 02:30:39",
+      "updated_at": "2026-10-01 02:26:32",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-07-AB.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
       "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/AB/Vol/2026-08/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:28.667420+00:00",
-      "bytes": 7658440,
-      "sha256": "135776b9d47987733663fceeea2693d880e6967810d0da860b3adb67f0890b26",
+      "retrieved_at": "2026-10-11T02:56:01.576834+00:00",
+      "bytes": 7657565,
+      "sha256": "adea4bad98031247f69e079f3c2779e42622ef794247bb235bb3aca8c72f4bd4",
       "etag": null,
       "last_modified": null,
       "http_status": 200,
       "source_id": "petrinex_ab_conventional_vol",
       "period": "2026-08",
       "current": true,
-      "updated_at": "2026-09-25 02:23:45",
+      "updated_at": "2026-10-10 02:26:13",
       "timestamp_timezone": "not specified by source",
       "raw_path": "petrinex/ab/vol/Vol_2026-08-AB.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
       "url": "https://bogfiles.dnrc.mt.gov/Reporting/Wells/MT_CompleteWellList.zip",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:29.619989+00:00",
+      "retrieved_at": "2026-10-11T02:56:03.206443+00:00",
       "bytes": 1854076,
       "sha256": "25c4e41a7d1b3f3fc0ff225a004e96d4b1d0c979dff56e9b46f0d4e406defa56",
       "etag": "\"1c4a7c-65bfe1e678963\"",
@@ -26644,15 +26668,16 @@
       "http_status": 200,
       "source_id": "montana_bogc_well_list",
       "raw_path": "montana/MT_CompleteWellList.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://bogfiles.dnrc.mt.gov/Reporting/Production/Historical/MT_Historical_Production.zip",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:33:48.171447+00:00",
+      "retrieved_at": "2026-10-11T02:56:37.231863+00:00",
       "bytes": 73961220,
       "sha256": "b1b0108d0c0c66085140c31f6dbe2c61cd124cd4767067550638105e339fb4c0",
       "etag": "\"4688f04-65bfe1f3e73ce\"",
@@ -26661,83 +26686,7 @@
       "source_id": "montana_bogc_well_production",
       "current": true,
       "raw_path": "montana/MT_Historical_Production.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-28T15:33:52.388171+00:00",
-      "bytes": 13424241,
-      "sha256": "8e41738e1236c2b41270c5a41a70455f9815f0d3f97899efbbca25506609b74a",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_infrastructure",
-      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
-      "mode": "online",
-      "content_changed": true
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-28T15:33:53.543853+00:00",
-      "bytes": 2864429,
-      "sha256": "96b547db50f31c477a3d16c332b0337ac1ae905ec9b84a5693017062097c2122",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-06",
-      "current": true,
-      "updated_at": "2026-09-21 21:16:16",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-28T15:33:54.787959+00:00",
-      "bytes": 2891160,
-      "sha256": "7fb06ed44fdd638834caec02ca7c0cd17c751f48e70b8817252eb2f0756b1132",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-07",
-      "current": true,
-      "updated_at": "2026-09-21 21:13:33",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
-      "mode": "online",
-      "content_changed": false
-    },
-    {
-      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
-      "status": "downloaded",
-      "error": null,
-      "retrieved_at": "2026-09-28T15:33:55.955649+00:00",
-      "bytes": 2876971,
-      "sha256": "f7d9a198e7a8c85cb840dc2a7b7e1fa59404fc8c44fff63d09f832756d57b784",
-      "etag": null,
-      "last_modified": null,
-      "http_status": 200,
-      "source_id": "petrinex_sk_well_production",
-      "period": "2026-08",
-      "current": true,
-      "updated_at": "2026-09-21 21:08:34",
-      "timestamp_timezone": "not specified by source",
-      "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
@@ -26751,82 +26700,133 @@
       "raw_file": "bcer/well_surface_locations.geojson",
       "grain": "34,425 well surface point geometries",
       "raw_path": "bcer/well_surface_locations.geojson",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "sha256": "e699a3e7290b72eabb629d1b101abb6d41fab92636d86066df8c1d018df892e5",
-      "bytes": 9453869,
-      "content_changed": false
+      "sha256": "0d6950766de583adcccf3b4e86510dd2d5600ac86872abe447b90047c945f1f8",
+      "bytes": 9453835,
+      "content_changed": true
     },
     {
       "url": "https://iris.bcogc.ca/download/well_index.csv",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:03.129936+00:00",
+      "retrieved_at": "2026-10-11T02:56:48.881055+00:00",
       "bytes": 14847126,
-      "sha256": "3fa702538430cdf25c0c7e5f74f5160b8c2e2b7e4893b00dfbe174003f67d3ed",
-      "etag": "\"e28c96-65c8963686736\"",
-      "last_modified": "Mon, 28 Sep 2026 11:30:08 GMT",
+      "sha256": "9d4690e876f6325a20b539ec610e36b61e83ce93d53d93789f1f9f01a7dbd084",
+      "etag": "\"e28c96-65d66ab86c821\"",
+      "last_modified": "Fri, 09 Oct 2026 11:30:06 GMT",
       "http_status": 200,
       "source_id": "bcer_well_index",
       "raw_path": "bcer/well_index.csv",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": true
     },
     {
       "url": "https://iris.bcogc.ca/download/prod_csv.zip",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:12.026384+00:00",
-      "bytes": 123407266,
-      "sha256": "cee020187aa57b164fe7a8a24a32b889e013f19215262fb149bf09eee5de3d1c",
-      "etag": "\"75b0ba2-65a691977cb24\"",
-      "last_modified": "Tue, 01 Sep 2026 10:08:25 GMT",
+      "retrieved_at": "2026-10-11T02:56:52.182223+00:00",
+      "bytes": 123635016,
+      "sha256": "cbd4029dadf936b427af2cde52c9d62f88adc24c89b38453ae82d8c50a0f91b4",
+      "etag": "\"75e8548-65cc4b35f587b\"",
+      "last_modified": "Thu, 01 Oct 2026 10:15:52 GMT",
       "http_status": 200,
       "source_id": "bcer_well_production",
       "current": true,
       "raw_path": "bcer/prod_csv.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
-      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Infra/Well%20Infrastructure/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:13.999282+00:00",
-      "bytes": 14060144,
-      "sha256": "2455343bfd99f84e88ce940050859e5b51450fac573e95913cb3c512bf05770e",
-      "etag": "0x8DF0AA12CD61BDE",
-      "last_modified": "Fri, 04 Sep 2026 16:25:46 GMT",
+      "retrieved_at": "2026-10-11T02:56:56.976296+00:00",
+      "bytes": 13428117,
+      "sha256": "c06580cc73f77f118ba3b6f39f04907067dee88baccb0a736611e2d7596dd5c2",
+      "etag": null,
+      "last_modified": null,
       "http_status": 200,
-      "source_id": "aer_st102_facility_spatial",
-      "raw_path": "aer_st102_facility_list_shapefile.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "source_id": "petrinex_sk_well_infrastructure",
+      "raw_path": "petrinex/sk/infra/well_infrastructure_sk.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
     },
     {
-      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-06/CSV",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:14.685569+00:00",
-      "bytes": 2237505,
-      "sha256": "13ad9010040eaf77473a3b0716087ca4d9ad91ae77dfc39532a15185fad5a7bb",
-      "etag": "0x8DEF2F741E5782C",
-      "last_modified": "Wed, 05 Aug 2026 13:41:30 GMT",
+      "retrieved_at": "2026-10-11T02:56:58.154121+00:00",
+      "bytes": 2864422,
+      "sha256": "8631ac6bd92272ed5f41b29c7f483c23678b575cbfd9bc052a05cdd3f3945b3a",
+      "etag": null,
+      "last_modified": null,
       "http_status": 200,
-      "source_id": "aer_scheme_spatial",
-      "raw_path": "aer_scheme_approval_spatial.zip",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-06",
+      "current": true,
+      "updated_at": "2026-10-10 11:09:26",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-06-SK.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
-      "content_changed": false
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-07/CSV",
+      "status": "downloaded",
+      "attempts": 1,
+      "error": null,
+      "retrieved_at": "2026-10-11T02:56:59.558022+00:00",
+      "bytes": 2891160,
+      "sha256": "ad1975891196000630d529963d87186e47f5427c78484e75de4bdfc916cecb3e",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-07",
+      "current": true,
+      "updated_at": "2026-10-10 11:05:13",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-07-SK.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.petrinex.gov.ab.ca/publicdata/API/Files/SK/Vol/2026-08/CSV",
+      "status": "downloaded",
+      "attempts": 1,
+      "error": null,
+      "retrieved_at": "2026-10-11T02:57:00.870718+00:00",
+      "bytes": 2876959,
+      "sha256": "064528d4b59c5115cfcd621e309f561bdbb3cfae0e9f0625257913ab7a6b4fa5",
+      "etag": null,
+      "last_modified": null,
+      "http_status": 200,
+      "source_id": "petrinex_sk_well_production",
+      "period": "2026-08",
+      "current": true,
+      "updated_at": "2026-10-10 11:00:59",
+      "timestamp_timezone": "not specified by source",
+      "raw_path": "petrinex/sk/vol/Vol_2026-08-SK.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
+      "mode": "online",
+      "content_changed": true
     },
     {
       "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_05.xlsx",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:15.515042+00:00",
+      "retrieved_at": "2026-10-11T02:57:01.812759+00:00",
       "bytes": 3290653,
       "sha256": "91a5c07902855b21d33653a615026bcec240d53f2e1ce1a84c55b2cdb37e60c9",
       "etag": "\"066aa2d2815dd1:0\"",
@@ -26836,15 +26836,16 @@
       "period": "2026-05",
       "current": true,
       "raw_path": "nd/mpr/2026_05.xlsx",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_06.xlsx",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:16.336205+00:00",
+      "retrieved_at": "2026-10-11T02:57:02.820890+00:00",
       "bytes": 3296675,
       "sha256": "256f63ecdff8d0b7bad5a256a2a2ec4281d629eb6adec33e19ed66a6ad7db6eb",
       "etag": "\"07a109c802edd1:0\"",
@@ -26854,15 +26855,16 @@
       "period": "2026-06",
       "current": true,
       "raw_path": "nd/mpr/2026_06.xlsx",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
       "content_changed": false
     },
     {
       "url": "https://www.dmr.nd.gov/oilgas/mpr/2026_07.xlsx",
       "status": "downloaded",
+      "attempts": 1,
       "error": null,
-      "retrieved_at": "2026-09-28T15:34:17.294381+00:00",
+      "retrieved_at": "2026-10-11T02:57:03.736990+00:00",
       "bytes": 3306982,
       "sha256": "dd55c53342e1079deb48985587c8064abd69400fa5d7fdb25b47e652ad85ec92",
       "etag": "\"80333ae4e4add1:0\"",
@@ -26872,14 +26874,64 @@
       "period": "2026-07",
       "current": true,
       "raw_path": "nd/mpr/2026_07.xlsx",
-      "checked_at": "2026-09-28T15:33:02+00:00",
+      "checked_at": "2026-10-11T02:55:32+00:00",
       "mode": "online",
+      "content_changed": false
+    },
+    {
+      "url": "https://www.aer.ca/data/shapefiles/Scheme_Approval_SHP.zip",
+      "status": "downloaded",
+      "attempts": 1,
+      "error": null,
+      "retrieved_at": "2026-10-11T02:57:04.170439+00:00",
+      "bytes": 2240838,
+      "sha256": "3636350cf0978d117e4c76a9ddb2b77e47c145b7eef7de9310f26ffe0fda6920",
+      "etag": "0x8DF20A638A6ED01",
+      "last_modified": "Fri, 02 Oct 2026 16:57:19 GMT",
+      "http_status": 200,
+      "source_id": "aer_scheme_spatial",
+      "raw_path": "aer_scheme_approval_spatial.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "url": "https://www.aer.ca/data/codes/ST102-SHP.zip",
+      "status": "downloaded",
+      "attempts": 1,
+      "error": null,
+      "retrieved_at": "2026-10-11T02:57:04.616042+00:00",
+      "bytes": 13827742,
+      "sha256": "a93ff8ec910d1c93a4dac728abc5305e5ce0b2f7e1bf8dc27cba323f02910387",
+      "etag": "0x8DF20B79D346E98",
+      "last_modified": "Fri, 02 Oct 2026 19:01:49 GMT",
+      "http_status": 200,
+      "source_id": "aer_st102_facility_spatial",
+      "raw_path": "aer_st102_facility_list_shapefile.zip",
+      "checked_at": "2026-10-11T02:55:32+00:00",
+      "mode": "online",
+      "content_changed": true
+    },
+    {
+      "source_id": "petrinex_ab_conventional_vol",
+      "status": "not_published",
+      "period": "2026-09",
+      "latest_published_period": "2026-08",
+      "basis": "Official published-report index",
+      "content_changed": false
+    },
+    {
+      "source_id": "petrinex_sk_well_production",
+      "status": "not_published",
+      "period": "2026-09",
+      "latest_published_period": "2026-08",
+      "basis": "Official published-report index",
       "content_changed": false
     },
     {
       "source_id": "ndic_well_production",
       "status": "not_published",
-      "period": "2026-08",
+      "period": "2026-09",
       "latest_published_period": "2026-07",
       "basis": "Official published-report index",
       "content_changed": false
