@@ -4,6 +4,10 @@ An interactive map of production, pipelines, rail and terminals, refineries, wil
 
 Hover over a pipeline for its name or regulatory identifier, product types, published capacity, origin, and destination. Click or tap to keep the card open and follow its source links. Grouped routes list component capacities separately; AER feeders show when capacity or a commercial name is not published. Product types describe the pipeline's service, not a live batch. See the [reviewed pipeline facts](docs/PIPELINE_ROUTE_FACTS.md) for dates, capacity definitions, and source limitations.
 
+Production history separates reported amounts from reporting availability. Solid lines show months covered by the selected sources and product streams; hollow grey points show partial or unverified reported subtotals. Missing observations leave gaps in current and previous years and in the historical range. Inspect a month by clicking a point, using the month selector, or opening the monthly table to see unavailable sources and their latest reporting dates. The main timeline and current-date breakdown also label partial reporting.
+
+A missing asset record does not establish zero production. Explicit reported zeros remain zero; the app does not estimate missing production or carry older amounts forward. Source coverage and asset observation counts are separate: some official well imports omit zero rows, so a source can cover a month while individual selected assets have no observation. Historical amounts remain available with an unverified label if their reporting metadata cannot load.
+
 ## Automatic official-data updates
 
 GitHub Actions now discovers regulator publications, downloads their source files, rebuilds a separate candidate dataset, validates it, archives changed official inputs, and publishes the app. The analyst forecast spreadsheet is no longer read. Its derived history and forecasts have been removed from the app; the original personal file remains untouched on disk.
@@ -69,7 +73,7 @@ Open `http://localhost:8766/index.src.html` for the source interface, or `/` to 
 
 ```powershell
 node --check src/main.js
-node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs
+node --test scripts/test_app_runtime.cjs scripts/test_refinery_model.cjs scripts/test_production_reporting.cjs
 python -m unittest discover -s scripts -p 'test_*.py'
 python scripts/validate_production_data.py
 python scripts/validate_infrastructure_layers.py

@@ -58,7 +58,7 @@ test('unloaded-month timeline does not add base data twice', () => {
   assert.equal(a.state.timelineCache.get(date), 300);
 });
 
-test('search history distinguishes unloaded months from measured zero', () => {
+test('search history distinguishes unloaded months from absent observations', () => {
   const a = app(); const date = '2026-07-31';
   a.state.dates = [date]; a.state.selectedDate = date; a.state.search = 'suncor';
   a.state.manifest = { monthly_record_files: { [date]: 'm.json' } };
@@ -68,7 +68,7 @@ test('search history distinguishes unloaded months from measured zero', () => {
   assert.match(a.els.timelineLabel.textContent, /1 search totals not loaded/);
   a.state.dateRecordCache.set(date, []); a.state.timelineCache = null;
   a.renderTimeline();
-  assert.equal(a.state.timelineCache.get(date), 0);
+  assert.equal(a.state.timelineCache.get(date), null);
   assert.doesNotMatch(a.els.timelineLabel.textContent, /not loaded/);
 });
 

@@ -3537,9 +3537,10 @@ def compact_on_demand_payload(date_records: list[dict[str, Any]], asset_ref_by_i
     grouped: dict[tuple[str, str, str], list[list[Any]]] = defaultdict(list)
     date_value = date_records[0]["date"] if date_records else ""
     for record in date_records:
-        volume = float(record.get("volume_kbbl_d") or 0.0)
-        if volume <= 0.0:
+        raw_volume = record.get("volume_kbbl_d")
+        if isinstance(raw_volume, bool) or not NumberLike(raw_volume) or raw_volume < 0:
             continue
+        volume = float(raw_volume)
         asset_ref = asset_ref_by_id.get(record["asset_id"])
         if asset_ref is None:
             continue
