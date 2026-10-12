@@ -21,6 +21,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
 
+from terminal_inventory import terminal_detail_errors, valid_capacity_value
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "public" / "data"
@@ -132,10 +134,11 @@ def validate_terminal_inventory(data: dict[str, Any]) -> list[str]:
             if not props.get("operator"):
                 errors.append(f"{label}: operator review requires an identified operator")
         capacity = props.get("storage_capacity_bbl")
-        if capacity is not None and (type(capacity) not in (int, float) or not math.isfinite(capacity) or capacity < 0):
-            errors.append(f"{label}: barrel storage capacity must be finite, nonnegative and numeric")
+        if capacity is not None and not valid_capacity_value(capacity):
+            errors.append(f"{label}: barrel storage capacity must be positive, finite and numeric; missing is not zero")
         if capacity is not None and not props.get("storage_capacity_note"):
             errors.append(f"{label}: storage capacity requires a source/basis note")
+        errors.extend(terminal_detail_errors(props, label))
     return errors
 
 

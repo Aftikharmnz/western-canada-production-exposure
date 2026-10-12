@@ -2124,6 +2124,27 @@ button.map-legend-header:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.facility-role-filters {
+  min-width: 0;
+  margin: 3px 0 9px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.facility-role-filters legend { padding: 0 4px; color: var(--ink); font-size: 11px; font-weight: 750; }
+.facility-role-filters p { margin: 7px 4px 3px; color: var(--muted); font-size: 10.5px; line-height: 1.4; }
+.facility-role-actions { display: flex; gap: 5px; margin: 2px 4px 6px; }
+.facility-role-actions button { padding: 4px 7px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--ink); font-size: 10.5px; cursor: pointer; }
+.facility-role-option { padding: 6px 4px; }
+.facility-role-icon { flex: 0 0 22px; text-align: center; font-size: 16px; color: #475569; }
+.terminal-capacities { margin: 10px 0; padding: 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; }
+.terminal-capacity { display: grid; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.terminal-capacity span { overflow-wrap: anywhere; line-height: 1.4; }
+.terminal-capacities p { margin: 7px 0 0; color: var(--muted); line-height: 1.4; }
+.terminal-evidence { margin: 9px 0; padding-top: 7px; border-top: 1px solid var(--line); }
+.terminal-evidence summary { min-height: 28px; cursor: pointer; color: var(--muted); font-size: 11px; font-weight: 650; }
+.pipeline-detail-tip .terminal-card { max-height: min(560px, calc(100vh - 160px)); overflow: hidden; }
+
 .pipeline-dot-swatch {
   width: 10px;
   height: 10px;
@@ -3542,6 +3563,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible {
     position: fixed; top: 170px; left: 14px; right: 14px; width: auto; max-height: 55dvh; overflow-y: auto;
   }
   .detail-panel { padding-bottom: 24px; }
+  .pipeline-detail-popup .leaflet-popup-content { max-height: min(620px, max(250px, calc(68dvh - 150px))); }
   .ref-controls, .sea-controls, .ref-footer { flex-wrap: wrap; }
   .ref-body { max-height: 45dvh; }
 }

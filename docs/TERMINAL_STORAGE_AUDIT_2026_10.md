@@ -1,5 +1,7 @@
 # Terminal and storage inventory audit — October 2026
 
+The subsequent [facility details review](TERMINAL_DETAILS_2026_10.md) enriches 205 existing observations and supplies 176 published capacity observations, independent role filters and separate stored/handled products. It resolves the Buckeye capacity-unit holdout below through the official web-map configuration. The original identity and coordinate audit remains historical evidence; its four-capacity scope describes that earlier tranche.
+
 The layer now contains **1,790 terminal/storage source observations**: 1,702 U.S. observations, including Puerto Rico, and 88 Canadian observations. This is **145 more observations** than the previous layer: 128 Buckeye map points, three Colonial sites, 13 Canadian facilities, and one Cushing storage complex. These are not a count of unique physical sites or a complete national storage registry.
 
 The review date is **2026-10-10 in Edmonton**. Public GIS snapshots were retrieved at **2026-10-11 05:11:32 UTC**; the Census address responses were retrieved at **05:24:18 UTC**. An observation/review date does not refresh the underlying inventory, establish that a facility is operating, or establish survey accuracy.

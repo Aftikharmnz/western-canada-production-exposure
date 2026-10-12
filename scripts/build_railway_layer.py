@@ -1091,6 +1091,9 @@ def build_layer(
             f["properties"].get("name") or "",
         ),
     )
+    features = terminal_inventory.apply_terminal_details(features)
+    detail_reviews = [f["properties"]["details_reviewed_at"] for f in features
+                      if f["properties"].get("feature_kind") == "terminal" and f["properties"].get("details_reviewed_at")]
     return {
         "type": "FeatureCollection",
         "name": "Railways and petroleum terminals",
@@ -1113,6 +1116,10 @@ def build_layer(
             "geometry_precision_note": "Rail coordinates are rounded to 0.001 degree for display (up to about 111 m per grid step); facility points retain 0.00001 degree. Source precision is not survey accuracy.",
             "grouped_rail_feature_count": len(lines),
             **terminal_inventory.inventory_metadata(canadian, buckeye, colonial, excluded),
+            "terminal_details_schema_version": 1,
+            "terminal_details_reviewed_at": max(detail_reviews) if detail_reviews else None,
+            "terminal_detail_review_count": len(detail_reviews),
+            "terminal_capacity_note": "Published capacity observations retain their individual units, scopes, bases and source dates. They are not summed, converted, or interpreted as available capacity, inventory or throughput.",
             "reviewed_us_crude_storage_facility_count": len(us_storage) + sum(f["properties"]["category"] == "crude-storage" for f in buckeye),
             "sources": [
                 {

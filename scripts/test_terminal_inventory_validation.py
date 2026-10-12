@@ -11,6 +11,8 @@ class TerminalInventoryValidationTests(unittest.TestCase):
                         "properties": {"feature_kind": "terminal", "facility_id": "official-1", "name": "Named facility",
                                        "category": "crude-storage", "review_status": "operator_verified",
                                        "operator": "Published operator", "reviewed_at": "2026-10-10", "source_as_of": None,
+                                       "facility_role": "unknown", "facility_role_note": "Facility role has not been reviewed",
+                                       "stored_products": [], "handled_products": [], "storage_capacities": [], "detail_sources": [],
                                        "source_url": "https://operator.example/facility", "coordinate_source_url": "https://regulator.example/1",
                                        "location_confidence": "medium", "location_note": "Published facility centroid; not surveyed"}}
 
@@ -45,7 +47,7 @@ class TerminalInventoryValidationTests(unittest.TestCase):
         self.assertTrue(any("basis note" in e for e in self.validate(self.feature)))
         p["storage_capacity_note"] = "Operator publishes tank capacity in barrels; website date unspecified"
         self.assertEqual(self.validate(self.feature), [])
-        for invalid in (True, -1, float("nan"), float("inf"), "160000"):
+        for invalid in (0, True, -1, float("nan"), float("inf"), "160000"):
             p["storage_capacity_bbl"] = invalid
             with self.subTest(value=invalid):
                 self.assertTrue(self.validate(self.feature))

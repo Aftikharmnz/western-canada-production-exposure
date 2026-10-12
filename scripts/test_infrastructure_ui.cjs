@@ -10,7 +10,7 @@ function app(globals = {}) {
     document: { querySelector: () => null, getElementById: () => null },
     console, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval,
     fetch: async () => { throw new Error('Infrastructure UI tests must not make network requests'); }, ...globals };
-  return vm.runInNewContext(source + '\n({state,RAIL_OWNER_META,DEFAULT_RAILWAY_CATEGORIES,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,buildRailwayMenu,handleRailwayMenuChange,handleRailwayMenuClick,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer})', context);
+  return vm.runInNewContext(source + '\n({state,FACILITY_ROLE_META,facilityRoleKey,RAIL_OWNER_META,DEFAULT_RAILWAY_CATEGORIES,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalCapacityHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,buildRailwayMenu,handleRailwayMenuChange,handleRailwayMenuClick,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer})', context);
 }
 
 function feature(id, properties, geometryType = 'Point') {
@@ -29,6 +29,127 @@ const terminal = (id, operator, extra = {}) => feature(id, {
 const rail = (id, owner, category = 'rail-main') => feature(id, {
   feature_kind: 'rail_line', category, name: 'Rail corridor', owner,
 }, 'LineString');
+
+function facilityRoleEvent(key, checked) {
+  const input = { dataset: { facilityRole: key }, checked };
+  return { target: { closest: selector => selector === 'input[data-facility-role]' ? input : null } };
+}
+
+function facilityRoleActionEvent(action) {
+  return { target: { closest: selector => selector === '[data-facility-role-action]' ? { dataset: { facilityRoleAction: action } } : null } };
+}
+
+test('facility roles use reviewed classification rather than inferring storage from names or categories', () => {
+  const a = app();
+  for (const properties of [{}, { category: 'crude-storage', name: 'Tank farm' }, { facility_type: 'Storage and distribution terminal' }, { facility_role: 'unrecognized' }]) {
+    assert.equal(a.facilityRoleKey(properties), 'unknown');
+  }
+  for (const key of Object.keys(a.FACILITY_ROLE_META)) assert.equal(a.facilityRoleKey({ facility_role: key }), key);
+});
+
+test('role filters independently select facility points and retain the cached railroad context', () => {
+  const { a, removed } = railTestMap();
+  a.state.railwayData = { features: [rail('cn', 'CN'), rail('cp', 'CP'),
+    ...['storage', 'terminal', 'both', 'processing', 'unknown'].map(role => terminal(role, 'Operator', { facility_role: role }))] };
+  a.renderRailwayLayer();
+  const lineLayer = a.state.railwayLineLayer;
+  a.handleRailwayMenuClick(facilityRoleActionEvent('none'));
+  assert.equal(a.state.railwayLayer, null);
+  assert.equal(a.state.railwayLineLayer, lineLayer);
+  a.handleRailwayMenuChange(facilityRoleEvent('both', true));
+  assert.deepEqual(Array.from(a.state.railwayLayer.features, f => f.properties.facility_id), ['both']);
+  assert.equal(a.state.railwayLineLayer, lineLayer);
+  assert.equal(removed.includes(lineLayer), false);
+  a.handleRailwayMenuChange(railOwnerEvent('cn', false));
+  assert.deepEqual(Array.from(a.state.railwayLineLayer.features, f => f.properties.facility_id), ['cp']);
+  assert.deepEqual(Array.from(a.state.railwayLayer.features, f => f.properties.facility_id), ['both']);
+  a.state.railwaySearch = 'nonexistent';
+  a.renderRailwayLayer();
+  assert.equal(a.state.railwayLayer, null);
+  assert.equal(a.state.selectedFacilityRoles.has('both'), true);
+});
+
+test('role checkboxes preserve selections during search redraws and Core and All reset them', () => {
+  const options = { innerHTML: '' };
+  const a = app({ document: { querySelector: () => null, getElementById: id => id === 'railwayOptions' ? options : null } });
+  a.state.railwayData = { features: [terminal('both', 'Operator', { facility_role: 'both' }), terminal('unreviewed', 'Operator')] };
+  a.handleRailwayMenuChange(facilityRoleEvent('unknown', false));
+  a.state.railwaySearch = 'Operator';
+  a.buildRailwayMenu();
+  assert.equal((options.innerHTML.match(/data-facility-role="/g) || []).length, 5);
+  assert.ok(options.innerHTML.indexOf('terminal-search-results') < options.innerHTML.indexOf('facility-role-filters'), 'Search results must stay above the lengthy role and category controls on mobile');
+  assert.doesNotMatch(options.innerHTML.match(/<input[^>]*data-facility-role="unknown"[^>]*>/)[0], /\bchecked\b/);
+  a.handleRailwayMenuClick(railActionEvent('none'));
+  assert.equal(a.state.selectedFacilityRoles.has('unknown'), false);
+  for (const action of ['defaults', 'all']) {
+    a.handleRailwayMenuChange(facilityRoleEvent('both', false));
+    a.handleRailwayMenuClick(railActionEvent(action));
+    assert.equal(a.state.selectedFacilityRoles.size, 5);
+  }
+});
+
+test('choosing a facility locator enables its role and category and cancels a delayed redraw that would close its card', async () => {
+  const { a } = railTestMap();
+  a.state.railwayData = { features: [terminal('chosen', 'Operator', { facility_role: 'both', category: 'crude-storage' })] };
+  a.state.selectedFacilityRoles.clear();
+  a.state.selectedRailwayCategories.clear();
+  a.state.map.setView = () => {};
+  let lateRedraw = false;
+  a.state.railwaySearchTimer = setTimeout(() => { lateRedraw = true; }, 5);
+  a.handleRailwayMenuClick({ target: { closest: selector => selector === '[data-terminal-index]' ? { dataset: { terminalIndex: '0' } } : null } });
+  assert.deepEqual(Array.from(a.state.selectedFacilityRoles), ['both']);
+  assert.deepEqual(Array.from(a.state.selectedRailwayCategories), ['crude-storage']);
+  assert.equal(a.state.railwayLayer.features[0].properties.facility_id, 'chosen');
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(lateRedraw, false);
+});
+
+test('facility cards distinguish stored and handled products and preserve separate capacity scopes and units', () => {
+  const a = app();
+  const p = terminal('detailed', 'Operator', { facility_role: 'both', stored_products: ['Propane'], handled_products: ['Propane', 'Condensate'],
+    details_reviewed_at: '2026-10-11', services: 'Rail loading and blending',
+    storage_capacities: [
+      { value: 2000000, unit: 'bbl', scope: 'Whole facility', basis: 'shell', source_url: 'https://operator.example/capacity', source_as_of: '2025-12-31', reviewed_at: '2026-10-11' },
+      { value: 1000000, unit: 'm3', scope: 'Underground cavern working volume', basis: 'working', source_url: 'https://operator.example/caverns', source_as_of: '2024' },
+    ], detail_sources: [{ label: 'Products and services', url: 'https://operator.example/products', as_of: '2025' }],
+  }).properties;
+  const html = a.terminalCardHtml(p);
+  assert.match(html, /Stored products<\/span><span class="pt-route-val">Propane<\/span>/);
+  assert.match(html, /Products handled<\/span><span class="pt-route-val">Propane \/ Condensate<\/span>/);
+  assert.match(html, /2,000,000 bbl/);
+  assert.match(html, /1,000,000 m³/);
+  assert.match(html, /Shell capacity/);
+  assert.match(html, /Working capacity/);
+  assert.doesNotMatch(html, /3,000,000/);
+  assert.match(html, /2025-12-31/);
+  assert.match(html, /Facility details reviewed/);
+  assert.match(html, /not current inventory or available space/);
+  assert.match(html, /href="https:\/\/operator.example\/products"/);
+});
+
+test('missing or invalid storage capacities stay unavailable and new product evidence is safely escaped', () => {
+  const a = app();
+  const base = { value: 123456, unit: 'bbl', scope: 'Facility', basis: 'unspecified', source_url: 'https://operator.example/capacity' };
+  for (const invalid of [{ value: 0 }, { value: -1 }, { value: '123456' }, { value: Infinity }, { unit: 'unknown' }, { basis: 'estimated' }, { scope: '' }, { source_url: 'javascript:bad()' }]) {
+    const html = a.terminalCapacityHtml({ storage_capacities: [{ ...base, ...invalid }] });
+    assert.match(html, /not published or not verified/);
+    assert.doesNotMatch(html, /123,456/);
+  }
+  const html = a.terminalCardHtml(terminal('unsafe-details', 'Operator', {
+    handled_products: ['Diesel', '<img onerror=bad()>'], stored_products: [], services: '<script>bad()</script>',
+    storage_capacities: [], storage_capacity_bbl: 123456, storage_capacity_note: 'Legacy value',
+    detail_sources: [{ label: '<b>unsafe</b>', url: 'javascript:bad()' }],
+  }).properties);
+  assert.match(html, /Stored products<\/span><span class="pt-route-val">Not established by source/);
+  assert.match(html, /&lt;img/);
+  assert.match(html, /&lt;script/);
+  assert.doesNotMatch(html, /<img|<script|href="javascript:|123,456/);
+  const unpublished = a.terminalCardHtml(terminal('handling-unreviewed', 'Operator', { handled_products: [], commodity: 'Historical gasoline', storage_capacities: [] }).properties);
+  assert.match(unpublished, /Products handled<\/span><span class="pt-route-val">Not established by source/);
+  assert.match(unpublished, /Reported commodity<\/span><span class="pt-route-val">Historical gasoline/);
+  assert.match(a.terminalCapacityHtml({ storage_capacities: [{ ...base, source_url: 'https://username:secret@example.org/capacity' }] }), /not published or not verified/);
+  assert.equal(a.infrastructureMatchesSearch({ handled_products: ['Diesel'], services: 'Blending' }, 'diesel blending'), true);
+});
 
 function railOwnerEvent(key, checked) {
   const input = { dataset: { railwayOwner: key }, checked };
@@ -51,7 +172,8 @@ function railTestMap() {
       const item = { feature, bindTooltip() { return this; }, bindPopup() { return this; }, on() { return this; } };
       options.onEachFeature(feature, item);
     });
-    return { features: collection.features, addTo() { return this; }, bringToBack() {} };
+    return { features: collection.features, addTo() { return this; }, bringToBack() {},
+      eachLayer(callback) { collection.features.forEach(feature => callback({ feature })); } };
   } };
   const a = app({ window: { L: fakeL, location: { href: 'https://example.com/' } }, L: fakeL });
   a.state.map = { removeLayer(layer) { removed.push(layer); } };
