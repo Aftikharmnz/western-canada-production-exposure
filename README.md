@@ -2,6 +2,8 @@
 
 An interactive map of production, pipelines, rail and terminals, refineries, wildfire proximity, weather, and Alberta power output.
 
+The legend starts folded; click **Legend** to open or close its map filters. Compact side panels leave more space for the map. In **Rail & Storage**, each owning-railroad colour has a visibility checkbox. Railroad choices filter rail lines independently of terminal and storage points; **Core** and **All** restore all railroad owners.
+
 Hover over a pipeline for its name or regulatory identifier, product types, published capacity, origin, and destination. Click or tap to keep the card open and follow its source links. Grouped routes list component capacities separately; AER feeders show when capacity or a commercial name is not published. Product types describe the pipeline's service, not a live batch. See the [reviewed pipeline facts](docs/PIPELINE_ROUTE_FACTS.md) for dates, capacity definitions, and source limitations.
 
 **Market Pipes** separates U.S. refined-product networks by their published operator and pipeline names, including Buckeye and Colonial. Search narrows the route menu while preserving selected routes on the map. Original inventory identities, operator reviews and route-geometry sources are separate; a hosted service edit does not prove a new pipeline survey.

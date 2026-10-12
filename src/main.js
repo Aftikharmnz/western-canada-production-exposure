@@ -407,6 +407,7 @@ const state = {
   railwayLineData: null,
   railwayLineSelection: '',
   selectedRailwayCategories: new Set(DEFAULT_RAILWAY_CATEGORIES),
+  selectedRailwayOwners: new Set(RAIL_OWNER_META.map((meta) => meta.key)),
   railwayMenuOpen: false,
   railwaySearch: "",
   railwaySearchTimer: null,
@@ -1111,6 +1112,35 @@ function updateSetFromToggle(event, group, targetSet) {
   state.selectedAssetId = null;
   state.timelineCache = null; // filters changed — invalidate bar chart cache
   scheduleRender();
+}
+
+function initLegendDisclosure() {
+  const legend = els.mapLegend;
+  if (!legend || legend.querySelector("#legendItems")) return;
+  const header = legend.querySelector(".map-legend-header");
+  if (!header) return;
+  const toggle = document.createElement("button");
+  toggle.id = "legendToggle";
+  toggle.type = "button";
+  toggle.className = "map-legend-header";
+  toggle.setAttribute("aria-controls", "legendItems");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.title = "Show legend";
+  toggle.innerHTML = '<span>Legend</span><span class="legend-caret" aria-hidden="true">▴</span>';
+  const items = document.createElement("div");
+  items.id = "legendItems";
+  items.hidden = true;
+  header.replaceWith(toggle);
+  Array.from(legend.children).filter((child) => child !== toggle).forEach((child) => items.appendChild(child));
+  legend.appendChild(items);
+  legend.classList.add("is-collapsed");
+  toggle.addEventListener("click", () => {
+    items.hidden = !items.hidden;
+    toggle.setAttribute("aria-expanded", String(!items.hidden));
+    toggle.title = items.hidden ? "Show legend" : "Hide legend";
+    toggle.querySelector(".legend-caret").textContent = items.hidden ? "▴" : "▾";
+    legend.classList.toggle("is-collapsed", items.hidden);
+  });
 }
 
 function initLegendControls() {
@@ -4826,6 +4856,8 @@ function railwayFeatures() {
 function selectedRailwayFeatures() {
   return railwayFeatures()
     .filter((feature) => state.selectedRailwayCategories.has(feature.properties?.category))
+    .filter((feature) => feature.properties?.feature_kind !== 'rail_line'
+      || state.selectedRailwayOwners.has(railLineOwnerMeta(feature.properties).key))
     .filter((feature) => feature.properties?.feature_kind === 'rail_line'
       || infrastructureMatchesSearch(feature.properties, state.railwaySearch));
 }
@@ -5024,7 +5056,9 @@ function renderRailwayLayer() {
   }
 
   const features = selectedRailwayFeatures();
-  const lineSelection = [...state.selectedRailwayCategories].filter((key) => RAILWAY_CATEGORY_META[key]?.kind === 'line').sort().join('|');
+  const lineCategories = [...state.selectedRailwayCategories].filter((key) => RAILWAY_CATEGORY_META[key]?.kind === 'line').sort().join('|');
+  const lineOwners = [...state.selectedRailwayOwners].sort().join('|');
+  const lineSelection = `${lineCategories}::${lineOwners}`;
   // A facility search changes only point features. Keep the 110,000-segment
   // rail context intact rather than recreating it for every query or locator.
   if (state.railwayLineData !== state.railwayData || state.railwayLineSelection !== lineSelection) {
@@ -5127,10 +5161,11 @@ function buildRailwayMenu() {
         ${RAIL_OWNER_META.map((meta) => {
           const count = ownerCounts.get(meta.key);
           return `
-            <span class="railway-owner-item">
+            <label class="railway-owner-item">
+              <input type="checkbox" data-railway-owner="${escapeHtml(meta.key)}" ${state.selectedRailwayOwners.has(meta.key) ? 'checked' : ''} />
               <span class="railway-swatch" style="background:${railwayOwnerColor(meta)}"></span>
-              ${escapeHtml(meta.label)}${count ? ` · ${formatNumber(count, 0)}` : ""}
-            </span>`;
+              <span class="railway-owner-name">${escapeHtml(meta.label)}${count ? ` · ${formatNumber(count, 0)}` : ""}</span>
+            </label>`;
         }).join("")}
       </div>`
     : "";
@@ -5169,6 +5204,17 @@ function terminalSearchResultsHtml() {
 }
 
 function handleRailwayMenuChange(event) {
+  const ownerInput = event.target.closest("input[data-railway-owner]");
+  if (ownerInput) {
+    const key = ownerInput.dataset.railwayOwner;
+    if (!RAIL_OWNER_META.some((meta) => meta.key === key)) return;
+    if (ownerInput.checked) state.selectedRailwayOwners.add(key);
+    else state.selectedRailwayOwners.delete(key);
+    state.railwayEnabled = railwaySelectedCount() > 0;
+    renderRailwayLayer();
+    updateRailwayToggleUI();
+    return;
+  }
   const input = event.target.closest("input[data-railway-category]");
   if (!input) return;
   const key = input.dataset.railwayCategory;
@@ -5199,10 +5245,12 @@ function handleRailwayMenuClick(event) {
   if (!action) return;
   if (action === "all") {
     Object.keys(RAILWAY_CATEGORY_META).forEach((key) => state.selectedRailwayCategories.add(key));
+    state.selectedRailwayOwners = new Set(RAIL_OWNER_META.map((meta) => meta.key));
   } else if (action === "none") {
     state.selectedRailwayCategories.clear();
   } else if (action === "defaults") {
     state.selectedRailwayCategories = new Set(DEFAULT_RAILWAY_CATEGORIES);
+    state.selectedRailwayOwners = new Set(RAIL_OWNER_META.map((meta) => meta.key));
   }
   state.railwayEnabled = railwaySelectedCount() > 0;
   buildRailwayMenu();
@@ -5764,6 +5812,7 @@ function pipelineLegendCounts() {
 
 async function boot() {
   try {
+    initLegendDisclosure();
     await loadData();
     initControls();
     initMap();

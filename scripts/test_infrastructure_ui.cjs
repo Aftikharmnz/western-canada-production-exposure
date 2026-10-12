@@ -10,7 +10,7 @@ function app(globals = {}) {
     document: { querySelector: () => null, getElementById: () => null },
     console, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval,
     fetch: async () => { throw new Error('Infrastructure UI tests must not make network requests'); }, ...globals };
-  return vm.runInNewContext(source + '\n({state,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer})', context);
+  return vm.runInNewContext(source + '\n({state,RAIL_OWNER_META,DEFAULT_RAILWAY_CATEGORIES,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,buildRailwayMenu,handleRailwayMenuChange,handleRailwayMenuClick,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer})', context);
 }
 
 function feature(id, properties, geometryType = 'Point') {
@@ -24,6 +24,141 @@ const terminal = (id, operator, extra = {}) => feature(id, {
   source_as_of: '2020', source: 'EIA terminal inventory',
   source_url: 'https://example.com/identity', coordinate_source_url: 'https://example.com/coordinates',
   location_confidence: 'Source inventory point; accuracy not established', ...extra,
+});
+
+const rail = (id, owner, category = 'rail-main') => feature(id, {
+  feature_kind: 'rail_line', category, name: 'Rail corridor', owner,
+}, 'LineString');
+
+function railOwnerEvent(key, checked) {
+  const input = { dataset: { railwayOwner: key }, checked };
+  return { target: { closest: selector => selector === 'input[data-railway-owner]' ? input : null } };
+}
+
+function railCategoryEvent(key, checked) {
+  const input = { dataset: { railwayCategory: key }, checked };
+  return { target: { closest: selector => selector === 'input[data-railway-category]' ? input : null } };
+}
+
+function railActionEvent(action) {
+  return { target: { closest: selector => selector === '[data-railway-action]' ? { dataset: { railwayAction: action } } : null } };
+}
+
+function railTestMap() {
+  const removed = [];
+  const fakeL = { geoJSON: (collection, options) => {
+    collection.features.forEach(feature => {
+      const item = { feature, bindTooltip() { return this; }, bindPopup() { return this; }, on() { return this; } };
+      options.onEachFeature(feature, item);
+    });
+    return { features: collection.features, addTo() { return this; }, bringToBack() {} };
+  } };
+  const a = app({ window: { L: fakeL, location: { href: 'https://example.com/' } }, L: fakeL });
+  a.state.map = { removeLayer(layer) { removed.push(layer); } };
+  a.state.railwayEnabled = true;
+  a.state.selectedRailwayCategories = new Set(['rail-main', 'product-terminal']);
+  return { a, removed };
+}
+
+test('every railroad owner legend entry has a checkbox selected by default, including fallback owners', () => {
+  const options = { innerHTML: '' };
+  const a = app({ document: { querySelector: () => null, getElementById: id => id === 'railwayOptions' ? options : null } });
+  a.state.railwayData = { features: [rail('cn', 'CN'), rail('unknown-owner', 'UNLISTED'), terminal('facility', 'Operator')] };
+  a.buildRailwayMenu();
+  const inputs = options.innerHTML.match(/<input[^>]*data-railway-owner=[^>]*>/g);
+  assert.equal(inputs.length, 8);
+  for (const key of ['cn', 'cpkc', 'bnsf', 'up', 'csx', 'ns', 'passenger', 'other']) {
+    const input = inputs.find(html => html.includes(`data-railway-owner="${key}"`));
+    assert.ok(input, `${key} must be independently selectable`);
+    assert.match(input, /\bchecked\b/);
+    assert.equal(a.state.selectedRailwayOwners.has(key), true);
+  }
+});
+
+test('owner checkboxes use the colour grouping and hide only the corresponding railroad geometry', () => {
+  const a = app();
+  a.state.railwayData = { features: [
+    rail('cn-alias', 'GTW'), rail('cp', 'CP'), rail('kcs', 'KCS'), rail('joint-cpkc-first', 'CPKC, UP'),
+    rail('up-first', 'UP, CP'), rail('passenger', 'AMTK'), rail('regional', 'UNLISTED'), rail('no-owner', ''),
+    terminal('cn-terminal', 'CN', { owner: 'CN' }),
+  ] };
+  a.handleRailwayMenuChange(railOwnerEvent('cpkc', false));
+  assert.deepEqual(Array.from(a.selectedRailwayFeatures(), feature => feature.properties.facility_id),
+    ['cn-alias', 'up-first', 'passenger', 'regional', 'no-owner', 'cn-terminal']);
+  a.handleRailwayMenuChange(railOwnerEvent('cn', false));
+  assert.equal(a.selectedRailwayFeatures().some(feature => feature.properties.facility_id === 'cn-terminal'), true,
+    'A terminal owner or operator must not be treated as a rail-line owner');
+  a.handleRailwayMenuChange(railOwnerEvent('other', false));
+  assert.deepEqual(Array.from(a.selectedRailwayFeatures(), feature => feature.properties.facility_id),
+    ['up-first', 'passenger', 'cn-terminal']);
+  a.handleRailwayMenuChange(railOwnerEvent('cpkc', true));
+  assert.deepEqual(Array.from(a.selectedRailwayFeatures(), feature => feature.properties.facility_id),
+    ['cp', 'kcs', 'joint-cpkc-first', 'up-first', 'passenger', 'cn-terminal']);
+});
+
+test('owner filtering invalidates cached lines, combines with categories, and preserves facility selections', () => {
+  const { a, removed } = railTestMap();
+  a.state.railwayData = { features: [rail('cn-main', 'CN'), rail('cp-main', 'CP'), rail('cn-lead', 'CN', 'rail-industrial'),
+    terminal('buckeye', 'Buckeye'), terminal('colonial', 'Colonial')] };
+  a.renderRailwayLayer();
+  const allLines = a.state.railwayLineLayer;
+  a.handleRailwayMenuChange(railOwnerEvent('cn', false));
+  assert.ok(removed.includes(allLines), 'Owner changes must invalidate the cached rail layer');
+  assert.deepEqual(Array.from(a.state.railwayLineLayer.features, feature => feature.properties.facility_id), ['cp-main']);
+  assert.deepEqual(Array.from(a.state.railwayLayer.features, feature => feature.properties.facility_id), ['buckeye', 'colonial']);
+  const cpLines = a.state.railwayLineLayer;
+  a.state.railwaySearch = 'Buckeye';
+  a.renderRailwayLayer();
+  assert.equal(a.state.railwayLineLayer, cpLines, 'Facility search must retain the filtered rail instance');
+  a.handleRailwayMenuChange(railCategoryEvent('rail-industrial', true));
+  assert.deepEqual(Array.from(a.state.railwayLineLayer.features, feature => feature.properties.facility_id), ['cp-main']);
+  a.handleRailwayMenuChange(railOwnerEvent('cn', true));
+  assert.deepEqual(Array.from(a.state.railwayLineLayer.features, feature => feature.properties.facility_id), ['cn-main', 'cp-main', 'cn-lead']);
+  a.handleRailwayMenuChange(railCategoryEvent('rail-main', false));
+  assert.deepEqual(Array.from(a.state.railwayLineLayer.features, feature => feature.properties.facility_id), ['cn-lead']);
+  a.handleRailwayMenuChange(railCategoryEvent('rail-main', true));
+  assert.deepEqual(Array.from(a.state.railwayLayer.features, feature => feature.properties.facility_id), ['buckeye']);
+  for (const { key } of a.RAIL_OWNER_META) a.handleRailwayMenuChange(railOwnerEvent(key, false));
+  assert.equal(a.state.railwayLineLayer, null);
+  assert.deepEqual(Array.from(a.state.railwayLayer.features, feature => feature.properties.facility_id), ['buckeye'],
+    'Hiding every railroad must leave the selected facility points visible');
+});
+
+test('rail owner checkbox state survives basemap, facility search and menu redraws', () => {
+  const options = { innerHTML: '' };
+  const a = app({ document: { querySelector: () => null, getElementById: id => id === 'railwayOptions' ? options : null } });
+  a.state.railwayData = { features: [rail('cn', 'CN'), rail('cp', 'CP'), terminal('buckeye', 'Buckeye')] };
+  a.handleRailwayMenuChange(railOwnerEvent('cn', false));
+  for (const [basemap, search] of [['dark', 'Buckeye'], ['light', ''], ['satellite', 'no matching facility']]) {
+    a.state.basemapKey = basemap;
+    a.state.railwaySearch = search;
+    a.buildRailwayMenu();
+    const cnInput = options.innerHTML.match(/<input[^>]*data-railway-owner="cn"[^>]*>/)[0];
+    const cpInput = options.innerHTML.match(/<input[^>]*data-railway-owner="cpkc"[^>]*>/)[0];
+    assert.doesNotMatch(cnInput, /\bchecked\b/);
+    assert.match(cpInput, /\bchecked\b/);
+    assert.equal(a.state.selectedRailwayOwners.has('cn'), false);
+  }
+});
+
+test('Core and All restore every owner while None clears categories without resetting owner choices', () => {
+  const a = app();
+  a.handleRailwayMenuChange(railOwnerEvent('cn', false));
+  a.handleRailwayMenuClick(railActionEvent('none'));
+  assert.equal(a.state.selectedRailwayCategories.size, 0);
+  assert.equal(a.state.railwayEnabled, false);
+  assert.equal(a.state.selectedRailwayOwners.has('cn'), false);
+  a.handleRailwayMenuChange(railOwnerEvent('cpkc', false));
+  assert.equal(a.state.railwayEnabled, false, 'An owner checkbox alone must not enable an unselected rail category');
+  a.handleRailwayMenuClick(railActionEvent('defaults'));
+  assert.deepEqual(Array.from(a.state.selectedRailwayCategories), Array.from(a.DEFAULT_RAILWAY_CATEGORIES));
+  assert.equal(a.state.selectedRailwayOwners.size, 8);
+  assert.equal(a.state.railwayEnabled, true);
+  a.handleRailwayMenuChange(railOwnerEvent('other', false));
+  a.handleRailwayMenuClick(railActionEvent('all'));
+  assert.equal(a.state.selectedRailwayOwners.size, 8);
+  assert.equal(a.state.selectedRailwayCategories.has('rail-industrial'), true);
+  assert.equal(a.state.selectedRailwayCategories.has('inactive-terminal'), true);
 });
 
 test('infrastructure search matches all case/accent-insensitive tokens across names and identity fields', () => {
