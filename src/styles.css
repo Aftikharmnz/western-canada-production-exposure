@@ -2640,6 +2640,17 @@ button.map-legend-header:focus-visible {
 .pipeline-card-source { margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 10px; }
 .pipeline-card-source a { color: #1d4ed8; text-decoration: underline; text-underline-offset: 2px; }
 .pipeline-card-footer { margin-top: 7px; color: #64748b; font-size: 9px; }
+.enbridge-line-guide { margin: 8px 0; padding: 8px; border: 1px solid #dbe5f1; border-radius: 6px; background: #f8fafc; }
+.enbridge-line-guide > summary { font-size: 11px; font-weight: 750; color: #16385b; cursor: pointer; }
+.enbridge-line-results { display: grid; gap: 5px; margin: 6px 0; }
+.enbridge-line-results button { display: grid; gap: 3px; width: 100%; padding: 7px; text-align: left; border: 1px solid #dbe5f1; border-radius: 5px; background: #fff; color: #0f172a; cursor: pointer; }
+.enbridge-line-results button:hover { border-color: #2563eb; background: #eff6ff; }
+.enbridge-line-results button strong { font-size: 11px; line-height: 1.4; }
+.enbridge-line-results button span { font-size: 10px; color: #64748b; line-height: 1.4; overflow-wrap: anywhere; }
+.enbridge-line-results button:focus-visible, .enbridge-line-guide > summary:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.enbridge-geometry-note { padding: 8px; border-left: 3px solid #94a3b8; background: #f8fafc; }
+.enbridge-line-card .pipeline-card-source summary { cursor: pointer; font-weight: 700; margin-bottom: 6px; }
+.pipeline-detail-tip .pipeline-card { max-height: min(560px, calc(100vh - 160px)); overflow: hidden; }
 .pipeline-detail-popup .leaflet-popup-content-wrapper { border: 1px solid #cbd5e1; border-radius: 10px; }
 .pipeline-detail-popup .leaflet-popup-content { width: min(340px, calc(100vw - 72px)) !important; margin: 15px 17px; max-height: min(640px, 72vh); overflow-y: auto; }
 

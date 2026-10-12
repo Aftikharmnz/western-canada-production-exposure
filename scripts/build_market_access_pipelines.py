@@ -15,6 +15,7 @@ Run:
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -189,7 +190,7 @@ ROUTES: list[dict[str, Any]] = [
     },
     {
         "route_id": "express-platte",
-        "route_name": "Express / Platte",
+        "route_name": "Enbridge Lines 40 / 41 — Express / Platte",
         "operator": "Enbridge (Express Pipeline / Platte Pipeline)",
         "operator_source_url": "https://www.enbridge.com/projects-and-infrastructure/liquids-pipelines/express-platte-system",
         "commodity": "Crude oil",
@@ -205,7 +206,7 @@ ROUTES: list[dict[str, Any]] = [
     },
     {
         "route_id": "southern-lights",
-        "route_name": "Southern Lights",
+        "route_name": "Enbridge Line 13 / Southern Lights",
         "operator": "Enbridge",
         "commodity": "Diluent / condensate",
         "flow_role": "Diluent import trunk into Alberta oil sands blending markets",
@@ -323,8 +324,38 @@ ROUTES: list[dict[str, Any]] = [
         ],
     },
     {
+        "route_id": "enbridge-line-7",
+        "route_name": "Enbridge Line 7",
+        "operator": "Enbridge",
+        "commodity": "Crude oil / liquids",
+        "flow_role": "Ontario refinery access",
+        "direction": "Sarnia to Westover, Ontario",
+        "geometry_note": "CER explicitly identifies these published segments as EnbridgeLine7. The linework is a general route reference, not survey-grade.",
+        "color": "#60a5fa",
+        "display_order": 80,
+        "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
+        "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'EnbridgeLine7'",
+                   "expected_identity": {"PipelineID": "EnbridgeLine7"}}],
+    },
+    {
+        "route_id": "enbridge-line-11",
+        "route_name": "Enbridge Line 11",
+        "operator": "Enbridge",
+        "commodity": "Crude oil / liquids",
+        "flow_role": "Ontario refinery access",
+        "direction": "Westover to Nanticoke, Ontario",
+        "geometry_note": "CER explicitly identifies these segments as EnbridgeLine11. Its published geometry begins near Hamilton and omits the connecting portion from Westover; the reviewed endpoints describe the full line.",
+        "color": "#93c5fd",
+        "display_order": 81,
+        "default_visible": True,
+        "menu_section": "Selected Other Crude Oil Pipelines",
+        "parts": [{"source": "CER", "url": CER_PIPELINES_URL, "where": "PipelineID = 'EnbridgeLine11'",
+                   "expected_identity": {"PipelineID": "EnbridgeLine11"}}],
+    },
+    {
         "route_id": "enbridge-lines-7-11",
-        "route_name": "Enbridge Lines 7 / 11",
+        "route_name": "Enbridge Lines 7 / 11 (combined reference)",
         "operator": "Enbridge",
         "commodity": "Crude oil / liquids",
         "flow_role": "Ontario refinery access",
@@ -481,7 +512,7 @@ ROUTES: list[dict[str, Any]] = [
     },
     {
         "route_id": "norman-wells",
-        "route_name": "Norman Wells / Zama (supply shut in)",
+        "route_name": "Enbridge Line 21 / Norman Wells (supply shut in)",
         "operator": "Enbridge",
         "commodity": "Crude oil",
         "flow_role": "Historical Northwest Territories crude supply connection",
@@ -726,6 +757,7 @@ def route_feature(route: dict[str, Any], include_remote: bool,
     lines: list[list[list[float]]] = []
     sources: list[str] = []
     warnings: list[str] = []
+    identity_records: list[dict[str, Any]] = []
 
     for part in route.get("parts", []):
         if part.get("manual_lines"):
@@ -759,6 +791,20 @@ def route_feature(route: dict[str, Any], include_remote: bool,
             continue
         if not part_features:
             warnings.append(f"{route['route_name']}: {part['source']} query returned no features ({part['where']})")
+        expected = part.get("expected_identity")
+        if expected:
+            seen_ids = set()
+            for feature in part_features:
+                attributes = feature.get("properties") or {}
+                object_id = attributes.get("OBJECTID")
+                if (any(attributes.get(field) != value for field, value in expected.items())
+                        or type(object_id) is not int or object_id in seen_ids or not feature_lines(feature)
+                        or any(len(line) < 2 for line in feature_lines(feature))):
+                    raise ValueError(f"{route['route_id']}: source query did not return unique explicitly identified line geometry")
+                seen_ids.add(object_id)
+            if part_features:
+                identity_records.append({"source_url": part["url"], "identity_fields": expected.copy(),
+                                         "source_feature_ids": sorted(seen_ids)})
         for feature in part_features:
             lines.extend(line for line in feature_lines(feature) if line_allowed(line, part.get("line_filter")))
         if part_features:
@@ -807,6 +853,8 @@ def route_feature(route: dict[str, Any], include_remote: bool,
             "Named route selected for market-access context; not a complete pipeline inventory.",
         ),
     }
+    if identity_records:
+        properties["geometry_source_identities"] = identity_records
     return {"type": "Feature", "properties": properties, "geometry": geometry_from_lines(lines)}, warnings
 
 
@@ -850,7 +898,7 @@ def load_route_facts(path: Path) -> dict[str, dict[str, Any]]:
         raise ValueError("Product network reviews require stable us-products-* IDs")
     facts = {**facts, **product_facts}
     required = {"origin", "destination", "product", "capacity_kbbl_d", "capacity_basis", "capacity_note", "source_url", "source_name", "verified_at"}
-    optional = {"capacity_label", "as_of", "route_source_url", "operator"}
+    optional = {"capacity_label", "as_of", "route_source_url", "operator", "route_name", "menu_section"}
     for route_id, fact in facts.items():
         if not isinstance(fact, dict) or not required <= set(fact) or set(fact) - required - optional:
             raise ValueError(f"{route_id}: unsupported or missing pipeline fact fields")
@@ -963,14 +1011,14 @@ def build_product_network_features(source_features: list[dict[str, Any]], source
         member_ids = sorted(member.get("properties", {}).get("FID", member.get("id")) for member in members)
         lines = [line for member in members for line in feature_lines(member)]
         properties = {
-            "feature_kind": "pipeline", "route_id": route_id, "route_name": name,
+            "feature_kind": "pipeline", "route_id": route_id, "route_name": details.get("route_name", name),
             "operator": details.get("operator", f"{published_operator} (EIA source label)"),
             "operator_source_url": details["source_url"] if "operator" in details else None,
             "commodity": details["product"], "flow_role": "Named EIA petroleum-products network snapshot",
             "direction": "Not inferred from coordinate order",
             "color": colors.get(route_id, palette[int(hashlib.sha256(route_id.encode()).hexdigest()[:4], 16) % len(palette)]),
             "display_order": 300 + number, "default_visible": False,
-            "menu_section": "U.S. refined-product networks",
+            "menu_section": details.get("menu_section", "U.S. refined-product networks"),
             "source_summary": f"{source_label} ({len(members)} source features); published operator: {published_operator}",
             "source_urls": sorted({source_url, details["source_url"]}),
             "source_operator_names": [operator] if operator else [],
@@ -1079,6 +1127,71 @@ def apply_buckeye_operator_geometry(features: list[dict[str, Any]], operator_fea
             "identity_note": "Reviewed exact-name matches only; additional operator names are emitted separately without guessed archived associations."}
 
 
+def apply_reviewed_route_facts(feature: dict[str, Any], details: dict[str, Any]) -> None:
+    """Update reviewed descriptive facts without changing line geometry/provenance."""
+    properties = feature["properties"]
+    properties.update(pipeline_details=copy.deepcopy(details), commodity=details["product"],
+                      direction=f"{details['origin']} → {details['destination']}")
+    for field in ("operator", "route_name", "menu_section"):
+        if field in details:
+            properties[field] = details[field]
+    if "operator" in details:
+        properties["operator_source_url"] = details["source_url"]
+
+
+def merge_verified_enbridge_lines(existing: dict[str, Any], facts: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Fetch only explicitly identified CER Lines 7/11; preserve every other geometry.
+
+    The old combined reference remains available but hidden. Reviewed facts may
+    refresh display names/products/menus; source IDs and linework are not inferred.
+    """
+    if existing.get("type") != "FeatureCollection" or not isinstance(existing.get("features"), list):
+        raise ValueError("Verified line merge requires an existing FeatureCollection")
+    output = copy.deepcopy(existing)
+    by_id = {}
+    for feature in output["features"]:
+        properties = feature.get("properties") or {}
+        if properties.get("feature_kind") == "pipeline":
+            route_id = properties.get("route_id")
+            if not isinstance(route_id, str) or route_id in by_id:
+                raise ValueError("Verified line merge requires unique existing route IDs")
+            by_id[route_id] = feature
+    aggregate_id = "enbridge-lines-7-11"
+    if aggregate_id not in by_id:
+        raise ValueError("Verified line merge must preserve the existing combined 7/11 reference")
+    child_ids = {"enbridge-line-7", "enbridge-line-11"}
+    child_features = []
+    for route in ROUTES:
+        if route["route_id"] not in child_ids:
+            continue
+        feature, warnings = route_feature(route, include_remote=True)
+        if warnings or feature is None:
+            raise ValueError(f"Incomplete explicit CER line query: {warnings}")
+        apply_reviewed_route_facts(feature, facts[route["route_id"]])
+        child_features.append(feature)
+    if len(child_features) != 2:
+        raise ValueError("Both numbered CER lines are required before publication")
+    for feature in output["features"]:
+        properties = feature.get("properties") or {}
+        route_id = properties.get("route_id")
+        if route_id in facts:
+            apply_reviewed_route_facts(feature, facts[route_id])
+        if route_id in {"southern-lights", "norman-wells", "express-platte", aggregate_id}:
+            definition = next(route for route in ROUTES if route["route_id"] == route_id)
+            properties["route_name"] = definition["route_name"]
+        if route_id == aggregate_id:
+            properties["default_visible"] = False
+            properties["coverage_scope"] = "Legacy combined CER Lines 7/11 reference. Separately identified numbered lines are available; do not add this geometry to their coverage."
+    output["features"] = [feature for feature in output["features"]
+                          if feature.get("properties", {}).get("route_id") not in child_ids] + child_features
+    output.setdefault("metadata", {})["numbered_line_geometry_review"] = {
+        "source_url": CER_PIPELINES_URL, "reviewed_at": date.today().isoformat(),
+        "explicit_pipeline_ids": ["EnbridgeLine7", "EnbridgeLine11"],
+        "note": "Only exact CER identities were split. Other geometry and source IDs were retained; grouped Mainline/Lakehead corridors are not assigned to individual numbered lines.",
+    }
+    return output
+
+
 def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_FEEDER_PIPELINES,
                              route_facts: Path = DEFAULT_ROUTE_FACTS) -> dict[str, Any]:
     facts = load_route_facts(route_facts)
@@ -1091,8 +1204,7 @@ def build_feature_collection(include_remote: bool, aer_feeder_input: Path = AER_
         warnings.extend(route_warnings)
         if feature:
             details = facts[route["route_id"]]
-            feature["properties"].update(pipeline_details=details, commodity=details["product"],
-                                         direction=f"{details['origin']} → {details['destination']}")
+            apply_reviewed_route_facts(feature, details)
             features.append(feature)
             print(f"{route['route_name']}: {feature['properties']['source_summary']}", file=sys.stderr)
 
@@ -1162,6 +1274,8 @@ def main() -> int:
                         help="Validated AER feeder layer to use, including an isolated ELT candidate")
     parser.add_argument("--route-facts", type=Path, default=DEFAULT_ROUTE_FACTS,
                         help="Reviewed route endpoints and capacity facts; retained across geometry refreshes")
+    parser.add_argument("--verified-enbridge-merge", type=Path, metavar="EXISTING_GEOJSON",
+                        help="Preserve existing geometry and fetch only exact CER Lines 7/11, then apply reviewed route facts")
     parser.add_argument(
         "--local-only",
         action="store_true",
@@ -1172,8 +1286,14 @@ def main() -> int:
     if args.local_only and args.output.resolve() == DEFAULT_OUTPUT.resolve():
         parser.error("--local-only requires a separate --output; it must not replace the production network")
 
-    collection = build_feature_collection(include_remote=not args.local_only, aer_feeder_input=args.aer_feeder_input.resolve(),
-                                         route_facts=args.route_facts.resolve())
+    if args.verified_enbridge_merge and args.local_only:
+        parser.error("--verified-enbridge-merge requires its two live CER identity queries")
+    if args.verified_enbridge_merge:
+        existing = json.loads(args.verified_enbridge_merge.read_text(encoding="utf-8"))
+        collection = merge_verified_enbridge_lines(existing, load_route_facts(args.route_facts.resolve()))
+    else:
+        collection = build_feature_collection(include_remote=not args.local_only, aer_feeder_input=args.aer_feeder_input.resolve(),
+                                             route_facts=args.route_facts.resolve())
     if collection["metadata"]["warnings"] and not args.local_only:
         for warning in collection["metadata"]["warnings"]:
             print(f"ERROR: {warning}", file=sys.stderr)
