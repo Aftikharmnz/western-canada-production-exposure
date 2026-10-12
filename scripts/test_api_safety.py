@@ -10,6 +10,11 @@ import check_alerts as alerts
 
 
 class PublicSourceTests(unittest.TestCase):
+    def setUp(self):
+        retry_sleep = patch.object(power.time, 'sleep')
+        retry_sleep.start()
+        self.addCleanup(retry_sleep.stop)
+
     def test_missing_generation_is_not_zero(self):
         parsed = power.parse_csd('Plant (A1)*,100,,0\nOther (A2),100,0,0')
         self.assertIsNone(parsed['assets'][0]['tng_mw'])
@@ -154,7 +159,9 @@ class PublicSourceTests(unittest.TestCase):
         # for a deterministic future-time fixture.
         now = datetime(2026, 9, 10, 18, 0, tzinfo=timezone.utc)
         local = now.astimezone(power.ZoneInfo('America/Edmonton'))
-        prefix = f'Last Update : {local:%b %d, %Y %H:%M}\nAlberta Internal Load (AIL),100\n'
+        prefix = (f'Last Update : {local:%b %d, %Y %H:%M}\nAlberta Internal Load (AIL),100\n'
+                  'Alberta Total Net Generation,100\nNet Actual Interchange,0\n'
+                  'Net-To-Grid Generation,100\nDispatched Contingency Reserve (DCR),0\nTOTAL,100,100,0\n')
         site = {'codes':['A1','A2'],'site':'Missing unit','operator':'Test','lat':55,'lon':-120}
         with patch.object(power, 'datetime', wraps=datetime) as clock, patch.object(power, 'SITE_COGEN_SITES', [site]), patch.object(power, 'fetch_csd', return_value=prefix+'Other (B1),100,30,0'):
             clock.now.return_value = now

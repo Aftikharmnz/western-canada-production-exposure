@@ -1,0 +1,2 @@
+# Includes Alberta's permanent UTC-6 rules effective November 2026.
+tzdata==2026.5

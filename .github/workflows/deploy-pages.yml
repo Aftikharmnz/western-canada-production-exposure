@@ -5,18 +5,19 @@ on:
     branches:
       - main
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency:
-  group: github-pages
-  cancel-in-progress: true
-
 jobs:
   deploy:
+    # Serialize site deployments without interrupting a refresh caller.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -26,12 +27,18 @@ jobs:
     steps:
       - name: Check out the published branch
         uses: actions/checkout@v7
+        with:
+          # A refresh pushes new data after its triggering commit. Always build
+          # the published branch, including that newly committed snapshot.
+          ref: main
 
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: scripts/requirements-elt.txt
+          cache-dependency-path: |
+            scripts/requirements-elt.txt
+            scripts/requirements-aeso.txt
 
       - uses: actions/setup-node@v6
         with:

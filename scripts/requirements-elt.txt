@@ -1,3 +1,4 @@
 openpyxl==3.1.5
+-r requirements-aeso.txt
 pyshp==2.3.1
 pyproj==3.7.2

@@ -10,29 +10,55 @@ on:
         description: "Send a test alert email (delivery check)"
         type: boolean
         default: false
+      check_only:
+        description: "Verify downloads and tests without publishing or sending alerts"
+        type: boolean
+        default: false
+      skip_alerts:
+        description: "Skip alert checks for this manual run"
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
 
 concurrency:
   group: refresh-aeso-power
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   refresh:
+    if: github.ref == 'refs/heads/main' || inputs.check_only == true
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.publish.outputs.changed }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-aeso.txt
+
+      - name: Install current Alberta time rules
+        run: python -m pip install -r scripts/requirements-aeso.txt
+
+      - name: Check AESO parsing and alert safeguards
+        run: |
+          python -m unittest discover -s scripts -p 'test_aeso*.py'
+          python -m unittest discover -s scripts -p 'test_api_safety.py'
 
       - name: Fetch AESO CSD and rebuild snapshot
         run: python scripts/build_aeso_power_status.py
 
       - name: Check alerts (power transitions, fires near assets)
+        if: inputs.check_only != true && inputs.skip_alerts != true
         continue-on-error: true
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -42,11 +68,17 @@ jobs:
         run: python scripts/check_alerts.py
 
       - name: Commit and push if changed
+        if: inputs.check_only != true
         id: publish
         run: python scripts/publish_data_update.py --paths public/data/aeso_power_status.json data/alerts/state.json --message "Auto-refresh AESO power status" --push
 
-      - name: Redeploy Pages after a data refresh
-        if: steps.publish.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run deploy-pages.yml --ref main
+  # Run deployment as part of this workflow: no separate dispatch API request,
+  # and the refresh only succeeds once the updated site has been deployed.
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy-pages.yml
