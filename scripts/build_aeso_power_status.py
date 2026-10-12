@@ -10,6 +10,7 @@ and writes public/data/aeso_power_status.json with:
   - the ATCO-heritage (Heartland Generation) merchant fleet
 
 Run locally:
+    python -m pip install -r scripts/requirements-aeso.txt
     python scripts/build_aeso_power_status.py
 
 In CI this runs on a 30-minute GitHub Actions schedule
@@ -19,14 +20,20 @@ automatically with no manual steps.
 
 from __future__ import annotations
 
+import argparse
 import csv
+import http.client
 import io
 import json
 import math
+import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from importlib.resources import files
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -35,6 +42,18 @@ OUTPUT = ROOT / "public" / "data" / "aeso_power_status.json"
 # AESO's legacy public CSV endpoint does not negotiate HTTPS (verified 2026-09).
 # No credentials are transmitted. Validate schema and observation age before publishing.
 CSD_URL = "http://ets.aeso.ca/ets_web/ip/Market/Reports/CSDReportServlet?contentType=csv"
+MAX_REPORT_BYTES = 512 * 1024
+MAX_ATTEMPTS = 3
+RETRY_HTTP_CODES = {408, 429, 500, 502, 503, 504}
+SYSTEM_FIELDS = {
+    "Alberta Internal Load (AIL)", "Alberta Total Net Generation",
+    "Net Actual Interchange", "Net-To-Grid Generation",
+    "Dispatched Contingency Reserve (DCR)",
+}
+# Use the pinned database rather than a runner's potentially older system rules.
+# Alberta stays on UTC-6 from November 2026; stale rules would misdate the report.
+with files("tzdata.zoneinfo").joinpath("America/Edmonton").open("rb") as zone_file:
+    OBSERVATION_ZONE = ZoneInfo.from_file(zone_file, key="America/Edmonton")
 
 # Production-site links. Each site may aggregate several AESO cogen units
 # (e.g. Suncor Base Plant + Poplar Creek). `asset_names` are display names in
@@ -94,7 +113,10 @@ ASSET_RE = re.compile(r"^(?P<name>.+?)\s*\((?P<code>[A-Z0-9]+)\)[\*\^]*$")
 def fetch_csd() -> str:
     req = urllib.request.Request(CSD_URL, headers={"User-Agent": "western-canada-production-exposure/power-status"})
     with urllib.request.urlopen(req, timeout=60) as response:
-        return response.read().decode("utf-8", errors="replace")
+        payload = response.read(MAX_REPORT_BYTES + 1)
+    if len(payload) > MAX_REPORT_BYTES:
+        raise ValueError("AESO response exceeds the report size limit")
+    return payload.decode("utf-8-sig")
 
 
 def to_num(value: str):
@@ -115,6 +137,9 @@ def parse_csd(text: str) -> dict:
 
     for row in rows:
         if not row or not row[0].strip():
+            # Some AESO CSV blocks omit their HTML fuel heading. A blank block
+            # boundary must not label subsequent wind/hydro units as gas steam.
+            section = None
             continue
         cell = row[0].strip()
         m = re.match(r"^<center><b>(.+?)</b></center>$", cell)
@@ -147,14 +172,49 @@ def parse_csd(text: str) -> dict:
     return {"system": system, "last_update": last_update, "groups": groups, "assets": assets}
 
 
-def build() -> dict:
-    parsed = parse_csd(fetch_csd())
-    if not parsed["assets"] or not parsed["last_update"] or parsed["system"].get("Alberta Internal Load (AIL)") is None:
+def validate_report(parsed: dict) -> None:
+    if (not parsed["assets"] or not parsed["last_update"]
+            or not SYSTEM_FIELDS.issubset(parsed["system"])):
         raise ValueError("AESO response is incomplete; preserving the last valid snapshot")
-    observed = datetime.strptime(parsed["last_update"], "%b %d, %Y %H:%M").replace(tzinfo=ZoneInfo("America/Edmonton"))
-    age = (datetime.now(timezone.utc) - observed.astimezone(timezone.utc)).total_seconds()
-    if age < -300 or age > 90 * 60:
+    codes = [row["code"] for row in parsed["assets"]]
+    if len(codes) != len(set(codes)):
+        raise ValueError("AESO response has duplicate unit codes")
+    groups = {row["group"]: row for row in parsed["groups"]}
+    if len(groups) != len(parsed["groups"]) or "Total" not in groups:
+        raise ValueError("AESO fuel summary is missing or duplicated")
+    capacities = [row["mc_mw"] for row in parsed["assets"]]
+    total = groups["Total"]["mc_mw"]
+    if (total is None or total <= 0 or any(mc is None or mc < 0 for mc in capacities)
+            or not math.isclose(sum(capacities), total, rel_tol=1e-6, abs_tol=1)):
+        raise ValueError("AESO unit capacities do not match the report total; response may be truncated")
+    if any(row["mc_mw"] is None or row["tng_mw"] is None for row in groups.values()):
+        raise ValueError("AESO fuel summary contains missing readings")
+
+
+def observation_time(stamp: str, now: datetime) -> datetime:
+    wall = datetime.strptime(stamp, "%b %d, %Y %H:%M")
+    zone = OBSERVATION_ZONE
+    candidates = []
+    for fold in (0, 1):
+        observed = wall.replace(tzinfo=zone, fold=fold).astimezone(timezone.utc)
+        # Reject nonexistent local times during the spring clock change.
+        if observed.astimezone(zone).replace(tzinfo=None) != wall:
+            continue
+        age = (now - observed).total_seconds()
+        if -300 <= age <= 90 * 60:
+            candidates.append(observed)
+    if not candidates:
         raise ValueError("AESO report is stale or future-dated; preserving the last valid snapshot")
+    # The source omits its UTC offset. During the autumn repeated hour use the
+    # nearest plausible occurrence instead of making fresh data an hour older.
+    return min(candidates, key=lambda observed: abs((now - observed).total_seconds()))
+
+
+def build_snapshot(text: str) -> dict:
+    parsed = parse_csd(text)
+    validate_report(parsed)
+    now = datetime.now(timezone.utc)
+    observed = observation_time(parsed["last_update"], now)
     by_code = {a["code"]: a for a in parsed["assets"]}
 
     site_cogen = []
@@ -196,10 +256,11 @@ def build() -> dict:
 
     sysm = parsed["system"]
     return {
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "observed_at": observed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": CSD_URL,
         "aeso_last_update": parsed["last_update"],
+        "aeso_asset_count": len(parsed["assets"]),
         "system": {
             "alberta_internal_load_mw": sysm.get("Alberta Internal Load (AIL)"),
             "total_net_generation_mw": sysm.get("Alberta Total Net Generation"),
@@ -217,14 +278,67 @@ def build() -> dict:
     }
 
 
-def main() -> int:
-    data = build()
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    temporary = OUTPUT.with_suffix(".tmp")
-    temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
-    temporary.replace(OUTPUT)
-    print(f"Wrote {OUTPUT.relative_to(ROOT)}: {len(data['site_cogen'])} site cogens, "
+def build() -> dict:
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            return build_snapshot(fetch_csd())
+        except urllib.error.HTTPError as exc:
+            if exc.code not in RETRY_HTTP_CODES:
+                raise
+            failure = exc
+        except (urllib.error.URLError, TimeoutError, ConnectionError,
+                http.client.HTTPException, ValueError, csv.Error) as exc:
+            failure = exc
+        if attempt == MAX_ATTEMPTS:
+            raise failure
+        delay = 2 ** attempt
+        print(f"warning: AESO attempt {attempt}/{MAX_ATTEMPTS} failed: {failure}; retrying in {delay}s", file=sys.stderr)
+        time.sleep(delay)
+    raise RuntimeError("AESO download attempts exhausted")
+
+
+def write_snapshot(data: dict, output: Path) -> None:
+    # A stale source replica must not move the published observation backwards.
+    if output.exists():
+        try:
+            previous = json.loads(output.read_text(encoding="utf-8"))
+            previous_stamp = previous.get("observed_at") if isinstance(previous, dict) else None
+            if previous_stamp and datetime.fromisoformat(previous_stamp.replace("Z", "+00:00")) > datetime.fromisoformat(data["observed_at"].replace("Z", "+00:00")):
+                raise RuntimeError("AESO observation predates the published snapshot; preserving the newer reading")
+        except (ValueError, TypeError, AttributeError):
+            # An unreadable previous JSON can be replaced by a validated report.
+            pass
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_suffix(".tmp")
+    try:
+        temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+        temporary.replace(output)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    args = parser.parse_args(argv)
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    try:
+        data = build()
+        write_snapshot(data, args.output)
+    except (OSError, ValueError, RuntimeError, http.client.HTTPException, csv.Error) as exc:
+        print(f"error: AESO refresh failed: {exc}. The last valid snapshot has been retained.", file=sys.stderr)
+        if summary:
+            with open(summary, "a", encoding="utf-8") as file:
+                file.write(f"### AESO power refresh\n\nFailed: {exc}. The last valid snapshot was retained.\n")
+        return 1
+    print(f"Wrote {args.output.name}: {len(data['site_cogen'])} site cogens, "
           f"{len(data['atco_fleet'])} ATCO-fleet units, AIL {data['system']['alberta_internal_load_mw']} MW", file=sys.stderr)
+    if summary:
+        missing = sum(not row["complete"] for row in data["site_cogen"])
+        with open(summary, "a", encoding="utf-8") as file:
+            file.write(f"### AESO power refresh\n\nSource observation: {data['observed_at']}. "
+                       f"Validated {data['aeso_asset_count']} generation units. "
+                       f"{missing} site readings are incomplete and remain unknown.\n")
     return 0
 
 
