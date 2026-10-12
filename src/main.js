@@ -233,6 +233,14 @@ const RAILWAY_CATEGORY_META = {
 
 const DEFAULT_RAILWAY_CATEGORIES = ["rail-main", "crude-rail-terminal", "crude-terminal", "product-terminal", "crude-storage", "product-storage", "ngl-storage"];
 
+const FACILITY_ROLE_META = {
+  storage: { label: 'Storage sites', detail: 'Storage documented; terminal handling not established', icon: '▤' },
+  terminal: { label: 'Terminals', detail: 'Handling documented; storage not established', icon: '↔' },
+  both: { label: 'Storage + terminal', detail: 'Storage and terminal handling documented', icon: '▣' },
+  processing: { label: 'Processing / other', detail: 'Refining, processing or another documented facility role', icon: '⚙' },
+  unknown: { label: 'Role unverified', detail: 'Keep records whose facility role has not been reviewed', icon: '?' },
+};
+
 // Rail line colour = owning railroad (first listed NARN owner, RROWNER1).
 // Class I systems get distinct colours; passenger/commuter and regional/short
 // lines are grouped. KCS/KCSM are shown as CPKC post-merger.
@@ -408,6 +416,7 @@ const state = {
   railwayLineSelection: '',
   selectedRailwayCategories: new Set(DEFAULT_RAILWAY_CATEGORIES),
   selectedRailwayOwners: new Set(RAIL_OWNER_META.map((meta) => meta.key)),
+  selectedFacilityRoles: new Set(Object.keys(FACILITY_ROLE_META)),
   railwayMenuOpen: false,
   railwaySearch: "",
   railwaySearchTimer: null,
@@ -524,7 +533,7 @@ function safeHttpUrl(value) {
   if (!value) return "";
   try {
     const url = new URL(String(value), window.location.href);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+    return (url.protocol === "http:" || url.protocol === "https:") && !url.username && !url.password ? url.href : "";
   } catch (_error) {
     return "";
   }
@@ -4817,6 +4826,10 @@ function infrastructureMatchesSearch(props, query) {
     p.name, p.reported_name, p.operator, p.reported_operator, p.city, p.state, p.province,
     p.country, p.address, p.facility_id, p.route_name, p.route_id, p.commodity,
     p.search_aliases,
+    ...(Array.isArray(p.stored_products) ? p.stored_products : []),
+    ...(Array.isArray(p.handled_products) ? p.handled_products : []),
+    p.services, p.facility_type, p.facility_role, p.facility_role_note,
+    FACILITY_ROLE_META[p.facility_role]?.label,
     ...(Array.isArray(p.source_pipeline_names) ? p.source_pipeline_names : []),
     ...(Array.isArray(p.source_operator_names) ? p.source_operator_names : []),
   ].filter(Boolean).join(' '));
@@ -4853,11 +4866,17 @@ function railwayFeatures() {
   return state.railwayData?.features || [];
 }
 
+function facilityRoleKey(properties) {
+  return Object.hasOwn(FACILITY_ROLE_META, properties?.facility_role) ? properties.facility_role : 'unknown';
+}
+
 function selectedRailwayFeatures() {
   return railwayFeatures()
     .filter((feature) => state.selectedRailwayCategories.has(feature.properties?.category))
     .filter((feature) => feature.properties?.feature_kind !== 'rail_line'
       || state.selectedRailwayOwners.has(railLineOwnerMeta(feature.properties).key))
+    .filter((feature) => feature.properties?.feature_kind === 'rail_line'
+      || state.selectedFacilityRoles.has(facilityRoleKey(feature.properties)))
     .filter((feature) => feature.properties?.feature_kind === 'rail_line'
       || infrastructureMatchesSearch(feature.properties, state.railwaySearch));
 }
@@ -4962,8 +4981,45 @@ function railwayTooltipHtml(p) {
   );
 }
 
+function terminalStorageCapacities(p) {
+  const units = new Set(['bbl', 'm3', 'tonnes', 'gal', 'L']);
+  if (Array.isArray(p.storage_capacities)) {
+    return p.storage_capacities.filter((capacity) => capacity
+      && typeof capacity.value === 'number' && Number.isFinite(capacity.value) && capacity.value > 0
+      && units.has(capacity.unit) && typeof capacity.scope === 'string' && capacity.scope.trim()
+      && ['published_total', 'working', 'shell', 'unspecified'].includes(capacity.basis)
+      && safeHttpUrl(capacity.source_url));
+  }
+  if (typeof p.storage_capacity_bbl === 'number' && Number.isFinite(p.storage_capacity_bbl)
+      && p.storage_capacity_bbl > 0 && p.storage_capacity_note && safeHttpUrl(p.source_url)) {
+    return [{ value: p.storage_capacity_bbl, unit: 'bbl', scope: 'Published facility storage',
+      basis: 'unspecified', source_url: p.source_url, source_as_of: p.source_as_of,
+      reviewed_at: p.details_reviewed_at || p.reviewed_at, note: p.storage_capacity_note }];
+  }
+  return [];
+}
+
+function terminalCapacityHtml(p) {
+  const capacities = terminalStorageCapacities(p);
+  if (!capacities.length) return '<div class="pipeline-card-note">Storage capacity: not published or not verified for this facility.</div>';
+  const units = { bbl: 'bbl', m3: 'm³', tonnes: 'tonnes', gal: 'gal', L: 'L' };
+  const bases = { published_total: 'Published total', working: 'Working capacity', shell: 'Shell capacity', unspecified: 'Working / shell basis not specified' };
+  return '<section class="terminal-capacities" aria-label="Published storage capacities"><strong>Published storage capacity</strong>'
+    + capacities.map((capacity) => '<div class="terminal-capacity">'
+      + `<strong>${escapeHtml(capacity.value.toLocaleString('en-CA', { maximumFractionDigits: 2 }))} ${units[capacity.unit]}</strong>`
+      + `<span>${escapeHtml(capacity.scope)} · ${bases[capacity.basis]}</span>`
+      + (capacity.note ? `<span>${escapeHtml(capacity.note)}</span>` : '')
+      + `<a href="${escapeHtml(safeHttpUrl(capacity.source_url))}" target="_blank" rel="noopener noreferrer">Capacity source${capacity.source_as_of ? ` · ${escapeHtml(capacity.source_as_of)}` : ' · publication date not specified'}</a>`
+      + (capacity.reviewed_at ? `<span>Reviewed ${escapeHtml(capacity.reviewed_at)}</span>` : '')
+      + '</div>').join('')
+    + '<p>Published capacity is not current inventory or available space. Separate scopes are not added together.</p></section>';
+}
+
 function terminalCardHtml(p) {
   const meta = RAILWAY_CATEGORY_META[p.category] || {};
+  const role = FACILITY_ROLE_META[facilityRoleKey(p)];
+  const stored = Array.isArray(p.stored_products) ? p.stored_products.filter((value) => typeof value === 'string' && value.trim()) : [];
+  const handled = Array.isArray(p.handled_products) ? p.handled_products.filter((value) => typeof value === 'string' && value.trim()) : [];
   const reviewLabels = {
     operator_verified: 'Identity reviewed against an official operator source',
     inventory_only: 'Official inventory record; current identity and operating status not independently verified',
@@ -4977,13 +5033,14 @@ function terminalCardHtml(p) {
     unknown: 'Location accuracy not specified by source',
   };
   const rows = [
+    ['Facility role', role.label],
     ['Type', p.facility_type || meta.label || p.category],
     ['Operator', p.operator || 'Not identified in source'],
     ['Location', [p.city, p.state || p.province, p.country].filter(Boolean).join(', ')],
     ['Address', p.address],
-    ['Commodity', p.commodity || 'Not identified in source'],
-    ['Storage capacity', typeof p.storage_capacity_bbl === 'number' && Number.isFinite(p.storage_capacity_bbl) && p.storage_capacity_bbl >= 0 && p.storage_capacity_note
-      ? `${p.storage_capacity_bbl.toLocaleString('en-CA', { maximumFractionDigits: 0 })} bbl` : ''],
+    ['Stored products', stored.length ? stored.join(' / ') : 'Not established by source'],
+    ['Products handled', handled.length ? handled.join(' / ') : (Array.isArray(p.handled_products) ? 'Not established by source' : (p.commodity || 'Not identified in source'))],
+    ['Services', p.services],
     ['Transport', p.modes || p.rail_connection || 'Not specified in source'],
     [p.review_status === 'operator_verified' ? 'Status' : 'Inventory status', p.status || 'Current operating status not verified'],
     ['Pipeline connections', p.pipeline_connections],
@@ -4992,27 +5049,41 @@ function terminalCardHtml(p) {
     ['Source timing', p.source_date_note],
     ['Coordinate source/check date', p.coordinate_as_of],
     ['Identity reviewed', p.review_status === 'operator_verified' ? (p.reviewed_at || p.last_verified) : ''],
+    ['Facility details reviewed', p.details_reviewed_at],
     ['Coordinate record', p.coordinate_source_id],
     ['Location accuracy', p.location_accuracy || locationLabels[p.location_confidence] || p.location_confidence || locationLabels.unknown],
   ].filter(([, value]) => value);
   if (p.reported_name && p.reported_name !== p.name) rows.push(['Inventory name', p.reported_name]);
   if (p.reported_operator && p.reported_operator !== p.operator) rows.push(['Inventory operator', p.reported_operator]);
+  if (Array.isArray(p.handled_products) && !handled.length && p.commodity) rows.push(['Reported commodity', p.commodity]);
   const sourceLinks = [
     ['Identity / inventory source', p.source_url],
     ['Coordinate source', p.coordinate_source_url],
+    ...(Array.isArray(p.detail_sources) ? p.detail_sources.filter((source) => source && typeof source.label === 'string')
+      .map((source) => [source.label + (source.as_of ? ` · ${source.as_of}` : ''), source.url]) : []),
   ].flatMap(([label, url]) => {
     const safe = safeHttpUrl(url);
     return safe ? [`<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`] : [];
   });
+  const evidenceLabels = new Set(['Facility ID', 'Source timing', 'Coordinate source/check date', 'Identity reviewed',
+    'Facility details reviewed', 'Coordinate record', 'Inventory name', 'Inventory operator', 'Reported commodity']);
+  const mainRows = rows.filter(([label]) => !evidenceLabels.has(label));
+  const evidenceRows = rows.filter(([label]) => evidenceLabels.has(label));
+  const productEnd = mainRows.findIndex(([label]) => label === 'Products handled') + 1;
   return `<div class="pipeline-card terminal-card">` +
     `<div class="pipeline-card-kind">${escapeHtml(meta.label || 'Petroleum facility')}</div>` +
     `<strong class="pipeline-card-title">${escapeHtml(p.name || 'Unnamed inventory facility')}</strong>` +
-    pipelineCardRows(rows) +
+    pipelineCardRows(mainRows.slice(0, productEnd)) +
+    terminalCapacityHtml(p) +
+    pipelineCardRows(mainRows.slice(productEnd)) +
     `<div class="pipeline-card-note">${escapeHtml(reviewLabels[p.review_status] || 'Source record; current identity and operating status not independently verified')}</div>` +
+    `<details class="terminal-evidence"><summary>Sources &amp; review details</summary>` +
+    pipelineCardRows(evidenceRows) +
+    `<div class="pipeline-card-note">${escapeHtml(p.facility_role_note || role.detail)}</div>` +
     `${p.location_note ? `<div class="pipeline-card-note">${escapeHtml(p.location_note)}</div>` : ''}` +
-    `${p.storage_capacity_note && typeof p.storage_capacity_bbl === 'number' ? `<div class="pipeline-card-note">${escapeHtml(p.storage_capacity_note)}</div>` : ''}` +
     `${p.facility_scope ? `<div class="pipeline-card-note">${escapeHtml(p.facility_scope)}</div>` : ''}` +
     `<div class="pipeline-card-source">${sourceLinks.join(' · ') || escapeHtml(p.source || 'Source link not available')}</div>` +
+    `</details>` +
     `<div class="pipeline-card-footer">Operator ownership does not establish a connection to a particular pipeline. Click or tap to keep this card open.</div></div>`;
 }
 
@@ -5126,6 +5197,22 @@ function setRailwayMenuOpen(open) {
   updateRailwayToggleUI();
 }
 
+function facilityRoleFiltersHtml() {
+  const counts = {};
+  for (const feature of railwayFeatures()) {
+    if (feature.properties?.feature_kind !== 'terminal' || !infrastructureMatchesSearch(feature.properties, state.railwaySearch)) continue;
+    const key = facilityRoleKey(feature.properties);
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return '<fieldset class="facility-role-filters"><legend>Facility role</legend>'
+    + '<div class="facility-role-actions"><button type="button" data-facility-role-action="all">All roles</button><button type="button" data-facility-role-action="none">Hide facilities</button></div>'
+    + Object.entries(FACILITY_ROLE_META).map(([key, meta]) => `<label class="railway-option facility-role-option" title="${escapeHtml(meta.detail)}">`
+      + `<input type="checkbox" data-facility-role="${key}" ${state.selectedFacilityRoles.has(key) ? 'checked' : ''} />`
+      + `<span class="facility-role-icon" aria-hidden="true">${meta.icon}</span>`
+      + `<span class="railway-option-text"><strong>${meta.label} · ${formatNumber(counts[key] || 0, 0)}</strong><em>${meta.detail}</em></span></label>`).join('')
+    + '<p>Roles filter facility points alongside the categories below. Counts are source records; records can overlap at one site.</p></fieldset>';
+}
+
 function buildRailwayMenu() {
   const options = document.getElementById("railwayOptions");
   if (!options) return;
@@ -5169,7 +5256,7 @@ function buildRailwayMenu() {
         }).join("")}
       </div>`
     : "";
-  options.innerHTML = (state.railwaySearch.trim() ? terminalSearchResultsHtml() : '') + Object.entries(RAILWAY_CATEGORY_META)
+  options.innerHTML = (state.railwaySearch.trim() ? terminalSearchResultsHtml() : '') + facilityRoleFiltersHtml() + Object.entries(RAILWAY_CATEGORY_META)
     .map(([key, meta]) => {
       const checked = state.selectedRailwayCategories.has(key);
       const swatch = meta.kind === "point"
@@ -5190,20 +5277,31 @@ function buildRailwayMenu() {
 }
 
 function terminalSearchResultsHtml() {
-  if (!state.railwaySearch.trim()) return '<div class="infrastructure-search-note">Solid points have an identity reviewed against an operator source. Faint points retain inventory records awaiting current verification. Facility coverage is incomplete; open a point for dates and location accuracy.</div>';
+  if (!state.railwaySearch.trim()) return '<div class="infrastructure-search-note">Solid points have an identity reviewed against an operator source. Faint points retain inventory records awaiting current verification. Open a point for products, published storage capacity, facility role and source dates. Coverage is incomplete.</div>';
   const matches = railwayFeatures().map((feature, index) => ({ feature, index }))
     .filter(({ feature }) => feature.properties?.feature_kind === 'terminal' && infrastructureMatchesSearch(feature.properties, state.railwaySearch))
     .sort((a, b) => Number(b.feature.properties.review_status === 'operator_verified') - Number(a.feature.properties.review_status === 'operator_verified')
       || String(a.feature.properties.name).localeCompare(String(b.feature.properties.name))
       || String(a.feature.properties.facility_id).localeCompare(String(b.feature.properties.facility_id)));
-  return `<div class="infrastructure-search-note" role="status">${matches.length} matching facility records${matches.length > 20 ? ' · first 20 shown' : ''}. Source records may overlap at one site. Search filters facility points; rail context stays visible.</div>` +
+  return `<div class="infrastructure-search-note" role="status">${matches.length} matching facility records${matches.length > 20 ? ' · first 20 shown' : ''}. Source records may overlap at one site. Choosing a result enables its category and role. Rail context stays visible.</div>` +
     `<div class="terminal-search-results">${matches.slice(0, 20).map(({ feature, index }) => {
       const p = feature.properties;
-      return `<button type="button" data-terminal-index="${index}" title="Locate ${escapeHtml(p.name)}"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml([p.operator, p.city, p.state || p.province, p.country].filter(Boolean).join(' · '))}</span><span>${escapeHtml(p.address || p.facility_id || '')}</span></button>`;
+      return `<button type="button" data-terminal-index="${index}" title="Locate ${escapeHtml(p.name)}"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml([p.operator, p.city, p.state || p.province, p.country].filter(Boolean).join(' · '))}</span><span>${FACILITY_ROLE_META[facilityRoleKey(p)].label} · ${escapeHtml(p.address || p.facility_id || '')}</span></button>`;
     }).join('')}</div>`;
 }
 
 function handleRailwayMenuChange(event) {
+  const roleInput = event.target.closest('input[data-facility-role]');
+  if (roleInput) {
+    const key = roleInput.dataset.facilityRole;
+    if (!Object.hasOwn(FACILITY_ROLE_META, key)) return;
+    if (roleInput.checked) state.selectedFacilityRoles.add(key);
+    else state.selectedFacilityRoles.delete(key);
+    state.railwayEnabled = railwaySelectedCount() > 0;
+    renderRailwayLayer();
+    updateRailwayToggleUI();
+    return;
+  }
   const ownerInput = event.target.closest("input[data-railway-owner]");
   if (ownerInput) {
     const key = ownerInput.dataset.railwayOwner;
@@ -5226,11 +5324,25 @@ function handleRailwayMenuChange(event) {
 }
 
 function handleRailwayMenuClick(event) {
+  const roleAction = event.target.closest('[data-facility-role-action]')?.dataset.facilityRoleAction;
+  if (roleAction) {
+    if (roleAction === 'all') state.selectedFacilityRoles = new Set(Object.keys(FACILITY_ROLE_META));
+    else if (roleAction === 'none') state.selectedFacilityRoles.clear();
+    else return;
+    state.railwayEnabled = railwaySelectedCount() > 0;
+    buildRailwayMenu();
+    renderRailwayLayer();
+    updateRailwayToggleUI();
+    return;
+  }
   const facilityButton = event.target.closest('[data-terminal-index]');
   if (facilityButton) {
     const feature = railwayFeatures()[Number(facilityButton.dataset.terminalIndex)];
     if (!feature || feature.geometry?.type !== 'Point') return;
+    clearTimeout(state.railwaySearchTimer);
+    state.railwaySearchTimer = null;
     state.selectedRailwayCategories.add(feature.properties.category);
+    state.selectedFacilityRoles.add(facilityRoleKey(feature.properties));
     state.railwayEnabled = true;
     renderRailwayLayer();
     const [lon, lat] = feature.geometry.coordinates;
@@ -5246,11 +5358,13 @@ function handleRailwayMenuClick(event) {
   if (action === "all") {
     Object.keys(RAILWAY_CATEGORY_META).forEach((key) => state.selectedRailwayCategories.add(key));
     state.selectedRailwayOwners = new Set(RAIL_OWNER_META.map((meta) => meta.key));
+    state.selectedFacilityRoles = new Set(Object.keys(FACILITY_ROLE_META));
   } else if (action === "none") {
     state.selectedRailwayCategories.clear();
   } else if (action === "defaults") {
     state.selectedRailwayCategories = new Set(DEFAULT_RAILWAY_CATEGORIES);
     state.selectedRailwayOwners = new Set(RAIL_OWNER_META.map((meta) => meta.key));
+    state.selectedFacilityRoles = new Set(Object.keys(FACILITY_ROLE_META));
   }
   state.railwayEnabled = railwaySelectedCount() > 0;
   buildRailwayMenu();

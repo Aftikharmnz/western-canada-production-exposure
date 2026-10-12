@@ -107,7 +107,8 @@ class TerminalInventoryTests(unittest.TestCase):
                 "geometry": {"type": "MultiLineString", "coordinates": [[[-97, 35], [-97.1, 35.2]]]}}
         original = {"features": [line], "metadata": {"rail_where": railway.DEFAULT_RAIL_WHERE, "bbox": list(railway.DEFAULT_BBOX),
                     "raw_rail_segment_count": 1, "raw_rail_source_row_count": 2, "generated_at": "2026-01-01T00:00:00Z"}}
-        with patch.object(railway, "query_rail_geojson") as network, patch("builtins.print"):
+        with patch.object(railway, "query_rail_geojson") as network, patch("builtins.print"), \
+             patch.object(inventory, "TERMINAL_DETAIL_FILES", ()):
             output = railway.build_layer(railway.DEFAULT_BBOX, railway.DEFAULT_RAIL_WHERE, "1=1", "1=1", original)
         network.assert_not_called()
         self.assertEqual(output["features"][0], line)
@@ -116,6 +117,10 @@ class TerminalInventoryTests(unittest.TestCase):
         self.assertEqual(len(terminals), 1790)
         self.assertEqual(sum(f["properties"]["facility_id"].startswith("eia-products-archive:") for f in terminals), 1476)
         self.assertEqual(sum(f["properties"]["facility_id"].startswith("buckeye-map:") for f in terminals), 128)
+        self.assertTrue(all(f["properties"]["facility_role"] in inventory.FACILITY_ROLES for f in terminals))
+        capacities = [c for f in terminals for c in f["properties"]["storage_capacities"]]
+        self.assertEqual(len(capacities), 4, "Existing explicit barrel observations must remain independently scoped")
+        self.assertEqual({c["unit"] for c in capacities}, {"bbl"})
         self.assertEqual(validate_terminal_inventory(output), [])
 
     def test_null_island_nonfinite_and_boolean_reviewed_points_are_rejected(self):

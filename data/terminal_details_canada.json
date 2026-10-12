@@ -1,0 +1,1171 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-11",
+  "facilities": [
+    {
+      "facility_id": "npri:30905",
+      "identity_match_note": "Existing NPRI Base Line point matches the named Pembina/Keyera joint-venture terminal at Keyera's Alberta EnviroFuels site.",
+      "facility_role": "both",
+      "facility_role_note": "Merchant crude storage and pipeline receipts/deliveries documented.",
+      "stored_products": [
+        "crude oil"
+      ],
+      "handled_products": [
+        "crude oil"
+      ],
+      "storage_capacities": [
+        {
+          "value": 4800000,
+          "unit": "bbl",
+          "scope": "Whole Base Line terminal; gross capacity of 12 tanks",
+          "basis": "shell",
+          "source_url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Shell basis is stated in Keyera footnote 9. The 2.4 million-barrel share reported by each 50% partner is part of this gross total and must not be added."
+        }
+      ],
+      "services": "Merchant tank storage; 12 tanks.",
+      "modes": "Pipeline",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Keyera 2025 Annual Information Form; operating data pp.29–31",
+          "url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:21533",
+      "identity_match_note": "NPRI Edmonton South name matches Gibson's Edmonton Terminal address, 10534 17 Street NW. This point represents the operator terminal; the separate ambiguous legacy Edmonton point receives no duplicate capacity.",
+      "facility_role": "both",
+      "facility_role_note": "Storage, rail loading/offloading, pipeline receipts/deliveries and renewable-diesel blending documented.",
+      "stored_products": [
+        "crude oil",
+        "renewable diesel"
+      ],
+      "handled_products": [
+        "crude oil",
+        "condensate",
+        "refined petroleum products",
+        "renewable diesel"
+      ],
+      "storage_capacities": [
+        {
+          "value": 3000000,
+          "unit": "bbl",
+          "scope": "Gibson Edmonton terminal as a whole, represented by the Edmonton South point",
+          "basis": "unspecified",
+          "source_url": "https://www.gibsonenergy.com/wp-content/uploads/2026/02/GEI-2025-AIF-SEDAR.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate whole-terminal storage, corroborated by Q 2-2026 presentation. Source does not identify shell versus working capacity or assign volume to individual tanks. Older undated web-page figures are not added."
+        }
+      ],
+      "services": "Storage; manifest rail loading/offloading; renewable-diesel storage and blending.",
+      "modes": "Pipeline / rail / truck",
+      "detail_sources": [
+        {
+          "label": "Gibson 2025 Annual Information Form; operations pp.18–19",
+          "url": "https://www.gibsonenergy.com/wp-content/uploads/2026/02/GEI-2025-AIF-SEDAR.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Gibson Q 2-2026 corporate presentation; slide 6",
+          "url": "https://www.gibsonenergy.com/wp-content/uploads/2026/05/Q1-2026-Corporate-Presentation.pdf",
+          "as_of": "2026-06-30"
+        },
+        {
+          "label": "Gibson Edmonton Terminal",
+          "url": "https://www.gibsonenergy.com/operations/edmonton-terminal/"
+        },
+        {
+          "label": "Gibson terminal street address",
+          "url": "https://www.gibsonenergy.com/contact-us/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:21534",
+      "identity_match_note": "Existing NPRI Gibson Hardisty point matches the operator's Hardisty terminal complex; the separate DRU point is not assigned the complex capacity.",
+      "facility_role": "both",
+      "facility_role_note": "Crude storage, pipeline receipt/delivery and unit-train access documented.",
+      "stored_products": [
+        "crude oil"
+      ],
+      "handled_products": [
+        "crude oil",
+        "condensate"
+      ],
+      "storage_capacities": [
+        {
+          "value": 13500000,
+          "unit": "bbl",
+          "scope": "Whole Gibson Hardisty terminal complex; gross storage",
+          "basis": "unspecified",
+          "source_url": "https://www.gibsonenergy.com/wp-content/uploads/2026/02/GEI-2025-AIF-SEDAR.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate terminal-complex total, corroborated by Q 2-2026 presentation. This is not a capacity specific to the DRU or an individual tank; shell/working basis is not specified."
+        }
+      ],
+      "services": "Storage and connection to Hardisty Unit Train Facility.",
+      "modes": "Pipeline / rail / truck",
+      "pipeline_connections": "Operator describes receipt/delivery connections to major Hardisty pipelines, Provost and Viking, and connections to the Hardisty Unit Train Facility and DRU.",
+      "detail_sources": [
+        {
+          "label": "Gibson 2025 Annual Information Form; operations pp.18–19",
+          "url": "https://www.gibsonenergy.com/wp-content/uploads/2026/02/GEI-2025-AIF-SEDAR.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Gibson Q 2-2026 corporate presentation; slide 6",
+          "url": "https://www.gibsonenergy.com/wp-content/uploads/2026/05/Q1-2026-Corporate-Presentation.pdf",
+          "as_of": "2026-06-30"
+        },
+        {
+          "label": "Gibson Hardisty Terminal",
+          "url": "https://www.gibsonenergy.com/operations/hardisty-terminal/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:32940",
+      "identity_match_note": "Existing NPRI Hardisty DRU / Rail point matches the Hardisty Energy Terminal diluent recovery unit, a separate installation from the bulk Hardisty tank complex.",
+      "facility_role": "processing",
+      "facility_role_note": "Diluent recovery is the primary documented function; rail shipment is also described. Storage capacity is not established by the reviewed source.",
+      "stored_products": [],
+      "handled_products": [
+        "diluted bitumen",
+        "diluent",
+        "diluent-reduced bitumen"
+      ],
+      "storage_capacities": [],
+      "services": "Diluent separation and rail loading. Published 50,000 bbl/day is processing throughput, not tank storage.",
+      "modes": "Rail",
+      "detail_sources": [
+        {
+          "label": "Gibson DRU at Hardisty",
+          "url": "https://www.gibsonenergy.com/operations/dru-at-hardisty/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:26384",
+      "identity_match_note": "Existing NPRI Pembina Edmonton North point matches ENT, distinguished from North 40, BaseLine and the leased Edmonton South tanks.",
+      "facility_role": "both",
+      "facility_role_note": "Above-ground storage with pipeline receipt access documented.",
+      "stored_products": [
+        "crude oil",
+        "condensate"
+      ],
+      "handled_products": [
+        "crude oil",
+        "condensate"
+      ],
+      "storage_capacities": [
+        {
+          "value": 900000,
+          "unit": "bbl",
+          "scope": "Edmonton North Terminal above-ground storage",
+          "basis": "unspecified",
+          "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate ENT storage. The filing does not specify shell versus working basis."
+        }
+      ],
+      "modes": "Pipeline",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:22904",
+      "identity_match_note": "Existing NPRI North 40 point matches the named nine-tank merchant terminal in Sherwood Park.",
+      "facility_role": "both",
+      "facility_role_note": "Merchant tank storage and pipeline connectivity documented.",
+      "stored_products": [
+        "crude oil"
+      ],
+      "handled_products": [
+        "heavy crude oil"
+      ],
+      "storage_capacities": [
+        {
+          "value": 2200000,
+          "unit": "bbl",
+          "scope": "North 40 terminal; total of nine storage tanks",
+          "basis": "published_total",
+          "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate site total; working-versus-shell basis is not provided. Not the aggregate capacity of Pembina's Edmonton terminals."
+        }
+      ],
+      "services": "Merchant tank storage; nine tanks.",
+      "modes": "Pipeline",
+      "pipeline_connections": "Nipisi Pipeline delivers heavy oil to North 40; the filing describes inbound and outbound connections for the Edmonton terminals.",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:5287",
+      "identity_match_note": "Existing NPRI Pembina Redwater point matches the Redwater fractionation/storage complex, rather than a separate propane export terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Cavern storage, fractionation, truck/rail loading and offloading documented.",
+      "stored_products": [
+        "natural gas liquids"
+      ],
+      "handled_products": [
+        "natural gas liquids"
+      ],
+      "storage_capacities": [
+        {
+          "value": 12100000,
+          "unit": "bbl",
+          "scope": "Redwater Complex cavern storage",
+          "basis": "published_total",
+          "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Reported cavern-storage volume for the complex. Fractionator or rail-loading rates are separate throughput measures and are not added."
+        }
+      ],
+      "services": "NGL fractionation and cavern storage; truck and rail terminals with unit-train capability.",
+      "modes": "Pipeline / rail / truck",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:11890",
+      "identity_match_note": "Existing NPRI Corunna Hydrocarbon Storage point matches Pembina's Corunna East NGL System facility; separate Sarnia cavern capacity is not included.",
+      "facility_role": "both",
+      "facility_role_note": "Hydrocarbon storage and truck/rail loading documented.",
+      "stored_products": [
+        "hydrocarbons"
+      ],
+      "handled_products": [
+        "hydrocarbons"
+      ],
+      "storage_capacities": [
+        {
+          "value": 6000000,
+          "unit": "bbl",
+          "scope": "Corunna hydrocarbon storage",
+          "basis": "published_total",
+          "source_url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Reported Corunna storage total. No commodity-by-tank or shell/working split is published in this description."
+        }
+      ],
+      "modes": "Rail / truck",
+      "services": "Hydrocarbon storage and truck/rail loading.",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:33002",
+      "identity_match_note": "Existing NPRI Watson Island point matches Pembina's Prince Rupert propane terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Propane storage spheres, rail receipt and marine export documented.",
+      "stored_products": [
+        "propane"
+      ],
+      "handled_products": [
+        "propane"
+      ],
+      "storage_capacities": [],
+      "services": "Three above-ground propane spheres; rail receipt and vessel loading. Published barrels/day figures describe throughput, not stored volume.",
+      "modes": "Rail / marine",
+      "detail_sources": [
+        {
+          "label": "Pembina 2025 Annual Information Form; terminal and facilities descriptions",
+          "url": "https://www.pembina.com/getattachment/c2ad1c87-26a9-49a3-88e9-4fd066351a86/aif-ppc-q4-2025-sedar-filing-version-.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Pembina Prince Rupert Terminal",
+          "url": "https://www.pembina.com/operations/facilities/prince-rupert-terminal"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:18972",
+      "identity_match_note": "Existing NPRI Edmonton NGL Terminal point matches Keyera's Edmonton Terminal, not ADT or Josephburg.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage, propane treating and rail/truck loading/offloading documented.",
+      "stored_products": [
+        "propane"
+      ],
+      "handled_products": [
+        "natural gas liquids",
+        "propane",
+        "butane",
+        "condensate",
+        "iso-octane"
+      ],
+      "storage_capacities": [
+        {
+          "value": 264000,
+          "unit": "bbl",
+          "scope": "Keyera Edmonton Terminal storage tanks; gross and net are equal",
+          "basis": "working",
+          "source_url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate working tank capacity per footnote 4; geometric tank volume may be larger. Individual product/tank allocations are not published."
+        }
+      ],
+      "services": "Propane treating; rail and truck loading/offloading.",
+      "modes": "Pipeline / rail / truck",
+      "pipeline_connections": "Rimbey Pipeline and pipelines connecting the Edmonton Terminal with Keyera's Fort Saskatchewan facilities.",
+      "detail_sources": [
+        {
+          "label": "Keyera 2025 Annual Information Form; operating data pp.29–31",
+          "url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Keyera Edmonton Terminal",
+          "url": "https://www.keyera.com/what-we-do/featured-assets/edmonton-terminal/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:23575",
+      "identity_match_note": "Existing NPRI point is named ADT/ACT in the source inventory. Capacity below is explicitly for Alberta Diluent Terminal only; no adjacent Alberta Crude Terminal capacity is combined.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage and multi-commodity rail handling documented.",
+      "stored_products": [
+        "condensate",
+        "solvent",
+        "iso-octane"
+      ],
+      "handled_products": [
+        "condensate",
+        "solvent",
+        "iso-octane"
+      ],
+      "storage_capacities": [
+        {
+          "value": 342600,
+          "unit": "bbl",
+          "scope": "Alberta Diluent Terminal tanks only; gross and net are equal",
+          "basis": "working",
+          "source_url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate working tank capacity per footnote 4. Published 90,000 bbl/day rail capacity is not storage volume; no ACT capacity is added."
+        }
+      ],
+      "modes": "Pipeline / rail",
+      "services": "Multi-commodity handling; CN and CPKC rail access.",
+      "detail_sources": [
+        {
+          "label": "Keyera 2025 Annual Information Form; operating data pp.29–31",
+          "url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Keyera Alberta Diluent Terminal",
+          "url": "https://www.keyera.com/what-we-do/featured-assets/alberta-diluent-terminal-adt/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:698",
+      "identity_match_note": "Existing NPRI Keyera Fort Saskatchewan point matches Keyera's KFS complex; Dow's separately listed facilities are not included.",
+      "facility_role": "both",
+      "facility_role_note": "NGL cavern storage, fractionation and pipeline handling documented.",
+      "stored_products": [
+        "NGL mix",
+        "propane",
+        "butane",
+        "condensate"
+      ],
+      "handled_products": [
+        "natural gas liquids"
+      ],
+      "storage_capacities": [
+        {
+          "value": 16683000,
+          "unit": "bbl",
+          "scope": "Keyera Fort Saskatchewan Facilities; gross storage in 18 underground caverns",
+          "basis": "published_total",
+          "source_url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "source_as_of": "2025-12-31",
+          "reviewed_at": "2026-10-11",
+          "note": "Table pp.29–30 reports 16,683,000 bbl gross and 16,350,000 bbl net to Keyera. These are not additive. Footnote 4 identifies 18 caverns and notes additional above-ground working storage not separately quantified. It does not explicitly classify the cavern figure as shell or working capacity."
+        }
+      ],
+      "services": "NGL fractionation, de-ethanization and cavern storage.",
+      "modes": "Pipeline",
+      "pipeline_connections": "Fort Saskatchewan Pipeline System connects KFS with the Edmonton Terminal; KAPS delivers NGLs and condensate to Fort Saskatchewan.",
+      "detail_sources": [
+        {
+          "label": "Keyera 2025 Annual Information Form; operating data pp.29–31",
+          "url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Keyera Fort Saskatchewan Complex",
+          "url": "https://www.keyera.com/what-we-do/featured-assets/fort-saskatchewan-facility-kfs/"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:29517",
+      "identity_match_note": "Existing NPRI Josephburg point matches the named Keyera rail terminal, distinct from KFS and Edmonton Terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Above-ground product storage and rail loading/offloading documented; tank volume is not published.",
+      "stored_products": [
+        "liquid hydrocarbons"
+      ],
+      "handled_products": [
+        "propane",
+        "butane"
+      ],
+      "storage_capacities": [],
+      "services": "Rail rack, rail storage spurs and above-ground product storage.42,000 bbl/day is rail capacity.",
+      "modes": "Pipeline / rail",
+      "detail_sources": [
+        {
+          "label": "Keyera 2025 Annual Information Form; operating data pp.29–31",
+          "url": "https://www.keyera.com/wp-content/uploads/2026/03/2025-Keyera-Annual-Information-Form.pdf",
+          "as_of": "2025-12-31"
+        },
+        {
+          "label": "Keyera Josephburg Terminal",
+          "url": "https://www.keyera.com/what-we-do/featured-assets/josephburg-terminal/"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:965163d1306fc92f",
+      "identity_match_note": "Existing named Moose Jaw point matches Gibson's heavy-crude processing facility.",
+      "facility_role": "processing",
+      "facility_role_note": "Primary activity is crude processing into refined products; tank storage capacity is not published in the reviewed sources.",
+      "stored_products": [],
+      "handled_products": [
+        "heavy crude oil",
+        "distillates",
+        "vacuum gas oil",
+        "roofing flux",
+        "road asphalt"
+      ],
+      "storage_capacities": [],
+      "services": "Heavy-crude processing. The AIF's up-to 24,000 bbl/day figure is throughput, not storage.",
+      "modes": "Pipeline / rail / truck",
+      "detail_sources": [
+        {
+          "label": "Gibson Moose Jaw Facility",
+          "url": "https://www.gibsonenergy.com/operations/moose-jaw-facility/"
+        },
+        {
+          "label": "Gibson 2025 Annual Information Form; p.19",
+          "url": "https://www.gibsonenergy.com/wp-content/uploads/2026/02/GEI-2025-AIF-SEDAR.pdf",
+          "as_of": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:1532e9f194d60c65",
+      "identity_match_note": "Existing Edmonton point represents the named Trans Mountain terminal, not the entire pipeline system.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage, feeder-line receipt and mainline shipment documented.",
+      "stored_products": [
+        "petroleum liquids"
+      ],
+      "handled_products": [
+        "petroleum liquids"
+      ],
+      "storage_capacities": [
+        {
+          "value": 9020000,
+          "unit": "bbl",
+          "scope": "Trans Mountain Edmonton Terminal; approximately 39 tanks",
+          "basis": "shell",
+          "source_url": "https://www.transmountain.com/terminals",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate shell capacity on the current undated operator page. No working volume is given. Pembina's leased Edmonton South tanks overlap this facility scope and must not be added."
+        }
+      ],
+      "services": "Pipeline staging;39 tanks.",
+      "modes": "Pipeline",
+      "detail_sources": [
+        {
+          "label": "Trans Mountain terminal descriptions; expanded system",
+          "url": "https://www.transmountain.com/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:cbfe447806b83f39",
+      "identity_match_note": "Existing Kamloops point matches Trans Mountain's intermediate terminal, distinct from Suncor's Kamloops products terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Intermediate pipeline pumping and relief-tank storage documented.",
+      "stored_products": [
+        "petroleum liquids"
+      ],
+      "handled_products": [
+        "petroleum liquids"
+      ],
+      "storage_capacities": [
+        {
+          "value": 160000,
+          "unit": "bbl",
+          "scope": "Trans Mountain Kamloops Terminal; two relief tanks",
+          "basis": "shell",
+          "source_url": "https://www.transmountain.com/terminals",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate shell capacity on the undated operator page. Relief tankage is not claimed as available merchant storage."
+        }
+      ],
+      "services": "Two relief tanks and two pump stations.",
+      "modes": "Pipeline",
+      "detail_sources": [
+        {
+          "label": "Trans Mountain terminal descriptions; expanded system",
+          "url": "https://www.transmountain.com/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:7b54b04bedd8e73a",
+      "identity_match_note": "Existing Sumas legacy point is an approximate terminal marker. Details refer to the operator's named Sumas terminal in Abbotsford and do not improve the point's location accuracy.",
+      "facility_role": "both",
+      "facility_role_note": "Crude staging and pipeline routing documented.",
+      "stored_products": [
+        "crude oil"
+      ],
+      "handled_products": [
+        "crude oil"
+      ],
+      "storage_capacities": [
+        {
+          "value": 890000,
+          "unit": "bbl",
+          "scope": "Trans Mountain Sumas Terminal; seven tanks",
+          "basis": "shell",
+          "source_url": "https://www.transmountain.com/terminals",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate shell capacity on the undated operator page; no working capacity or individual tank volumes are supplied."
+        }
+      ],
+      "services": "Pipeline staging; seven tanks.",
+      "modes": "Pipeline",
+      "pipeline_connections": "Trans Mountain mainline and Trans Mountain Puget Sound Pipeline System.",
+      "detail_sources": [
+        {
+          "label": "Trans Mountain terminal descriptions; expanded system",
+          "url": "https://www.transmountain.com/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:6ec46413bf4b58c7",
+      "identity_match_note": "Existing Burnaby point matches the Trans Mountain tank terminal, distinct from Westridge Marine Terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage and local crude/refined-product distribution documented.",
+      "stored_products": [
+        "crude oil",
+        "refined petroleum products"
+      ],
+      "handled_products": [
+        "crude oil",
+        "refined petroleum products"
+      ],
+      "storage_capacities": [
+        {
+          "value": 5500000,
+          "unit": "bbl",
+          "scope": "Trans Mountain Burnaby Terminal;26 tanks",
+          "basis": "shell",
+          "source_url": "https://www.transmountain.com/terminals",
+          "reviewed_at": "2026-10-11",
+          "note": "Approximate shell capacity on the undated operator page, not working capacity or available space."
+        }
+      ],
+      "services": "Pipeline staging and local distribution;26 tanks.",
+      "modes": "Pipeline",
+      "pipeline_connections": "Trans Mountain mainlines; operator lists distribution to local terminals, Parkland refinery and Westridge Marine Terminal.",
+      "detail_sources": [
+        {
+          "label": "Trans Mountain terminal descriptions; expanded system",
+          "url": "https://www.transmountain.com/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:563394b33be08a87",
+      "identity_match_note": "Existing Westridge point matches the named marine terminal, not Burnaby's separate tank farm.",
+      "facility_role": "terminal",
+      "facility_role_note": "Marine loading and jet-fuel pipeline receipt/shipment documented; a site-specific storage volume is not established.",
+      "stored_products": [],
+      "handled_products": [
+        "crude oil",
+        "jet fuel"
+      ],
+      "storage_capacities": [],
+      "services": "Tanker loading; jet-fuel transfer to Vancouver International Airport.",
+      "modes": "Marine / pipeline",
+      "pipeline_connections": "Separate third-party jet-fuel pipeline to Vancouver International Airport.",
+      "detail_sources": [
+        {
+          "label": "Trans Mountain terminal descriptions; expanded system",
+          "url": "https://www.transmountain.com/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:3905",
+      "identity_match_note": "Existing Burrard Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Main/secondary tank farms and truck, rail and marine handling documented; no stored-volume capacity is published.",
+      "stored_products": [
+        "refined petroleum products"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel",
+        "jet fuel",
+        "ethanol",
+        "biodiesel"
+      ],
+      "storage_capacities": [],
+      "services": "Tank storage, fuel processing and blending. Published 40,000 bbl/day export capacity is throughput.",
+      "modes": "Pipeline / marine / truck / rail",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Burrard Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/burrard-terminal-emergency-preparedness-en.pdf?created=20200901213623&modified=20250729145401"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6566",
+      "identity_match_note": "Existing Edmonton Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "terminal",
+      "facility_role_note": "Operator identifies this as a refined-product distribution terminal adjacent to its refinery. This review does not assign refinery-wide tanks or capacity to the terminal.",
+      "stored_products": [],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6616",
+      "identity_match_note": "Existing Kamloops Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Product storage and truck distribution documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "13 storage tanks; truck distribution.",
+      "modes": "Truck / rail / pipeline",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Kamloops Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/kamloops-terminal-emergency-preparedness-en.pdf?created=20250729143346&modified=20250729143354"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:7278",
+      "identity_match_note": "Existing London Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank receipt/storage and truck loading documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "13 above-ground tanks; truck loading.",
+      "modes": "Pipeline / truck",
+      "pipeline_connections": "Sun Canadian Pipeline supplies this terminal.",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor London Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/london-terminal-emergency-preparedness-en.pdf?created=20250729143604&modified=20250729143604"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6614",
+      "identity_match_note": "Existing Milden Tank Farm point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage and pipeline transfer to the separate Saskatoon terminal documented.",
+      "stored_products": [
+        "refined petroleum products"
+      ],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "services": "Five storage tanks and a pumping station. Saskatoon's tanks/racks are not assigned to Milden.",
+      "modes": "Pipeline",
+      "pipeline_connections": "92-km Saskatoon pipeline transports products from Milden to Saskatoon.",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Milden Tank Farm emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/saskatoon-terminal-emergency-preparedness-en.pdf?created=20250729143606&modified=20250729143607"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:34554",
+      "identity_match_note": "Existing Montreal Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "terminal",
+      "facility_role_note": "Operator identifies a refinery-adjacent refined-product terminal. This review does not assign refinery processing throughput or refinery-wide tankage to this point.",
+      "stored_products": [],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6606",
+      "identity_match_note": "Existing Nanaimo Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank-farm storage, barge receipt and truck loading documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "Tank-farm storage and truck rack; wharf receipt from Burrard.",
+      "modes": "Marine / truck",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Nanaimo Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/nanaimo-terminal-emergency-preparedness-en.pdf?created=20250729143604&modified=20250729143604"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:3901",
+      "identity_match_note": "Existing Oakville South Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "storage",
+      "facility_role_note": "South-site tank storage is explicit. Truck-rack handling is described for the separate North site; it is not assigned to this South-site point.",
+      "stored_products": [
+        "refined petroleum products"
+      ],
+      "handled_products": [],
+      "storage_capacities": [],
+      "services": "21 above-ground tanks at South Terminal. North-site racks and the remote jetty are separate installations.",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Oakville South Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/oakville-terminal-emergency-preparedness-en.pdf?created=20250729143605&modified=20250729143605"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6600",
+      "identity_match_note": "Existing Ottawa Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank receipt/storage and truck loading documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "13 above-ground tanks; truck loading.",
+      "modes": "Pipeline / truck",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Ottawa Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/ottawa-terminal-emergency-preparedness-en.pdf?created=20250729143606&modified=20250729143606"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6602",
+      "identity_match_note": "Existing Rimouski Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage, marine-dock pipeline receipt and truck loading documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "Six above-ground tanks and an underground slop tank; truck loading.",
+      "modes": "Marine / pipeline / truck",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Rimouski Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/rimouski-emergency-prepardness-en.pdf?created=20200922162027&modified=20250729143204"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6612",
+      "identity_match_note": "Existing Saskatoon Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage and truck loading/unloading documented.",
+      "stored_products": [
+        "refined petroleum products"
+      ],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "services": "Ten above-ground tanks and four truck racks. Milden's five tanks are not counted here.",
+      "modes": "Pipeline / truck",
+      "pipeline_connections": "Saskatoon pipeline from the separate Milden tank farm.",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Saskatoon Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/saskatoon-terminal-emergency-preparedness-en.pdf?created=20250729143606&modified=20250729143607"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6610",
+      "identity_match_note": "Existing Terrace Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Gasoline/diesel receipt into storage tanks and loading/unloading racks documented.",
+      "stored_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "Nine above-ground tanks and loading/unloading racks.",
+      "modes": "Rail / truck",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Terrace Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/terrace-terminal-emergency-preparedness-en.pdf?created=20250729143607&modified=20250729143607"
+        }
+      ]
+    },
+    {
+      "facility_id": "npri:6604",
+      "identity_match_note": "Existing Thunder Bay Products Terminal point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Gasoline/distillate storage and marine, rail and truck distribution documented.",
+      "stored_products": [
+        "gasoline",
+        "distillates"
+      ],
+      "handled_products": [
+        "gasoline",
+        "diesel"
+      ],
+      "storage_capacities": [],
+      "services": "Eight above-ground tanks; marine offloading on the Mission River.",
+      "modes": "Marine / rail / truck",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Thunder Bay Products Terminal emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/thunder-bay-terminal-emergency-preparedness-en.pdf?created=20250729143608&modified=20250729143608"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:5926e5f51b3afd41",
+      "identity_match_note": "Existing Toronto Metro Depot point matches Suncor's specifically named facility.",
+      "facility_role": "both",
+      "facility_role_note": "Tank storage and truck/pipeline receipts documented.",
+      "stored_products": [
+        "refined petroleum products",
+        "additives",
+        "biodiesel"
+      ],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "services": "Ten product tanks, three additive tanks, three biodiesel tanks and a slop silo.",
+      "modes": "Truck / pipeline",
+      "pipeline_connections": "Trans-Northern, Sun-Canadian and Sarnia Products pipelines.",
+      "detail_sources": [
+        {
+          "label": "Suncor Canadian terminal descriptions",
+          "url": "https://www.suncor.com/en-ca/what-we-do/refining/terminals"
+        },
+        {
+          "label": "Suncor Toronto Metro Depot emergency-preparedness description",
+          "url": "https://www.suncor.com/-/media/project/suncor/files/about-us/terminals/toronto-metro-terminal-emergency-preparedness-en.pdf?created=20250729143608&modified=20250729143609"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:4f740a1e879bde8d",
+      "identity_match_note": "Existing named Charlottetown point matches Irving's Charlottetown Marine Terminal; not the separate bulk plant.",
+      "facility_role": "both",
+      "facility_role_note": "Marine cargo lines to storage tanks and land distribution documented.",
+      "stored_products": [
+        "gasoline",
+        "distillates"
+      ],
+      "handled_products": [
+        "gasoline",
+        "furnace oil",
+        "ultra-low-sulphur diesel",
+        "kerosene"
+      ],
+      "storage_capacities": [],
+      "services": "Three marine cargo lines transferring product to storage tanks.",
+      "modes": "Marine / truck",
+      "detail_sources": [
+        {
+          "label": "Irving Charlottetown Marine Terminal",
+          "url": "https://www.irvingoil.com/en-CA/discover-irving/charlottetown-terminal"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:8a17929026a397de",
+      "identity_match_note": "Existing Halifax Harbour point matches Irving's named oil-product terminal in Woodside, Dartmouth; not the separate Dartmouth bulk plant.",
+      "facility_role": "terminal",
+      "facility_role_note": "Operator identifies marine-terminal product handling. The reviewed description does not quantify or independently describe tank storage.",
+      "stored_products": [],
+      "handled_products": [
+        "gasoline",
+        "ultra-low-sulphur diesel",
+        "furnace oil",
+        "marine gas oil",
+        "jet fuel"
+      ],
+      "storage_capacities": [],
+      "modes": "Marine",
+      "detail_sources": [
+        {
+          "label": "Irving Halifax Harbour Terminal",
+          "url": "https://www.irvingoil.com/en-CA/discover-irving/halifax-harbour-terminal"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:466695a8e83130a9",
+      "identity_match_note": "Existing St. John's point matches the Irving marine terminal at Pier 24, South Side Road; not its separate Mount Pearl bulk plant.",
+      "facility_role": "terminal",
+      "facility_role_note": "Operator identifies marine-terminal product handling; site-specific storage volume is not published.",
+      "stored_products": [],
+      "handled_products": [
+        "gasoline",
+        "furnace oil",
+        "ultra-low-sulphur diesel",
+        "marine gas oil"
+      ],
+      "storage_capacities": [],
+      "modes": "Marine",
+      "detail_sources": [
+        {
+          "label": "Irving St. John's Marine Terminal",
+          "url": "https://www.irvingoil.com/node/31016"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:d04e2e903faadf04",
+      "identity_match_note": "Legacy point/name combines Irving Canaport with East Saint John. Current operator pages identify distinct addresses:2240 Red Head Road and 350 Bayside Drive. Exact site identity cannot be resolved from the combined record.",
+      "facility_role": "unknown",
+      "facility_role_note": "Combined identity must be separated before assigning site-specific functions, products or capacity. Canaport's published 'more than six million barrels' is not applied to the East Saint John location.",
+      "stored_products": [],
+      "handled_products": [],
+      "storage_capacities": [],
+      "detail_sources": [
+        {
+          "label": "Irving Canaport; distinct site/address",
+          "url": "https://www.irvingoil.com/en-CA/discover-irving/canaport"
+        },
+        {
+          "label": "Irving East Saint John; distinct site/address",
+          "url": "https://www.irvingoil.com/en-CA/discover-irving/east-saint-john-terminal"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:e19a1de37823b199",
+      "identity_match_note": "Existing Valero Montreal East point matches the named Montreal-Est storage and distribution terminal.",
+      "facility_role": "both",
+      "facility_role_note": "Petroleum-product storage, truck loading, marine handling and airport pipeline supply documented.",
+      "stored_products": [
+        "gasoline",
+        "distillates",
+        "jet fuel",
+        "renewable diesel",
+        "ethanol",
+        "crude oil"
+      ],
+      "handled_products": [
+        "gasoline",
+        "distillates",
+        "jet fuel",
+        "renewable diesel",
+        "ethanol",
+        "crude oil"
+      ],
+      "storage_capacities": [],
+      "services": "Truck loading and marine transfer; numerical tank capacity is not published in these descriptions.",
+      "modes": "Truck / marine / pipeline",
+      "pipeline_connections": "Saint-Laurent pipeline links Jean-Gaulin refinery and Montreal-Est terminal; pipeline supply to Montreal-Trudeau airport.",
+      "detail_sources": [
+        {
+          "label": "Valero Montreal-Est Terminal",
+          "url": "https://www.valero.com/fr-ca/Operations/Terminals/Montreal-EastTerminal"
+        },
+        {
+          "label": "Valero Canadian operations; Saint-Laurent connection",
+          "url": "https://www.valero.com/fr-ca/Operations"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:16175b58a3853da1",
+      "identity_match_note": "Legacy point is named Levis / Jean-Gaulin Marine Terminal, while the reviewed operator capacity belongs to the whole Jean-Gaulin refinery. Exact storage scope for the marine point is not established.",
+      "facility_role": "unknown",
+      "facility_role_note": "Refinery-wide storage or processing capacity is not assigned to a separately mapped marine component.",
+      "stored_products": [],
+      "handled_products": [],
+      "storage_capacities": [],
+      "detail_sources": [
+        {
+          "label": "Valero Jean-Gaulin refinery; whole-complex scope",
+          "url": "https://www.valero.com/fr-ca/Operations/JeanGaulinRefinery"
+        },
+        {
+          "label": "Valero Jean-Gaulin logistics description",
+          "url": "https://www.valero.com/about/locations/jean-gaulin-refinery"
+        }
+      ]
+    },
+    {
+      "facility_id": "ca-legacy:4d847dc297de6d5e",
+      "identity_match_note": "Existing Finch terminal name matches Imperial's explicitly identified Finch terminal-storage facility in North York. The 2025 operator map corroborates a Toronto terminal, without providing tank-level details.",
+      "facility_role": "both",
+      "facility_role_note": "Operator consultation filing documents existing terminal storage and refined-products pipeline supply. Storage evidence is dated 2019; this is not a 2026 capacity or operating-status claim.",
+      "stored_products": [
+        "refined petroleum products"
+      ],
+      "handled_products": [
+        "refined petroleum products"
+      ],
+      "storage_capacities": [],
+      "modes": "Pipeline",
+      "services": "Refined-product pipeline supply and terminal storage; no tank volume inferred from pipeline flow.",
+      "detail_sources": [
+        {
+          "label": "Imperial Waterdown-to-Finch consultation filing; existing Finch storage facility",
+          "url": "https://www.imperialoil.ca/-/media/imperial/files/exhibit-h--record-of-consultation.pdf",
+          "as_of": "2019-02-21"
+        },
+        {
+          "label": "Imperial 2025 Investor Day; terminal network map, slide 40",
+          "url": "https://www.imperialoil.ca/-/media/imperial/files/2025-sec/2025-ir-day-final-combined.pdf",
+          "as_of": "2025"
+        }
+      ]
+    }
+  ]
+}
