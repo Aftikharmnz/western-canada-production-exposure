@@ -98,11 +98,11 @@
       "origin": "Manhattan Terminal, Illinois",
       "destination": "Edmonton, Alberta",
       "capacity_kbbl_d": 198,
-      "capacity_basis": "operating",
-      "capacity_note": "Annual-average capacity after the Line 13 expansion. The 2025 annual report lists 198,000 bbl/d, superseding older 180,000 bbl/d descriptions. This is capacity, not observed throughput.",
+      "capacity_basis": "annual_average",
+      "capacity_note": "Published annual-average capacity after the Line 13 expansion. The CER expansion summary identifies approximately 198,000 bbl/d annual-average capacity; the 2025 annual report corroborates the installed 198,000 bbl/d system. The July-2026 asset catalogue retains an older 180,000 bbl/d description. This rating is not current throughput, nominations or available space.",
       "source_url": "https://www.enbridge.com/~/media/Enb/Documents/Investor-Relations/NoticeAndAccess/2026/ENB_2025_Annual_Report_EN.pdf?hash=3AC33A8767949550990ACA7684ED7772&rev=b158e24fe41d45f5af4f3178958a071e",
       "source_name": "Enbridge — 2025 Annual Report, page 19",
-      "verified_at": "2026-09-11",
+      "verified_at": "2026-10-12",
       "as_of": "2025-12-31"
     },
     "cochin": {
@@ -297,6 +297,30 @@
       "verified_at": "2026-09-11",
       "as_of": "CER details updated October 2024",
       "route_source_url": "https://www.sec.gov/Archives/edgar/data/1572910/000157291017000039/mlp-2017630_exhibit101.htm"
+    },
+    "enbridge-line-7": {
+      "product": "Light crude; Medium crude; Heavy crude",
+      "origin": "Sarnia, Ontario",
+      "destination": "Westover Station near Hamilton, Ontario",
+      "capacity_kbbl_d": 180,
+      "capacity_basis": "annual_average",
+      "capacity_note": "Operator-published average annual line capacity; excludes temporary operating restrictions and is not a shipper allocation or live available space.",
+      "source_url": "https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6#page=20",
+      "source_name": "Enbridge Energy Infrastructure Assets, printed page 20; global cover update 2026-07-28",
+      "verified_at": "2026-10-11",
+      "as_of": "2026-07-28 (global catalogue cover date; not a separate observation date for every asset)"
+    },
+    "enbridge-line-11": {
+      "product": "Light crude; Medium crude; Heavy crude",
+      "origin": "Westover Station near Hamilton, Ontario",
+      "destination": "Nanticoke, Ontario",
+      "capacity_kbbl_d": 117,
+      "capacity_basis": "annual_average",
+      "capacity_note": "Operator-published average annual line capacity; excludes temporary operating restrictions and is not a shipper allocation or live available space.",
+      "source_url": "https://www.enbridge.com/~/media/Enb/Documents/Factsheets/FS_EnergyInfrastructureAssets.pdf?hash=0F0D0B4D79CA67E8A6F35606D00412B7&rev=25205c955e1840d3854fe621bb0200a6#page=23",
+      "source_name": "Enbridge Energy Infrastructure Assets, printed page 23; global cover update 2026-07-28",
+      "verified_at": "2026-10-11",
+      "as_of": "2026-07-28 (global catalogue cover date; not a separate observation date for every asset)"
     }
   },
   "product_networks": {
@@ -434,6 +458,51 @@
       "as_of": "Operator review 2026-10-10; Underlying EIA inventory date unavailable; copy service data edit 2025-07-01",
       "route_source_url": "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Petroleum_Products_Pipelines_1/FeatureServer/0",
       "operator": "Sunoco LP (legacy NuStar identity)"
+    },
+    "us-products-enbridge-olympic-dcdc646a51": {
+      "product": "Unleaded gasoline; Aviation turbine fuel (kerosene); Diesel fuel",
+      "origin": "Refineries in northwest Washington (Cherry Point, Ferndale and Anacortes)",
+      "destination": "Washington delivery terminals and Portland-area terminals, Oregon",
+      "capacity_kbbl_d": null,
+      "capacity_basis": "not_published",
+      "capacity_note": "No current physical-line capacity is independently verified; missing capacity is not zero. BP's September 2024 plan explicitly identifies itself as operator. Enbridge's 2017 annual report records its disposal. An archived EIA ENBRIDGE label is not a current ownership statement; this is not a live operating-status feed.",
+      "source_url": "https://www.bp.com/content/dam/bp/country-sites/en_us/united-states/home/documents/products-and-services/pipelines/contractor-information/Olympic%20NW%20Pipeline%20Plan%20V39%20Sept%202024.pdf",
+      "source_name": "BP Olympic response plan, owner/operator/products and delivery facilities",
+      "verified_at": "2026-10-11",
+      "as_of": "2024-09",
+      "operator": "BP Pipelines North America",
+      "route_name": "Olympic (BP-operated; former Enbridge interest)",
+      "menu_section": "U.S. refined-product networks"
+    },
+    "us-products-enbridge-tinsley-4f0cde0a4f": {
+      "product": "Crude oil (historical service; current commodity slate not verified)",
+      "origin": "Not independently verified in the reviewed primary sources.",
+      "destination": "Not independently verified in the reviewed primary sources.",
+      "capacity_kbbl_d": null,
+      "capacity_basis": "not_published",
+      "capacity_note": "No current physical-line capacity is independently verified; missing capacity is not zero. The SEC disposal record supports historical crude-oil service and former Enbridge association. A regulator facility permit is not sufficient to attribute the whole archived EIA pipeline to a current company.",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/880285/000114420417009660/v456966_10k.htm",
+      "source_name": "Enbridge Energy Partners 2016 Form 10-K: July 2015 Tinsley crude-pipeline disposal",
+      "verified_at": "2026-10-11",
+      "as_of": "July 2015 transaction disclosed in 2016 Form 10-K",
+      "operator": "Current pipeline operator not independently verified",
+      "route_name": "Tinsley (former Enbridge; current service unverified)",
+      "menu_section": "Historical / unverified liquids routes"
+    },
+    "us-products-enbridge-southern-lights-c4352928a5": {
+      "product": "Diluent (condensate)",
+      "origin": "Manhattan Terminal, Illinois",
+      "destination": "Edmonton, Alberta",
+      "capacity_kbbl_d": 198,
+      "capacity_basis": "annual_average",
+      "capacity_note": "Published annual-average capacity after the Line 13 expansion. The CER expansion summary identifies approximately 198,000 bbl/d annual-average capacity; the 2025 annual report corroborates the installed 198,000 bbl/d system. The July-2026 asset catalogue retains an older 180,000 bbl/d description. This rating is not current throughput, nominations or available space.",
+      "source_url": "https://www.enbridge.com/~/media/Enb/Documents/Investor-Relations/NoticeAndAccess/2026/ENB_2025_Annual_Report_EN.pdf?hash=3AC33A8767949550990ACA7684ED7772&rev=b158e24fe41d45f5af4f3178958a071e",
+      "source_name": "Enbridge — 2025 Annual Report, page 19",
+      "verified_at": "2026-10-12",
+      "as_of": "2025-12-31",
+      "operator": "Enbridge — Line 13 / Southern Lights",
+      "route_name": "Enbridge Line 13 / Southern Lights (archived U.S. segment)",
+      "menu_section": "Diluent pipeline references"
     }
   }
 }

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from terminal_inventory import terminal_detail_errors, valid_capacity_value
+from enbridge_lines import published_catalogue_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -164,7 +165,8 @@ def validate_product_networks(data: dict[str, Any]) -> list[str]:
         source_ids.extend(ids)
         if row.get("source_feature_count") != len(ids):
             errors.append(f"market_access_pipelines.geojson: {label} source feature count mismatch")
-        if row.get("default_visible") is not False or row.get("menu_section") != "U.S. refined-product networks":
+        reviewed_menu = (row.get("pipeline_details") or {}).get("menu_section", "U.S. refined-product networks")
+        if row.get("default_visible") is not False or row.get("menu_section") != reviewed_menu:
             errors.append(f"market_access_pipelines.geojson: {label} must be a separate optional product selection")
         for key in ("source_operator_names", "source_pipeline_names"):
             if not isinstance(row.get(key), list):
@@ -246,6 +248,9 @@ def main() -> int:
     if missing_routes:
         errors.append(f"market_access_pipelines.geojson: missing required routes {missing_routes}")
     errors.extend(validate_product_networks(pipeline))
+    errors.extend(published_catalogue_errors(DATA / "enbridge_liquids_lines.json",
+                                            ROOT / "data" / "enbridge_liquids_lines.json",
+                                            routes=DATA / "market_access_pipelines.geojson"))
     for feature in route_features:
         props = feature.get("properties", {})
         if props.get("route_id", "").endswith("-reference") and props.get("default_visible") is not False:

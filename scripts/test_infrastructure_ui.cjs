@@ -10,7 +10,7 @@ function app(globals = {}) {
     document: { querySelector: () => null, getElementById: () => null },
     console, URL, URLSearchParams, AbortController, setTimeout, clearTimeout, setInterval, clearInterval,
     fetch: async () => { throw new Error('Infrastructure UI tests must not make network requests'); }, ...globals };
-  return vm.runInNewContext(source + '\n({state,FACILITY_ROLE_META,facilityRoleKey,RAIL_OWNER_META,DEFAULT_RAILWAY_CATEGORIES,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalCapacityHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,buildRailwayMenu,handleRailwayMenuChange,handleRailwayMenuClick,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer})', context);
+  return vm.runInNewContext(source + '\n({state,FACILITY_ROLE_META,facilityRoleKey,RAIL_OWNER_META,DEFAULT_RAILWAY_CATEGORIES,infrastructureMatchesSearch,marketPipelineFeatures,selectedMarketPipelineFeatures,selectedRailwayFeatures,railwayTooltipHtml,terminalCardHtml,terminalCapacityHtml,terminalSearchResultsHtml,buildMarketPipelineMenu,buildRailwayMenu,handleRailwayMenuChange,handleRailwayMenuClick,renderMarketHubTooltip,renderMarketPipelineTooltip,renderRailwayLayer,enbridgeLineMatchesSearch,enbridgeLineGuideHtml,renderEnbridgeLineCard,openEnbridgeLineDetails,handleMarketPipelineMenuClick})', context);
 }
 
 function feature(id, properties, geometryType = 'Point') {
@@ -29,6 +29,79 @@ const terminal = (id, operator, extra = {}) => feature(id, {
 const rail = (id, owner, category = 'rail-main') => feature(id, {
   feature_kind: 'rail_line', category, name: 'Rail corridor', owner,
 }, 'LineString');
+
+function guideLine(number, extra = {}) {
+  return { id: `enbridge-line-${number}`, line_number: String(number), name: `Line ${number}`,
+    aliases: [], products: ['Light crude oil', 'Natural gas liquids'], origin: 'Superior, Wisconsin',
+    destination: 'Sarnia, Ontario', direction: 'Eastbound', capacity_kbbl_d: 540,
+    capacity_basis: 'annual_average', capacity_note: 'Published rating, not current available space.',
+    status: 'Published operating', status_note: '', diameter_note: '', length_note: '', connections: [],
+    trading_note: 'Check nominations and apportionment before scheduling.',
+    route_ids: ['enbridge-mainline-lakehead'], geometry_note: 'System corridor only; individual line geometry is not identified.',
+    sources: [{ label: 'Operator factsheet', url: 'https://www.enbridge.com/factsheet', as_of: 'July 2026' }],
+    commercial_links: [{ label: 'Tariffs', url: 'https://www.enbridge.com/tariffs' }], reviewed_at: '2026-10-11', ...extra };
+}
+
+test('numbered line search distinguishes Line 5 from Line 55 and matches products and aliases', () => {
+  const a = app();
+  const five = guideLine(5), fiftyFive = guideLine(55, { name: 'Spearhead', aliases: ['Line 55'], products: ['Crude oil'] });
+  assert.equal(a.enbridgeLineMatchesSearch(five, 'Enbridge Line 5'), true);
+  assert.equal(a.enbridgeLineMatchesSearch(five, 'line5'), true);
+  assert.equal(a.enbridgeLineMatchesSearch(fiftyFive, 'Line 5'), false);
+  assert.equal(a.enbridgeLineMatchesSearch(fiftyFive, 'Line 55'), true);
+  assert.equal(a.enbridgeLineMatchesSearch(fiftyFive, 'Spearhead'), true);
+  assert.equal(a.enbridgeLineMatchesSearch(five, 'natural gas liquids Sarnia'), true);
+  assert.equal(a.enbridgeLineMatchesSearch(five, 'heavy crude'), false);
+  assert.equal(a.enbridgeLineMatchesSearch(guideLine('78A', { aliases: ['Line 78', 'Former Line 6B'] }), 'Line 78'), true);
+});
+
+test('line guide search exposes individual cards while preserving shared corridor selections', () => {
+  const options = { innerHTML: '' };
+  const a = app({ document: { querySelector: () => null, getElementById: id => id === 'marketPipelineOptions' ? options : null } });
+  a.state.enbridgeLineData = { lines: [guideLine(5), guideLine(55, { name: 'Spearhead', aliases: ['Line 55'] })] };
+  a.state.marketPipelineData = { features: [feature('unused', { feature_kind: 'pipeline', route_id: 'enbridge-mainline-lakehead', route_name: 'Enbridge Mainline / Lakehead' }, 'MultiLineString')] };
+  a.state.selectedMarketPipelineIds.add('enbridge-mainline-lakehead');
+  a.state.marketPipelineSearch = 'Line 5';
+  a.buildMarketPipelineMenu();
+  assert.match(options.innerHTML, /data-enbridge-line-id="enbridge-line-5"/);
+  assert.doesNotMatch(options.innerHTML, /data-enbridge-line-id="enbridge-line-55"/);
+  assert.match(options.innerHTML, /data-market-pipeline-id="enbridge-mainline-lakehead"/);
+  assert.equal(a.state.selectedMarketPipelineIds.size, 1);
+  const guide = a.enbridgeLineGuideHtml('');
+  assert.match(guide, /<details class="enbridge-line-guide"><summary>/);
+  assert.doesNotMatch(guide, /<details[^>]*\bopen\b/);
+  assert.match(a.renderMarketPipelineTooltip({ route_id: 'enbridge-mainline-lakehead' }), /Shared corridor geometry does not identify each numbered line/);
+});
+
+test('line cards preserve unknown capacity, source timing and safe links without guessing flow or geometry', () => {
+  const a = app();
+  const html = a.renderEnbridgeLineCard(guideLine(5));
+  assert.match(html, /540,000 bbl\/d/);
+  assert.match(html, /annual average/);
+  assert.match(html, /current batches, measured flow or bookable space/);
+  assert.match(html, /individual line geometry is not identified/);
+  assert.match(html, /July 2026/);
+  assert.match(html, /Reviewed 2026-10-11/);
+  const unknown = a.renderEnbridgeLineCard(guideLine(5, { name: '<img onerror=alert(1)>', capacity_kbbl_d: null,
+    commercial_links: [{ label: 'Unsafe', url: 'javascript:alert(1)' }], sources: [{ label: '<bad>', url: 'https://user:pass@example.com' }] }));
+  assert.match(unknown, /Not published \/ not verified/);
+  assert.doesNotMatch(unknown, /0 bbl\/d|javascript:|user:pass|<img|<bad>/);
+  assert.match(unknown, /&lt;img/);
+});
+
+test('opening an unlocated line card uses the map centre without selecting or highlighting a guessed corridor', () => {
+  const calls = [];
+  const popup = { setLatLng: centre => { calls.push(['centre', centre]); return popup; }, setContent: html => { calls.push(['html', html]); return popup; }, openOn: map => { calls.push(['map', map]); return popup; } };
+  const a = app({ window: { location: { href: 'https://example.com/' }, L: {} }, L: { popup: options => { calls.push(['options', options]); return popup; } } });
+  a.state.enbridgeLineData = { lines: [guideLine(5)] };
+  a.state.map = { getCenter: () => [50, -100] };
+  a.state.selectedMarketPipelineIds.add('unrelated');
+  a.openEnbridgeLineDetails('enbridge-line-5');
+  assert.deepEqual(Array.from(a.state.selectedMarketPipelineIds), ['unrelated']);
+  assert.deepEqual(calls[1], ['centre', [50, -100]]);
+  assert.equal(a.state.marketPipelineMenuOpen, false);
+  assert.match(calls[2][1], /Line 5/);
+});
 
 function facilityRoleEvent(key, checked) {
   const input = { dataset: { facilityRole: key }, checked };

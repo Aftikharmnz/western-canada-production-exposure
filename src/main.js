@@ -14,6 +14,7 @@ const DATA_PATHS = {
   refineries: "public/data/refineries.geojson",
   marketPipelines: "public/data/market_access_pipelines.geojson",
   marketTariffs: "public/data/market_access_tariffs.json",
+  enbridgeLines: "public/data/enbridge_liquids_lines.json",
   railways: "public/data/railways.geojson",
   pipelineIndex: "public/data/aer_pipeline_index.json",
 };
@@ -398,6 +399,7 @@ const state = {
   marketPipelineEnabled: false,
   marketPipelineData: null,
   marketTariffData: null,
+  enbridgeLineData: null,
   marketPipelineLoading: false,
   marketPipelineError: null,
   marketPipelineLineLayer: null,
@@ -4372,16 +4374,19 @@ async function fetchMarketPipelineData() {
   state.marketPipelineLoading = true;
   state.marketPipelineError = null;
   updateMarketPipelineToggleUI();
-  updatePipelineStatus('Loading market access pipelines and current tariffs...');
+  updatePipelineStatus('Loading market routes, tariff snapshot and Enbridge line guide...');
 
   try {
-    const [routes, tariffs] = await Promise.allSettled([
+    const [routes, tariffs, enbridge] = await Promise.allSettled([
       requestJson(DATA_PATHS.marketPipelines).then(requireFeatureCollection),
       requestJson(DATA_PATHS.marketTariffs),
+      requestJson(DATA_PATHS.enbridgeLines),
     ]);
     if (routes.status === "rejected") throw routes.reason;
     state.marketPipelineData = routes.value;
     state.marketTariffData = tariffs.status === "fulfilled" && Array.isArray(tariffs.value?.tariffs) ? tariffs.value : null;
+    state.enbridgeLineData = enbridge.status === "fulfilled" && Array.isArray(enbridge.value?.lines) ? enbridge.value : null;
+    if (!state.enbridgeLineData) state.optionalDataWarnings.push("Enbridge line guide unavailable; mapped routes remain available.");
     if (!state.marketTariffData) state.optionalDataWarnings.push("Market tariffs unavailable; routes remain available.");
     initializeMarketPipelineSelection();
     buildMarketPipelineMenu();
@@ -4584,6 +4589,103 @@ function pipelineCardRows(rows) {
   ).join('')}</div>`;
 }
 
+function enbridgeLines() {
+  return state.enbridgeLineData?.lines || [];
+}
+
+function enbridgeLineTitle(line) {
+  const number = String(line.line_number || '');
+  const name = String(line.name || 'Enbridge liquids system');
+  return number && !/^Lines?\s/i.test(name) ? `Line ${number} · ${name}` : name;
+}
+
+function enbridgeLineMatchesSearch(line, query) {
+  const requestedNumber = String(query || '').match(/\bline\s*(\d+[a-z]?)\b/i)?.[1];
+  if (requestedNumber) {
+    const numberPattern = new RegExp(`\\bline\\s*${requestedNumber}(?:\\b|[a-z]\\b)`, 'i');
+    const identities = [enbridgeLineTitle(line), ...(line.aliases || [])].join(' ');
+    if (!numberPattern.test(identities)) return false;
+  }
+  return infrastructureMatchesSearch({ route_name: enbridgeLineTitle(line), operator: line.operator || 'Enbridge',
+    commodity: (line.products || []).join(' '), search_aliases: ['Enbridge', ...(line.aliases || []),
+      line.origin, line.destination, line.direction, line.status, line.ownership_note,
+      ...(line.connections || [])].filter(Boolean).join(' ') }, String(query || '').replace(/\bline(\d+[a-z]?)\b/gi, 'Line $1'));
+}
+
+function enbridgeLinesForRoute(routeId) {
+  return enbridgeLines().filter(line => (line.route_ids || []).includes(routeId));
+}
+
+function marketPipelineMatchesSearch(properties, query) {
+  return infrastructureMatchesSearch(properties, query)
+    || enbridgeLinesForRoute(properties?.route_id).some(line => enbridgeLineMatchesSearch(line, query));
+}
+
+function enbridgeLineButtons(lines) {
+  return lines.map(line => `<button type="button" data-enbridge-line-id="${escapeHtml(line.id)}">` +
+    `<strong>${escapeHtml(enbridgeLineTitle(line))}</strong>` +
+    `<span>${escapeHtml((line.products || []).join('; ') || 'Products not verified')}</span>` +
+    `<span>${escapeHtml(line.origin || 'Origin not verified')} → ${escapeHtml(line.destination || 'Destination not verified')}</span></button>`).join('');
+}
+
+function enbridgeLineGuideHtml(query) {
+  if (!enbridgeLines().length) return '';
+  const matches = enbridgeLines().filter(line => enbridgeLineMatchesSearch(line, query));
+  if (!matches.length) return '';
+  const results = `<div class="enbridge-line-results">${enbridgeLineButtons(matches)}</div>`;
+  const note = '<div class="infrastructure-search-note">Open a line for products, capacity, direction, market connections and official sources. Line details and mapped route selections are separate.</div>';
+  return query.trim() ? `<div class="market-pipeline-menu-section">Enbridge line details (${matches.length})</div>${results}${note}`
+    : `<details class="enbridge-line-guide"><summary>Enbridge lines &amp; systems (${matches.length})</summary>${note}${results}</details>`;
+}
+
+function renderEnbridgeLineCard(line) {
+  const capacity = Number(line.capacity_kbbl_d);
+  const rating = Number.isFinite(capacity) && capacity > 0
+    ? `${(capacity * 1000).toLocaleString('en-CA', { maximumFractionDigits: 0 })} bbl/d`
+    : line.capacity_label || 'Not published / not verified';
+  const rows = [['Products', (line.products || []).join('; ') || 'Not verified'],
+    ['Origin', line.origin || 'Not verified'], ['Destination', line.destination || 'Not verified'],
+    ['Direction', line.direction || 'Not verified'], ['Published status', line.status || 'Not verified']];
+  if (line.operator) rows.push(['Operator', line.operator]);
+  if (line.ownership_note) rows.push(['Ownership', line.ownership_note]);
+  if (line.aliases?.length) rows.push(['Other names', line.aliases.join('; ')]);
+  if (line.diameter_note) rows.push(['Diameter', line.diameter_note]);
+  if (line.length_note) rows.push(['Length', line.length_note]);
+  if (line.connections?.length) rows.push(['Connections', line.connections.join('; ')]);
+  const notes = [line.products_note, line.capacity_note, line.status_note, line.trading_note].filter(Boolean)
+    .map(note => `<div class="pipeline-card-note">${escapeHtml(note)}</div>`).join('');
+  const links = (line.commercial_links || []).map(link => tariffSourceLink(link.label, link.url)).join(' · ');
+  const sources = (line.sources || []).map(source => `<div>${tariffSourceLink(source.label, source.url)}` +
+    `${source.as_of ? ` · ${escapeHtml(source.as_of)}` : ''}</div>`).join('');
+  return `<div class="pipeline-card enbridge-line-card"><div class="pipeline-card-kind">Enbridge liquids line guide</div>` +
+    `<strong class="pipeline-card-title">${escapeHtml(enbridgeLineTitle(line))}</strong>` +
+    `<div class="pipeline-card-capacity"><span>Published capacity</span><strong>${escapeHtml(rating)}</strong>` +
+    `<small>${escapeHtml(String(line.capacity_basis || 'not verified').replaceAll('_', ' '))}</small></div>` +
+    pipelineCardRows(rows) + notes +
+    `<div class="pipeline-card-note enbridge-geometry-note">${escapeHtml(line.geometry_note || 'Individual line geometry is not identified here. This card provides system facts without assigning a line number to a shared mapped corridor.')}</div>` +
+    `${links ? `<div class="pipeline-card-source"><strong>Trading resources</strong><br>${links}</div>` : ''}` +
+    `<details class="pipeline-card-source"><summary>Sources and dates</summary>${sources}` +
+    `<div>Reviewed ${escapeHtml(line.reviewed_at || state.enbridgeLineData?.metadata?.reviewed_at || 'date unavailable')}</div></details>` +
+    `<div class="pipeline-card-footer">Published service and capacity are not current batches, measured flow or bookable space. Confirm sections and shared constraints before combining line ratings into a route or system capacity.</div></div>`;
+}
+
+function openEnbridgeLineDetails(lineId) {
+  const line = enbridgeLines().find(item => item.id === lineId);
+  if (!line || !state.map || !window.L) return;
+  setMarketPipelineMenuOpen(false);
+  L.popup({ className: 'pipeline-detail-popup enbridge-guide-popup', maxWidth: 380, autoPan: true,
+    autoPanPaddingTopLeft: [12, 80], autoPanPaddingBottomRight: [12, 12] })
+    .setLatLng(state.map.getCenter()).setContent(renderEnbridgeLineCard(line)).openOn(state.map);
+}
+
+function handleEnbridgeLineClick(event) {
+  const id = event.target.closest('[data-enbridge-line-id]')?.dataset.enbridgeLineId;
+  if (!id) return false;
+  event.preventDefault();
+  openEnbridgeLineDetails(id);
+  return true;
+}
+
 function renderMarketPipelineTooltip(p) {
   const details = p.pipeline_details || {};
   const capacity = Number(details.capacity_kbbl_d);
@@ -4592,11 +4694,13 @@ function renderMarketPipelineTooltip(p) {
     : details.capacity_label || 'Not published';
   const basis = String(details.capacity_basis || 'not_published').replaceAll('_', ' ');
   const capacityTitle = details.capacity_basis === 'multiple_systems' ? 'Published component capacities'
-    : ['operating', 'available', 'initial'].includes(details.capacity_basis)
+    : ['operating', 'available', 'initial', 'annual_average'].includes(details.capacity_basis)
       ? `Published ${basis} capacity` : 'Nameplate / rated capacity';
   const source = safeHttpUrl(details.source_url);
   const inventorySource = safeHttpUrl(details.route_source_url);
   const routeSource = safeHttpUrl(p.geometry_source_url) || inventorySource;
+  const numberedLines = enbridgeLinesForRoute(p.route_id);
+  const lineNumbers = [...new Set(numberedLines.map(line => line.line_number).filter(Boolean))];
   return `<div class="pipeline-card">` +
     `<div class="pipeline-card-kind">Market access pipeline</div>` +
     `<strong class="pipeline-card-title">${escapeHtml(p.route_name || 'Market access pipeline')}</strong>` +
@@ -4604,6 +4708,7 @@ function renderMarketPipelineTooltip(p) {
     `<div class="pipeline-card-capacity"><span>${escapeHtml(capacityTitle)}</span><strong>${escapeHtml(capacityText)}</strong>` +
     `${details.capacity_basis && details.capacity_basis !== 'not_published' ? `<small>${escapeHtml(basis)}</small>` : ''}</div>` +
     pipelineCardRows([['Product', details.product || p.commodity || 'Not published'], ['Origin', details.origin || 'Not published'], ['Destination', details.destination || 'Not published']]) +
+    `${lineNumbers.length ? pipelineCardRows([['Line numbers', lineNumbers.join(', ')]]) : ''}` +
     `${details.capacity_note ? `<div class="pipeline-card-note">${escapeHtml(details.capacity_note)}</div>` : ''}` +
     `${p.status_note ? `<div class="pipeline-card-note">${escapeHtml(p.status_note)}</div>` : ''}` +
     `${p.geometry_note || p.coverage_note ? `<div class="pipeline-card-note">${escapeHtml(p.geometry_note || p.coverage_note)}</div>` : ''}` +
@@ -4614,6 +4719,7 @@ function renderMarketPipelineTooltip(p) {
     `${inventorySource && inventorySource !== routeSource && inventorySource !== source ? ` · <a href="${escapeHtml(inventorySource)}" target="_blank" rel="noopener noreferrer">Archived inventory reference</a>` : ''}` +
     `${details.as_of ? `<br>Source basis: ${escapeHtml(details.as_of)}` : ''}` +
     `${details.verified_at ? `<br>Reviewed ${escapeHtml(details.verified_at)}` : ''}</div>` +
+    `${numberedLines.length ? `<details class="enbridge-line-guide"><summary>Lines / systems in this group (${numberedLines.length})</summary><div class="pipeline-card-note">These are reviewed system facts. Shared corridor geometry does not identify each numbered line.</div><div class="enbridge-line-results">${enbridgeLineButtons(numberedLines)}</div></details>` : ''}` +
     `<div class="pipeline-card-footer">${escapeHtml(p.geometry_confidence || 'Route-level map')}. Products describe service, not the current batch. Click or tap to keep this card open.</div></div>`;
 }
 
@@ -4621,7 +4727,14 @@ function bindPipelineCard(layer, html) {
   layer.bindTooltip(html, { sticky: true, opacity: 1, className: 'pipeline-tip pipeline-detail-tip' });
   layer.bindPopup(html, { className: 'pipeline-detail-popup', maxWidth: 380, autoPan: true,
     autoPanPaddingTopLeft: [12, 80], autoPanPaddingBottomRight: [12, 12] });
-  layer.on('popupopen', () => layer.closeTooltip());
+  layer.on('popupopen', () => {
+    layer.closeTooltip();
+    const element = layer.getPopup?.()?.getElement?.();
+    if (element && !element.dataset.enbridgeClickBound) {
+      element.addEventListener('click', handleEnbridgeLineClick);
+      element.dataset.enbridgeClickBound = 'true';
+    }
+  });
   layer.on('mouseover', () => { if (layer.isPopupOpen()) layer.closeTooltip(); });
 }
 
@@ -4734,7 +4847,7 @@ function buildMarketPipelineMenu() {
   let currentSection = '';
   const sections = new Map();
   for (const feature of marketPipelineFeatures()) {
-    if (!infrastructureMatchesSearch(feature.properties, state.marketPipelineSearch)) continue;
+    if (!marketPipelineMatchesSearch(feature.properties, state.marketPipelineSearch)) continue;
     const section = feature.properties?.menu_section || 'Core Market Access Pipelines';
     if (!sections.has(section)) sections.set(section, []);
     sections.get(section).push(feature);
@@ -4758,7 +4871,8 @@ function buildMarketPipelineMenu() {
         </span>
       </label>`;
   }
-  options.innerHTML = (html || '<div class="infrastructure-search-note">No pipelines match this search.</div>') +
+  const lineGuide = enbridgeLineGuideHtml(state.marketPipelineSearch);
+  options.innerHTML = lineGuide + (html || (!lineGuide ? '<div class="infrastructure-search-note">No pipelines match this search.</div>' : '')) +
     '<div class="infrastructure-search-note">Search narrows this list. Selected routes remain visible on the map. Route locations and source dates vary; open a line for details.</div>';
   const hubsToggle = document.getElementById('marketHubToggle');
   if (hubsToggle) hubsToggle.checked = state.marketHubsEnabled;
@@ -4787,6 +4901,7 @@ function handleMarketPipelineMenuChange(event) {
 }
 
 function handleMarketPipelineMenuClick(event) {
+  if (handleEnbridgeLineClick(event)) return;
   const action = event.target.closest('[data-market-action]')?.dataset.marketAction;
   if (!action) return;
   if (action === 'all') {
