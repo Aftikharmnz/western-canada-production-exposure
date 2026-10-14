@@ -3,17 +3,17 @@
   "Suncor Base Plant": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Syncrude Mildred Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Firebag SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Cold Lake (Imperial)": {
    "status": "normal",
@@ -23,7 +23,7 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "CNRL Horizon": {
    "status": "normal",
@@ -33,12 +33,12 @@
   "MacKay River SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Long Lake SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Fort Hills Mine": {
    "status": "normal",
@@ -48,17 +48,17 @@
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
@@ -68,12 +68,12 @@
   "Foster Creek SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 183
+   "runs_above": 184
   },
   "Kearl Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 95
+   "runs_above": 96
   },
   "Long Lake Upgrader": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-10-14 02:44 UTC",
- "power_observation": "2026-10-14T02:43:00+00:00",
+ "last_check": "2026-10-14 03:17 UTC",
+ "power_observation": "2026-10-14T03:16:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
