@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-16T07:38:19+00:00",
+  "checked_at": "2026-11-01T07:34:14+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -53,7 +53,7 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "9042627ebd24c5f50e77523a61abc165e8ff6206c6825973179af845855ac067",
+      "fingerprint": "6ca53741e8d1691a265b323b7b74f020de268e51020f7d13662b11bf3100ba94",
       "document_links": [
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2016/EXP-US-PLT-Commodity.pdf?rev=43528ec604994858b9d3cc36d52f63af&hash=AB25FA2EF0E1AA308F42BFB5642E316F",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2018/Table-of-Loss-Allowance-Percentages-April-2018.pdf?rev=83e1bfad918345af8a850ee4ec787c5a&hash=FC12D38D1A61469C924CC3E335C35856",
@@ -66,8 +66,8 @@
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-205.pdf?rev=c8c342333bb4451ea1b5c04bcfb70d91&hash=E7BB9DCFE0A3963C98D7E6D41F4A8DE7",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-207-FERC-167331.pdf?rev=fcf04ca093df43d1887e7ce25caa9fe7&hash=F5386D552CAD15BC8FE9254748305D0C",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-208.pdf?rev=e318b7de1db04539b7658e3c3748762b&hash=600529C0ED500677F4B60DB59262050E",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-US-CER-203-EXP-CAN-FERC-16732-PLT.pdf?rev=abcd00be578f4717b8fae1d51adc05ae&hash=12063B8A253AAC8B16786250D5DC4141",
-        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/EXP-CAN-CER-209-EXP-US-FERC-167340--PLT.pdf?rev=9e2eade1f16e43a4a2a27d6c47d91e9c&hash=ADE5C518B43B878A9C2784BD07614556"
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-CAN-CER-209-EXP-US-FERC-167340--PLT.pdf?rev=dd2ea81ce6634b5eae7518d0b4423cff&hash=68A5D620A1E09913A4E72EA316EE99B9",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/EXP-US-CER-203-EXP-CAN-FERC-16732-PLT.pdf?rev=abcd00be578f4717b8fae1d51adc05ae&hash=12063B8A253AAC8B16786250D5DC4141"
       ],
       "comparison_basis": "observed_source",
       "observation_baseline": "63e8a33368f4212e922b081b808ff2f689ae0c6307eb87b2347786a1b9e28809",
@@ -503,7 +503,7 @@
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "f6743108e2df3d03ecae1b657168a1b0b268e012409a805d02b7aa84355fd473",
+      "fingerprint": "20e736fb0482f87af88eb38ace7ec7192f8cf77e7755b72322ce049a6fd72238",
       "comparison_basis": "observed_source",
       "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
       "review_required": true,
@@ -559,7 +559,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-10-16T07:38:18+00:00",
+      "checked_at": "2026-11-01T07:34:13+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
