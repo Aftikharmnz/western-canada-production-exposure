@@ -3,17 +3,17 @@
   "Suncor Base Plant": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Syncrude Mildred Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Firebag SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Cold Lake (Imperial)": {
    "status": "normal",
@@ -23,7 +23,7 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "CNRL Horizon": {
    "status": "normal",
@@ -33,47 +33,47 @@
   "MacKay River SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Long Lake SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 4
+   "runs_above": 5
   },
   "Fort Hills Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 20
+   "runs_above": 21
   },
   "Foster Creek SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 64
+   "runs_above": 65
   },
   "Kearl Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 27
+   "runs_above": 28
   },
   "Long Lake Upgrader": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-11-02 07:35 UTC",
- "power_observation": "2026-11-02T07:35:00+00:00",
+ "last_check": "2026-11-02 08:14 UTC",
+ "power_observation": "2026-11-02T08:14:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
