@@ -3,17 +3,17 @@
   "Suncor Base Plant": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Syncrude Mildred Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Firebag SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Cold Lake (Imperial)": {
    "status": "normal",
@@ -23,7 +23,7 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "CNRL Horizon": {
    "status": "normal",
@@ -33,47 +33,47 @@
   "MacKay River SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Long Lake SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 29
+   "runs_above": 30
   },
   "Fort Hills Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 72
+   "runs_above": 73
   },
   "Foster Creek SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 116
+   "runs_above": 117
   },
   "Kearl Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 79
+   "runs_above": 80
   },
   "Long Lake Upgrader": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-11-03 09:35 UTC",
- "power_observation": "2026-11-03T09:35:00+00:00",
+ "last_check": "2026-11-03 10:09 UTC",
+ "power_observation": "2026-11-03T10:09:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
