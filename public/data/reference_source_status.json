@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-13T07:28:47+00:00",
+  "checked_at": "2026-11-14T07:28:14+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -11,7 +11,7 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "7cc37843accfd1b2f923f298e2d01f02bba13de9f7afa1c2af574162933ebfd4",
+      "fingerprint": "cccb6b02b932c9738aef52fc979e86179a665084e717f9c2a39e36a8d6bb303d",
       "document_links": [
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2011/CDMN-RT-12.pdf?rev=d15aaaf1bb6e4a23a4d724391265f9af&hash=636F242B527919716ED6EEFF3A7AA437",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-497.pdf?rev=5f2631d77d534e6688038ceb4afab595&hash=6D70018208884759856A470565538027",
@@ -22,6 +22,8 @@
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-CER-8-FERC-4630.pdf?rev=5a68df5823f44ded8a8468ca6c08d39d&hash=594EE8722A9709ECF469DBCE829E598F",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CCPS-FERC-4621-CER-9.pdf?rev=dc11374ede384f609c1d47f324238a66&hash=E626B9139F196AD72554206C309E5499",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-1.pdf?rev=627d126edb2e4e4f92357b6b2e4f7f32&hash=CF0B561C87186D95CBBD09EA347EDFF7",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-13.pdf?rev=13fa4a09ec5e4ba7b4a2cbd396a7cb43&hash=DF34ECF6882454E1A4CA6634F52C13AB",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-14-FERC-45500-LKH.pdf?rev=2e1f54bc83624e029d76ed44736922ed&hash=A7937FB12C41D4DFE664F8B033073FCC",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-2.pdf?rev=8478f9aa68cf44dc905a0290d3dc946e&hash=0ADEFF10362336744720ACC665A94F78",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-3.pdf?rev=02651e4c86fe426480346684a1703102&hash=3FEDAA47D8A65821C11757BC1DC1275A",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDMN-CER-4.pdf?rev=ef28836ca1d64917b6ad9a0e0f73e3a4&hash=0B9245A51E4B90CA2B64DE7C31EBEAC1",
@@ -558,7 +560,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-11-13T07:28:47+00:00",
+      "checked_at": "2026-11-14T07:28:13+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
