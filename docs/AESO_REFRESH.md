@@ -15,6 +15,22 @@ fetched, checked alerts, and pushed the data successfully. GitHub returned HTTP
 refresh, run 1612, and its Pages deployment succeeded. This was a deployment
 request failure, not an AESO source failure.
 
+## Pages package lookup failures in November 2026
+
+[Run 3186](https://github.com/Aftikharmnz/western-canada-production-exposure/actions/runs/43661677919)
+successfully refreshed the snapshot and uploaded the site artifact, but Pages
+could not find it immediately afterward. Now the deploy job polls GitHub for the
+specific uploaded artifact ID, then tries deployment once more after a delay if
+the first attempt fails. Both attempts use the same artifact and the job still
+fails if both attempts fail. A manual GitHub rerun uses a distinct artifact name
+to avoid matching an artifact from its earlier attempt.
+
+Pages validation reuses a successful check only for an exact fingerprint of
+the checked-out repository inputs. The AESO snapshot and alert state are excluded
+because they are validated independently in the refresh. A change to any other
+tracked input, or a missing cache entry, runs the complete checks again.
+Artifact construction and protected-wrapper checks always run.
+
 ## Publication safeguards
 
 - Downloads have a 60-second timeout, a 512 KiB size limit, strict UTF-8 decoding,
