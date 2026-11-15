@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-08T08:40:09.785968+00:00",
+  "checked_at": "2026-11-15T08:40:13.169358+00:00",
   "scope": "Browser runtime APIs and basemaps. ETL and infrastructure services are documented in the production/infrastructure audits.",
   "checks": [
     {
@@ -8,7 +8,7 @@
       "http_status": 200,
       "content_type": "application/json;charset=UTF-8",
       "cors": "*",
-      "feature_count": 345,
+      "feature_count": 231,
       "sample_fields": [
         "age",
         "agency",
@@ -75,7 +75,7 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 3,
+      "feature_count": 1,
       "sample_fields": [
         "AREA_ESTIMATE",
         "ASSESSMENT_ASSISTANCE_DATE",
@@ -101,17 +101,8 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 1,
-      "sample_fields": [
-        "EstimatedStartDate",
-        "FireIncidentStatus",
-        "Hectares",
-        "LatitudeDDM",
-        "LocalGovernment",
-        "LongitudeDDM",
-        "MRFireNumber",
-        "MutualAidContactZone"
-      ],
+      "feature_count": 0,
+      "sample_fields": [],
       "status": "ok"
     },
     {
@@ -120,7 +111,7 @@
       "http_status": 200,
       "content_type": "application/json; charset=utf-8",
       "cors": "*",
-      "feature_count": 2,
+      "feature_count": 1,
       "sample_fields": [
         "AREA_ESTIMATE",
         "ASSESSMENT_ASSISTANCE_DATE",
@@ -142,11 +133,11 @@
     },
     {
       "name": "ECCC_WindDir",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-11-08T07%3A40%3A07.570333%2B00%3A00%2F2026-11-08T11%3A40%3A07.570333%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindDir&datetime=2026-11-15T07%3A40%3A11.837077%2B00%3A00%2F2026-11-15T11%3A40%3A11.837077%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",
-      "feature_count": 403,
+      "feature_count": 434,
       "sample_fields": [
         "ade_id",
         "forecast_datetime",
@@ -172,11 +163,11 @@
     },
     {
       "name": "ECCC_WindSpeed",
-      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-11-08T07%3A40%3A07.570333%2B00%3A00%2F2026-11-08T11%3A40%3A07.570333%2B00%3A00&limit=700",
+      "url": "https://api.weather.gc.ca/collections/prognos-rdps-realtime/items?f=json&bbox=-114%2C55%2C-110%2C59&variable=WindSpeed&datetime=2026-11-15T07%3A40%3A11.837077%2B00%3A00%2F2026-11-15T11%3A40%3A11.837077%2B00%3A00&limit=700",
       "http_status": 200,
       "content_type": "application/json",
       "cors": "*",
-      "feature_count": 676,
+      "feature_count": 700,
       "sample_fields": [
         "ade_id",
         "forecast_datetime",
