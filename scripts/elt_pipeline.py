@@ -164,7 +164,7 @@ def release_status(previous: dict, *, mode: str, timestamp: str, data_changed: b
                    failed: bool, warnings: list[str], run_url: str | None, manifest: dict) -> dict:
     value = dict(previous or {})
     value["schema_version"] = 1
-    value["policy"] = {"production": "Official reported actuals only", "production_checks": "Daily",
+    value["policy"] = {"production": "Official reported actuals only", "production_checks": "Monthly (28th)",
                        "revision_window_months": 3, "infrastructure_checks": "Weekly",
                        "power_checks": "Every 30 minutes", "publication": "Validated releases only"}
     prior = value.get(mode, {})

@@ -8,19 +8,21 @@ on:
   workflow_call:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     # Serialize site deployments without interrupting a refresh caller.
     concurrency:
       group: github-pages
       cancel-in-progress: false
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -32,7 +34,28 @@ jobs:
           # the published branch, including that newly committed snapshot.
           ref: main
 
+      - name: Identify the exact inputs to site validation
+        id: validation_inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Only these two files are written by the independently validated AESO job.
+          # Hash paths, modes and content IDs of everything else, including validators.
+          fingerprint=$(git ls-files --stage -z -- . \
+            ':(exclude,literal)public/data/aeso_power_status.json' \
+            ':(exclude,literal)data/alerts/state.json' | sha256sum)
+          echo "fingerprint=${fingerprint%% *}" >> "$GITHUB_OUTPUT"
+
+      - name: Check for a previous validation of these inputs
+        id: validation
+        uses: actions/cache/restore@v5
+        with:
+          path: .pages-validation/passed
+          key: pages-validation-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.validation_inputs.outputs.fingerprint }}
+          lookup-only: true
+
       - uses: actions/setup-python@v7
+        if: steps.validation.outputs.cache-hit != 'true'
         with:
           python-version: "3.12"
           cache: pip
@@ -41,24 +64,29 @@ jobs:
             scripts/requirements-aeso.txt
 
       - uses: actions/setup-node@v6
+        if: steps.validation.outputs.cache-hit != 'true'
         with:
           node-version: "24"
 
       - uses: r-lib/actions/setup-r@v2
+        if: steps.validation.outputs.cache-hit != 'true'
         with:
           r-version: "4.5.2"
           use-public-rspm: true
 
       - name: Restore report-reader library
+        if: steps.validation.outputs.cache-hit != 'true'
         uses: actions/cache@v5
         with:
           path: ${{ env.R_LIBS_USER }}
           key: report-reader-${{ runner.os }}-r4.5.2-${{ hashFiles('scripts/install_elt_r.R') }}
 
       - name: Install AER extraction reader
+        if: steps.validation.outputs.cache-hit != 'true'
         run: Rscript scripts/install_elt_r.R
 
       - name: Validate calculations and published data
+        if: steps.validation.outputs.cache-hit != 'true'
         run: |
           python -m pip install -r scripts/requirements-elt.txt
           mkdir -p data/processed
@@ -67,6 +95,15 @@ jobs:
           python -m unittest discover -s scripts -p 'test_*.py'
           python scripts/validate_production_data.py
           python scripts/validate_infrastructure_layers.py
+          mkdir -p .pages-validation
+          touch .pages-validation/passed
+
+      - name: Record successful validation for these exact inputs
+        if: steps.validation.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .pages-validation/passed
+          key: ${{ steps.validation.outputs.cache-primary-key }}
 
       - name: Build the public artifact
         shell: bash
@@ -104,10 +141,47 @@ jobs:
         uses: actions/configure-pages@v6
 
       - name: Upload the protected site
+        id: upload
         uses: actions/upload-pages-artifact@v5
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: _site
+
+      - name: Wait for GitHub to register the uploaded package
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact_id }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ARTIFACT_ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::The Pages upload did not return a valid artifact ID."
+            exit 1
+          fi
+          for delay in 3 6 12; do
+            sleep "$delay"
+            if size=$(timeout 10s gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" --jq '.size_in_bytes') && [[ "$size" =~ ^[1-9][0-9]*$ ]]; then
+              exit 0
+            fi
+          done
+          echo "::warning::GitHub's artifact API did not confirm the upload yet. The Pages action will check its artifact service directly."
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          timeout: 240000
+
+      - name: Wait before retrying Pages
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 15
+
+      - name: Retry deployment with the same package
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          timeout: 240000

@@ -78,6 +78,7 @@ jobs:
     needs: refresh
     if: needs.refresh.outputs.changed == 'true'
     permissions:
+      actions: read
       contents: read
       pages: write
       id-token: write

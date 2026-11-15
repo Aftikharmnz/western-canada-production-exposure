@@ -28,14 +28,16 @@ The public boundary is the data commit followed by the Pages deployment. Interme
 
 | Family | Polling schedule | Discovery and refresh policy |
 | --- | --- | --- |
-| Production | Daily 07:17 UTC | Current/bulk source files and the latest three published monthly reports; no assumed publication based on today's date |
-| Historical production revisions | Sunday 07:17 UTC run | Recheck annual AER files and historical publication revision tokens; download changed files beyond the normal window |
+| Production | 28th of each month, 19:17 UTC (1:17 PM Alberta time) | Current/bulk source files and the latest three published monthly reports; no assumed publication based on today's date |
+| Historical production revisions | Same monthly run | Recheck annual AER files and historical publication revision tokens; download changed files beyond the normal window |
 | AER feeder pipelines and installations | Sunday 08:37 UTC | Import the official SHP/CSV ZIP archives; validate and publish the complete geometry, category, tile, and index family together; any family failure blocks the candidate |
 | Market-access pipelines and railways | Sunday 08:37 UTC | Refresh service geometry and validate the candidate layer; an unavailable upstream refresh preserves its prior layer with a warning |
 | Tariff/refinery source monitoring | Production and infrastructure runs | Detect source publication changes; import the separate EIA annual capacity observations; retain reviewed tariff/operator facts pending review |
 | AESO | Existing 30-minute schedule | Independent snapshot and existing alert behavior |
 
 Scheduled checks are polling, not publisher webhooks. A regulator's own reporting lag still applies. GitHub runs can be delayed or dropped under load, and schedules operate from the default branch. The app's checked-at time and per-source observation periods are therefore separate fields. [GitHub schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+
+The 28th leaves time after [Petrinex reporting deadlines](https://petrinex.ca/) and [North Dakota's monthly production releases](https://www.dmr.nd.gov/dmr/oilgas/directorscut), while also picking up [AER ST53](https://www.aer.ca/data-and-performance-reports/statistical-reports/st53), typically published earlier in the month. [AER ST39](https://www.aer.ca/data-and-performance-reports/statistical-reports/st39) can arrive near or after month-end. B.C., Manitoba and other publisher release dates can vary. Releases that miss the cutoff are picked up at the next monthly run; the manual production refresh remains available when a late publication is needed sooner.
 
 Supported production source groups are `aer`, `petrinex-ab`, `petrinex-sk`, `bcer`, `ndic`, `manitoba`, and `montana`. [Official source discovery](OFFICIAL_SOURCE_DISCOVERY.md) documents report formats and publication indexes; [reference-source automation](REFERENCE_SOURCE_AUTOMATION.md) documents independent EIA observations and review limits. The initial regional normalized history is retained from the audited Git baseline, while AER annual history is replaced with direct official publications. The first live monthly-catalog observation records historical publisher revision tokens without downloading all historical files. Later revision-token changes trigger historical downloads. An observed catalog token is not represented as a raw-byte receipt; files receive SHA-256 receipts only when their bytes are actually fetched or verified. This reduces repeated historical downloads while preserving the adopted, audited Git history.
 

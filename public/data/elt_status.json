@@ -2,7 +2,7 @@
   "schema_version": 1,
   "policy": {
     "production": "Official reported actuals only",
-    "production_checks": "Daily",
+    "production_checks": "Monthly (28th)",
     "revision_window_months": 3,
     "infrastructure_checks": "Weekly",
     "power_checks": "Every 30 minutes",
