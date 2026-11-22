@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-15T08:40:15+00:00",
+  "checked_at": "2026-11-22T08:40:58+00:00",
   "status": "review_required",
   "checks": [
     {
@@ -11,7 +11,7 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "cccb6b02b932c9738aef52fc979e86179a665084e717f9c2a39e36a8d6bb303d",
+      "fingerprint": "4ee7c27d819e8d260ce9fd1d3a3bfa99eef7b2b3b1b926da60df320fc56dab71",
       "document_links": [
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2011/CDMN-RT-12.pdf?rev=d15aaaf1bb6e4a23a4d724391265f9af&hash=636F242B527919716ED6EEFF3A7AA437",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2022/CDMN-CER-497.pdf?rev=5f2631d77d534e6688038ceb4afab595&hash=6D70018208884759856A470565538027",
@@ -36,6 +36,7 @@
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Destination-Verification-Procedure-July-24-2013.pdf?rev=4249da9f21c74fe086a8175a27792b11&hash=5D2287B099C23B8C2629DA0C57B9679F",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-CER-6-FERC-3590.pdf?rev=a665fdddae7f409d8b7062874b6a035e&hash=993FC29AB7A3A2023ADE2FF54E6C1DFD",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-IJT-CER-12-FERC-3600.pdf?rev=0fa5dcca3f2346b593429d0c45f33867&hash=71696F8C0CE3E890C8E1A47E5C3CB6DC",
+        "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/FSP-IJT-CER-15.pdf?rev=407dab82bd754f87a107a763a792262e&hash=A8F7A6DD964E3A5D190456DBC09E571A",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/Supply-Exception-Procedure-July--2--2026.pdf?rev=51ef53b3c7fe47a490bc25715b60c523&hash=82456236872DFC96F14D5A4527D372EE",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/TOL-CER-7-FERC-37240.pdf?rev=d9c0943979c145a9b45f00c0e1d6f83c&hash=7085EC6E2E0FB463AC8F4A43DEA33452",
         "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/TOLEDO-CER-603-FERC-37230.pdf?rev=f18f425859f64d0b852caaf1dfc3b5f3&hash=0F82A28E6D9805663471231B8AC11065",
@@ -128,8 +129,14 @@
       "facts_last_verified": null,
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "c783226f86ca6c6a61839f5ebb1ff4530c049da954f3bd8cd2c8dd8150e61851",
+      "fingerprint": "f5eac9a5af028290be280f2c5990b5518a95659ff3fc6279d6fb1cdef3ee914e",
       "recent_filings": [
+        {
+          "form": "10-Q",
+          "accessionNumber": "0001628280-26-073981",
+          "filingDate": "2026-11-16",
+          "primaryDocument": "skyq-20260930.htm"
+        },
         {
           "form": "8-K",
           "accessionNumber": "0001096906-26-001527",
@@ -303,12 +310,6 @@
           "accessionNumber": "0001096906-25-001254",
           "filingDate": "2025-08-08",
           "primaryDocument": "skyq-20250808_8k.htm"
-        },
-        {
-          "form": "8-K",
-          "accessionNumber": "0001096906-25-001206",
-          "filingDate": "2025-07-30",
-          "primaryDocument": "skyq-20250730.htm"
         }
       ],
       "comparison_basis": "observed_source",
@@ -504,7 +505,7 @@
       "facts_last_verified": "2026-09-10",
       "facts_automatically_updated": false,
       "available": true,
-      "fingerprint": "2aad70d4c981dd711819f032d00e94f0994cddc49126b42989e826295049a39c",
+      "fingerprint": "086fe553df9900ae1da1fc22097c25c7e6ea5f5e06337ea6cb467efac0a30658",
       "comparison_basis": "observed_source",
       "observation_baseline": "b3ed433e53de74a8325c92832e6d3b2e5e79cae03d8b2d6bb7fb35ed7fb7ff84",
       "review_required": true,
@@ -560,7 +561,7 @@
       "id": "eia_refinery_capacity",
       "name": "EIA annual refinery crude capacity",
       "url": "https://www.eia.gov/petroleum/refinerycapacity/index.php",
-      "checked_at": "2026-11-15T08:40:15+00:00",
+      "checked_at": "2026-11-22T08:40:58+00:00",
       "available": true,
       "status": "unchanged",
       "review_required": false,
