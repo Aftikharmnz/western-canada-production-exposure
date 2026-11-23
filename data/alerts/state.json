@@ -3,17 +3,17 @@
   "Suncor Base Plant": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Syncrude Mildred Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Firebag SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Cold Lake (Imperial)": {
    "status": "normal",
@@ -23,7 +23,7 @@
   "Shell Scotford complex": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "CNRL Horizon": {
    "status": "normal",
@@ -33,47 +33,47 @@
   "MacKay River SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Long Lake SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Fort Hills Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Muskeg River Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Christina Lake SAGD (MEG)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Primrose / Wolf Lake": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Christina Lake SAGD (Cenovus)": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Foster Creek SAGD": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 295
+   "runs_above": 296
   },
   "Kearl Mine": {
    "status": "normal",
    "runs_below": 0,
-   "runs_above": 169
+   "runs_above": 170
   },
   "Long Lake Upgrader": {
    "status": "normal",
@@ -93,8 +93,8 @@
  },
  "fires": {},
  "fires_baselined": true,
- "last_check": "2026-11-23 04:12 UTC",
- "power_observation": "2026-11-23T04:11:00+00:00",
+ "last_check": "2026-11-23 04:37 UTC",
+ "power_observation": "2026-11-23T04:37:00+00:00",
  "fire_sources_baselined": [
   "AB",
   "BC"
